@@ -1,0 +1,11 @@
+
+== 2009-11-27 ==
+
+ * Add our taxonomy (via "exportables") to lingwoorg_dictionary
+
+ * Test our custom install profile.
+
+ * Check out:
+
+   http://drupal.org/project/install_profile_api
+
