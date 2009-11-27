@@ -1,0 +1,15 @@
+
+Here we will eventually have something like the following modules:
+
+ * lingwoorg: Small hacks that are specific to lingwoorg and not to any other psuedo generic modules
+
+ * lingwoorg_dictionary: For tying together all the dictionary functionality.
+
+ * lingwoorg_wiki: For tying together all of the wiki functionality
+
+ * lingwoorg_content: For tying together all the content syndication functionality together.
+
+I'm not sure where the annotation, etc stuff should go: lingwoorg_dictionary or lingwoorg_content.  Maybe in both of them??
+
+Anyway, this stuff is intended to allow us to easily setup test servers and deploy to production.
+
