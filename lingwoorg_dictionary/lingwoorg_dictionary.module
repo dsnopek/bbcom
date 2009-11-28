@@ -8,6 +8,11 @@ include_once('lingwoorg_dictionary.features.inc');
 function lingwoorg_dictionary_strongarm() {
   return array(
     'node_options_entry' => array('status', 'revision'),
+
+    // lingwo_dictionary variables
+    'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
+    'lingwo_dictionary_entry_content_type' => 'entry',
+    'lingwo_dictionary_pos_vocabulary' => exportables_machine_load_id('taxonomy_vocabulary', 'pos'),
   );
 }
 
