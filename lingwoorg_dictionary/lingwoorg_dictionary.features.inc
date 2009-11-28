@@ -26,3 +26,12 @@ function lingwoorg_dictionary_node_info() {
   $args = func_get_args();
   return call_user_func_array('_lingwoorg_dictionary_node_info', $args);
 }
+
+/**
+ * Implementation of hook_user_default_permissions().
+ */
+function lingwoorg_dictionary_user_default_permissions() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_user_default_permissions', $args);
+}

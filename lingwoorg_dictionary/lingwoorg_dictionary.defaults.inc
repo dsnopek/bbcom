@@ -122,3 +122,61 @@ function _lingwoorg_dictionary_context_default_contexts() {
   );
   return $items;
 }
+
+/**
+ * Helper to implementation of hook_user_default_permissions().
+ */
+function _lingwoorg_dictionary_user_default_permissions() {
+  $permissions = array();
+
+  // Exported permission: create entry content
+  $permissions[] = array(
+    'name' => 'create entry content',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+      '2' => 'editor',
+      '3' => 'manager',
+    ),
+  );
+
+  // Exported permission: delete any entry content
+  $permissions[] = array(
+    'name' => 'delete any entry content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: delete own entry content
+  $permissions[] = array(
+    'name' => 'delete own entry content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: edit any entry content
+  $permissions[] = array(
+    'name' => 'edit any entry content',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+      '2' => 'editor',
+      '3' => 'manager',
+    ),
+  );
+
+  // Exported permission: edit own entry content
+  $permissions[] = array(
+    'name' => 'edit own entry content',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+      '2' => 'editor',
+      '3' => 'manager',
+    ),
+  );
+
+  return $permissions;
+}
