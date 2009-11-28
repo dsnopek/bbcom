@@ -11,9 +11,6 @@ function lingwoorg_dictionary_strongarm() {
      * 'entry' content type
      */
     'node_options_entry' => array('status', 'revision'),
-    // TODO: What is 2??
-    'language_content_type_entry' => 2,
-    'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
     // put the fields in the correct order
     'content_extra_weights_entry' => array(
       'language' => 0,
@@ -23,6 +20,9 @@ function lingwoorg_dictionary_strongarm() {
       // field_senses => 4
       'menu'     => 5,
     ),
+    // translation settings
+    'language_content_type_entry' => TRANSLATION_ENABLED,
+    'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
 
     // lingwo_dictionary variables
     'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
