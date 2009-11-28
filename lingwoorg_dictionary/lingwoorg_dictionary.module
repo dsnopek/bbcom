@@ -24,6 +24,11 @@ function lingwoorg_dictionary_strongarm() {
     'language_content_type_entry' => TRANSLATION_ENABLED,
     'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
 
+    // part of speech is translatable
+    'i18ntaxonomy_vocabulary' => array(
+      exportables_machine_load_id('taxonomy_vocabulary', 'pos') => I18N_TAXONOMY_LOCALIZE,
+    ),
+
     // lingwo_dictionary variables
     'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
     'lingwo_dictionary_entry_content_type' => 'entry',
