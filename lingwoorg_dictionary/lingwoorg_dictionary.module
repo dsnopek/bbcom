@@ -7,7 +7,22 @@ include_once('lingwoorg_dictionary.features.inc');
  */
 function lingwoorg_dictionary_strongarm() {
   return array(
+    /*
+     * 'entry' content type
+     */
     'node_options_entry' => array('status', 'revision'),
+    // TODO: What is 2??
+    'language_content_type_entry' => 2,
+    'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
+    // put the fields in the correct order
+    'content_extra_weights_entry' => array(
+      'language' => 0,
+      'taxonomy' => 1,
+      'title'    => 2,
+      // field_fields => 3
+      // field_senses => 4
+      'menu'     => 5,
+    ),
 
     // lingwo_dictionary variables
     'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
