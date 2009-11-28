@@ -28,6 +28,33 @@ function lingwoorg_dictionary_node_info() {
 }
 
 /**
+ * Implementation of hook_taxonomy_default_vocabularies().
+ */
+function lingwoorg_dictionary_taxonomy_default_vocabularies() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.taxonomy_vocabulary');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_taxonomy_default_vocabularies', $args);
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwoorg_dictionary_enable() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.taxonomy_vocabulary');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_enable', $args);
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwoorg_dictionary_disable() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.taxonomy_vocabulary');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_disable', $args);
+}
+
+/**
  * Implementation of hook_user_default_permissions().
  */
 function lingwoorg_dictionary_user_default_permissions() {
