@@ -27,15 +27,15 @@ function _lingwoorg_dictionary_taxonomy_default_vocabularies() {
 }
 
 /**
- * Helper to implementation of hook_enable().
+ * Helper to implementation of hook_enable_taxonomy_vocabulary().
  */
-function _lingwoorg_dictionary_enable() {
+function _lingwoorg_dictionary_enable_taxonomy_vocabulary() {
   exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
 }
 
 /**
- * Helper to implementation of hook_disable().
+ * Helper to implementation of hook_disable_taxonomy_vocabulary().
  */
-function _lingwoorg_dictionary_disable() {
+function _lingwoorg_dictionary_disable_taxonomy_vocabulary() {
   exportables_unsync('taxonomy_vocabulary', 'lingwoorg_dictionary');
 }

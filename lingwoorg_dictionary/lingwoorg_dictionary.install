@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwoorg_dictionary_enable() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.inc');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_enable', $args);
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwoorg_dictionary_disable() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.inc');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_disable', $args);
+}

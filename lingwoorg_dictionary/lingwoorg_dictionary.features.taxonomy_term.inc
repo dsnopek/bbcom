@@ -6,7 +6,7 @@
 function _lingwoorg_dictionary_taxonomy_default_terms() {
   $items = array(
   array(
-      'vid' => '3',
+      'vid' => '5',
       'name' => 'Adjective',
       'description' => '',
       'weight' => '0',
@@ -16,7 +16,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'adjective',
     ),
   array(
-      'vid' => '3',
+      'vid' => '5',
       'name' => 'Noun',
       'description' => '',
       'weight' => '0',
@@ -26,7 +26,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'noun',
     ),
   array(
-      'vid' => '3',
+      'vid' => '5',
       'name' => 'Verb',
       'description' => '',
       'weight' => '0',
@@ -40,15 +40,15 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
 }
 
 /**
- * Helper to implementation of hook_enable().
+ * Helper to implementation of hook_enable_taxonomy_term().
  */
-function _lingwoorg_dictionary_enable() {
+function _lingwoorg_dictionary_enable_taxonomy_term() {
   exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
 }
 
 /**
- * Helper to implementation of hook_disable().
+ * Helper to implementation of hook_disable_taxonomy_term().
  */
-function _lingwoorg_dictionary_disable() {
+function _lingwoorg_dictionary_disable_taxonomy_term() {
   exportables_unsync('taxonomy_term', 'lingwoorg_dictionary');
 }
