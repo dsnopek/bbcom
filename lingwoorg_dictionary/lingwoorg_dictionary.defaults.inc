@@ -87,7 +87,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       'label' => 'Senses',
       'weight' => '4',
       'description' => '',
-      'type' => 'lingwo_senses_senses_widget',
+      'type' => 'lingwo_senses_widget',
       'module' => 'lingwo_senses',
     ),
   );
