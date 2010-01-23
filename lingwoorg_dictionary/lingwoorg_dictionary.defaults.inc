@@ -5,16 +5,16 @@
  */
 function _lingwoorg_dictionary_content_default_fields() {
   $fields = array();
+  $fields['groups'] = array();
 
   // Exported field: field_fields
   $fields[] = array(
     'field_name' => 'field_fields',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '-1',
-      'parent' => '',
       'label' => array(
-        'format' => 'hidden',
+        'format' => 'above',
+        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -25,6 +25,14 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -41,10 +49,68 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Fields',
-      'weight' => '3',
+      'weight' => '4',
       'description' => '',
       'type' => 'lingwo_fields_widget',
       'module' => 'lingwo_fields',
+    ),
+  );
+
+  // Exported field: field_license
+  $fields[] = array(
+    'field_name' => 'field_license',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_license][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'License',
+      'weight' => '34',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
     ),
   );
 
@@ -85,17 +151,378 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Senses',
-      'weight' => '4',
+      'weight' => '5',
       'description' => '',
       'type' => 'lingwo_senses_widget',
       'module' => 'lingwo_senses',
     ),
   );
 
+  // Exported field: field_source_copyright
+  $fields[] = array(
+    'field_name' => 'field_source_copyright',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_copyright][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Copyright',
+      'weight' => '33',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_source_name
+  $fields[] = array(
+    'field_name' => 'field_source_name',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_name][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Source Name',
+      'weight' => '31',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_source_raw
+  $fields[] = array(
+    'field_name' => 'field_source_raw',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => '5',
+      'size' => 60,
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_raw][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Raw Data',
+      'weight' => '35',
+      'description' => '',
+      'type' => 'text_textarea',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_source_url
+  $fields[] = array(
+    'field_name' => 'field_source_url',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_url][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Source URL',
+      'weight' => '32',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_timestamp
+  $fields[] = array(
+    'field_name' => 'field_timestamp',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_timestamp][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Timestamp',
+      'weight' => '36',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported fieldset: group_sources
+  $fields['groups'][] = array(
+    'group_type' => 'multigroup',
+    'type_name' => 'entry',
+    'group_name' => 'group_sources',
+    'label' => 'Sources',
+    'settings' => array(
+      'form' => array(
+        'style' => 'fieldset_collapsed',
+        'description' => '',
+      ),
+      'display' => array(
+        'description' => '',
+        'teaser' => array(
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        'full' => array(
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        '4' => array(
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        '2' => array(
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        '3' => array(
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        'label' => NULL,
+      ),
+      'multigroup' => array(
+        'multiple-columns' => 0,
+        'required' => 0,
+        'multiple' => '1',
+        'labels' => array(
+          '0' => '',
+          '1' => '',
+          '2' => '',
+          '3' => '',
+          '4' => '',
+          '5' => '',
+          '6' => '',
+          '7' => '',
+          '8' => '',
+          '9' => '',
+        ),
+      ),
+    ),
+    'weight' => '6',
+    'fields' => array(
+      '0' => 'field_source_name',
+      '1' => 'field_source_url',
+      '2' => 'field_source_copyright',
+      '3' => 'field_license',
+      '4' => 'field_source_raw',
+      '5' => 'field_timestamp',
+    ),
+  );
+
   // Translatables
   array(
+    t('Copyright'),
     t('Fields'),
+    t('License'),
+    t('Raw Data'),
     t('Senses'),
+    t('Source Name'),
+    t('Source URL'),
+    t('Sources'),
+    t('Timestamp'),
   );
 
   return $fields;

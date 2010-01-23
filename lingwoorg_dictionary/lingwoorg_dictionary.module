@@ -16,9 +16,9 @@ function lingwoorg_dictionary_strongarm() {
       'language' => 0,
       'taxonomy' => 1,
       'title'    => 2,
-      // field_fields => 3
-      // field_senses => 4
-      'menu'     => 5,
+      'menu'     => 3,
+      // field_fields => 4
+      // field_senses => 5
     ),
     // translation settings
     'language_content_type_entry' => TRANSLATION_ENABLED,
