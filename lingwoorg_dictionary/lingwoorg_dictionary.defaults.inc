@@ -12,13 +12,14 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_fields',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '4',
+      'parent' => '',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       'full' => array(
         'format' => 'default',
@@ -61,9 +62,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_license',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '34',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -119,10 +121,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_senses',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => 0,
+      'weight' => '5',
       'parent' => '',
       'label' => array(
-        'format' => 'above',
+        'format' => 'hidden',
       ),
       'teaser' => array(
         'format' => 'default',
@@ -163,9 +165,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_copyright',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '33',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -221,9 +224,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_name',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '31',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -279,9 +283,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_raw',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '35',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -337,9 +342,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_url',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '32',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -395,9 +401,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_timestamp',
     'type_name' => 'entry',
     'display_settings' => array(
+      'weight' => '36',
+      'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
@@ -460,15 +467,17 @@ function _lingwoorg_dictionary_content_default_fields() {
         'description' => '',
       ),
       'display' => array(
-        'description' => '',
+        'weight' => '6',
+        'label' => 'above',
         'teaser' => array(
           'format' => 'fieldset',
-          'exclude' => 0,
+          'exclude' => 1,
         ),
         'full' => array(
-          'format' => 'fieldset',
+          'format' => 'fieldset_collapsed',
           'exclude' => 0,
         ),
+        'description' => '',
         '4' => array(
           'format' => 'fieldset',
           'exclude' => 0,
@@ -481,7 +490,6 @@ function _lingwoorg_dictionary_content_default_fields() {
           'format' => 'fieldset',
           'exclude' => 0,
         ),
-        'label' => NULL,
       ),
       'multigroup' => array(
         'multiple-columns' => 0,
@@ -498,6 +506,18 @@ function _lingwoorg_dictionary_content_default_fields() {
           '7' => '',
           '8' => '',
           '9' => '',
+        ),
+        'subgroup' => array(
+          'weight' => -20,
+          'label' => 'above',
+          'teaser' => array(
+            'format' => 'fieldset',
+            'exclude' => 0,
+          ),
+          'full' => array(
+            'format' => 'fieldset',
+            'exclude' => 0,
+          ),
         ),
       ),
     ),
