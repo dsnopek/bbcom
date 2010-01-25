@@ -12,10 +12,10 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_fields',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '4',
+      'weight' => '5',
       'parent' => '',
       'label' => array(
-        'format' => 'above',
+        'format' => 'hidden',
       ),
       'teaser' => array(
         'format' => 'default',
@@ -50,7 +50,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Fields',
-      'weight' => '4',
+      'weight' => '5',
       'description' => '',
       'type' => 'lingwo_fields_widget',
       'module' => 'lingwo_fields',
@@ -121,7 +121,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_senses',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '5',
+      'weight' => '4',
       'parent' => '',
       'label' => array(
         'format' => 'hidden',
@@ -153,7 +153,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Senses',
-      'weight' => '5',
+      'weight' => '4',
       'description' => '',
       'type' => 'lingwo_senses_widget',
       'module' => 'lingwo_senses',
@@ -293,7 +293,7 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       'full' => array(
-        'format' => 'default',
+        'format' => 'text_pre',
         'exclude' => 0,
       ),
       '4' => array(
@@ -352,7 +352,7 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       'full' => array(
-        'format' => 'default',
+        'format' => 'text_link',
         'exclude' => 0,
       ),
       '4' => array(
