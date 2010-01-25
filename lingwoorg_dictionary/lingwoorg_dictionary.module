@@ -91,7 +91,7 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     }
 
     $node->content['entry_summary'] = array(
-      '#weight' => -50,
+      '#weight' => -1,
       '#value'  => theme(array(
         'lingwoorg_dictionary_entry_summary_'. $language .'_'. $pos,
         'lingwoorg_dictionary_entry_summary_'. $language,
