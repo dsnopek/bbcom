@@ -23,6 +23,7 @@ function lingwoorg_dictionary_strongarm() {
     // translation settings
     'language_content_type_entry' => TRANSLATION_ENABLED,
     'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
+    'i18n_hide_translation_links' => 1,
 
     // part of speech is translatable
     'i18ntaxonomy_vocabulary' => array(
@@ -75,6 +76,27 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         'lingwoorg_dictionary_entry_summary_'. $language,
         'lingwoorg_dictionary_entry_summary'
       ), $node, $a3, $a4)
+    );
+  }
+}
+
+/**
+ * Implementation of hook_link().
+ *
+ * Adds a link to an entries source entry.
+ *
+ */
+function lingwoorg_dictionary_link($type, $node, $teaser=FALSE) {
+  if ($type == 'node' && $node->type == lingwo_dictionary_settings('entry_content_type') &&
+      ($source_node = lingwo_dictionary_entry_load_translation_source($node))) {
+    
+    $languages = language_list();
+    $language_name = $languages[$source_node->language]->name;
+    return array(
+      array(
+        'title' => t('Source entry in @lang', array('@lang' => $language_name)),
+        'href'  => lingwo_dictionary_entry_path($source_node),
+      )
     );
   }
 }
