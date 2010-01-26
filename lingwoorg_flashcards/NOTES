@@ -1,0 +1,22 @@
+
+In the future this module will provide:
+
+ * Creating an anki deck node for all users WIAL list (once anki deck nodes exist)
+
+ * The ability for users to share decks with other users (ie. find other decks and copy them
+   to their own)
+ 
+ * The tracking which 'Lingwo IDs' are present in each deck (for giving users suggestions for
+   a particular deck, ie: "The 'Household Items' deck from _MasterSpanglish_ has 24 items from
+   your WIAL list.  Buy now for $4.95!"
+ 
+ * Integrating with ubercart to provide the afore-aluded-to purchasing of other users decks.
+
+Right now (2010-01-26), what it does is:
+
+ * Add/remove facts to a user's deck when entries are added/removed from a users WIAL list.
+   (It will continue to do this in the future).
+
+ * Provide some stand-in pages to allow users to access their WIAL flashcards and (maybe) quiz
+   them.  (This will only be here until anki decks are actual nodes)
+

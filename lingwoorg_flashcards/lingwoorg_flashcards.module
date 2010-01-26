@@ -1,0 +1,114 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Integrate Anki flashcards into Lingwo.org
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+/*
+function lingwoorg_flashcards_menu() {
+  $items = array();
+
+  return $items;
+}
+*/
+
+function _lingwoorg_flashcards_open_wial_deck($anki, $deck_path) {
+
+  try {
+    $deck = $anki->request('open_deck', array('path' => $deck_path));
+  }
+  catch (AnkiServerException $e) {
+    try {
+      $deck = $anki->request('create_deck', array('path' => $deck_path));
+    }
+    catch (AnkiServerException $e) {
+      return NULL;
+    }
+  }
+
+  return $deck;
+}
+
+function _lingwoorg_flashcards_node_to_fact_fields($node) {
+  $node = node_build_content($node, FALSE, TRUE);
+
+  $allowed_tags = array('em','strong','ul','ol','li');
+
+  $front .= implode(' => ', lingwo_dictionary_entry_get_languages($node, TRUE)) ."\n";
+  $front .= $node->title ." (". lingwo_dictionary_entry_get_pos($node) .")\n";
+  $front .= filter_xss(drupal_render($node->content['entry_summary']), $allowed_tags);
+
+  $back = trim(filter_xss(drupal_render($node->content['field_senses']), $allowed_tags));
+
+  $fields = array(
+    'Front' => $front,
+    'Back'  => $back,
+    'Lingwo ID' => lingwo_dictionary_entry_get_id($node),
+  );
+  return $fields;
+}
+
+/**
+ * Implementation of hook_lingwo_wial().
+ */
+function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
+  $node = node_load($nid);
+
+  // connect to AnkiServer
+  $anki = anki_server_connect();
+
+  // first we need to get a users deck
+  $deck_path = 'wial-'. $uid .'.anki';
+  if (!$deck = _lingwoorg_flashcards_open_wial_deck($anki, $deck_path)) {
+    // TODO: this should really be the same message as the later, but for now...
+    drupal_set_message(t('Unable to load your "Words I Am Learning" deck.'), 'error');
+    return;
+  }
+
+  switch ($op) {
+    case 'add':
+      try {
+        $anki->request('add_fact', array(
+          'deck_id' => $deck->id,
+          'fields' => _lingwoorg_flashcards_node_to_fact_fields($node),
+        ));
+      }
+      catch (AnkiServerException $e) {
+        drupal_set_message(t('Unable to add flashcard to your "Words I am Learning" deck.'), 'error');
+        return;
+      }
+
+      drupal_set_message(t('Added flashcard to your "Words I am Learning" deck.'));
+      break;
+    
+    case 'remove':
+      try {
+        $fact = $anki->request('find_fact', array(
+          'deck_id' => $deck->id,
+          'lingwo_id' => lingwo_dictionary_entry_get_id($node),
+        ));
+        if (empty($fact)) {
+          // nothing to do if no such card exsists!
+          return;
+        }
+
+        $anki->request('delete_fact', array(
+          'deck_id' => $deck->id,
+          'fact_id' => $fact->id,
+        ));
+      }
+      catch (AnkiServerException $e) {
+        drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+        return;
+      }
+
+      drupal_set_message(t('Flashcard removed from your "Words I am Learning" deck.'));
+      break;
+  }
+}
+

@@ -1,0 +1,7 @@
+; $Id$
+name = Lingwo.org Flashcards
+description = Integrate Anki flashcards into the Lingwo.org
+package = Lingwo.org
+core = 6.x
+dependencies[] = lingwoorg_dictionary
+
