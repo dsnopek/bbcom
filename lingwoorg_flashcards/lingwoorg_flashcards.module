@@ -6,18 +6,89 @@
  * Integrate Anki flashcards into Lingwo.org
  */
 
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwoorg_flashcards_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  if ($node->type != anki_deck_content_type())
+    return;
+
+  if ($op == 'delete') {
+    db_query('DELETE FROM {lingwoorg_flashcards_wial} WHERE nid = %d', $node->nid);
+  }
+}
+
+// TODO: clean this up!
+// This function is long, ugly and 12 kinds of hackity, but it works!!
+function _lingwoorg_flashcards_get_wial_deck($uid) {
+  // TODO: attempt to get or to create the users WIAL deck
+  $wial_deck = db_fetch_object(db_query("SELECT nid FROM lingwoorg_flashcards_wial WHERE uid = %d", $uid));
+  if ($wial_deck) {
+    return node_load($wial_deck->nid);
+  }
+
+  # TODO: we will need to create this directory if it doesn't exist!
+  $deck_path = "anki/$uid/wial.anki";
+
+  $anki = anki_server_connect();
+  // create the deck
+  $anki->request('create_deck', array('path' => $deck_path));
+
+  // add the file to drupal's file system
+  $full_deck_path = file_directory_path() .'/'. $deck_path;
+  $file = (object)array(
+    'uid' => $uid,
+    'filename' => 'wial.anki',
+    'filepath' => $full_deck_path,
+    'filemime' => 'application/octet-stream',
+    'filesize' => filesize($full_deck_path),
+    'status' => 1,
+    'timestamp' => time(),
+    'origname' => 'wial.anki',
+  );
+  drupal_write_record('files', $file);
+
+  // add some other fields that filefield uses
+  // TODO: is this necessary?
+  $file->list = 1;
+  $file->data = array('description' => NULL);
+
+  // attempt to save the node
+  $field_anki_deck = anki_deck_content_field();
+  $node = (object)array(
+    'uid' => $uid,
+    'type' => anki_deck_content_type(),
+    'title' => t('"Words I am Learning" deck'),
+    'body' => t('All the words on your "Words I am Learning" list will be automatically added to this flashcard deck!'),
+    $field_anki_deck => array(0 => (array)$file),
+  );
+  node_save($node);
+
+  $wial_deck = (object)array(
+    'uid' => $uid,
+    'nid' => $node->nid,
+  );
+  drupal_write_record('lingwoorg_flashcards_wial', $wial_deck);
+
+  // TODO: should we node_load() this or does it not matter?
+  return $node;
+}
+
 function _lingwoorg_flashcards_open_wial_deck($anki, $deck_path) {
 
   try {
     $deck = $anki->request('open_deck', array('path' => $deck_path));
   }
   catch (AnkiServerException $e) {
+    /*
     try {
       $deck = $anki->request('create_deck', array('path' => $deck_path));
     }
     catch (AnkiServerException $e) {
       return NULL;
     }
+    */
+    return NULL;
   }
 
   return $deck;
@@ -42,21 +113,26 @@ function _lingwoorg_flashcards_node_to_fact_fields($node) {
   return $fields;
 }
 
-function _lingwoorg_flashcards_get_wial_deck($uid) {
-  // TODO: attempt to get or to create the users WIAL deck
-}
-
 /**
  * Implementation of hook_lingwo_wial().
  */
 function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
+  // TODO: the next four lines are mud!!
+  $deck_node = _lingwoorg_flashcards_get_wial_deck($uid);
+  //$field_anki_deck = anki_deck_content_field();
+  //$field_anki_deck = $deck_node->$field_anki_deck;
+  //$deck_path = $field_anki_deck[0]['filepath'];
+  // TODO: since the path to the WIAL deck is standardized, I don't see why we couldn't
+  // just use its name directly.  The problem is really only creating the file and node
+  // if the user doesn't already have them.
+  $deck_path = "anki/$uid/wial.anki";
+
   $node = node_load($nid);
 
   // connect to AnkiServer
   $anki = anki_server_connect();
 
   // first we need to get a users deck
-  $deck_path = 'wial-'. $uid .'.anki';
   if (!$deck = _lingwoorg_flashcards_open_wial_deck($anki, $deck_path)) {
     // TODO: this should really be the same message as the later, but for now...
     drupal_set_message(t('Unable to load your "Words I Am Learning" deck.'), 'error');
@@ -103,5 +179,11 @@ function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
       drupal_set_message(t('Flashcard removed from your "Words I am Learning" deck.'));
       break;
   }
+
+  // after any updates to the file, we need to adjust the file size on the files table
+  // TODO: copy-and-paste coding alert!  Refactor!
+  $full_deck_path = file_directory_path() .'/'. $deck_path;
+  db_query('UPDATE {files} SET filesize = %d WHERE fid = %d',
+    filesize($full_deck_path), $deck_node->field_anki_deck[0]['fid']);
 }
 
