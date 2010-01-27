@@ -18,6 +18,26 @@ function lingwoorg_flashcards_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   }
 }
 
+/*
+ * Implementation of hook_field_access().
+ */
+function lingwoorg_flashcards_field_access($op, $field, $account, $node=NULL) {
+  global $user;
+
+  if ($field['field_name'] == anki_deck_content_field() && !is_null($node)) {
+    if (!$account) {
+      $account = $user;
+    }
+
+    // Only he owner of this deck should be able to access the deck file
+    if ($account->uid != $node->uid) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
 // TODO: clean this up!
 // This function is long, ugly and 12 kinds of hackity, but it works!!
 function _lingwoorg_flashcards_get_wial_deck($uid) {
