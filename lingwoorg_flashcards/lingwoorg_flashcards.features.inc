@@ -19,15 +19,10 @@ function lingwoorg_flashcards_node_info() {
 }
 
 /**
- * Helper to implementation of hook_enable().
+ * Implementation of hook_views_default_views().
  */
-function _lingwoorg_flashcards_enable() {
-
-}
-
-/**
- * Helper to implementation of hook_disable().
- */
-function _lingwoorg_flashcards_disable() {
-
+function lingwoorg_flashcards_views_default_views() {
+  module_load_include('inc', 'lingwoorg_flashcards', 'lingwoorg_flashcards.features.views');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_flashcards_views_default_views', $args);
 }
