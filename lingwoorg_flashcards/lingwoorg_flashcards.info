@@ -4,4 +4,9 @@ description = Integrate Anki flashcards into the Lingwo.org
 package = Lingwo.org
 core = 6.x
 dependencies[] = lingwoorg_dictionary
+dependencies[] = filefield
+dependencies[] = filefield_paths
+features[node][] = "entry"
+dependencies[] = "features"
+project = "lingwoorg_flashcards"
 
