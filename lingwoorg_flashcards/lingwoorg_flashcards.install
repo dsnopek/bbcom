@@ -1,0 +1,86 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ * Install file for lingwoorg_flashcards.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function lingwoorg_flashcards_schema() {
+  $schema['lingwoorg_flashcards_wial'] = array(
+    'description' => 'Used to keep track of each User\'s WIAL deck.',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'The primary identifier for user.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'User ID.',
+      ),
+      'nid' => array(
+        'description' => 'The primary identifier for the entry node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('uid', 'nid'),
+    'indexes' => array(
+      'nid' => array('nid'),
+    )
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwoorg_flashcards_enable() {
+  # setup our filefield_paths settings
+  $data = (object)array(
+    'type' => 'deck',
+    'field' => 'field_anki_deck',
+    'filename' => array(
+      'value' => '[title].anki',
+      'tolower' => 1,
+      'pathauto' => 0,
+      'transliterate' => 0
+    ),
+    'filepath' => array(
+      'value' => 'anki/[user-id]',
+      'tolower' => 0,
+      'pathauto' => 0,
+      'transliterate' => 0
+    )
+  );
+
+  drupal_write_record('filefield_paths', $data);
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwoorg_flashcards_disable() {
+  db_query("DELETE FROM {filefield_paths} WHERE type = 'deck'");
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwoorg_flashcards_install() {
+  variable_set('lingwoorg_flashcards_schema_version', 6000);
+  drupal_install_schema('lingwoorg_flashcards');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwoorg_flashcards_uninstall() {
+  drupal_uninstall_schema('lingwoorg_flashcards');
+  variable_del('lingwoorg_flashcards_schema_version');
+}
+

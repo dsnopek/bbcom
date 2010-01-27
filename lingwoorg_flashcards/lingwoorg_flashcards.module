@@ -6,17 +6,6 @@
  * Integrate Anki flashcards into Lingwo.org
  */
 
-/**
- * Implementation of hook_menu().
- */
-/*
-function lingwoorg_flashcards_menu() {
-  $items = array();
-
-  return $items;
-}
-*/
-
 function _lingwoorg_flashcards_open_wial_deck($anki, $deck_path) {
 
   try {
@@ -51,6 +40,10 @@ function _lingwoorg_flashcards_node_to_fact_fields($node) {
     'Lingwo ID' => lingwo_dictionary_entry_get_id($node),
   );
   return $fields;
+}
+
+function _lingwoorg_flashcards_get_wial_deck($uid) {
+  // TODO: attempt to get or to create the users WIAL deck
 }
 
 /**
@@ -110,23 +103,5 @@ function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
       drupal_set_message(t('Flashcard removed from your "Words I am Learning" deck.'));
       break;
   }
-}
-
-// TODO: This really belongs in *.install!!  Right now (with my features hacks) I don't feel
-// safe putting it there, so it will live here for now.
-function lingwoorg_flashcards_enable() {
-  # setup our filefield_paths settings
-  $data = (object)array(
-    'type' => 'deck',
-    'field' => 'field_anki_deck',
-    'filename' => 'a:4:{s:5:"value";s:12:"[title].anki";s:7:"tolower";i:1;s:8:"pathauto";i:0;s:13:"transliterate";i:0;}',
-    'filepath' => 'a:4:{s:5:"value";s:14:"anki/[user-id]";s:7:"tolower";i:0;s:8:"pathauto";i:0;s:13:"transliterate";i:0;}',
-  );
-
-  drupal_write_record('filefield_paths', $data);
-}
-
-function lingwoorg_flashcards_disable() {
-  db_query("DELETE FROM {filefield_paths} WHERE type = 'deck'");
 }
 
