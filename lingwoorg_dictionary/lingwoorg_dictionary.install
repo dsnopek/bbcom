@@ -16,7 +16,7 @@ function lingwoorg_dictionary_enable() {
 function lingwoorg_dictionary_disable() {
   drupal_load('module', 'exportables');
 
-  exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
-  exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
+  exportables_unsync('taxonomy_term', 'lingwoorg_dictionary');
+  exportables_unsync('taxonomy_vocabulary', 'lingwoorg_dictionary');
 }
 
