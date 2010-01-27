@@ -25,17 +25,3 @@ function _lingwoorg_dictionary_taxonomy_default_vocabularies() {
   );
   return $items;
 }
-
-/**
- * Helper to implementation of hook_enable_taxonomy_vocabulary().
- */
-function _lingwoorg_dictionary_enable_taxonomy_vocabulary() {
-  exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
-}
-
-/**
- * Helper to implementation of hook_disable_taxonomy_vocabulary().
- */
-function _lingwoorg_dictionary_disable_taxonomy_vocabulary() {
-  exportables_unsync('taxonomy_vocabulary', 'lingwoorg_dictionary');
-}

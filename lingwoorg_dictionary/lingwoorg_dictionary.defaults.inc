@@ -5,7 +5,6 @@
  */
 function _lingwoorg_dictionary_content_default_fields() {
   $fields = array();
-  $fields['groups'] = array();
 
   // Exported field: field_fields
   $fields[] = array(
@@ -455,83 +454,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     ),
   );
 
-  // Exported fieldset: group_sources
-  $fields['groups'][] = array(
-    'group_type' => 'multigroup',
-    'type_name' => 'entry',
-    'group_name' => 'group_sources',
-    'label' => 'Sources',
-    'settings' => array(
-      'form' => array(
-        'style' => 'fieldset_collapsed',
-        'description' => '',
-      ),
-      'display' => array(
-        'weight' => '6',
-        'label' => 'above',
-        'teaser' => array(
-          'format' => 'fieldset',
-          'exclude' => 1,
-        ),
-        'full' => array(
-          'format' => 'fieldset_collapsed',
-          'exclude' => 0,
-        ),
-        'description' => '',
-        '4' => array(
-          'format' => 'fieldset',
-          'exclude' => 0,
-        ),
-        '2' => array(
-          'format' => 'fieldset',
-          'exclude' => 0,
-        ),
-        '3' => array(
-          'format' => 'fieldset',
-          'exclude' => 0,
-        ),
-      ),
-      'multigroup' => array(
-        'multiple-columns' => 0,
-        'required' => 0,
-        'multiple' => '1',
-        'labels' => array(
-          '0' => '',
-          '1' => '',
-          '2' => '',
-          '3' => '',
-          '4' => '',
-          '5' => '',
-          '6' => '',
-          '7' => '',
-          '8' => '',
-          '9' => '',
-        ),
-        'subgroup' => array(
-          'weight' => -20,
-          'label' => 'above',
-          'teaser' => array(
-            'format' => 'fieldset',
-            'exclude' => 0,
-          ),
-          'full' => array(
-            'format' => 'fieldset',
-            'exclude' => 0,
-          ),
-        ),
-      ),
-    ),
-    'weight' => '6',
-    'fields' => array(
-      '0' => 'field_source_name',
-      '1' => 'field_source_url',
-      '2' => 'field_source_copyright',
-      '3' => 'field_license',
-      '4' => 'field_source_raw',
-      '5' => 'field_timestamp',
-    ),
-  );
-
   // Translatables
   array(
     t('Copyright'),
@@ -541,7 +463,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     t('Senses'),
     t('Source Name'),
     t('Source URL'),
-    t('Sources'),
     t('Timestamp'),
   );
 

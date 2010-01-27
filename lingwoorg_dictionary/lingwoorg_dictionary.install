@@ -4,16 +4,19 @@
  * Implementation of hook_enable().
  */
 function lingwoorg_dictionary_enable() {
-  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.inc');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_dictionary_enable', $args);
+  drupal_load('module', 'exportables');
+
+  exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
+  exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
 }
 
 /**
  * Implementation of hook_disable().
  */
 function lingwoorg_dictionary_disable() {
-  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.inc');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_dictionary_disable', $args);
+  drupal_load('module', 'exportables');
+
+  exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
+  exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
 }
+

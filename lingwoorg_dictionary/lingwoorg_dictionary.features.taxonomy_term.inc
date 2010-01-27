@@ -168,17 +168,3 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
   );
   return $items;
 }
-
-/**
- * Helper to implementation of hook_enable_taxonomy_term().
- */
-function _lingwoorg_dictionary_enable_taxonomy_term() {
-  exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
-}
-
-/**
- * Helper to implementation of hook_disable_taxonomy_term().
- */
-function _lingwoorg_dictionary_disable_taxonomy_term() {
-  exportables_unsync('taxonomy_term', 'lingwoorg_dictionary');
-}
