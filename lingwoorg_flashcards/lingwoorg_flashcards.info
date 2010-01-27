@@ -1,12 +1,11 @@
-; $Id$
-name = Lingwo.org Flashcards
-description = Integrate Anki flashcards into the Lingwo.org
-package = Lingwo.org
-core = 6.x
-dependencies[] = lingwoorg_dictionary
-dependencies[] = filefield
-dependencies[] = filefield_paths
-features[node][] = "entry"
+core = "6.x"
+dependencies[] = "lingwoorg_dictionary"
+dependencies[] = "filefield"
+dependencies[] = "filefield_paths"
 dependencies[] = "features"
+description = "Integrate Anki flashcards into the Lingwo.org"
+features[content][] = "deck-field_anki_deck"
+features[node][] = "deck"
+name = "Lingwo.org Flashcards"
+package = "Lingwo.org"
 project = "lingwoorg_flashcards"
-
