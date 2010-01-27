@@ -29,8 +29,16 @@ function lingwoorg_flashcards_field_access($op, $field, $account, $node=NULL) {
       $account = $user;
     }
 
+    $node_uid = $node->uid;
+    // HACK: for when this is being pulled in from 'views'!
+    // TODO: there really should be a way to add the nodes uid to the view..  Either
+    // that or just say you're going to load each node..
+    if (!$node_uid && $node->users_uid) {
+      $node_uid = $node->users_uid;
+    }
+
     // Only he owner of this deck should be able to access the deck file
-    if ($account->uid != $node->uid) {
+    if ($account->uid != $node_uid) {
       return FALSE;
     }
   }
