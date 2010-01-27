@@ -112,3 +112,21 @@ function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
   }
 }
 
+// TODO: This really belongs in *.install!!  Right now (with my features hacks) I don't feel
+// safe putting it there, so it will live here for now.
+function lingwoorg_flashcards_enable() {
+  # setup our filefield_paths settings
+  $data = (object)array(
+    'type' => 'deck',
+    'field' => 'field_anki_deck',
+    'filename' => 'a:4:{s:5:"value";s:12:"[title].anki";s:7:"tolower";i:1;s:8:"pathauto";i:0;s:13:"transliterate";i:0;}',
+    'filepath' => 'a:4:{s:5:"value";s:14:"anki/[user-id]";s:7:"tolower";i:0;s:8:"pathauto";i:0;s:13:"transliterate";i:0;}',
+  );
+
+  drupal_write_record('filefield_paths', $data);
+}
+
+function lingwoorg_flashcards_disable() {
+  db_query("DELETE FROM {filefield_paths} WHERE type = 'deck'");
+}
+
