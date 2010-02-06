@@ -56,65 +56,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     ),
   );
 
-  // Exported field: field_license
-  $fields[] = array(
-    'field_name' => 'field_license',
-    'type_name' => 'entry',
-    'display_settings' => array(
-      'weight' => '34',
-      'parent' => 'group_sources',
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'text',
-    'required' => '0',
-    'multiple' => '1',
-    'module' => 'text',
-    'active' => '1',
-    'text_processing' => '0',
-    'max_length' => '',
-    'allowed_values' => '',
-    'allowed_values_php' => '',
-    'widget' => array(
-      'rows' => 5,
-      'size' => '60',
-      'default_value' => array(
-        '0' => array(
-          'value' => '',
-          '_error_element' => 'default_value_widget][field_license][0][value',
-        ),
-      ),
-      'default_value_php' => NULL,
-      'label' => 'License',
-      'weight' => '34',
-      'description' => '',
-      'type' => 'text_textfield',
-      'module' => 'text',
-    ),
-  );
-
   // Exported field: field_senses
   $fields[] = array(
     'field_name' => 'field_senses',
@@ -164,7 +105,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_copyright',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '33',
+      'weight' => '13',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -186,6 +127,10 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -211,19 +156,19 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Copyright',
-      'weight' => '33',
+      'weight' => '13',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
     ),
   );
 
-  // Exported field: field_source_name
+  // Exported field: field_source_license
   $fields[] = array(
-    'field_name' => 'field_source_name',
+    'field_name' => 'field_source_license',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '31',
+      'weight' => '14',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -245,6 +190,73 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_license][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'License',
+      'weight' => '14',
+      'description' => '',
+      'type' => 'text_textfield',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_source_name
+  $fields[] = array(
+    'field_name' => 'field_source_name',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'weight' => '11',
+      'parent' => 'group_sources',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -270,7 +282,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Source Name',
-      'weight' => '31',
+      'weight' => '11',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -282,7 +294,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_raw',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '35',
+      'weight' => '15',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -304,6 +316,10 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -329,9 +345,72 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Raw Data',
-      'weight' => '35',
+      'weight' => '15',
       'description' => '',
       'type' => 'text_textarea',
+      'module' => 'text',
+    ),
+  );
+
+  // Exported field: field_source_timestamp
+  $fields[] = array(
+    'field_name' => 'field_source_timestamp',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'weight' => '16',
+      'parent' => 'group_sources',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => '',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'rows' => 5,
+      'size' => '60',
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+          '_error_element' => 'default_value_widget][field_source_timestamp][0][value',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Timestamp',
+      'weight' => '16',
+      'description' => '',
+      'type' => 'text_textfield',
       'module' => 'text',
     ),
   );
@@ -341,7 +420,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_url',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '32',
+      'weight' => '12',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -363,6 +442,10 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -388,66 +471,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Source URL',
-      'weight' => '32',
-      'description' => '',
-      'type' => 'text_textfield',
-      'module' => 'text',
-    ),
-  );
-
-  // Exported field: field_timestamp
-  $fields[] = array(
-    'field_name' => 'field_timestamp',
-    'type_name' => 'entry',
-    'display_settings' => array(
-      'weight' => '36',
-      'parent' => 'group_sources',
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'text',
-    'required' => '0',
-    'multiple' => '1',
-    'module' => 'text',
-    'active' => '1',
-    'text_processing' => '0',
-    'max_length' => '',
-    'allowed_values' => '',
-    'allowed_values_php' => '',
-    'widget' => array(
-      'rows' => 5,
-      'size' => '60',
-      'default_value' => array(
-        '0' => array(
-          'value' => '',
-          '_error_element' => 'default_value_widget][field_timestamp][0][value',
-        ),
-      ),
-      'default_value_php' => NULL,
-      'label' => 'Timestamp',
-      'weight' => '36',
+      'weight' => '12',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',

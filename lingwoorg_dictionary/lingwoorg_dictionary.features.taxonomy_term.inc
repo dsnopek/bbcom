@@ -6,7 +6,7 @@
 function _lingwoorg_dictionary_taxonomy_default_terms() {
   $items = array(
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Abbreviation',
       'description' => '',
       'weight' => '0',
@@ -16,7 +16,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'abbreviation',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Adjective',
       'description' => '',
       'weight' => '0',
@@ -26,7 +26,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'adjective',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Adverb',
       'description' => '',
       'weight' => '0',
@@ -36,7 +36,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'adverb',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Conjunction',
       'description' => '',
       'weight' => '0',
@@ -46,7 +46,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'conjunction',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Exclamation',
       'description' => '',
       'weight' => '0',
@@ -56,7 +56,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'exclamation',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Noun',
       'description' => '',
       'weight' => '0',
@@ -66,7 +66,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'noun',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Onomatopoeia',
       'description' => '',
       'weight' => '0',
@@ -76,7 +76,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'onomatopoeia',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Particle',
       'description' => '',
       'weight' => '0',
@@ -86,7 +86,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'particle',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Phrase',
       'description' => '',
       'weight' => '0',
@@ -96,7 +96,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'phrase',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Prefix',
       'description' => '',
       'weight' => '0',
@@ -106,7 +106,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'prefix',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Preposition',
       'description' => '',
       'weight' => '0',
@@ -116,7 +116,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'preposition',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Pronoun',
       'description' => '',
       'weight' => '0',
@@ -126,7 +126,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'pronoun',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Suffix',
       'description' => '',
       'weight' => '0',
@@ -136,7 +136,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'suffix',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Symbol',
       'description' => '',
       'weight' => '0',
@@ -146,7 +146,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'symbol',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Title',
       'description' => '',
       'weight' => '0',
@@ -156,7 +156,7 @@ function _lingwoorg_dictionary_taxonomy_default_terms() {
       'machine' => 'title',
     ),
   array(
-      'vid' => '15',
+      'vid' => '16',
       'name' => 'Verb',
       'description' => '',
       'weight' => '0',

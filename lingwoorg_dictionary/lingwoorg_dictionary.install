@@ -4,10 +4,38 @@
  * Implementation of hook_enable().
  */
 function lingwoorg_dictionary_enable() {
-  drupal_load('module', 'exportables');
+  // create field group
+  $field_sources = array(
+    'type_name'  => 'entry',
+    'group_type' => 'multigroup',
+    'group_name' => 'group_sources',
+    'label'      => 'Sources',
+    // NOTE: for some reason, this causes the whole field group not to be added...
+    //'weight'     => 5
+  );
+  $field_sources['settings'] = field_group_default_settings('multigroup');
+  $field_sources['settings']['multigroup']['required'] = FALSE;
+  $field_sources['settings']['multigroup']['multiple'] = 1;
+  $field_sources['settings']['form']['style'] = 'fieldset_collapsed';
+  $field_sources['settings']['display']['teaser']['exclude'] = 1;
+  $field_sources['settings']['display']['full']['format'] = 'fieldset_collapsed';
+  fieldgroup_save_group('entry', $field_sources);
 
+  // add our fields to the field group
+  foreach(array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $field_name) {
+  	$field_name = 'field_source_'. $field_name;
+    db_query("INSERT INTO {content_group_fields} (type_name, group_name, field_name) VALUES ('%s', '%s', '%s')", 'entry', 'group_sources', $field_name);
+  }
+  // set the correct weight (for some reason I can set with fieldgroup_save_group).
+  db_query("UPDATE {content_group} SET weight = %d WHERE group_name = '%s'", 5, 'group_sources');
+
+  // handle exportables
+  drupal_load('module', 'exportables');
   exportables_sync('taxonomy_vocabulary', 'lingwoorg_dictionary');
   exportables_sync('taxonomy_term', 'lingwoorg_dictionary');
+
+  // we should just clear all caches
+  drupal_flush_all_caches();
 }
 
 /**
