@@ -15,7 +15,7 @@ function lingwoorg_content_strongarm() {
     'i18n_node_content' => LANGUAGE_SUPPORT_NORMAL,
 
     // lingwo_korpus variables
-    'lingwo_korpus_text_content_type' => 'entry',
+    'lingwo_korpus_text_content_type' => 'content',
 
     // allow the <anno> tag in "Filtered HTML" (ID 1)
     'allowed_html_1' => "<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd> <anno>"
