@@ -1,0 +1,8 @@
+core = "6.x"
+dependencies[] = "features"
+dependencies[] = "lingwo_korpus"
+dependencies[] = "strongarm"
+description = "The default Content related settings for Lingwo.org"
+features[node][] = "content"
+name = "Lingwo.org Content Feature"
+package = "Lingwo.org"

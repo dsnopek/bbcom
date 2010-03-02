@@ -1,0 +1,21 @@
+<?php
+
+include_once('lingwoorg_content.features.inc');
+
+/**
+ * Implementation of hook_strongarm()
+ */
+function lingwoorg_content_strongarm() {
+  return array(
+    /*
+     * 'content' content type
+     */
+    // translation settings
+    'language_content_type_content' => 1,
+    'i18n_node_content' => LANGUAGE_SUPPORT_NORMAL,
+
+    // lingwo_korpus variables
+    'lingwo_korpus_text_content_type' => 'entry',
+  );
+}
+
