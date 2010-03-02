@@ -42,10 +42,10 @@ function lingwoorg_dictionary_strongarm() {
     //'lingwo_data_field_pron' => 'field_pron'
     // All the Source fields:
     'lingwo_data_field_source_copyright' => 'field_source_copyright',
-    'lingwo_data_field_source_license' => 'field_license',
+    'lingwo_data_field_source_license' => 'field_source_license',
     'lingwo_data_field_source_name' => 'field_source_name',
     'lingwo_data_field_source_raw' => 'field_source_raw',
-    'lingwo_data_field_source_timestamp' => 'field_timestamp',
+    'lingwo_data_field_source_timestamp' => 'field_source_timestamp',
     'lingwo_data_field_source_url' => 'field_source_url',
   );
 }
