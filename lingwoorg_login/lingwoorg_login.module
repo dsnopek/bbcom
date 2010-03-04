@@ -37,6 +37,7 @@ function lingwoorg_login_strongarm() {
  */
 function lingwoorg_login_menu_alter(&$items) {
   $items['user']['title'] = t('User Login');
+  $items['user/login']['weight'] = -10;
 }
 
 /**
