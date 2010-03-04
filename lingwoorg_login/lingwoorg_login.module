@@ -1,0 +1,57 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Customize login for our needs
+ */
+
+/**
+ * Implementation of hook_strongarm()
+ */
+function lingwoorg_login_strongarm() {
+  return array(
+    // logintoboggan configuration
+    'logintoboggan_login_with_email' => TRUE,
+    'logintoboggan_confirm_email_at_registration' => TRUE,
+    'logintoboggan_redirect_on_confirm' => '<front>',
+    'logintoboggan_login_successful_message' => TRUE,
+    'logintoboggan_minimum_password_length' => '7',
+    'site_403' => 'toboggan/denied',
+
+    // remember_me configuration
+    'remember_me_checkbox' => 1,
+    'remember_me_managed' => 0,
+    'remember_me_phantom_session' => 0,
+
+    // cheap hack to replace 'Remember me' with 'Remember me!'
+    'locale_custom_strings_en' => array(
+      'Remember me' => 'Remember me!',
+      'Access Denied / User Login' => 'User Login',
+    )
+  );
+}
+
+/**
+ * Implemantation of menu alter().
+ */
+function lingwoorg_login_menu_alter(&$items) {
+  $items['user']['title'] = t('User Login');
+}
+
+/**
+ * Implementation of hook_form_user_login_alter().
+ */
+// NOTE: We do this in the theme now!
+/*
+function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_login':
+      unset($form['name']['#description']);
+      unset($form['pass']['#description']);
+      break;
+  }
+}
+*/
+
+
