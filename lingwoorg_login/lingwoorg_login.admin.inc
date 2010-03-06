@@ -6,7 +6,31 @@
  */
 
 function lingwoorg_login_batches_list() {
-  return 'list';
+  $res = pager_query('SELECT * FROM {lingwoorg_login_reg_batch} ORDER BY created');
+
+  $rows = array();
+  while($batch = db_fetch_object($res)) {
+	$series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
+  	$rows[] = array(
+		l($series, 'admin/user/reg_codes/'. $batch->batch_id),
+		format_date($batch->created),
+		format_date($batch->expires),
+		$batch->note
+	);
+  }
+
+  if (!$rows) {
+  	return '<p>'.t('No registration codes.').'</p>';
+  }
+
+  $header = array(
+  	t('Series'),
+	t('Created'),
+	t('Expires'),
+	t('Note'),
+  );
+
+  return theme('table', $header, $rows) . theme('pager');
 }
 
 function lingwoorg_login_batches_add(&$form_state) {
@@ -108,6 +132,7 @@ function lingwoorg_login_batch_view($batch_id) {
       '#type' => 'item',
       '#title' => t('Note'),
       '#value' => $batch->note,
+	  '#weight' => 10,
     );
   }
 
@@ -117,7 +142,8 @@ function lingwoorg_login_batch_view($batch_id) {
 }
 
 function _lingwoorg_login_batch_get_codes($batch) {
-  drupal_set_title(t('Batch #!batch_id', array('!batch_id' => $batch->batch_id)));
+  $series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
+  drupal_set_title(t('Batch !series', array('!series' => $series)));
 
   $res = db_query("SELECT * FROM {lingwoorg_login_reg_code} WHERE batch_id = %d", $batch->batch_id);
 
