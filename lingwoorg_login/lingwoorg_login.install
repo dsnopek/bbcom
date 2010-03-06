@@ -26,14 +26,14 @@ function lingwoorg_login_schema() {
         'description' => 'A random seed to make guessing batch ids harder.',
       ),
       'created' => array(
-        'type' => 'datetime',
+        'type' => 'int',
         'not null' => TRUE,
-        'description' => 'The datetime when this batch was created',
+        'description' => 'When this batch was created (unix time)',
       ),
       'expires' => array(
-        'type' => 'datetime',
+        'type' => 'int',
         'not null' => TRUE,
-        'description' => 'The datetime when this batch expires',
+        'description' => 'When this batch expires (unix time)',
       ),
       'note' => array(
         'type' => 'varchar',
