@@ -7,6 +7,47 @@
  */
 
 /**
+ * Implementation of hook_menu().
+ */
+function lingwoorg_login_menu() {
+  $items = array();
+  $items['admin/user/reg_codes'] = array(
+    'title' => 'Registration Codes',
+    'description' => 'Create/list registration codes',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'lingwoorg_login_batches_list',
+    'file' => 'lingwoorg_login.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['admin/user/reg_codes/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/user/reg_codes/add'] = array(
+    'title' => 'Create new batch',
+    'description' => 'Create a new batch of registration codes',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwoorg_login_batches_add'),
+    'file' => 'lingwoorg_login.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implemantation of hook_menu_alter().
+ */
+function lingwoorg_login_menu_alter(&$items) {
+  // Rename 'User Account' to user login
+  $items['user']['title'] = t('User Login');
+  // Move the 'Login' tab to the front
+  $items['user/login']['weight'] = -10;
+}
+
+/**
  * Implementation of hook_strongarm()
  */
 function lingwoorg_login_strongarm() {
@@ -31,28 +72,5 @@ function lingwoorg_login_strongarm() {
     )
   );
 }
-
-/**
- * Implemantation of menu alter().
- */
-function lingwoorg_login_menu_alter(&$items) {
-  $items['user']['title'] = t('User Login');
-  $items['user/login']['weight'] = -10;
-}
-
-/**
- * Implementation of hook_form_user_login_alter().
- */
-// NOTE: We do this in the theme now!
-/*
-function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
-  switch ($form_id) {
-    case 'user_login':
-      unset($form['name']['#description']);
-      unset($form['pass']['#description']);
-      break;
-  }
-}
-*/
 
 
