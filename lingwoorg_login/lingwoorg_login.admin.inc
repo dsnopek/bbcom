@@ -151,7 +151,7 @@ function _lingwoorg_login_batch_get_codes($batch) {
   while ($code = db_fetch_object($res)) {
     $rows[] = array(
       lingwoorg_login_make_code($batch->batch_id, $batch->seed, $code->code),
-      $code->uid ? l(t($code->uid), '/user/'. $code->uid) : t('not used')
+      $code->uid ? l(t(user_load($code->uid)->name), 'user/'. $code->uid) : t('not used')
     );
   }
 

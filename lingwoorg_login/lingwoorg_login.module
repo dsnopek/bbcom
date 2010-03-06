@@ -85,6 +85,36 @@ function lingwoorg_login_strongarm() {
 }
 
 /*
+ * Implementation of hook_form_alter().
+ */
+function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_register') {
+    $form['registration_code'] = array(
+      '#title' => t('Registration Code'),
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#description' => t('Format: <em>XXXX-XX-XXXX</em>. You should have received this number from your teacher.'),
+    );
+
+    $form['#validate'][] = 'lingwoorg_login_user_register_validate';
+    $form['#submit'][] = 'lingwoorg_login_user_register_submit';
+  }
+}
+
+function lingwoorg_login_user_register_validate($form, &$form_state) {
+  if (!lingwoorg_login_check_code($form_state['values']['registration_code'])) {
+    form_set_error('registration_code', t('Invalid registration code.'));
+  }
+}
+
+function lingwoorg_login_user_register_submit($form, &$form_state) {
+  list($batch_id, $seed, $code) = lingwoorg_login_parse_code($form_state['values']['registration_code']);
+
+  db_query('UPDATE {lingwoorg_login_reg_code} SET uid = %d WHERE batch_id = %d AND code = %d',
+    $form_state['user']->uid, $batch_id, $code);
+}
+
+/*
  * API functions
  */
 
@@ -107,5 +137,30 @@ function lingwoorg_login_parse_code($full_code) {
   $code = $full_code[8] . $full_code[9] . $full_code[4] . $full_code[5];
 
   return array($batch_id, $seed, $code);
+}
+
+function lingwoorg_login_check_code($full_code) {
+  $full_code = str_replace('-', '', $full_code);
+  if (strlen($full_code) != 10) {
+    return FALSE;
+  }
+
+  list($batch_id, $seed, $code) = lingwoorg_login_parse_code($full_code);
+
+  $batch = db_fetch_object(db_query("SELECT seed, expires FROM {lingwoorg_login_reg_batch} WHERE batch_id = %d", $batch_id));
+
+  // check that the batch exists, hasn't expired and we were given a valid seed
+  if (!$batch || $batch->expires < time() || $batch->seed != $seed) {
+    return FALSE;
+  }
+
+  $code_obj = db_fetch_object(db_query("SELECT uid FROM {lingwoorg_login_reg_code} WHERE batch_id = %d AND code = '%s'", $batch_id, $code));
+
+  // check that this is a valid and unused code on this the batch
+  if (!$code_obj || !empty($code_obj->uid)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
