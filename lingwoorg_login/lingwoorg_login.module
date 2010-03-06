@@ -6,6 +6,8 @@
  * Customize login for our needs
  */
 
+require_once(drupal_get_path('module', 'lingwoorg_login') .'/base32.php');
+
 /**
  * Implementation of hook_menu().
  */
@@ -32,6 +34,15 @@ function lingwoorg_login_menu() {
     'page arguments' => array('lingwoorg_login_batches_add'),
     'file' => 'lingwoorg_login.admin.inc',
     'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/user/reg_codes/%'] = array(
+    'title' => 'Batch',
+    'description' => 'See the registration codes in a batch',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'lingwoorg_login_batch_view',
+    'page arguments' => array(3),
+    'file' => 'lingwoorg_login.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
@@ -73,4 +84,28 @@ function lingwoorg_login_strongarm() {
   );
 }
 
+/*
+ * API functions
+ */
+
+function lingwoorg_login_make_code($batch_id, $seed, $code) {
+  $base32 = new Base32();
+
+  $batch_id = $base32->fromDec($batch_id, 2);
+
+  return $seed[0] . $seed[1] . $batch_id[1] . $batch_id[0] .'-'.
+         $code[2] . $code[3]                               .'-'.
+         $seed[2] . $seed[3] . $code[0]     . $code[1];
+}
+
+function lingwoorg_login_parse_code($full_code) {
+  $full_code = str_replace('-', '', $full_code);
+
+  $base32 = new Base32();
+  $batch_id = $base32->fromDec($full_code[3] . $full_code[2]);
+  $seed = $full_code[0] . $full_code[1] . $full_code[6] . $full_code[7];
+  $code = $full_code[8] . $full_code[9] . $full_code[4] . $full_code[5];
+
+  return array($batch_id, $seed, $code);
+}
 

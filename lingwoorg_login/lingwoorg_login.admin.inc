@@ -51,13 +51,10 @@ function lingwoorg_login_batches_add_validate($form, &$form_state) {
 // Returns a random 4-character base32 number
 function _lingwoorg_login_random_base32() {
   $base32 = new Base32();
-  $value = $base32->fromDec(rand(0, 1048575));
-  return str_pad($value, 4, '0', STR_PAD_LEFT);
+  return $base32->fromDec(rand(0, 1048575), 4);
 }
 
 function lingwoorg_login_batches_add_submit($form, &$form_state) {
-  require_once(drupal_get_path('module', 'lingwoorg_login') .'/base32.php');
-
   // create the batch
   $batch = (object)array(
     'seed'    => _lingwoorg_login_random_base32(),
@@ -84,6 +81,62 @@ function lingwoorg_login_batches_add_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('Batch created.'));
-  //$form_state['redirect'] = url('admin/user/reg_codes/'. $batch_id);
+  $form_state['redirect'] = 'admin/user/reg_codes/'. $batch->batch_id;
+}
+
+
+function lingwoorg_login_batch_view($batch_id) {
+  $res = db_query("SELECT * FROM {lingwoorg_login_reg_batch} WHERE batch_id = %d", $batch_id);
+  $batch = db_fetch_object($res);
+
+  if (!$batch) {
+    return drupal_not_found();
+  }
+
+  $form['created'] = array(
+    '#type' => 'item',
+    '#title' => t('Created'),
+    '#value' => format_date($batch->created),
+  );
+  $form['expires'] = array(
+    '#type' => 'item',
+    '#title' => t('Expires'),
+    '#value' => format_date($batch->expires),
+  );
+  if ($batch->note) {
+    $form['note'] = array(
+      '#type' => 'item',
+      '#title' => t('Note'),
+      '#value' => $batch->note,
+    );
+  }
+
+  $output = drupal_render($form);
+  $output .= _lingwoorg_login_batch_get_codes($batch);
+  return $output;
+}
+
+function _lingwoorg_login_batch_get_codes($batch) {
+  drupal_set_title(t('Batch #!batch_id', array('!batch_id' => $batch->batch_id)));
+
+  $res = db_query("SELECT * FROM {lingwoorg_login_reg_code} WHERE batch_id = %d", $batch->batch_id);
+
+  $rows = array();
+  while ($code = db_fetch_object($res)) {
+    $rows[] = array(
+      lingwoorg_login_make_code($batch->batch_id, $batch->seed, $code->code),
+      $code->uid ? l(t($code->uid), '/user/'. $code->uid) : t('not used')
+    );
+  }
+
+  if ($rows) {
+    $header = array(
+      t('Code'),
+      t('User'),
+    );
+    return theme('table', $header, $rows);
+  }
+
+  return '<p>'.t('No registration codes in this batch!').'</p>';
 }
 

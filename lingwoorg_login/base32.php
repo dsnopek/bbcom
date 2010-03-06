@@ -19,7 +19,7 @@ class Base32 {
     return $dec;
   }
   
-  public function fromDec($num) {
+  public function fromDec($num, $pad=0) {
     if ($num == 0) return '0';
 
     $s = '';
@@ -28,6 +28,10 @@ class Base32 {
       $num = intval($num / 32);
 
       $s = ($this->charset[$remainder] . $s);
+    }
+
+    if ($pad) {
+      $s = str_pad($s, $pad, '0', STR_PAD_LEFT);
     }
 
     return $s;
