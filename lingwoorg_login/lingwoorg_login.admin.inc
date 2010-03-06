@@ -121,18 +121,20 @@ function lingwoorg_login_batch_view($batch_id) {
     '#type' => 'item',
     '#title' => t('Created'),
     '#value' => format_date($batch->created),
+	'#weight' => 0,
   );
   $form['expires'] = array(
     '#type' => 'item',
     '#title' => t('Expires'),
     '#value' => format_date($batch->expires),
+	'#weight' => 1,
   );
   if ($batch->note) {
     $form['note'] = array(
       '#type' => 'item',
       '#title' => t('Note'),
       '#value' => $batch->note,
-	  '#weight' => 10,
+	  '#weight' => 2,
     );
   }
 
