@@ -13,6 +13,8 @@ require_once(drupal_get_path('module', 'lingwoorg_login') .'/base32.php');
  */
 function lingwoorg_login_menu() {
   $items = array();
+
+  // Lists of batches
   $items['admin/user/reg_codes'] = array(
     'title' => 'Registration Codes',
     'description' => 'Create/list registration codes',
@@ -35,6 +37,8 @@ function lingwoorg_login_menu() {
     'file' => 'lingwoorg_login.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
+
+  // Individual batches
   $items['admin/user/reg_codes/%'] = array(
     'title' => 'Batch',
     'description' => 'See the registration codes in a batch',
@@ -44,8 +48,43 @@ function lingwoorg_login_menu() {
     'file' => 'lingwoorg_login.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['admin/user/reg_codes/%/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/user/reg_codes/%/print'] = array(
+    'title' => 'Print',
+    'description' => 'Print a cards to distribute.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'lingwoorg_login_batch_print',
+    'page arguments' => array(3),
+    'file' => 'lingwoorg_login.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
 
   return $items;
+}
+
+/**
+ * Implemantation of hook_theme().
+ */
+function lingwoorg_login_theme() {
+  return array(
+    'lingwoorg_login_registration_page' => array(
+      'arguments' => array('batch' => NULL, 'content' => NULL),
+      'template' => 'lingwoorg-login-registration-page',
+      'file' => 'lingwoorg_login.admin.inc',
+    ),
+    'lingwoorg_login_registration_sheet' => array(
+      'arguments' => array('codes' => NULL),
+      'file' => 'lingwoorg_login.admin.inc',
+    ),
+    'lingwoorg_login_registration_card' => array(
+      'arguments' => array('code' => NULL),
+      'file' => 'lingwoorg_login.admin.inc',
+    ),
+  );
 }
 
 /**

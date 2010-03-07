@@ -175,3 +175,53 @@ function _lingwoorg_login_batch_get_codes($batch) {
   return '<p>'.t('No registration codes in this batch!').'</p>';
 }
 
+function lingwoorg_login_batch_print($batch_id) {
+  $batch = db_fetch_object(db_query('SELECT * FROM {lingwoorg_login_reg_batch} WHERE batch_id = %d', $batch_id));
+  if (!$batch) {
+    return drupal_not_found();
+  }
+
+  $res = db_query('SELECT code FROM {lingwoorg_login_reg_code} WHERE batch_id = %d AND uid IS NULL', $batch_id);
+
+  while ($obj = db_fetch_object($res)) {
+    $codes[] = lingwoorg_login_make_code($batch_id, $batch->seed, $obj->code);
+  }
+
+  // output the page
+  drupal_set_header('HTTP/1.1 200 Ok');
+  $content = theme('lingwoorg_login_registration_sheet', $codes);
+  print theme('lingwoorg_login_registration_page', $batch, $content);
+}
+
+function template_preprocess_lingwoorg_login_registration_page(&$vars) {
+  $batch = $vars['batch'];
+  $batch->series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
+}
+
+function theme_lingwoorg_login_registration_sheet($codes) {
+  $output = '<table width="100%" border="0">';
+  $col = 0;
+  foreach ($codes as $code) {
+    if ($col == 0) {
+      $output .= '<tr>';
+    }
+    $output .= '<td>'. theme('lingwoorg_login_registration_card', $code) .'</td>';
+    $col ++;
+
+    if ($col == 2) {
+      $col = 0;
+      $output .= '</tr>';
+    }
+  }
+  if ($col != 0) {
+    $output .= '</tr>';
+  }
+  $output .= '</table>';
+
+  return $output;
+}
+
+function theme_lingwoorg_login_registration_card($code) {
+  return '<span style="font-size: 20pt">'. $code .'</span>';
+}
+
