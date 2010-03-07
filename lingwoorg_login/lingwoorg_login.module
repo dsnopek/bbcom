@@ -77,11 +77,11 @@ function lingwoorg_login_theme() {
       'file' => 'lingwoorg_login.admin.inc',
     ),
     'lingwoorg_login_registration_sheet' => array(
-      'arguments' => array('codes' => NULL),
+      'arguments' => array('batch' => NULL, 'codes' => NULL),
       'file' => 'lingwoorg_login.admin.inc',
     ),
     'lingwoorg_login_registration_card' => array(
-      'arguments' => array('code' => NULL),
+      'arguments' => array('batch' => NULL, 'code' => NULL),
       'file' => 'lingwoorg_login.admin.inc',
     ),
   );

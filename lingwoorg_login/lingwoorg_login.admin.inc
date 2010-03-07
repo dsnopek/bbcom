@@ -25,9 +25,9 @@ function lingwoorg_login_batches_list() {
 
   $header = array(
   	t('Series'),
-	t('Created'),
-	t('Expires'),
-	t('Note'),
+    t('Created'),
+    t('Expires'),
+    t('Note'),
   );
 
   return theme('table', $header, $rows) . theme('pager');
@@ -176,6 +176,12 @@ function _lingwoorg_login_batch_get_codes($batch) {
 }
 
 function lingwoorg_login_batch_print($batch_id) {
+  global $custom_theme;
+
+  // This is a hack to make sure that we AREN'T using the admin theme when printing
+  // our registration cards.
+  $custom_theme = variable_get('theme_default', 'garland');
+
   $batch = db_fetch_object(db_query('SELECT * FROM {lingwoorg_login_reg_batch} WHERE batch_id = %d', $batch_id));
   if (!$batch) {
     return drupal_not_found();
@@ -189,23 +195,27 @@ function lingwoorg_login_batch_print($batch_id) {
 
   // output the page
   drupal_set_header('HTTP/1.1 200 Ok');
-  $content = theme('lingwoorg_login_registration_sheet', $codes);
+  $content = theme('lingwoorg_login_registration_sheet', $batch, $codes);
   print theme('lingwoorg_login_registration_page', $batch, $content);
 }
 
 function template_preprocess_lingwoorg_login_registration_page(&$vars) {
   $batch = $vars['batch'];
   $batch->series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
+  unset($batch->seed);
+
+  $vars['expires'] = _format_date($batch->expires);
+  $vars['created'] = _format_date($batch->created);
 }
 
-function theme_lingwoorg_login_registration_sheet($codes) {
+function theme_lingwoorg_login_registration_sheet($batch, $codes) {
   $output = '<table width="100%" border="0">';
   $col = 0;
   foreach ($codes as $code) {
     if ($col == 0) {
       $output .= '<tr>';
     }
-    $output .= '<td>'. theme('lingwoorg_login_registration_card', $code) .'</td>';
+    $output .= '<td style="page-break-inside: avoid;">'. theme('lingwoorg_login_registration_card', $batch, $code) .'</td>';
     $col ++;
 
     if ($col == 2) {
@@ -221,7 +231,13 @@ function theme_lingwoorg_login_registration_sheet($codes) {
   return $output;
 }
 
-function theme_lingwoorg_login_registration_card($code) {
+function template_preprocess_lingwoorg_login_registration_card(&$vars) {
+  $batch = $vars['batch'];
+  $vars['expires'] = _format_date($batch->expires);
+  $vars['created'] = _format_date($batch->created);
+}
+
+function theme_lingwoorg_login_registration_card($batch, $code) {
   return '<span style="font-size: 20pt">'. $code .'</span>';
 }
 
