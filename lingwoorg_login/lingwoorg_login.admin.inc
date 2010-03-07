@@ -13,8 +13,8 @@ function lingwoorg_login_batches_list() {
 	$series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
   	$rows[] = array(
 		l($series, 'admin/user/reg_codes/'. $batch->batch_id),
-		format_date($batch->created),
-		format_date($batch->expires),
+		_format_date($batch->created),
+		_format_date($batch->expires),
 		$batch->note
 	);
   }
@@ -78,13 +78,20 @@ function _lingwoorg_login_random_base32() {
   return $base32->fromDec(rand(0, 1048575), 4);
 }
 
+// NOTE: Drupal's format_date() doesn't correctly deal with daylight savings time, nor does it
+// translate the date parts.  This should be put in the theme as well, to handle all dates, particularly
+// the node submitted ones.
+function _format_date($date, $type='medium', $format='') {
+  return date_format_date(date_make_date($date, NULL, DATE_UNIX), $type, $format);
+}
+
 function lingwoorg_login_batches_add_submit($form, &$form_state) {
   // create the batch
   $batch = (object)array(
     'seed'    => _lingwoorg_login_random_base32(),
     'note'    => $form_state['values']['note'],
     'created' => time(),
-    'expires' => date_format(date_create($form_state['values']['expires']), 'U'),
+    'expires' => date_make_date($form_state['values']['expires'])->format('U'),
   );
   drupal_write_record('lingwoorg_login_reg_batch', $batch);
 
@@ -120,13 +127,13 @@ function lingwoorg_login_batch_view($batch_id) {
   $form['created'] = array(
     '#type' => 'item',
     '#title' => t('Created'),
-    '#value' => format_date($batch->created),
+    '#value' => _format_date($batch->created),
 	'#weight' => 0,
   );
   $form['expires'] = array(
     '#type' => 'item',
     '#title' => t('Expires'),
-    '#value' => format_date($batch->expires),
+    '#value' => _format_date($batch->expires),
 	'#weight' => 1,
   );
   if ($batch->note) {
