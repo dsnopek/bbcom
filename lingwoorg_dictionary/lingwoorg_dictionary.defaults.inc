@@ -78,6 +78,18 @@ function _lingwoorg_dictionary_content_default_fields() {
         'format' => 'default',
         'exclude' => 0,
       ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
     ),
     'widget_active' => '1',
     'type' => 'lingwo_senses',
@@ -105,7 +117,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_copyright',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '13',
+      'weight' => '8',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -156,7 +168,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Copyright',
-      'weight' => '13',
+      'weight' => '8',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -168,7 +180,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_license',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '14',
+      'weight' => '9',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -219,7 +231,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'License',
-      'weight' => '14',
+      'weight' => '9',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -231,7 +243,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_name',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '11',
+      'weight' => '6',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -282,7 +294,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Source Name',
-      'weight' => '11',
+      'weight' => '6',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -294,7 +306,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_raw',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '15',
+      'weight' => '10',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -345,7 +357,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Raw Data',
-      'weight' => '15',
+      'weight' => '10',
       'description' => '',
       'type' => 'text_textarea',
       'module' => 'text',
@@ -357,7 +369,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_timestamp',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '16',
+      'weight' => '11',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -408,7 +420,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Timestamp',
-      'weight' => '16',
+      'weight' => '11',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -420,7 +432,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     'field_name' => 'field_source_url',
     'type_name' => 'entry',
     'display_settings' => array(
-      'weight' => '12',
+      'weight' => '7',
       'parent' => 'group_sources',
       'label' => array(
         'format' => 'above',
@@ -471,7 +483,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Source URL',
-      'weight' => '12',
+      'weight' => '7',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -503,14 +515,26 @@ function _lingwoorg_dictionary_context_default_contexts() {
     'namespace' => 'lingwoorg',
     'attribute' => 'section',
     'value' => 'dictionary',
-    'description' => 'Working on the dictionary',
+    'description' => 'Working in the dictionary',
     'node' => array(
       '0' => 'entry',
     ),
-    'menu_trail' => array(
-      'node' => 'node',
+    'path' => array(
+      'dictionary' => 'dictionary',
+      'dictionary/*' => 'dictionary/*',
     ),
-    'block' => array(),
+    'menu' => 'node/53402',
+    'block' => array(
+      'lingwo_dictionary_0' => array(
+        'module' => 'lingwo_dictionary',
+        'delta' => '0',
+        'weight' => -16,
+        'region' => 'header',
+        'status' => '0',
+        'label' => 'Lingwo Dictionary: Search block',
+        'type' => 'context_ui',
+      ),
+    ),
   );
   return $items;
 }
