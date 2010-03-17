@@ -534,6 +534,15 @@ function _lingwoorg_dictionary_context_default_contexts() {
         'label' => 'Lingwo Dictionary: Search block',
         'type' => 'context_ui',
       ),
+      'lingwoorg_dictionary_0' => array(
+        'module' => 'lingwoorg_dictionary',
+        'delta' => '0',
+        'weight' => 15,
+        'region' => 'right',
+        'status' => '0',
+        'label' => 'Lingwo Dictionary: Add Content Block',
+        'type' => 'context_ui',
+      ),
     ),
   );
   return $items;

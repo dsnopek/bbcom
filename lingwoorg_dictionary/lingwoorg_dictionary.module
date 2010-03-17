@@ -81,6 +81,27 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 }
 
 /**
+ * Implementation of hook_block().
+ */
+function lingwoorg_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Lingwo Dictionary: Add Content Block'),
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0 && user_access('create entry content')) {
+        $block['content'] = l('Create Dictionary Entry', 'node/add/entry',
+          array('attributes' => array('id' => 'create-content-link')));
+        return $block;
+      }
+      break; 
+  }
+}
+
+/**
  * Implementation of hook_link().
  *
  * Adds a link to an entries source entry.
