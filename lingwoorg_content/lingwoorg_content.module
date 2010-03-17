@@ -22,3 +22,25 @@ function lingwoorg_content_strongarm() {
   );
 }
 
+/**
+ * Implementation of hook_block().
+ */
+function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Lingwo.org Content: Add Content Block'),
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0 && user_access('create content content')) {
+        $block['content'] = l('Create Content', 'node/add/content',
+          array('attributes' => array('id' => 'create-content-link')));
+        return $block;
+      }
+      break; 
+  }
+}
+
+
