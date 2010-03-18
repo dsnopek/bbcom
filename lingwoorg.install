@@ -14,6 +14,9 @@ function lingwoorg_enable() {
   // stuff runs.  Kinda lame, but it does exactly what I want!
   variable_set('language_negotiation', 127);
 
+  // we context to happen after the i18nmenu module, so we move it happen later.
+  update_sql("UPDATE {system} SET weight = 10 WHERE name = 'context'");
+
   drupal_flush_all_caches();
 }
 
