@@ -35,7 +35,7 @@ function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
 
     case 'view':
       if ($delta == 0 && user_access('create content content')) {
-        $block['content'] = l('Create Content', 'node/add/content',
+        $block['content'] = l(t('Create Content'), 'node/add/content',
           array('attributes' => array('id' => 'create-content-link')));
         return $block;
       }

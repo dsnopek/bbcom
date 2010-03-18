@@ -93,7 +93,7 @@ function lingwoorg_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
 
     case 'view':
       if ($delta == 0 && user_access('create entry content')) {
-        $block['content'] = l('Create Dictionary Entry', 'node/add/entry',
+        $block['content'] = l(t('Create Dictionary Entry'), 'node/add/entry',
           array('attributes' => array('id' => 'create-content-link')));
         return $block;
       }
