@@ -114,12 +114,6 @@ function lingwoorg_login_strongarm() {
     'remember_me_checkbox' => 1,
     'remember_me_managed' => 0,
     'remember_me_phantom_session' => 0,
-
-    // cheap hack to replace 'Remember me' with 'Remember me!'
-    'locale_custom_strings_en' => array(
-      'Remember me' => 'Remember me!',
-      'Access Denied / User Login' => 'User Login',
-    )
   );
 }
 

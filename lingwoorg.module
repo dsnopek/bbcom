@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implementation of hook_strongarm()
+ */
+function lingwoorg_strongarm() {
+  return array(
+    // cheap translations
+    'locale_custom_strings_en' => array(
+      'Remember me' => 'Remember me!',
+      'Access Denied / User Login' => 'User Login',
+    )
+  );
+}
+

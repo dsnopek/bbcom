@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwoorg_enable() {
+  $old = variable_get('language_negotiation', LANGUAGE_NEGOTIATION_NONE);
+  if ($old == 127) $old = LANGUAGE_NEGOTIATION_NONE;
+  variable_set('language_negotiation_old', $old);
+
+  // This is a hack to make Drupal's built-in language negotiation use the user values, then
+  // browser settings, then default.  It works because 127 isn't a value used in the switch()
+  // statement in root/includes/language.inc language_initialize(), so none of the default
+  // stuff runs.  Kinda lame, but it does exactly what I want!
+  variable_set('language_negotiation', 127);
+
+  drupal_flush_all_caches();
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwoorg_disable() {
+  $old = variable_get('language_negotiation_old', LANGUAGE_NEGOTIATION_NONE);
+  variable_set('language_negotiation', $old);
+  variable_del('language_negotiation_old');
+}
+
