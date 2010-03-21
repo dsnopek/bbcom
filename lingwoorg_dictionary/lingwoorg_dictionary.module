@@ -14,26 +14,26 @@ function lingwoorg_dictionary_strongarm() {
     // put the fields in the correct order
     'content_extra_weights_entry' => array(
       'language' => 0,
-      'taxonomy' => 1,
+      // field_pos => 1,
       'title'    => 2,
       'menu'     => 3,
       // field_senses => 4
       // field_fields => 5
+      // field_sources => 6,
+      'revision_information' => 7,
+      'path'                 => 8,
+      'comment_settings'     => 9,
+      'translation'          => 10,
     ),
     // translation settings
     'language_content_type_entry' => TRANSLATION_ENABLED,
     'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
     'i18n_hide_translation_links' => 1,
 
-    // part of speech is translatable
-    'i18ntaxonomy_vocabulary' => array(
-      exportables_machine_load_id('taxonomy_vocabulary', 'pos') => I18N_TAXONOMY_LOCALIZE,
-    ),
-
     // lingwo_dictionary variables
     'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
     'lingwo_dictionary_entry_content_type' => 'entry',
-    'lingwo_dictionary_pos_vocabulary' => exportables_machine_load_id('taxonomy_vocabulary', 'pos'),
+    'lingwo_dictionary_field_pos' => 'field_pos',
 
     // lingwo_data variables (mappings!)
     'lingwo_data_field_fields' => 'field_fields',

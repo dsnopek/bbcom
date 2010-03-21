@@ -18,7 +18,7 @@ function _lingwoorg_dictionary_content_default_fields() {
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 1,
+        'exclude' => 0,
       ),
       'full' => array(
         'format' => 'default',
@@ -33,6 +33,10 @@ function _lingwoorg_dictionary_content_default_fields() {
         'exclude' => 0,
       ),
       '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -53,6 +57,81 @@ function _lingwoorg_dictionary_content_default_fields() {
       'description' => '',
       'type' => 'lingwo_fields_widget',
       'module' => 'lingwo_fields',
+    ),
+  );
+
+  // Exported field: field_pos
+  $fields[] = array(
+    'field_name' => 'field_pos',
+    'type_name' => 'entry',
+    'display_settings' => array(
+      'weight' => '1',
+      'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '1',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => 'abbreviation|Abbreviation
+adjective|Adjective
+adverb|Adverb
+conjunction|Conjunction
+exclamation|Exclamation
+noun|Noun
+onomatopoeia|Onomatopoeia
+particle|Particle
+phrase|Phrase
+prefix|Prefix
+preposition|Preposition
+pronoun|Pronoun
+suffix|Suffix
+symbol|Symbol
+title|Title
+verb|Verb',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Part of Speech',
+      'weight' => '1',
+      'description' => '',
+      'type' => 'optionwidgets_select',
+      'module' => 'optionwidgets',
     ),
   );
 
@@ -495,6 +574,7 @@ function _lingwoorg_dictionary_content_default_fields() {
     t('Copyright'),
     t('Fields'),
     t('License'),
+    t('Part of Speech'),
     t('Raw Data'),
     t('Senses'),
     t('Source Name'),
@@ -528,7 +608,7 @@ function _lingwoorg_dictionary_context_default_contexts() {
       'lingwo_dictionary_0' => array(
         'module' => 'lingwo_dictionary',
         'delta' => '0',
-        'weight' => -16,
+        'weight' => -17,
         'region' => 'header',
         'status' => '0',
         'label' => 'Lingwo Dictionary: Search block',
@@ -537,7 +617,7 @@ function _lingwoorg_dictionary_context_default_contexts() {
       'lingwoorg_dictionary_0' => array(
         'module' => 'lingwoorg_dictionary',
         'delta' => '0',
-        'weight' => 15,
+        'weight' => 16,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo Dictionary: Add Content Block',
