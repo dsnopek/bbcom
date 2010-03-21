@@ -1,6 +1,8 @@
 <?php
 // $Id$
 
+include_once('lingwoorg_flashcards.features.inc');
+
 /**
  * @file
  * Integrate Anki flashcards into Lingwo.org

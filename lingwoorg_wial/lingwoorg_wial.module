@@ -1,6 +1,8 @@
 <?php
 // $Id$
 
+include_once('lingwoorg_wial.features.inc');
+
 /**
  * @file
  * Gives each user a list of entries they are learning
@@ -9,7 +11,7 @@
 /*
  * Implementation of hook_flag_default_flags().
  */
-function lingwo_wial_flag_default_flags() {
+function lingwoorg_wial_flag_default_flags() {
   $flags = array();
   $flags[] = array(
     'content_type' => 'node',
@@ -26,7 +28,19 @@ function lingwo_wial_flag_default_flags() {
     'show_on_page' => TRUE,
     'show_on_teaser' => TRUE,
     'show_on_form' => FALSE,
+    // enabled by default
+    'status' => TRUE,
   );
   return $flags;
+}
+
+/*
+ * Implementation of hook_link_alter().
+ */
+function lingwoorg_wial_link_alter(&$links, $node) {
+  // Only translations can be added!
+  if (!lingwo_dictionary_entry_is_translation($node)) {
+    unset($links['flag-wial']);
+  }
 }
 
