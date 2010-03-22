@@ -60,81 +60,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     ),
   );
 
-  // Exported field: field_pos
-  $fields[] = array(
-    'field_name' => 'field_pos',
-    'type_name' => 'entry',
-    'display_settings' => array(
-      'weight' => '1',
-      'parent' => '',
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'token' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'text',
-    'required' => '1',
-    'multiple' => '0',
-    'module' => 'text',
-    'active' => '1',
-    'text_processing' => '0',
-    'max_length' => '',
-    'allowed_values' => 'abbreviation|Abbreviation
-adjective|Adjective
-adverb|Adverb
-conjunction|Conjunction
-exclamation|Exclamation
-noun|Noun
-onomatopoeia|Onomatopoeia
-particle|Particle
-phrase|Phrase
-prefix|Prefix
-preposition|Preposition
-pronoun|Pronoun
-suffix|Suffix
-symbol|Symbol
-title|Title
-verb|Verb',
-    'allowed_values_php' => '',
-    'widget' => array(
-      'default_value' => array(
-        '0' => array(
-          'value' => '',
-        ),
-      ),
-      'default_value_php' => NULL,
-      'label' => 'Part of Speech',
-      'weight' => '1',
-      'description' => '',
-      'type' => 'optionwidgets_select',
-      'module' => 'optionwidgets',
-    ),
-  );
-
   // Exported field: field_senses
   $fields[] = array(
     'field_name' => 'field_senses',
@@ -574,7 +499,6 @@ verb|Verb',
     t('Copyright'),
     t('Fields'),
     t('License'),
-    t('Part of Speech'),
     t('Raw Data'),
     t('Senses'),
     t('Source Name'),

@@ -14,7 +14,7 @@ function lingwoorg_dictionary_strongarm() {
     // put the fields in the correct order
     'content_extra_weights_entry' => array(
       'language' => 0,
-      // field_pos => 1,
+      'pos'      => 1,
       'title'    => 2,
       'menu'     => 3,
       // field_senses => 4
@@ -34,6 +34,7 @@ function lingwoorg_dictionary_strongarm() {
     'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
     'lingwo_dictionary_entry_content_type' => 'entry',
     'lingwo_dictionary_field_pos' => 'field_pos',
+    'lingwo_dictionary_pos_allowed_values' => "abbreviation|Abbreviation\nadjective|Adjective\nadverb|Adverb\nconjunction|Conjunction\nexclamation|Exclamation\nnoun|Noun\nonomatopoeia|Onomatopoeia\nparticle|Particle\nphrase|Phrase\nprefix|Prefix\npreposition|Preposition\npronoun|Pronoun\nsuffix|Suffix\nsymbol|Symbol\ntitle|Title\nverb|Verb",
 
     // lingwo_data variables (mappings!)
     'lingwo_data_field_fields' => 'field_fields',
