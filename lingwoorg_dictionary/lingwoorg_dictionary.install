@@ -4,6 +4,8 @@
  * Implementation of hook_enable().
  */
 function lingwoorg_dictionary_enable() {
+  features_rebuild(array('lingwoorg_dictionary' => array('node', 'content')));
+
   // create field group
   $field_sources = array(
     'type_name'  => 'entry',
@@ -23,19 +25,33 @@ function lingwoorg_dictionary_enable() {
 
   // add our fields to the field group
   foreach(array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $field_name) {
-  	$field_name = 'field_source_'. $field_name;
-    db_query("INSERT INTO {content_group_fields} (type_name, group_name, field_name) VALUES ('%s', '%s', '%s')", 'entry', 'group_sources', $field_name);
+    $field_name = 'field_source_'. $field_name;
+    fieldgroup_update_fields(array(
+      'field_name' => $field_name,
+      'group'      => 'group_sources',
+      'type_name'  => 'entry'
+    ));
   }
   // set the correct weight (for some reason I can set with fieldgroup_save_group).
-  db_query("UPDATE {content_group} SET weight = %d WHERE group_name = '%s'", 5, 'group_sources');
+  db_query("UPDATE {content_group} SET weight = %d WHERE type_name = '%s' AND group_name = '%s'",
+    6, 'entry', 'group_sources');
 
-  // we should just clear all caches
+  // we should clear a bunch of caches
   drupal_flush_all_caches();
+
+  // TODO: We apparently aren't clearing enough caches!  Because I can't get the "Sources" field
+  // to show up correctly without saving the "Display Fields" page.
+  fieldgroup_groups('', FALSE, TRUE);
+
+  cache_clear_all('fieldgroup_data:', content_cache_tablename(), TRUE);
+  content_clear_type_cache(TRUE);
+  menu_rebuild();
 }
 
 /**
  * Implementation of hook_disable().
  */
 function lingwoorg_dictionary_disable() {
+  fieldgroup_delete('entry', 'group_sources');
 }
 
