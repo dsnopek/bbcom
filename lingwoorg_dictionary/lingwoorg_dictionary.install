@@ -6,6 +6,9 @@
 function lingwoorg_dictionary_enable() {
   features_rebuild(array('lingwoorg_dictionary' => array('node', 'content')));
 
+  // we have to set it in like 3 places!
+  $field_sources_weight = 6;
+
   // create field group
   $field_sources = array(
     'type_name'  => 'entry',
@@ -13,14 +16,30 @@ function lingwoorg_dictionary_enable() {
     'group_name' => 'group_sources',
     'label'      => 'Sources',
     // NOTE: for some reason, this causes the whole field group not to be added...
-    //'weight'     => 5
+    //'weight'     => $field_sources_weight
   );
   $field_sources['settings'] = field_group_default_settings('multigroup');
-  $field_sources['settings']['multigroup']['required'] = FALSE;
-  $field_sources['settings']['multigroup']['multiple'] = 1;
   $field_sources['settings']['form']['style'] = 'fieldset_collapsed';
   $field_sources['settings']['display']['teaser']['exclude'] = 1;
   $field_sources['settings']['display']['full']['format'] = 'fieldset_collapsed';
+  $field_sources['settings']['display']['full']['exclude'] = 0;
+  $field_sources['settings']['display']['weight'] = $field_sources_weight;
+  $field_sources['settings']['display']['label'] = 'above';
+  $field_sources['settings']['display']['description'] = '';
+  $field_sources['settings']['multigroup']['required'] = FALSE;
+  $field_sources['settings']['multigroup']['multiple'] = 1;
+  $field_sources['settings']['multigroup']['subgroup'] = array(
+    'weight' => -20,
+    'label'  => 'above',
+    'teaser' => array(
+      'format' => 'fieldset',
+      'exclude' => 0
+    ),
+    'full' => array(
+      'format' => 'simple',
+      'exclude' => 0,
+    )
+  );
   fieldgroup_save_group('entry', $field_sources);
 
   // add our fields to the field group
@@ -34,18 +53,13 @@ function lingwoorg_dictionary_enable() {
   }
   // set the correct weight (for some reason I can set with fieldgroup_save_group).
   db_query("UPDATE {content_group} SET weight = %d WHERE type_name = '%s' AND group_name = '%s'",
-    6, 'entry', 'group_sources');
+    $field_sources_weight, 'entry', 'group_sources');
 
   // we should clear a bunch of caches
   drupal_flush_all_caches();
 
-  // TODO: We apparently aren't clearing enough caches!  Because I can't get the "Sources" field
-  // to show up correctly without saving the "Display Fields" page.
+  // clear this one too for good measure
   fieldgroup_groups('', FALSE, TRUE);
-
-  cache_clear_all('fieldgroup_data:', content_cache_tablename(), TRUE);
-  content_clear_type_cache(TRUE);
-  menu_rebuild();
 }
 
 /**
