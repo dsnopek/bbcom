@@ -138,6 +138,14 @@ function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
     $form['#validate'][] = 'lingwoorg_login_user_register_validate';
     $form['#submit'][] = 'lingwoorg_login_user_register_submit';
   }
+  elseif ($form_id == 'user_login') {
+    $form['#submit'][] = 'lingwoorg_login_user_login_submit';
+  }
+}
+
+function lingwoorg_login_user_login_submit($form, &$form_state) {
+  // should take us to the front page.. I hope.
+  $_REQUEST['destination'] = '';
 }
 
 function lingwoorg_login_user_register_validate($form, &$form_state) {
