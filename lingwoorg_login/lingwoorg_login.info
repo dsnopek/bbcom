@@ -1,6 +1,6 @@
 core = "6.x"
 dependencies[] = "logintoboggan"
-//dependencies[] = "login_destination"
+dependencies[] = "lingwoorg"
 dependencies[] = "remember_me"
 dependencies[] = "strongarm"
 dependencies[] = "date_api"

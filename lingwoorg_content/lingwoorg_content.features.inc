@@ -17,3 +17,12 @@ function lingwoorg_content_node_info() {
   $args = func_get_args();
   return call_user_func_array('_lingwoorg_content_node_info', $args);
 }
+
+/**
+ * Implementation of hook_views_default_views().
+ */
+function lingwoorg_content_views_default_views() {
+  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.features.views');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_content_views_default_views', $args);
+}

@@ -23,6 +23,9 @@ function lingwoorg_content_strongarm() {
     // configure the annotation reader block
     'lingwo_korpus_annotation_reader_block_footer_id' => 'footer',
     'lingwo_korpus_annotation_reader_block_footer_margin' => '15',
+
+    // make our recent content be the front page
+    'site_frontpage' => 'content',
   );
 }
 
