@@ -19,6 +19,10 @@ function lingwoorg_content_strongarm() {
 
     // allow the <anno> tag in "Filtered HTML" (ID 1)
     'allowed_html_1' => "<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd> <word>",
+
+    // configure the annotation reader block
+    'lingwo_korpus_annotation_reader_block_footer_id' => 'footer',
+    'lingwo_korpus_annotation_reader_block_footer_margin' => '15',
   );
 }
 
