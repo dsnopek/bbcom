@@ -56,6 +56,8 @@ function lingwoorg_dictionary_strongarm() {
  */
 // Add entry summary information to the node view
 function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
+  global $user;
+
   if ($op == 'view') {
     if ($node->type != lingwo_dictionary_settings('entry_content_type')) {
       return NULL;
@@ -78,6 +80,11 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         'lingwoorg_dictionary_entry_summary'
       ), $node, $a3, $a4)
     );
+
+    // TODO: should this be 'editor'?
+    if (array_search('admin', $user->roles) == FALSE) {
+      unset($node->content['field_fields']);
+    }
   }
 }
 
