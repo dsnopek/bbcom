@@ -10,6 +10,15 @@ function lingwoorg_content_context_default_contexts() {
 }
 
 /**
+ * Implementation of hook_menu_default_items().
+ */
+function lingwoorg_content_menu_default_items() {
+  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_content_menu_default_items', $args);
+}
+
+/**
  * Implementation of hook_node_info().
  */
 function lingwoorg_content_node_info() {

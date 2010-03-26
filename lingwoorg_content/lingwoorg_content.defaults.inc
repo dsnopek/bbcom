@@ -41,3 +41,23 @@ function _lingwoorg_content_context_default_contexts() {
   );
   return $items;
 }
+
+/**
+ * Helper to implementation of hook_menu_default_items().
+ */
+function _lingwoorg_content_menu_default_items() {
+  $items = array();
+
+  $items[] = array(
+    'title' => 'Content',
+    'path' => '<front>',
+    'weight' => '0',
+  );
+  // Translatables
+  array(
+    t('Content'),
+  );
+
+
+  return $items;
+}

@@ -19,6 +19,15 @@ function lingwoorg_dictionary_context_default_contexts() {
 }
 
 /**
+ * Implementation of hook_menu_default_items().
+ */
+function lingwoorg_dictionary_menu_default_items() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_menu_default_items', $args);
+}
+
+/**
  * Implementation of hook_node_info().
  */
 function lingwoorg_dictionary_node_info() {

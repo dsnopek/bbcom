@@ -527,7 +527,7 @@ function _lingwoorg_dictionary_context_default_contexts() {
       'dictionary' => 'dictionary',
       'dictionary/*' => 'dictionary/*',
     ),
-    'menu' => 'node/53402',
+    'menu' => 'dictionary',
     'block' => array(
       'lingwo_dictionary_0' => array(
         'module' => 'lingwo_dictionary',
@@ -549,6 +549,26 @@ function _lingwoorg_dictionary_context_default_contexts() {
       ),
     ),
   );
+  return $items;
+}
+
+/**
+ * Helper to implementation of hook_menu_default_items().
+ */
+function _lingwoorg_dictionary_menu_default_items() {
+  $items = array();
+
+  $items[] = array(
+    'title' => 'Dictionary',
+    'path' => 'dictionary',
+    'weight' => '2',
+  );
+  // Translatables
+  array(
+    t('Dictionary'),
+  );
+
+
   return $items;
 }
 
