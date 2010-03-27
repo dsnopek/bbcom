@@ -50,7 +50,7 @@ function _lingwoorg_content_menu_default_items() {
 
   $items[] = array(
     'title' => 'Content',
-    'path' => '<front>',
+    'path' => 'content',
     'weight' => '0',
   );
   // Translatables

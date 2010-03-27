@@ -11,17 +11,6 @@ function lingwoorg_strongarm() {
       'Access Denied / User Login' => 'User Login',
     ),
 
-    // our theme settings
-    'theme_default' => 'lingwoorg_theme',
-    'admin_theme'   => 'rubik',
-    'admin_theme_invalidated' => TRUE,
-
-    // strongarm settings (set, ironically, with strongarm)
-    //'strongarm_show_messages' => 0,
-
-    // menus
-    'menu_primary_links_source' => 'features',
-    'menu_default_node_menu'    => 'navigation',
   );
 }
 

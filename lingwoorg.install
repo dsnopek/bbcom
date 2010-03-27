@@ -14,8 +14,15 @@ function lingwoorg_enable() {
   // stuff runs.  Kinda lame, but it does exactly what I want!
   variable_set('language_negotiation', 127);
 
-  // we context to happen after the i18nmenu module, so we move it happen later.
+  // we need context to happen after the i18nmenu module, so we move it happen later.
   update_sql("UPDATE {system} SET weight = 10 WHERE name = 'context'");
+
+  // here are some super basic variables that seem not to play well with strong arm
+  variable_set('theme_default', 'lingwoorg_theme');
+  variable_set('admin_theme', 'rubik');
+  variable_set('admin_theme_invalidated', TRUE);
+  variable_set('menu_primary_links_source', 'features');
+  variable_set('menu_default_node_menu', 'navigation');
 
   drupal_flush_all_caches();
 }
