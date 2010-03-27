@@ -44,3 +44,12 @@ function lingwoorg_dictionary_user_default_permissions() {
   $args = func_get_args();
   return call_user_func_array('_lingwoorg_dictionary_user_default_permissions', $args);
 }
+
+/**
+ * Implementation of hook_views_default_views().
+ */
+function lingwoorg_dictionary_views_default_views() {
+  module_load_include('inc', 'lingwoorg_dictionary', 'lingwoorg_dictionary.features.views');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_dictionary_views_default_views', $args);
+}
