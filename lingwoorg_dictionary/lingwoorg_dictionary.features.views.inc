@@ -30,6 +30,24 @@ function _lingwoorg_dictionary_views_default_views() {
       'relationship' => 'none',
     ),
   ));
+  $handler->override_option('filters', array(
+    'type' => array(
+      'operator' => 'in',
+      'value' => array(
+        'entry' => 'entry',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'none',
+    ),
+  ));
   $handler->override_option('access', array(
     'type' => 'none',
   ));
