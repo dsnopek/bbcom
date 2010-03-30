@@ -73,6 +73,7 @@ function _lingwoorg_content_user_default_permissions() {
     'name' => 'create content content',
     'roles' => array(
       '0' => 'admin',
+      '1' => 'editor',
     ),
   );
 
@@ -97,6 +98,7 @@ function _lingwoorg_content_user_default_permissions() {
     'name' => 'edit any content content',
     'roles' => array(
       '0' => 'admin',
+      '1' => 'editor',
     ),
   );
 
@@ -105,6 +107,7 @@ function _lingwoorg_content_user_default_permissions() {
     'name' => 'edit own content content',
     'roles' => array(
       '0' => 'admin',
+      '1' => 'editor',
     ),
   );
 
