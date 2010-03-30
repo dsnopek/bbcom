@@ -61,3 +61,52 @@ function _lingwoorg_content_menu_default_items() {
 
   return $items;
 }
+
+/**
+ * Helper to implementation of hook_user_default_permissions().
+ */
+function _lingwoorg_content_user_default_permissions() {
+  $permissions = array();
+
+  // Exported permission: create content content
+  $permissions[] = array(
+    'name' => 'create content content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: delete any content content
+  $permissions[] = array(
+    'name' => 'delete any content content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: delete own content content
+  $permissions[] = array(
+    'name' => 'delete own content content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: edit any content content
+  $permissions[] = array(
+    'name' => 'edit any content content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: edit own content content
+  $permissions[] = array(
+    'name' => 'edit own content content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  return $permissions;
+}

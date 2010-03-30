@@ -578,14 +578,22 @@ function _lingwoorg_dictionary_menu_default_items() {
 function _lingwoorg_dictionary_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: access content
+  $permissions[] = array(
+    'name' => 'access content',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+      '2' => 'editor',
+    ),
+  );
+
   // Exported permission: create entry content
   $permissions[] = array(
     'name' => 'create entry content',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
-      '2' => 'editor',
-      '3' => 'manager',
+      '1' => 'editor',
     ),
   );
 
@@ -610,9 +618,7 @@ function _lingwoorg_dictionary_user_default_permissions() {
     'name' => 'edit any entry content',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
-      '2' => 'editor',
-      '3' => 'manager',
+      '1' => 'editor',
     ),
   );
 
@@ -621,9 +627,7 @@ function _lingwoorg_dictionary_user_default_permissions() {
     'name' => 'edit own entry content',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
-      '2' => 'editor',
-      '3' => 'manager',
+      '1' => 'editor',
     ),
   );
 
