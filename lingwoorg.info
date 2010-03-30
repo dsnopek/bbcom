@@ -1,7 +1,7 @@
 core = "6.x"
 dependencies[] = "strongarm"
 dependencies[] = "context"
-dependencies[] = "admin"
+//dependencies[] = "admin"
 description = "The global customizations for Lingwo.org"
 name = "Lingwo.org Global Module"
 package = "Lingwo.org"
