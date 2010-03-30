@@ -49,7 +49,8 @@ function _lingwoorg_dictionary_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'none',
+    'type' => 'perm',
+    'perm' => 'access content',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
