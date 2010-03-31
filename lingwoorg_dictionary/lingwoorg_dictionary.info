@@ -1,4 +1,6 @@
 core = "6.x"
+dependencies[] = "locale"
+dependencies[] = "translation"
 dependencies[] = "content_multigroup"
 dependencies[] = "views"
 dependencies[] = "content"
