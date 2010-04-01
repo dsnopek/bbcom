@@ -127,7 +127,8 @@ function lingwoorg_login_strongarm() {
  * Implementation of hook_form_alter().
  */
 function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'user_register') {
+  // if you can administer users, then you don't need to enter a registration code
+  if ($form_id == 'user_register' && !user_access('administer users')) {
     $form['registration_code'] = array(
       '#title' => t('Registration Code'),
       '#type' => 'textfield',
@@ -145,7 +146,7 @@ function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
 
 function lingwoorg_login_user_login_submit($form, &$form_state) {
   // should take us to the front page.. I hope.
-  $_REQUEST['destination'] = '';
+  $_REQUEST['destination'] = variable_get('site_frontpage', 'node');
 }
 
 function lingwoorg_login_user_register_validate($form, &$form_state) {
