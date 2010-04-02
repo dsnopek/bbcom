@@ -16,7 +16,7 @@ function _lingwoorg_dictionary_views_default_views() {
   $view->is_cacheable = FALSE;
   $view->api_version = 2;
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-  $handler = $view->new_display('default', '', 'default');
+  $handler = $view->new_display('default', 'Recent Entries', 'default');
   $handler->override_option('sorts', array(
     'timestamp' => array(
       'order' => 'DESC',
@@ -45,6 +45,20 @@ function _lingwoorg_dictionary_views_default_views() {
       'id' => 'type',
       'table' => 'node',
       'field' => 'type',
+      'relationship' => 'none',
+    ),
+    'child_translation' => array(
+      'operator' => '=',
+      'value' => '',
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'child_translation',
+      'table' => 'node',
+      'field' => 'child_translation',
       'relationship' => 'none',
     ),
   ));
