@@ -105,7 +105,7 @@ function lingwoorg_login_strongarm() {
     // logintoboggan configuration
     'logintoboggan_login_with_email' => TRUE,
     'logintoboggan_confirm_email_at_registration' => TRUE,
-    'logintoboggan_redirect_on_confirm' => '<front>',
+    //'logintoboggan_redirect_on_confirm' => '<front>',
     'logintoboggan_login_successful_message' => TRUE,
     'logintoboggan_minimum_password_length' => '7',
     'site_403' => 'toboggan/denied',
