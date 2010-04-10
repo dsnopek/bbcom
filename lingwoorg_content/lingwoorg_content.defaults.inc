@@ -17,12 +17,12 @@ function _lingwoorg_content_context_default_contexts() {
     'path' => array(
       '<front>' => '<front>',
     ),
-    'menu' => '<front>',
+    'menu' => 'content',
     'block' => array(
       'lingwoorg_content_0' => array(
         'module' => 'lingwoorg_content',
         'delta' => '0',
-        'weight' => 16,
+        'weight' => 15,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo.org Content: Add Content Block',
@@ -31,7 +31,7 @@ function _lingwoorg_content_context_default_contexts() {
       'lingwo_korpus_0' => array(
         'module' => 'lingwo_korpus',
         'delta' => '0',
-        'weight' => 17,
+        'weight' => 16,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo Korpus: Annotation Reader block',
