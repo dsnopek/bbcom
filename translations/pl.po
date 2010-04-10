@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2010-04-09 12:58+0200\n"
-"PO-Revision-Date: 2010-04-09 12:58+0200\n"
+"POT-Creation-Date: 2010-04-10 18:39+0200\n"
+"PO-Revision-Date: 2010-04-10 18:39+0200\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -1347,10 +1347,6 @@ msgid "flagged content"
 msgstr ""
 
 #: /
-msgid "Words I Am Learning"
-msgstr ""
-
-#: /
 msgid "A @flag-type has been flagged, under \"@flag-title\""
 msgstr ""
 
@@ -1683,10 +1679,6 @@ msgstr ""
 
 #: /dictionary
 msgid "Confirmation form"
-msgstr ""
-
-#: /dictionary
-msgid "Add to \"Words I Am Learning\""
 msgstr ""
 
 #: /dictionary
@@ -2312,10 +2304,6 @@ msgstr ""
 
 #: /lingwo_korpus/lookup_entry?url=%2Fdictionary%2Flookup%2Fen-pl%2Fimage%2528noun%2529
 msgid "Evaluation of \"@label\" has been finished."
-msgstr ""
-
-#: /lingwo_korpus/lookup_entry?url=%2Fdictionary%2Flookup%2Fen-pl%2FEuropean%2528adjective%2529
-msgid "Remove from \"Words I Am Learning\""
 msgstr ""
 
 #: /admin/content/backup_migrate/destination/list/edit/manual
@@ -2994,6 +2982,24 @@ msgstr ""
 
 #: /admin/build/translate/refresh
 msgid "Successfully refreshed strings for %group"
+msgstr ""
+
+#: /node/3
+msgid "context_ui"
+msgstr ""
+
+#: /node/3
+msgid "Context"
+msgstr ""
+
+#: /node/3
+msgid ""
+"Associate menus, views, blocks, etc. with different contexts to "
+"structure your site."
+msgstr ""
+
+#: /user/1/wial
+msgid "1 week"
 msgstr ""
 
 #:   ; misc/drupal.js
@@ -22857,6 +22863,18 @@ msgid ""
 "Format: <em>XXXX-XX-XXXX</em>. You should have received this number "
 "from your teacher."
 msgstr "Format: <em>XXXX-XX-XXXX</em>.  Nauczyciel powinien był to ci podać."
+
+#: /
+msgid "Words I Am Learning"
+msgstr "Mój osobisty słowniczek"
+
+#: /dictionary
+msgid "Add to \"Words I Am Learning\""
+msgstr "Dodaj do \"Mego Słowniczku\""
+
+#: /lingwo_korpus/lookup_entry?url=%2Fdictionary%2Flookup%2Fen-pl%2FEuropean%2528adjective%2529
+msgid "Remove from \"Words I Am Learning\""
+msgstr "Usuń od \"Mego Słowniczku\""
 
 #: /lingwo_korpus/lookup_entry?url=%2Fdictionary%2Flookup%2Fen-pl%2Fnew%2528adjective%2529
 msgid "Entry not found."
