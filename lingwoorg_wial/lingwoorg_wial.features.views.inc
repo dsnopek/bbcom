@@ -228,6 +228,7 @@ function _lingwoorg_wial_views_default_views() {
     'type' => 'none',
   ));
   $handler->override_option('title', 'Words I Am Learning');
+  $handler->override_option('use_pager', 'mini');
   $handler->override_option('style_plugin', 'bulk');
   $handler->override_option('style_options', array(
     'grouping' => '',
@@ -302,6 +303,7 @@ function _lingwoorg_wial_views_default_views() {
     'title' => '',
     'description' => '',
     'weight' => 0,
+    'name' => 'navigation',
   ));
 
   $views[$view->name] = $view;
