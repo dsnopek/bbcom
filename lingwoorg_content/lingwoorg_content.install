@@ -7,7 +7,7 @@ function lingwoorg_content_enable() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 
   $filename = serialize(array(
-    'value' => '[filefield-filename].[filefield-extension]',
+    'value' => '[filefield-onlyname].[filefield-extension]',
     'tolower' => 0,
     'autopath' => 0,
     'transliterate' => 0,
@@ -33,7 +33,7 @@ function lingwoorg_content_update_6001() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 
   $filename = serialize(array(
-    'value' => '[filefield-filename].[filefield-extension]',
+    'value' => '[filefield-onlyname].[filefield-extension]',
     'tolower' => 0,
     'autopath' => 0,
     'transliterate' => 0,
