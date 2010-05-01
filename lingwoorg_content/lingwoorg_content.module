@@ -27,10 +27,23 @@ function lingwoorg_content_strongarm() {
     // make our recent content be the front page
     'site_frontpage' => 'content',
 
+    // sort the fields on the content type
+    'content_extra_weights_content' => array(
+      'title' => -5,
+      'menu'  => -4,
+      'language' => -3,
+      'body_field' => -2,
+      //'field_audio' => -1,
+      'revision_information' => 0,
+      'comment_settings' => 1,
+    ),
+
     // for playing audio on the content items
     'flowplayer3_mediaplayer_file' => 'flowplayer-3.1.5.swf',
     'flowplayer3_mediaplayer_stream_plugin' => '',
     'flowplayer3_mediaplayer' => unserialize('a:3:{s:4:"clip";a:14:{s:8:"autoPlay";s:5:"false";s:13:"autoBuffering";s:5:"false";s:7:"scaling";s:5:"scale";s:5:"start";s:0:"";s:8:"duration";s:0:"";s:11:"accelerated";s:5:"false";s:12:"bufferLength";s:0:"";s:8:"provider";s:0:"";s:11:"fadeInSpeed";s:0:"";s:12:"fadeOutSpeed";s:0:"";s:7:"linkUrl";s:0:"";s:10:"linkWindow";s:6:"_blank";s:4:"live";s:5:"false";s:18:"cuePointMultiplier";s:0:"";}s:8:"controls";a:13:{s:18:"backgroundGradient";s:6:"medium";s:16:"progressGradient";s:6:"medium";s:14:"bufferGradient";s:4:"none";s:14:"sliderGradient";s:4:"none";s:8:"autoHide";s:10:"fullscreen";s:4:"play";s:4:"true";s:6:"volume";s:4:"true";s:4:"mute";s:4:"true";s:4:"time";s:4:"true";s:4:"stop";s:5:"false";s:8:"playlist";s:5:"false";s:10:"fullscreen";s:5:"false";s:8:"scrubber";s:4:"true";}s:6:"canvas";a:7:{s:6:"height";s:2:"24";s:5:"width";s:3:"560";s:15:"backgroundImage";s:0:"";s:16:"backgroundRepeat";s:6:"repeat";s:18:"backgroundGradient";s:3:"low";s:6:"border";s:0:"";s:12:"borderRadius";s:0:"";}}'),
+    'swftools_embed_method' => 'swfobject2_replace',
+    'swftools_mp3_display' => 'flowplayer3_mediaplayer',
   );
 }
 
