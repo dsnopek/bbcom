@@ -91,6 +91,7 @@ function _lingwoorg_content_views_default_views() {
     'title' => '',
     'description' => '',
     'weight' => 0,
+    'name' => 'navigation',
   ));
   $handler = $view->new_display('feed', 'Feed', 'feed');
   $handler->override_option('title', 'Front page feed');
@@ -116,6 +117,7 @@ function _lingwoorg_content_views_default_views() {
     'title' => '',
     'description' => '',
     'weight' => 0,
+    'name' => 'navigation',
   ));
   $handler->override_option('displays', array(
     'default' => 'default',

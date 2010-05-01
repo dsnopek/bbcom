@@ -1,6 +1,66 @@
 <?php
 
 /**
+ * Helper to implementation of hook_content_default_fields().
+ */
+function _lingwoorg_content_content_default_fields() {
+  $fields = array();
+
+  // Exported field: field_audio
+  $fields[] = array(
+    'field_name' => 'field_audio',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'weight' => '-3',
+      'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'swftools_no_file',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'swftools',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'filefield',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'filefield',
+    'active' => '1',
+    'list_field' => '0',
+    'list_default' => 1,
+    'description_field' => '0',
+    'widget' => array(
+      'file_extensions' => 'mp3',
+      'file_path' => '',
+      'progress_indicator' => 'bar',
+      'max_filesize_per_file' => '',
+      'max_filesize_per_node' => '',
+      'label' => 'Audio',
+      'weight' => '-1',
+      'description' => '',
+      'type' => 'filefield_widget',
+      'module' => 'filefield',
+    ),
+  );
+
+  // Translatables
+  array(
+    t('Audio'),
+  );
+
+  return $fields;
+}
+
+/**
  * Helper to implementation of hook_context_default_contexts().
  */
 function _lingwoorg_content_context_default_contexts() {

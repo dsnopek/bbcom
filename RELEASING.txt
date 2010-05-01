@@ -1,0 +1,19 @@
+
+ * Put the site into maintenance mode.
+
+ * (Back-up the database)
+
+ * (Back-up the code)
+
+ * Update all the bzr code.
+
+ * Enable all newly required modules (checking admin/build/features can help know which)
+
+ * Run update.php
+
+ * Check admin/build/features and revert any overridden components.
+
+ * Clear the apc user cache at diag/apc.php
+
+ * Clear the drupal cache with: drush cc
+

@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Implementation of hook_content_default_fields().
+ */
+function lingwoorg_content_content_default_fields() {
+  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_lingwoorg_content_content_default_fields', $args);
+}
+
+/**
  * Implementation of hook_context_default_contexts().
  */
 function lingwoorg_content_context_default_contexts() {
