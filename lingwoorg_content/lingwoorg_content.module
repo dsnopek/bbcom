@@ -68,4 +68,33 @@ function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+/**
+ * Implementation of hook_service().
+ */
+function lingwoorg_content_service() {
+  return array(
+    array(
+      '#method' => 'lingwoorg_content.get_content_item',
+      '#callback' => 'lingwoorg_content_service_get_content_item',
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_content'),
+      '#access arguments' => array('access content'),
+      '#args' => array(
+        array(
+          '#name' => 'id',
+          '#type' => 'string',
+          '#description' => t('The id of the content item'),
+        ),
+        array(
+          '#name' => 'modified_since_revid',
+          '#type' => 'string',
+          '#optional' => TRUE,
+          '#default_value' => '',
+          '#description' => t('If passed, only return the item if has been updated since the given revid'),
+        )
+      ),
+      '#return' => 'struct',
+      '#help' => t('Returns an item of content'),
+    ),
+  );
+}
 
