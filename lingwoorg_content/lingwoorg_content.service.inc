@@ -14,7 +14,7 @@ function lingwoorg_content_service_get_content_item($nid, $vid = '') {
     return services_error('No such id', 404);
   }
   if ($vid != '' && $node->vid == $vid) {
-    // TODO: this isn't the best hint ever, but it works.
+    // the client should check if the revid's match
     return array('id' => $nid, 'revid' => $vid);
   }
 
@@ -23,11 +23,16 @@ function lingwoorg_content_service_get_content_item($nid, $vid = '') {
   
   $content = array(
     'id' => ''.$node->nid,
+	'language' => $node->language,
     'revid' => ''.$node->vid,
     'title' => $node->title,
     'body' => $node->body,
     'entries' => $entries
   );
+
+  if (!empty($node->field_audio[0]['filepath'])) {
+  	$content['audio'] = file_create_url($node->field_audio[0]['filepath']);
+  }
 
   return $content;
 }
