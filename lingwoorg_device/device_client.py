@@ -36,5 +36,6 @@ sessid = res['sessid']
 
 # lingwoorg_device.get_content_item
 res = callMethod(server.lingwoorg_device.get_content_item, '211')
+#res = callMethod(server.lingwoorg_device.get_content_item, '394')
 print json.dumps(res)
 
