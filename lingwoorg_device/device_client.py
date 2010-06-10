@@ -6,10 +6,10 @@ try:
 except ImportError:
     import simplejson as json
 
-DOMAIN = 'skystudio'
-KEY = 'c19d6a8b2a58e8c74e6cfa4fa312d918'
-USERNAME = 'Importer'
-PASSWORD = 'IamTHEiMP0rt3r'
+DOMAIN = 'device'
+KEY = '232c11cd4ad53a82dc96c19b825bf704'
+USERNAME = 'Device'
+PASSWORD = 'iT8_sL@ba'
 
 # connect
 server = ServerProxy('http://localhost:35637/services/xmlrpc')
@@ -34,7 +34,7 @@ def callMethod(method, *user_args):
 res = callMethod(server.user.login, USERNAME, PASSWORD)
 sessid = res['sessid']
 
-# lingwoorg_content.get_content_item
-res = callMethod(server.lingwoorg_content.get_content_item, '211')
+# lingwoorg_device.get_content_item
+res = callMethod(server.lingwoorg_device.get_content_item, '211')
 print json.dumps(res)
 
