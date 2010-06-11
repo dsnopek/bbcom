@@ -12,7 +12,10 @@ USERNAME = 'Device'
 PASSWORD = 'iT8_sL@ba'
 
 # connect
-server = ServerProxy('http://localhost:35637/services/xmlrpc')
+# PHP server
+#server = ServerProxy('http://localhost:35637/services/xmlrpc')
+# Python server
+server = ServerProxy('http://localhost:35638/services/xmlrpc')
 res = server.system.connect()
 sessid = res['sessid']
 
