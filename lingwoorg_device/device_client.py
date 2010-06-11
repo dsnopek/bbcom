@@ -41,6 +41,11 @@ class Interface(object):
     def get_content_item(self, id):
         return self._call_method(self.server.lingwoorg_device.get_content_item, id)
 
+    def pull_update(self, software_version, device_name):
+        return self._call_method(self.server.lingwoorg_device.pull_update, software_version, device_name)
+
+    def push_update(self, software_version, device_name, data):
+        return self._call_method(self.server.lingwoorg_device.push_update, software_version, device_name, data)
 
 # connect
 # PHP server
@@ -51,5 +56,10 @@ server = Interface('http://localhost:35638/services/xmlrpc')
 server.connect()
 server.login()
 item = server.get_content_item('211')
+#item = server.pull_update('1.0', 'device_1')
+#server.login('user_1', 'abc123')
+#server.login('user_2', '678def')
+#item = server.push_update('1.0', 'device_1', {'user_1': {'wial_add': ['en:adjective:red']}})
 print item
+
 

@@ -37,7 +37,7 @@ for id in ['211','394']:
 
 devices = {
     'device_1': {
-        'content': content.keys()[1],
+        'content': [content.keys()[1]],
         'users': ['user_1'],
     }
 }
@@ -93,7 +93,7 @@ def lingwoorg_device_pull_update(sessid, software_version, device_name):
     dev = devices[device_name]
     data = {
         # id:revid of the content
-        'content': [':'.join(id, content[id]['revid']) for id in dev['content']],
+        'content': [':'.join([str(id), str(content[id]['revid'])]) for id in dev['content']],
         # list of usernames which should be defaults on the device
         'users': dev['users'],
     }
@@ -115,12 +115,15 @@ def lingwoorg_device_pull_update(sessid, software_version, device_name):
 def lingwoorg_device_push_update(sessid, software_version, device_name, data):
     # check if the device exists
     devices[device_name]
+    iam = sessions[sessid]
 
     # data will be keyed to the user, ie:
     # {'user_1': {'wial_add': ['en:adjective:red', ...]}}
-    username = sessions[sessid]
-    for word in data[username]['wial_add']:
-        print device_name, ': wial_add :', word
+    for username in data.keys():
+        for word in data[username]['wial_add']:
+            if iam != username and not users[iam]['admin']:
+                raise Exception('Current user doesn\'t have permission to wial_add another user')
+            print device_name, ': wial_add('+username+') :', word
 
     # returns True if everything was successful or throws an exception otherwise
     return True
