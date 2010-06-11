@@ -11,34 +11,45 @@ KEY = '232c11cd4ad53a82dc96c19b825bf704'
 USERNAME = 'Device'
 PASSWORD = 'iT8_sL@ba'
 
+class Interface(object):
+    def __init__(self, url):
+        self.server = ServerProxy(url)
+        self.sessid = None
+
+    def connect(self):
+        res = self.server.system.connect()
+        self.sessid = res['sessid']
+
+    def _call_method(self, method, *user_args):
+        import time, random, string, hmac, hashlib
+
+        cmd = method._Method__name
+        #timestamp = str(int(time.mktime(time.gmtime())));
+        # NOTE: Heh, so this takes Warszawa time!  Really should be UTC...
+        timestamp = str(int(time.mktime(time.localtime())));
+        nonce = ''.join([random.choice(string.ascii_letters) for x in range(10)])
+        hash = hmac.new(KEY, ';'.join([timestamp, DOMAIN, nonce, cmd]), hashlib.sha256).hexdigest()
+
+        args = [hash, DOMAIN, timestamp, nonce, self.sessid] + list(user_args)
+
+        return method(*args)
+
+    def login(self, username=USERNAME, password=PASSWORD):
+        res = self._call_method(self.server.user.login, username, password)
+        self.sessid = res['sessid']
+
+    def get_content_item(self, id):
+        return self._call_method(self.server.lingwoorg_device.get_content_item, id)
+
+
 # connect
 # PHP server
-#server = ServerProxy('http://localhost:35637/services/xmlrpc')
+#server = Interface('http://localhost:35637/services/xmlrpc')
 # Python server
-server = ServerProxy('http://localhost:35638/services/xmlrpc')
-res = server.system.connect()
-sessid = res['sessid']
+server = Interface('http://localhost:35638/services/xmlrpc')
 
-def callMethod(method, *user_args):
-    import time, random, string, hmac, hashlib
-
-    cmd = method._Method__name
-    #timestamp = str(int(time.mktime(time.gmtime())));
-    # NOTE: Heh, so this takes Warszawa time!  Really should be UTC...
-    timestamp = str(int(time.mktime(time.localtime())));
-    nonce = ''.join([random.choice(string.ascii_letters) for x in range(10)])
-    hash = hmac.new(KEY, ';'.join([timestamp, DOMAIN, nonce, cmd]), hashlib.sha256).hexdigest()
-
-    args = [hash, DOMAIN, timestamp, nonce, sessid] + list(user_args)
-
-    return method(*args)
-
-# login
-res = callMethod(server.user.login, USERNAME, PASSWORD)
-sessid = res['sessid']
-
-# lingwoorg_device.get_content_item
-res = callMethod(server.lingwoorg_device.get_content_item, '211')
-#res = callMethod(server.lingwoorg_device.get_content_item, '394')
-print json.dumps(res)
+server.connect()
+server.login()
+item = server.get_content_item('211')
+print item
 
