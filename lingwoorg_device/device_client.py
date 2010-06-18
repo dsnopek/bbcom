@@ -244,6 +244,10 @@ class App(object):
             # store the content item
             self.device_content[content_id] = item
 
+            # download audio file
+            if item.has_key('audio'):
+                self.log("Download the audio file: "+item['audio'])
+
             # loop through entries storing updated ones
             for entry in entries:
                 entry_id = ':'.join([entry['language'], entry['pos'], entry['headword']])
