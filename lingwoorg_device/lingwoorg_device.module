@@ -17,6 +17,11 @@ function lingwoorg_device_service() {
           '#description' => t('A string representing the device software version.'),
         ),
         array(
+          '#name' => 'device_name',
+          '#type' => 'string',
+          '#description' => t('A string representing the device making the call.'),
+        ),
+        array(
           '#name' => 'id',
           '#type' => 'string',
           '#description' => t('The id of the content item'),

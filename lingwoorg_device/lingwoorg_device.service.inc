@@ -94,7 +94,7 @@ function lingwoorg_device_service_export_entry($nid) {
 /*
  * lingwoorg_device.get_content_item
  */
-function lingwoorg_device_service_get_content_item($software_version, $nid, $vid = '') {
+function lingwoorg_device_service_get_content_item($software_version, $device_name, $nid, $vid = '') {
   $node = node_load($nid);
   if (!$node || $node->type != 'content') {
     return services_error('No such id', 404);

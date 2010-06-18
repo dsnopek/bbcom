@@ -41,7 +41,7 @@ sessid = res['sessid']
 for id in ['211', '394']:
     # lingwoorg_device.get_content_item
     print "Dumping "+id+"..."
-    res = callMethod(server.lingwoorg_device.get_content_item, '0.0.01', id)
+    res = callMethod(server.lingwoorg_device.get_content_item, '0.0.01', 'device_1', id)
     json.dump(res, open(id+'.json', 'wt'))
     pickle.dump(res, open(id+'.pickle', 'wt'))
 

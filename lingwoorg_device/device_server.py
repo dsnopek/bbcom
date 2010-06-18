@@ -90,7 +90,7 @@ def user_logout(sessid):
     del sessions[sessid]
     return True
 
-def lingwoorg_device_get_content_item(sessid, software_version, id):
+def lingwoorg_device_get_content_item(sessid, software_version, device_name, id):
     if id == '211' or id == '394':
         return content[id]
 

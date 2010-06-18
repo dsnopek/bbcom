@@ -93,8 +93,8 @@ class ServerInterface(object):
         self._in_connect = False
         return res
 
-    def get_content_item(self, software_version, id):
-        return self._call_method(self.server.lingwoorg_device.get_content_item, software_version, id)
+    def get_content_item(self, software_version, device_name, id):
+        return self._call_method(self.server.lingwoorg_device.get_content_item, software_version, device_name, id)
 
     def pull_update(self, software_version, device_name):
         return self._call_method(self.server.lingwoorg_device.pull_update, software_version, device_name)
@@ -235,7 +235,7 @@ class App(object):
         # next, pull the content items that have been updated
         for content_id in update_content:
             self.log('get_content_item: '+content_id)
-            item = self.server.get_content_item('0.0.01', content_id)
+            item = self.server.get_content_item('0.0.01', 'device_1', content_id)
 
             # pull the entries out
             entries = item['entries']
