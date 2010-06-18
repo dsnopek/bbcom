@@ -80,6 +80,10 @@ def user_login(sessid, username, password):
 
     raise Exception('Wrong username or password')
 
+def user_logout(sessid):
+    del sessions[sessid]
+    return True
+
 def lingwoorg_device_get_content_item(sessid, id):
     if id == '211' or id == '394':
         import simplejson as json
@@ -131,6 +135,7 @@ def lingwoorg_device_push_update(sessid, software_version, device_name, data):
 # Real XML-RPC functions
 server.register_function(system_connect, 'system.connect')
 register_wrapped_function(user_login, 'user.login')
+register_wrapped_function(user_logout, 'user.logout')
 register_wrapped_function(lingwoorg_device_get_content_item, 'lingwoorg_device.get_content_item')
 register_wrapped_function(lingwoorg_device_pull_update, 'lingwoorg_device.pull_update')
 register_wrapped_function(lingwoorg_device_push_update, 'lingwoorg_device.push_update')
@@ -159,6 +164,8 @@ def test(cmd):
             dev['users'] = ['user_1']
     else:
         raise Exception('Unknown test command')
+
+    return True
 
 # our special test control function
 server.register_function(test)
