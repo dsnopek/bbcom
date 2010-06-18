@@ -153,18 +153,18 @@ class App(object):
 
         def create_frame(parent, text, btns):
             frame = Frame(parent)
-            label = Label(frame, text=text)
-            label.pack(side=TOP)
+            label = Label(frame, text=text, font=('Courier', '12', 'bold'))
+            label.pack(side=LEFT)
             for text, command in btns:
                 btn = Button(frame, text=text, command=command)
-                btn.pack(side=TOP)
-            frame.pack(side=LEFT)
+                btn.pack(side=LEFT)
+            frame.pack(side=TOP, fill=X)
             return frame
 
         # arrange the buttons
         frame = Frame(master)
-        create_frame(frame, 'Server Control', server_buttons)
-        create_frame(frame, 'Client Control', client_buttons)
+	create_frame(frame, 'Server Control: ', server_buttons)
+	create_frame(frame, 'Client Control: ', client_buttons)
         frame.pack(side=TOP)
 
         # add the log view
