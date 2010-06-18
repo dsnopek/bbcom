@@ -12,7 +12,7 @@ function lingwoorg_device_service_export_entry($nid) {
     'language' => $node->language,
     'pos' => lingwo_dictionary_entry_get_pos($node),
     'headword' => $node->title,
-    'revid' => $node->vid,
+    'revid' => 0+$node->vid,
     'fields' => array(),
     'senses' => array(),
     'translations' => array()
@@ -94,7 +94,7 @@ function lingwoorg_device_service_export_entry($nid) {
 /*
  * lingwoorg_device.get_content_item
  */
-function lingwoorg_device_service_get_content_item($nid, $vid = '') {
+function lingwoorg_device_service_get_content_item($software_version, $nid, $vid = '') {
   $node = node_load($nid);
   if (!$node || $node->type != 'content') {
     return services_error('No such id', 404);

@@ -84,12 +84,9 @@ def user_logout(sessid):
     del sessions[sessid]
     return True
 
-def lingwoorg_device_get_content_item(sessid, id):
+def lingwoorg_device_get_content_item(sessid, software_version, id):
     if id == '211' or id == '394':
-        import simplejson as json
-        content = json.load(open(id+'.json', 'rt'))
-        # TODO: force an update of the revid
-        return content
+        return content[id]
 
     raise Exception('No such content item')
 
@@ -148,18 +145,19 @@ def test(cmd):
         if len(dev['content']) == 1:
             dev['content'] = content.keys()
         elif len(dev['content']) > 1:
-            dev['content'] = content.keys()[1]
+            dev['content'] = [content.keys()[1]]
     elif cmd == 'update_content':
         # updates a random 10 revisions in the texts and updates the texts too
         for text in content.values():
             text['revid'] += 1
-            for i in range(10):
-                random.choice(text.entries)['revid'] += 1;
+            for i in range(5):
+                entry = random.choice(text['entries'])
+                entry['revid'] += 1
     elif cmd == 'software_update':
         software_update = 'http://www.lingwo.org/device/updates/lingwo-0.1.2.apk'
     elif cmd == 'toggle_users':
         if len(dev['users']) == 1:
-            dev['users'] += 'user_3'
+            dev['users'].append('user_3')
         else:
             dev['users'] = ['user_1']
     else:

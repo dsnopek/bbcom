@@ -40,6 +40,6 @@ sessid = res['sessid']
 for id in ['211', '394']:
     # lingwoorg_device.get_content_item
     print "Dumping "+id+"..."
-    res = callMethod(server.lingwoorg_device.get_content_item, id)
+    res = callMethod(server.lingwoorg_device.get_content_item, '0.0.01', id)
     json.dump(res, open(id+'.json', 'wt'))
 

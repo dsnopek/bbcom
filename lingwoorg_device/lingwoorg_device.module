@@ -12,6 +12,11 @@ function lingwoorg_device_service() {
       '#access arguments' => array('access content'),
       '#args' => array(
         array(
+          '#name' => 'software_version',
+          '#type' => 'string',
+          '#description' => t('A string representing the device software version.'),
+        ),
+        array(
           '#name' => 'id',
           '#type' => 'string',
           '#description' => t('The id of the content item'),
