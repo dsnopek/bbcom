@@ -1,10 +1,16 @@
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 import random
+
+data_ext = '.json'
 try:
-    import simplejson as json
+    import simplejson as loader
 except ImportError:
-    import json
+    try:
+        import json as loader
+    except ImportError:
+        import pickle as loader
+        data_ext = '.pickle'
 
 #
 # Global Server Data
@@ -33,7 +39,7 @@ sessions = {}
 
 content = {}
 for id in ['211','394']:
-    content[id] = json.load(open(id+'.json', 'rt'))
+    content[id] = loader.load(open(id+data_ext, 'rt'))
 
 devices = {
     'device_1': {
@@ -168,5 +174,6 @@ def test(cmd):
 # our special test control function
 server.register_function(test)
 
+print "Running server..."
 server.serve_forever()
 

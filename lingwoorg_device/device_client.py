@@ -153,7 +153,7 @@ class App(object):
 
         def create_frame(parent, text, btns):
             frame = Frame(parent)
-            label = Label(frame, text=text, font=('Courier', '12', 'bold'))
+            label = Label(frame, text=text, font=('Courier', '10', 'bold'))
             label.pack(side=LEFT)
             for text, command in btns:
                 btn = Button(frame, text=text, command=command)

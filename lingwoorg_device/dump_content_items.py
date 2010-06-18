@@ -5,6 +5,7 @@ try:
     import json
 except ImportError:
     import simplejson as json
+import pickle
 
 DOMAIN = 'device'
 KEY = '232c11cd4ad53a82dc96c19b825bf704'
@@ -42,4 +43,5 @@ for id in ['211', '394']:
     print "Dumping "+id+"..."
     res = callMethod(server.lingwoorg_device.get_content_item, '0.0.01', id)
     json.dump(res, open(id+'.json', 'wt'))
+    pickle.dump(res, open(id+'.pickle', 'wt'))
 
