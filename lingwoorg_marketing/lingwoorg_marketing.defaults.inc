@@ -95,3 +95,32 @@ function _lingwoorg_marketing_content_default_fields() {
 
   return $fields;
 }
+
+/**
+ * Helper to implementation of hook_context_default_contexts().
+ */
+function _lingwoorg_marketing_context_default_contexts() {
+  $items = array();
+
+  $items[] = array(
+    'namespace' => 'lingwoorg',
+    'attribute' => 'section',
+    'value' => 'marketing',
+    'description' => 'Viewing our marketing materials.',
+    'menu_trail' => array(
+      'node/1430' => 'node/1430',
+    ),
+    'block' => array(
+      'views_latest_news-block_1' => array(
+        'module' => 'views',
+        'delta' => 'latest_news-block_1',
+        'weight' => 15,
+        'region' => 'header',
+        'status' => '0',
+        'label' => 'Story Slideshow',
+        'type' => 'context_ui',
+      ),
+    ),
+  );
+  return $items;
+}
