@@ -42,6 +42,7 @@ for id in ['211', '394']:
     # lingwoorg_device.get_content_item
     print "Dumping "+id+"..."
     res = callMethod(server.lingwoorg_device.get_content_item, '0.0.01', 'device_1', id)
+    res['audio'] = res['audio'].replace('localhost:35637', 'www.lingwo.org')
     json.dump(res, open(id+'.json', 'wt'))
     pickle.dump(res, open(id+'.pickle', 'wt'))
 
