@@ -40,10 +40,10 @@ function _lingwoorg_marketing_content_default_fields() {
     'active' => '1',
     'widget' => array(
       'video_width' => '425',
-      'video_height' => '350',
+      'video_height' => '290',
       'video_autoplay' => 0,
       'preview_width' => '425',
-      'preview_height' => '350',
+      'preview_height' => '290',
       'preview_autoplay' => 0,
       'thumbnail_width' => '120',
       'thumbnail_height' => '90',

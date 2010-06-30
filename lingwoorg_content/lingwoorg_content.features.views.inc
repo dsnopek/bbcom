@@ -60,6 +60,22 @@ function _lingwoorg_content_views_default_views() {
         'label' => '',
       ),
     ),
+    'type' => array(
+      'operator' => 'in',
+      'value' => array(
+        'content' => 'content',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'none',
+    ),
   ));
   $handler->override_option('access', array(
     'type' => 'perm',
