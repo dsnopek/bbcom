@@ -107,8 +107,11 @@ function _lingwoorg_marketing_context_default_contexts() {
     'attribute' => 'section',
     'value' => 'marketing',
     'description' => 'Viewing our marketing materials.',
+    'path' => array(
+      'about' => 'about',
+    ),
     'menu_trail' => array(
-      'node/1430' => 'node/1430',
+      'about' => 'about',
     ),
     'block' => array(
       'views_latest_news-block_1' => array(
@@ -127,6 +130,15 @@ function _lingwoorg_marketing_context_default_contexts() {
         'region' => 'content_right',
         'status' => '0',
         'label' => 'Webform: Contact Us',
+        'type' => 'context_ui',
+      ),
+      'views_all_news-block_1' => array(
+        'module' => 'views',
+        'delta' => 'all_news-block_1',
+        'weight' => 16,
+        'region' => 'content_bottom',
+        'status' => '0',
+        'label' => 'All News',
         'type' => 'context_ui',
       ),
     ),
