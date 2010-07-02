@@ -1,0 +1,3 @@
+# Should be hidden from the web!
+deny from all
+

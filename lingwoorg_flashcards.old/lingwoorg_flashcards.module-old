@@ -1,0 +1,226 @@
+<?php
+// $Id$
+
+include_once('lingwoorg_flashcards.features.inc');
+
+/**
+ * @file
+ * Integrate Anki flashcards into Lingwo.org
+ */
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwoorg_flashcards_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  if ($node->type != anki_deck_content_type())
+    return;
+
+  if ($op == 'delete') {
+    db_query('DELETE FROM {lingwoorg_flashcards_wial} WHERE nid = %d', $node->nid);
+  }
+}
+
+/*
+ * Implementation of hook_field_access().
+ */
+function lingwoorg_flashcards_field_access($op, $field, $account, $node=NULL) {
+  global $user;
+
+  if ($field['field_name'] == anki_deck_content_field() && !is_null($node)) {
+    if (!$account) {
+      $account = $user;
+    }
+
+    $node_uid = $node->uid;
+    // HACK: for when this is being pulled in from 'views'!
+    // TODO: there really should be a way to add the nodes uid to the view..  Either
+    // that or just say you're going to load each node..
+    if (!$node_uid && $node->users_uid) {
+      $node_uid = $node->users_uid;
+    }
+
+    // Only he owner of this deck should be able to access the deck file
+    if ($account->uid != $node_uid) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+// TODO: clean this up!
+// This function is long, ugly and 12 kinds of hackity, but it works!!
+function _lingwoorg_flashcards_get_wial_deck($uid) {
+  // TODO: attempt to get or to create the users WIAL deck
+  $wial_deck = db_fetch_object(db_query("SELECT nid FROM lingwoorg_flashcards_wial WHERE uid = %d", $uid));
+  if ($wial_deck) {
+    return node_load($wial_deck->nid);
+  }
+
+  # TODO: we will need to create this directory if it doesn't exist!
+  $deck_path = "anki/$uid/wial.anki";
+
+  $anki = anki_server_connect();
+  // create the deck
+  $anki->request('create_deck', array('path' => $deck_path));
+
+  // add the file to drupal's file system
+  $full_deck_path = file_directory_path() .'/'. $deck_path;
+  $file = (object)array(
+    'uid' => $uid,
+    'filename' => 'wial.anki',
+    'filepath' => $full_deck_path,
+    'filemime' => 'application/octet-stream',
+    'filesize' => filesize($full_deck_path),
+    'status' => 1,
+    'timestamp' => time(),
+    'origname' => 'wial.anki',
+  );
+  drupal_write_record('files', $file);
+
+  // add some other fields that filefield uses
+  // TODO: is this necessary?
+  $file->list = 1;
+  $file->data = array('description' => NULL);
+
+  // attempt to save the node
+  $field_anki_deck = anki_deck_content_field();
+  $node = (object)array(
+    'uid' => $uid,
+    'type' => anki_deck_content_type(),
+    'title' => t('"Words I am Learning" deck'),
+    'body' => t('All the words on your "Words I am Learning" list will be automatically added to this flashcard deck!'),
+    $field_anki_deck => array(0 => (array)$file),
+  );
+  node_save($node);
+
+  $wial_deck = (object)array(
+    'uid' => $uid,
+    'nid' => $node->nid,
+  );
+  drupal_write_record('lingwoorg_flashcards_wial', $wial_deck);
+
+  // TODO: should we node_load() this or does it not matter?
+  return $node;
+}
+
+function _lingwoorg_flashcards_open_wial_deck($anki, $deck_path) {
+
+  try {
+    $deck = $anki->request('open_deck', array('path' => $deck_path));
+  }
+  catch (AnkiServerException $e) {
+    /*
+    try {
+      $deck = $anki->request('create_deck', array('path' => $deck_path));
+    }
+    catch (AnkiServerException $e) {
+      return NULL;
+    }
+    */
+    return NULL;
+  }
+
+  return $deck;
+}
+
+function _lingwoorg_flashcards_node_to_fact_fields($node) {
+  // TODO: we shouldn't do this!!
+  $node = node_build_content($node, FALSE, TRUE);
+
+  $allowed_tags = array('em','strong','ul','ol','li');
+
+  $front .= implode(' => ', lingwo_dictionary_entry_get_languages($node, TRUE)) ."\n";
+  $front .= $node->title ." (". lingwo_dictionary_entry_get_pos($node) .")\n";
+  // TODO: fer real, we need to not abuse node_build_content() and just call the function
+  // to build this.
+  $front .= filter_xss(drupal_render($node->content['entry_summary']), $allowed_tags);
+
+  // TODO: we want to get the examples on the front of the card, and only the translations
+  // on the back of the card
+  // TODO: we need to stop cheating by re-using the original theme!  A new theme 
+  // function or template would be cool though.
+  $back = trim(filter_xss(drupal_render($node->content['field_senses']), $allowed_tags));
+
+  $fields = array(
+    'Front' => $front,
+    'Back'  => $back,
+    'Lingwo ID' => lingwo_dictionary_entry_get_id($node),
+  );
+  return $fields;
+}
+
+/**
+ * Implementation of hook_lingwo_wial().
+ */
+function lingwoorg_flashcards_lingwo_wial($op, $nid, $uid) {
+  // TODO: the next four lines are mud!!
+  $deck_node = _lingwoorg_flashcards_get_wial_deck($uid);
+  //$field_anki_deck = anki_deck_content_field();
+  //$field_anki_deck = $deck_node->$field_anki_deck;
+  //$deck_path = $field_anki_deck[0]['filepath'];
+  // TODO: since the path to the WIAL deck is standardized, I don't see why we couldn't
+  // just use its name directly.  The problem is really only creating the file and node
+  // if the user doesn't already have them.
+  $deck_path = "anki/$uid/wial.anki";
+
+  $node = node_load($nid);
+
+  // connect to AnkiServer
+  $anki = anki_server_connect();
+
+  // first we need to get a users deck
+  if (!$deck = _lingwoorg_flashcards_open_wial_deck($anki, $deck_path)) {
+    // TODO: this should really be the same message as the later, but for now...
+    drupal_set_message(t('Unable to load your "Words I Am Learning" deck.'), 'error');
+    return;
+  }
+
+  switch ($op) {
+    case 'add':
+      try {
+        $anki->request('add_fact', array(
+          'deck_id' => $deck->id,
+          'fields' => _lingwoorg_flashcards_node_to_fact_fields($node),
+        ));
+      }
+      catch (AnkiServerException $e) {
+        drupal_set_message(t('Unable to add flashcard to your "Words I am Learning" deck.'), 'error');
+        return;
+      }
+
+      drupal_set_message(t('Added flashcard to your "Words I am Learning" deck.'));
+      break;
+    
+    case 'remove':
+      try {
+        $fact = $anki->request('find_fact', array(
+          'deck_id' => $deck->id,
+          'lingwo_id' => lingwo_dictionary_entry_get_id($node),
+        ));
+        if (empty($fact)) {
+          // nothing to do if no such card exsists!
+          return;
+        }
+
+        $anki->request('delete_fact', array(
+          'deck_id' => $deck->id,
+          'fact_id' => $fact->id,
+        ));
+      }
+      catch (AnkiServerException $e) {
+        drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+        return;
+      }
+
+      drupal_set_message(t('Flashcard removed from your "Words I am Learning" deck.'));
+      break;
+  }
+
+  // after any updates to the file, we need to adjust the file size on the files table
+  // TODO: copy-and-paste coding alert!  Refactor!
+  $full_deck_path = file_directory_path() .'/'. $deck_path;
+  db_query('UPDATE {files} SET filesize = %d WHERE fid = %d',
+    filesize($full_deck_path), $deck_node->field_anki_deck[0]['fid']);
+}
+

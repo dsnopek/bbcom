@@ -138,7 +138,7 @@ function _lingwoorg_marketing_views_default_views() {
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
-  $handler->override_option('title', 'News');
+  $handler->override_option('title', 'All News');
   $handler->override_option('use_ajax', TRUE);
   $handler->override_option('use_pager', 'mini');
   $handler->override_option('style_plugin', 'table');
