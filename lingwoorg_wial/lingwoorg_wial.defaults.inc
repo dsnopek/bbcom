@@ -59,3 +59,30 @@ function _lingwoorg_wial_rules_defaults() {
     ),
   );
 }
+
+/**
+ * Helper to implementation of hook_user_default_permissions().
+ */
+function _lingwoorg_wial_user_default_permissions() {
+  $permissions = array();
+
+  // Exported permission: access other wials
+  $permissions[] = array(
+    'name' => 'access other wials',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: access wial
+  $permissions[] = array(
+    'name' => 'access wial',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'authenticated user',
+      '2' => 'editor',
+    ),
+  );
+
+  return $permissions;
+}

@@ -44,3 +44,30 @@ function lingwoorg_wial_link_alter(&$links, $node) {
   }
 }
 
+/*
+ * Implementation of hook_perm().
+ */
+function lingwoorg_wial_perm() {
+  return array(
+    // TODO: we need to make is so users without 'access wial' don't see any signs of!
+    'access wial',
+    'access other wials'
+  );
+}
+
+function lingwoorg_wial_page_access($account) {
+  global $user;
+
+  // root user
+  if ($user->uid == 1) {
+    return TRUE;
+  }
+
+  if (is_numeric($account)) {
+    $account = (object)array('uid' => $account);
+  }
+
+  return (user_access('access wial') && $user->uid == $account->uid) ||
+    user_access('access other wials');
+}
+

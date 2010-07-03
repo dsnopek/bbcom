@@ -222,7 +222,11 @@ function _lingwoorg_wial_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'none',
+    'type' => 'php',
+    'code' => '<?php
+$parts = explode(\'/\', $_GET[\'q\']);
+return lingwoorg_wial_page_access($parts[1]);
+?>',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
@@ -290,10 +294,10 @@ function _lingwoorg_wial_views_default_views() {
     ),
   ));
   $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->override_option('path', 'user/%/wial');
+  $handler->override_option('path', 'wial/%/edit');
   $handler->override_option('menu', array(
     'type' => 'tab',
-    'title' => 'Words I Am Learning',
+    'title' => 'Edit',
     'description' => '',
     'weight' => '0',
     'name' => 'navigation',
