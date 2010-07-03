@@ -1,7 +1,0 @@
-; $Id$
-name = Anki
-description = Integrate Anki with Drupal
-package = Lingwo Dictionary
-core = 6.x
-dependencies[] = filefield
-

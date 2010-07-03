@@ -2,11 +2,46 @@
 // $Id$
 
 //include_once('lingwoorg_flashcards.features.inc');
+require_once(drupal_get_path('module', 'lingwoorg_flashcards') .'/lingwoorg_flashcards.anki.inc');
 
 /**
  * @file
  * Integrate Anki flashcards into Lingwo.org
  */
+
+/**
+ * Implementation of hook_menu().
+ */
+function lingwoorg_flashcards_menu() {
+  $items = array();
+  $items['admin/settings/lingwo_dictionary/flashcards'] = array(
+    'title' => 'Flashcards',
+    'description' => 'Settings for Lingwo.org Flashcards module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwoorg_flashcards_admin_settings'),
+    'file' => 'lingwoorg_flashcards.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function lingwoorg_flashcards_theme() {
+  return array(
+    'lingwoorg_flashcards_flashcard_front' => array(
+      'arguments' => array('node' => NULL),
+      'file' => 'lingwoorg_flashcards.theme.inc',
+    ),
+    'lingwoorg_flashcards_flashcard_back' => array(
+      'arguments' => array('node' => NULL),
+      'file' => 'lingwoorg_flashcards.theme.inc',
+    ),
+  );
+}
 
 /**
  * Implementation of hook_rules_action_info()
@@ -21,10 +56,62 @@ function lingwoorg_flashcards_rules_action_info() {
       ),
       'module' => 'lingwoorg_flashcard',
     ),
+    'lingwoorg_flashcards_action_remove_from_wial_deck' => array(
+      'label' => t('Remove flashcard from user\'s WIAL deck'),
+      'arguments' => array(
+        'node' => array('type' => 'node', 'label' => t('Entry')),
+        'user' => array('type' => 'user', 'label' => t('User')),
+      ),
+      'module' => 'lingwoorg_flashcard',
+    ),
   );
 }
 
+
+/*
+ * Actions
+ */
+
 function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
-  #
+  try {
+    lingwoorg_flashcards_anki_server_connect()
+      ->openWialDeck($user->uid)
+      ->addFactForNode($node);
+  }
+  catch (AnkiServerException $e) {
+    watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+    drupal_set_message(t('Unable to add flashcard to your "Words I am Learning" deck.'), 'error');
+  }
+}
+
+function lingwoorg_flashcards_action_remove_from_wial_deck($node, $user) {
+  try {
+    $deck = lingwoorg_flashcards_anki_server_connect()
+      ->openWialDeck($user->uid);
+    $deck->deleteFact($deck->findFactForNode($node));
+  }
+  catch (AnkiServerException $e) {
+    watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+    drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+  }
+}
+
+/*
+ * API functions
+ */
+
+function lingwoorg_flashcards_anki_server_connect() {
+  return new AnkiServer(lingwoorg_flashcards_anki_server_url());
+}
+
+/*
+ * Settings
+ */
+
+function lingwoorg_flashcards_anki_server_url($value = NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwoorg_flashcards_anki_server_url', 'localhost:5000');
+  }
+  variable_set('lingwoorg_flashcards_anki_server_url', $value);
 }
 

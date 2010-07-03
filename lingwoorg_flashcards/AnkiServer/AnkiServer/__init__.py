@@ -45,7 +45,20 @@ class AnkiServerApp(object):
         return npath
 
     def create_deck(self, path):
+        import errno
+
         full_path = self._get_path(path)
+
+        # mkdir -p the path, because it might not exist
+        dir = os.path.dirname(full_path)
+        try:
+            os.makedirs(dir)
+        except OSError, exc:
+            if exc.errno == errno.EEXIST:
+                pass
+            else:
+                raise
+
         if os.path.exists(full_path):
             raise HTTPBadRequest('"%s" already exists' % path)
 

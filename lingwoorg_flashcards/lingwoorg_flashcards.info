@@ -1,7 +1,6 @@
 core = "6.x"
 dependencies[] = "lingwoorg_wial"
 dependencies[] = "rules"
-dependencies[] = "anki"
 description = "Provide user flashcards for their WIAL words"
 name = "Lingwo.org Flashcards"
 package = "Lingwo.org"

@@ -1,5 +1,6 @@
 
 This module depends on HTTP_Request2 from pear.  Install it using this command:
 
+  $ pear install Net_URL2-0.3.1
   $ pear install HTTP_Request2-0.5.1
 
