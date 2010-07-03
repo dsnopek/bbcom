@@ -35,6 +35,7 @@ function lingwoorg_flashcards_theme() {
     'lingwoorg_flashcards_flashcard_front' => array(
       'arguments' => array('node' => NULL),
       'file' => 'lingwoorg_flashcards.theme.inc',
+      'template' => 'lingwoorg-flashcards-flashcard-front',
     ),
     'lingwoorg_flashcards_flashcard_back' => array(
       'arguments' => array('node' => NULL),
@@ -73,6 +74,7 @@ function lingwoorg_flashcards_rules_action_info() {
  */
 
 function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
+  # TODO: only do this if it is a translation!
   try {
     lingwoorg_flashcards_anki_server_connect()
       ->openWialDeck($user->uid)
@@ -85,6 +87,7 @@ function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
 }
 
 function lingwoorg_flashcards_action_remove_from_wial_deck($node, $user) {
+  # TODO: only do this if it is a translation!
   try {
     $deck = lingwoorg_flashcards_anki_server_connect()
       ->openWialDeck($user->uid);
