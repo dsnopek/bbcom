@@ -74,28 +74,30 @@ function lingwoorg_flashcards_rules_action_info() {
  */
 
 function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
-  # TODO: only do this if it is a translation!
-  try {
-    lingwoorg_flashcards_anki_server_connect()
-      ->openWialDeck($user->uid)
-      ->addFactForNode($node);
-  }
-  catch (AnkiServerException $e) {
-    watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-    drupal_set_message(t('Unable to add flashcard to your "Words I am Learning" deck.'), 'error');
+  if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
+    try {
+      lingwoorg_flashcards_anki_server_connect()
+        ->openWialDeck($user->uid)
+        ->addFactForNode($node);
+    }
+    catch (AnkiServerException $e) {
+      watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+      drupal_set_message(t('Unable to add flashcard to your "Words I am Learning" deck.'), 'error');
+    }
   }
 }
 
 function lingwoorg_flashcards_action_remove_from_wial_deck($node, $user) {
-  # TODO: only do this if it is a translation!
-  try {
-    $deck = lingwoorg_flashcards_anki_server_connect()
-      ->openWialDeck($user->uid);
-    $deck->deleteFact($deck->findFactForNode($node));
-  }
-  catch (AnkiServerException $e) {
-    watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-    drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+  if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
+    try {
+      $deck = lingwoorg_flashcards_anki_server_connect()
+        ->openWialDeck($user->uid);
+      $deck->deleteFact($deck->findFactForNode($node));
+    }
+    catch (AnkiServerException $e) {
+      watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+      drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+    }
   }
 }
 
