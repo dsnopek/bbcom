@@ -1,8 +1,8 @@
 <?php
 // $Id$
 
-//include_once('lingwoorg_flashcards.features.inc');
-require_once(drupal_get_path('module', 'lingwoorg_flashcards') .'/lingwoorg_flashcards.anki.inc');
+include_once('lingwoorg_flashcards.features.inc');
+include_once('lingwoorg_flashcards.anki.inc');
 
 /**
  * @file
