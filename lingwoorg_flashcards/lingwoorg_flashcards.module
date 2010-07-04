@@ -42,8 +42,8 @@ function lingwoorg_flashcards_menu() {
     'title' => 'Quiz',
     'access callback' => 'lingwoorg_wial_page_access',
     'access arguments' => array(1),
-    'page callback' => 'lingwoorg_flashcards_page_wial_quiz',
-    'page arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwoorg_flashcards_page_wial_quiz_form', 1),
     'file' => 'lingwoorg_flashcards.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );

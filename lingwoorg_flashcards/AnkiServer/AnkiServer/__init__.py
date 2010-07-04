@@ -160,6 +160,40 @@ class AnkiServerApp(object):
         finally:
             deck.close()
 
+    def _output_card(self, card):
+        return {
+            'id': card.id,
+            'question': card.question,
+            'answer': card.answer,
+        }
+
+    def get_card(self, deck_id):
+        deck = self._open_deck(deck_id)
+        try:
+            card = deck.getCard()
+            if card:
+                # grab the interval strings
+                intervals = []
+                for i in range(1, 5):
+                    intervals.append(deck.nextIntervalStr(card, i))
+
+                card = self._output_card(card)
+                card['intervals'] = intervals
+        finally:
+            deck.close()
+        return card
+
+    def answer_card(self, deck_id, card_id, ease):
+        ease = int(ease)
+        deck = self._open_deck(deck_id)
+        try:
+            card = deck.cardFromId(card_id)
+            if card:
+                deck.answerCard(card, ease)
+                deck.save()
+        finally:
+            deck.close()
+
     @wsgify
     def __call__(self, req):
         if self.allowed_hosts != '*':

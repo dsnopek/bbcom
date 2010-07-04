@@ -44,6 +44,20 @@ class AnkiDeck {
       'fact_id' => $fact->id,
     ));
   }
+
+  function getCard() {
+    return $this->server->request('get_card', array(
+      'deck_id' => $this->deck->id,
+    ));
+  }
+
+  function answerCard($card, $ease) {
+    $this->server->request('answer_card', array(
+      'deck_id' => $this->deck->id,
+      'card_id' => $card->id,
+      'ease' => $ease,
+    ));
+  }
 }
 
 class AnkiServer {

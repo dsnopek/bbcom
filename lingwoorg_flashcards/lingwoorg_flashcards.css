@@ -1,0 +1,25 @@
+
+#lingwoorg-flashcards-flashcard {
+  margin: 10px;
+  padding: 25px 10px;
+  border: 1px solid black;
+  background: white;
+  font-size: 14pt;
+}
+
+#lingwoorg-flashcards-flashcard-question {
+}
+
+#lingwoorg-flashcards-flashcard-answer {
+  display: none;
+}
+
+#lingwoorg-flashcards-ease-buttons {
+  display: none;
+}
+
+#lingwoorg-flashcards-finished {
+  font-size: 14pt;
+  margin: 10px 0;
+}
+
