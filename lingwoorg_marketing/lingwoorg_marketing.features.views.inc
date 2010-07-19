@@ -131,6 +131,22 @@ function _lingwoorg_marketing_views_default_views() {
       'field' => 'type',
       'relationship' => 'none',
     ),
+    'language' => array(
+      'operator' => 'in',
+      'value' => array(
+        '***CURRENT_LANGUAGE***' => '***CURRENT_LANGUAGE***',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'language',
+      'table' => 'node',
+      'field' => 'language',
+      'relationship' => 'none',
+    ),
   ));
   $handler->override_option('access', array(
     'type' => 'none',
@@ -400,6 +416,22 @@ function _lingwoorg_marketing_views_default_views() {
       ),
       'relationship' => 'none',
     ),
+    'language' => array(
+      'operator' => 'in',
+      'value' => array(
+        '***CURRENT_LANGUAGE***' => '***CURRENT_LANGUAGE***',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'language',
+      'table' => 'node',
+      'field' => 'language',
+      'relationship' => 'none',
+    ),
   ));
   $handler->override_option('access', array(
     'type' => 'none',
@@ -548,6 +580,22 @@ function _lingwoorg_marketing_views_default_views() {
       'hierarchy' => 0,
       'relationship' => 'none',
       'reduce_duplicates' => 0,
+    ),
+    'language' => array(
+      'operator' => 'in',
+      'value' => array(
+        '***CURRENT_LANGUAGE***' => '***CURRENT_LANGUAGE***',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'language',
+      'table' => 'node',
+      'field' => 'language',
+      'relationship' => 'none',
     ),
   ));
   $handler->override_option('access', array(

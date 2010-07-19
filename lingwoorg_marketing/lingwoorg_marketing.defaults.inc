@@ -117,16 +117,16 @@ function _lingwoorg_marketing_context_default_contexts() {
       'views_latest_news-block_1' => array(
         'module' => 'views',
         'delta' => 'latest_news-block_1',
-        'weight' => 16,
+        'weight' => 15,
         'region' => 'content_top',
         'status' => '0',
         'label' => 'Story Slideshow',
         'type' => 'context_ui',
       ),
-      'webformblock_1431' => array(
+      'webformblock_1449' => array(
         'module' => 'webformblock',
-        'delta' => '1431',
-        'weight' => 16,
+        'delta' => '1449',
+        'weight' => 15,
         'region' => 'content_right',
         'status' => '0',
         'label' => 'Webform: Contact Us',
@@ -135,7 +135,7 @@ function _lingwoorg_marketing_context_default_contexts() {
       'views_all_news-block_1' => array(
         'module' => 'views',
         'delta' => 'all_news-block_1',
-        'weight' => 16,
+        'weight' => 15,
         'region' => 'content_bottom',
         'status' => '0',
         'label' => 'All News',
