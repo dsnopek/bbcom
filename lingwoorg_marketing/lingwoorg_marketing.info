@@ -1,5 +1,4 @@
 core = "6.x"
-dependencies[] = "taxonomy"
 dependencies[] = "webformblock"
 dependencies[] = "context"
 dependencies[] = "views"
