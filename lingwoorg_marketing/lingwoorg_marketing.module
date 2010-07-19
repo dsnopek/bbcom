@@ -1,2 +1,4 @@
 <?php
 
+include_once('lingwoorg_marketing.features.inc');
+
