@@ -108,7 +108,6 @@ function lingwoorg_login_strongarm() {
     'logintoboggan_redirect_on_confirm' => 'user/%uid/edit',
     'logintoboggan_login_successful_message' => TRUE,
     'logintoboggan_minimum_password_length' => '7',
-    'site_403' => 'toboggan/denied',
 
     // remember_me configuration
     'remember_me_checkbox' => 1,
