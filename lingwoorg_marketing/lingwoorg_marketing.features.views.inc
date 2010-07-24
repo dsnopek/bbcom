@@ -84,13 +84,6 @@ function _lingwoorg_marketing_views_default_views() {
     ),
   ));
   $handler->override_option('sorts', array(
-    'sticky' => array(
-      'order' => 'DESC',
-      'id' => 'sticky',
-      'table' => 'node',
-      'field' => 'sticky',
-      'relationship' => 'none',
-    ),
     'created' => array(
       'order' => 'DESC',
       'granularity' => 'second',
