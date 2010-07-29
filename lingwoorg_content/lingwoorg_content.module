@@ -76,6 +76,16 @@ function lingwoorg_content_flag_default_flags() {
   return $flags;
 }
 
+/*
+ * Implementation of hook_nodeapi().
+ */
+function lingwoorg_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  if ($node->type == lingwo_korpus_text_content_type() && $op == 'view') {
+    drupal_add_js(drupal_get_path('module', 'flag') .'/theme/flag.js');
+    drupal_add_css(drupal_get_path('module', 'flag') .'/theme/flag.css');
+  }
+}
+
 /**
  * Implementation of hook_block().
  */
