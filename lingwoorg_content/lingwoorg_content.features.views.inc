@@ -269,15 +269,6 @@ function _lingwoorg_content_views_default_views() {
       'relationship' => 'nid',
     ),
   ));
-  $handler->override_option('sorts', array(
-    'title' => array(
-      'order' => 'ASC',
-      'id' => 'title',
-      'table' => 'node',
-      'field' => 'title',
-      'relationship' => 'translation',
-    ),
-  ));
   $handler->override_option('arguments', array(
     'nid' => array(
       'default_action' => 'not found',
@@ -335,7 +326,7 @@ function _lingwoorg_content_views_default_views() {
   $handler->override_option('filters', array(
     'flagged' => array(
       'operator' => '=',
-      'value' => '0',
+      'value' => 'All',
       'group' => '0',
       'exposed' => TRUE,
       'expose' => array(
@@ -373,22 +364,48 @@ return $node->type == \'content\' && user_access(\'translate content\');
     'sticky' => 0,
     'order' => 'asc',
     'columns' => array(
-      'language' => 'language',
-      'pos' => 'pos',
       'headword' => 'headword',
+      'pos' => 'pos',
+      'timestamp' => 'timestamp',
+      'nothing_1' => 'nothing_1',
+      'nothing' => 'nothing',
+      'nid' => 'nid',
+      'language' => 'language',
+      'nid_1' => 'nid_1',
     ),
     'info' => array(
-      'language' => array(
+      'headword' => array(
+        'sortable' => 1,
         'separator' => '',
       ),
       'pos' => array(
+        'sortable' => 1,
         'separator' => '',
       ),
-      'headword' => array(
+      'timestamp' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'nothing_1' => array(
+        'separator' => '',
+      ),
+      'nothing' => array(
+        'separator' => '',
+      ),
+      'nid' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'language' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'nid_1' => array(
+        'sortable' => 0,
         'separator' => '',
       ),
     ),
-    'default' => '-1',
+    'default' => 'headword',
   ));
   $handler = $view->new_display('page', 'Page', 'page_1');
   $handler->override_option('path', 'node/%/entries');
