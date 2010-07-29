@@ -12,7 +12,7 @@ function lingwoorg_enable() {
   // browser settings, then default.  It works because 127 isn't a value used in the switch()
   // statement in root/includes/language.inc language_initialize(), so none of the default
   // stuff runs.  Kinda lame, but it does exactly what I want!
-  variable_set('language_negotiation', 127);
+  //variable_set('language_negotiation', 127);
 
   // we need context to happen after the i18nmenu module, so we move it happen later.
   update_sql("UPDATE {system} SET weight = 10 WHERE name = 'context'");
