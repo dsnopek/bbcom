@@ -354,6 +354,11 @@ return $node->type == \'content\' && user_access(\'translate content\');
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
+  $handler->override_option('header', 'There are <?php
+$view = views_get_current_view();
+echo $view->total_rows; ?> entries that match this query.');
+  $handler->override_option('header_format', '3');
+  $handler->override_option('header_empty', 1);
   $handler->override_option('items_per_page', 20);
   $handler->override_option('use_pager', '1');
   $handler->override_option('distinct', 0);
