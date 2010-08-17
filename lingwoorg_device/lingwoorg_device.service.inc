@@ -179,10 +179,31 @@ function lingwoorg_device_service_pull_update($software_version, $device_name) {
  * lingwoorg_device.push_update
  */
 function lingwoorg_device_service_push_update($software_version, $device_name, $data) {
+  global $user;
+
   if ($device_name != 'device_1') {
     return services_error("Unknown device name", 400);
   }
-  # TODO: actually set the flags!
+
+  $flag = flag_get_flag('wial');
+  foreach ($data as $username => $user_data) {
+    $push_user = user_load(array('name' => $username));
+    # TODO: implement teacher accounts
+    if ($user->uid != 0 && $push_user->uid != $user->uid) {
+      return services_error("Cannot update data for another user!", 403);
+    }
+    if (empty($push_user)) {
+      continue;
+    }
+    $wial_add = $user_data['wial_add'];
+    foreach ($wial_add as $entry_spec) {
+      list($language, $pos, $headword) = explode(':', $entry_spec);
+      $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
+      if ($nid) {
+        $flag->flag('flag', $nid, $push_user);
+      }
+    }
+  }
   return TRUE;
 }
 
