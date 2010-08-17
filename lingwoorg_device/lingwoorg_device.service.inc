@@ -5,13 +5,29 @@
  * The actual callbacks for this service
  */
 
+function _lingwoorg_device_service_get_revcount($nid) {
+  # we default to 1, because having any translation counts for 1 (this is helpful
+  # when, for example, an entry is already on the device BUT not for a specific translation
+  # and then that translation is added).
+  $res = db_query("SELECT COUNT(*) FROM {node_revisions} WHERE nid = %s", $nid);
+  if ($res && $row = db_fetch_array($res)) {
+    return $row[0];
+  }
+  # return 0 because we can't even find data for this translation, which can't be a good
+  # sign!
+  return 0;
+}
+
 // TODO: should probably be in lingwo_data!
 function lingwoorg_device_service_export_entry($nid) {
   $node = node_load($nid);
+  $base_revid = $node->vid;
   $entry = array(
     'language' => $node->language,
     'pos' => lingwo_dictionary_entry_get_pos($node),
     'headword' => $node->title,
+    # TODO: maybe a timestamp would be better?  We would just take the newest timestamp from
+    # among the source and all the translations?
     'revid' => 0+$node->vid,
     'fields' => array(),
     'senses' => array(),
@@ -50,6 +66,10 @@ function lingwoorg_device_service_export_entry($nid) {
     }
 
     $tnode = node_load($tnode->nid);
+
+    # take the translation revisions into account with the overall revid
+    # TODO: See note above about how a timestamp would be good instead...
+    $entry['revid'] += _lingwoorg_device_service_get_revcount($tnode->nid);
 
     $translations = array();
     foreach ($tnode->field_senses as $sense) {
@@ -95,6 +115,10 @@ function lingwoorg_device_service_export_entry($nid) {
  * lingwoorg_device.get_content_item
  */
 function lingwoorg_device_service_get_content_item($software_version, $device_name, $nid, $vid = '') {
+  if ($device_name != 'device_1') {
+    return services_error("Unknown device name", 400);
+  }
+
   $node = node_load($nid);
   if (!$node || $node->type != 'content') {
     return services_error('No such id', 404);
@@ -129,5 +153,36 @@ function lingwoorg_device_service_get_content_item($software_version, $device_na
   }
 
   return $content;
+}
+
+/*
+ * lingwoorg_device.pull_update
+ */
+function lingwoorg_device_service_pull_update($software_version, $device_name) {
+  # TODO: make this really work!  For now, just give everything to 'device_1' and 
+  # no one else.
+  if ($device_name == 'device_1') {
+    $res = db_query("SELECT nid, vid FROM {node} WHERE type = 'content' AND status = 1");
+    while ($row = db_fetch_array($res)) {
+      $content[] = implode(':', $row);
+    }
+    return array(
+      'users' => array('Test User'),
+      'content' => $content,
+      #'software_update' => '',
+    );
+  }
+  return services_error("Unknown device name", 400);
+}
+
+/*
+ * lingwoorg_device.push_update
+ */
+function lingwoorg_device_service_push_update($software_version, $device_name, $data) {
+  if ($device_name != 'device_1') {
+    return services_error("Unknown device name", 400);
+  }
+  # TODO: actually set the flags!
+  return TRUE;
 }
 

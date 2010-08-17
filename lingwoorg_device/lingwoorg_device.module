@@ -37,6 +37,60 @@ function lingwoorg_device_service() {
       '#return' => 'struct',
       '#help' => t('Returns an item of content'),
     ),
+
+    array(
+      '#method' => 'lingwoorg_device.pull_update',
+      '#callback' => 'lingwoorg_device_service_pull_update',
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_device'),
+      '#access arguments' => array('call bibliobird_device.pull_update'),
+      '#args' => array(
+        array(
+          '#name' => 'software_version',
+          '#type' => 'string',
+          '#description' => t('A string representing the device software version.'),
+        ),
+        array(
+          '#name' => 'device_name',
+          '#type' => 'string',
+          '#description' => t('A string representing the device making the call.'),
+        ),
+      ),
+      '#return' => 'struct',
+      '#help' => t('Returns a list of the data this device should have on it.'),
+    ),
+
+    array(
+      '#method' => 'lingwoorg_device.push_update',
+      '#callback' => 'lingwoorg_device_service_push_update',
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_device'),
+      '#access arguments' => array('access content'),
+      '#args' => array(
+        array(
+          '#name' => 'software_version',
+          '#type' => 'string',
+          '#description' => t('A string representing the device software version.'),
+        ),
+        array(
+          '#name' => 'device_name',
+          '#type' => 'string',
+          '#description' => t('A string representing the device making the call.'),
+        ),
+        array(
+          '#name' => 'data',
+          '#type' => 'struct',
+          '#description' => t('A struct of the data to update.'),
+        ),
+      ),
+      '#return' => 'boolean',
+      '#help' => t('Updates data for one or more users.'),
+    ),
   );
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function lingwoorg_device_perm() {
+  return array('call bibliobird_device.pull_update');
 }
 
