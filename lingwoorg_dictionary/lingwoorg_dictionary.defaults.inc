@@ -60,62 +60,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     ),
   );
 
-  // Exported field: field_senses
-  $fields[] = array(
-    'field_name' => 'field_senses',
-    'type_name' => 'entry',
-    'display_settings' => array(
-      'weight' => '4',
-      'parent' => '',
-      'label' => array(
-        'format' => 'hidden',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'token' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'lingwo_senses',
-    'required' => '0',
-    'multiple' => '1',
-    'module' => 'lingwo_senses',
-    'active' => '1',
-    'widget' => array(
-      'default_value' => array(
-        'wrapper' => array(
-          'add_sense' => 'Add Another Sense',
-        ),
-      ),
-      'default_value_php' => NULL,
-      'label' => 'Senses',
-      'weight' => '4',
-      'description' => '',
-      'type' => 'lingwo_senses_widget',
-      'module' => 'lingwo_senses',
-    ),
-  );
-
   // Exported field: field_source_copyright
   $fields[] = array(
     'field_name' => 'field_source_copyright',
@@ -500,7 +444,6 @@ function _lingwoorg_dictionary_content_default_fields() {
     t('Fields'),
     t('License'),
     t('Raw Data'),
-    t('Senses'),
     t('Source Name'),
     t('Source URL'),
     t('Timestamp'),
@@ -602,7 +545,7 @@ function _lingwoorg_dictionary_fieldgroup_default_groups() {
         ),
       ),
     ),
-    'weight' => '6',
+    'weight' => '8',
     'fields' => array(
       '0' => 'field_source_name',
       '1' => 'field_source_url',
@@ -653,7 +596,8 @@ function _lingwoorg_dictionary_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
-      '2' => 'editor',
+      '2' => 'device',
+      '3' => 'editor',
     ),
   );
 

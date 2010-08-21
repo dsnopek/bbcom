@@ -13,15 +13,16 @@ function lingwoorg_dictionary_strongarm() {
     'node_options_entry' => array('status', 'revision'),
     // put the fields in the correct order
     'content_extra_weights_entry' => array(
-      'language' => 0,
-      'pos'      => 1,
-      'title'    => 2,
-      'menu'     => 3,
-      // field_senses => 4
-      // field_fields => 5
-      // field_sources => 6,
+      'language'             => 0,
+      'pos'                  => 1,
+      'title'                => 2,
+      'menu'                 => 3,
+      'lingwo_senses'        => 4,
+      // field_fields        => 5,
+      'flag'                 => 6,
       'revision_information' => 7,
-      'path'                 => 8,
+      // field_sources       => 8,
+      //'path'               => 8,
       'comment_settings'     => 9,
       'translation'          => 10,
     ),
