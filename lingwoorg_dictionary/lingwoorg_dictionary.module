@@ -18,7 +18,7 @@ function lingwoorg_dictionary_strongarm() {
       'title'                => 2,
       'menu'                 => 3,
       'lingwo_senses'        => 4,
-      // field_fields        => 5,
+      'lingwo_fields'        => 5,
       'flag'                 => 6,
       'revision_information' => 7,
       // field_sources       => 8,

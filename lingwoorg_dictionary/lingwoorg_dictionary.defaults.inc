@@ -6,60 +6,6 @@
 function _lingwoorg_dictionary_content_default_fields() {
   $fields = array();
 
-  // Exported field: field_fields
-  $fields[] = array(
-    'field_name' => 'field_fields',
-    'type_name' => 'entry',
-    'display_settings' => array(
-      'weight' => '5',
-      'parent' => '',
-      'label' => array(
-        'format' => 'hidden',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      'token' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-    ),
-    'widget_active' => '1',
-    'type' => 'lingwo_fields',
-    'required' => '0',
-    'multiple' => '1',
-    'module' => 'lingwo_fields',
-    'active' => '1',
-    'widget' => array(
-      'default_value' => array(
-        'refresh' => 'Refresh',
-      ),
-      'default_value_php' => NULL,
-      'label' => 'Fields',
-      'weight' => '5',
-      'description' => '',
-      'type' => 'lingwo_fields_widget',
-      'module' => 'lingwo_fields',
-    ),
-  );
-
   // Exported field: field_source_copyright
   $fields[] = array(
     'field_name' => 'field_source_copyright',
@@ -441,7 +387,6 @@ function _lingwoorg_dictionary_content_default_fields() {
   // Translatables
   array(
     t('Copyright'),
-    t('Fields'),
     t('License'),
     t('Raw Data'),
     t('Source Name'),
