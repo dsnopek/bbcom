@@ -47,7 +47,7 @@ function lingwoorg_device_service_export_entry($nid) {
   }
 
   # do up the senses
-  foreach ($node->field_senses as $orig_sense) {
+  foreach ($node->lingwo_senses as $orig_sense) {
     $sense = array(
       'id' => $orig_sense['id']
     );
@@ -72,7 +72,7 @@ function lingwoorg_device_service_export_entry($nid) {
     $entry['revid'] += _lingwoorg_device_service_get_revcount($tnode->nid);
 
     $translations = array();
-    foreach ($tnode->field_senses as $sense) {
+    foreach ($tnode->lingwo_senses as $sense) {
       $trans = array();
 
       # copy the properties

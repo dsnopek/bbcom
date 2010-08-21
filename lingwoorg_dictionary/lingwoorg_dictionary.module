@@ -39,7 +39,6 @@ function lingwoorg_dictionary_strongarm() {
 
     // lingwo_data variables (mappings!)
     'lingwo_data_field_fields' => 'field_fields',
-    'lingwo_data_field_senses' => 'field_senses',
     // TODO: We haven't implemented pron yet!
     //'lingwo_data_field_pron' => 'field_pron'
     // All the Source fields:
