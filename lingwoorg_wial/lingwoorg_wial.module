@@ -38,14 +38,12 @@ function lingwoorg_wial_flag_default_flags() {
  * Implementation of hook_link_alter().
  */
 function lingwoorg_wial_link_alter(&$links, $node) {
-  try {
-    $entry = LingwoEntry::fromNode($node);
+  if ($entry = LingwoEntry::fromNode($node)) {
     if (!$entry->isTranslation()) {
       // Only translations can be added!
       unset($links['flag-wial']);
     }
   }
-  catch (LingwoEntryException $e) { }
 }
 
 /*
