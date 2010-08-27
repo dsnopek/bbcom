@@ -35,15 +35,8 @@ function lingwoorg_device_service_export_entry($nid) {
   );
 
   # do up fields
-  foreach ($node->lingwo_fields as $field) {
-    if (!empty($field['name'])) {
-      $entry['fields'][] = array(
-        'name' => $field['name'],
-        'type' => $field['type'],
-        'value' => $field['value'],
-        'automatic' => $field['automatic'] == '1' ? TRUE : FALSE,
-      );
-    }
+  foreach ($node->lingwo_fields as $name => $field) {
+    $entry['fields'][$name] = $field;
   }
 
   # do up the senses
