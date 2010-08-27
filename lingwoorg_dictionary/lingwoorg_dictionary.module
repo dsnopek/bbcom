@@ -13,15 +13,16 @@ function lingwoorg_dictionary_strongarm() {
     'node_options_entry' => array('status', 'revision'),
     // put the fields in the correct order
     'content_extra_weights_entry' => array(
-      'language' => 0,
-      'pos'      => 1,
-      'title'    => 2,
-      'menu'     => 3,
-      // field_senses => 4
-      // field_fields => 5
-      // field_sources => 6,
+      'language'             => 0,
+      'pos'                  => 1,
+      'title'                => 2,
+      'menu'                 => 3,
+      'lingwo_senses'        => 4,
+      'lingwo_fields'        => 5,
+      'flag'                 => 6,
       'revision_information' => 7,
-      'path'                 => 8,
+      // field_sources       => 8,
+      //'path'               => 8,
       'comment_settings'     => 9,
       'translation'          => 10,
     ),
@@ -37,8 +38,6 @@ function lingwoorg_dictionary_strongarm() {
     'lingwo_dictionary_pos_allowed_values' => "abbreviation|Abbreviation\nadjective|Adjective\nadverb|Adverb\narticle|Article\nauxilary verb|Auxilary Verb\nconjunction|Conjunction\ndeterminer|Determiner\nexclamation|Exclamation\nnoun|Noun\nonomatopoeia|Onomatopoeia\nparticle|Particle\nphrase|Phrase\nprefix|Prefix\npreposition|Preposition\npronoun|Pronoun\nsuffix|Suffix\nsymbol|Symbol\ntitle|Title\nverb|Verb",
 
     // lingwo_data variables (mappings!)
-    'lingwo_data_field_fields' => 'field_fields',
-    'lingwo_data_field_senses' => 'field_senses',
     // TODO: We haven't implemented pron yet!
     //'lingwo_data_field_pron' => 'field_pron'
     // All the Source fields:
@@ -89,7 +88,7 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 
     // TODO: should this be 'editor'?
     if (array_search('admin', $user->roles) == FALSE) {
-      unset($node->content['field_fields']);
+      unset($node->content['lingwo_fields']);
     }
   }
 }
@@ -186,8 +185,7 @@ function template_preprocess_lingwoorg_dictionary_entry_summary(&$vars, $hook) {
 
   // get the source fields (we always deal with the source fields, so this should be
   // no surprise and we can name it simply $fields).
-  $field_fields = lingwo_data_settings('field_fields');
-  $vars['fields'] = lingwo_fields_map_items($vars['source_node']->$field_fields);
+  $vars['fields'] = lingwo_fields_map_items($vars['source_node']->lingwo_fields);
 }
 
 function theme_lingwoorg_dictionary_entry_summary($node, $teaser=FALSE, $page=FALSE) {

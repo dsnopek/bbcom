@@ -140,7 +140,7 @@ function _lingwoorg_flashcards_node_to_fact_fields($node) {
   // on the back of the card
   // TODO: we need to stop cheating by re-using the original theme!  A new theme 
   // function or template would be cool though.
-  $back = trim(filter_xss(drupal_render($node->content['field_senses']), $allowed_tags));
+  $back = trim(filter_xss(drupal_render($node->content['lingwo_senses']), $allowed_tags));
 
   $fields = array(
     'Front' => $front,

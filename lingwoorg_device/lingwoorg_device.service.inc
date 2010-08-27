@@ -35,19 +35,12 @@ function lingwoorg_device_service_export_entry($nid) {
   );
 
   # do up fields
-  foreach ($node->field_fields as $field) {
-    if (!empty($field['name'])) {
-      $entry['fields'][] = array(
-        'name' => $field['name'],
-        'type' => $field['type'],
-        'value' => $field['value'],
-        'automatic' => $field['automatic'] == '1' ? TRUE : FALSE,
-      );
-    }
+  foreach ($node->lingwo_fields as $name => $field) {
+    $entry['fields'][$name] = $field;
   }
 
   # do up the senses
-  foreach ($node->field_senses as $orig_sense) {
+  foreach ($node->lingwo_senses as $orig_sense) {
     $sense = array(
       'id' => $orig_sense['id']
     );
@@ -72,7 +65,7 @@ function lingwoorg_device_service_export_entry($nid) {
     $entry['revid'] += _lingwoorg_device_service_get_revcount($tnode->nid);
 
     $translations = array();
-    foreach ($tnode->field_senses as $sense) {
+    foreach ($tnode->lingwo_senses as $sense) {
       $trans = array();
 
       # copy the properties
@@ -133,7 +126,7 @@ function lingwoorg_device_service_get_content_item($software_version, $device_na
   $res = db_query("SELECT language, pos, headword FROM {lingwo_korpus_entry} WHERE nid = %d", $nid);
   while ($obj = db_fetch_object($res)) {
     $entry = lingwoorg_device_service_export_entry(
-      lingwo_dictionary_entry_lookup($obj->headword, $obj->language, $obj->pos));
+      lingwo_dictionary_entry_lookup($obj->language, $obj->pos, $obj->headword));
     if ($entry) {
       $entries[] = $entry;
     }
@@ -198,7 +191,7 @@ function lingwoorg_device_service_push_update($software_version, $device_name, $
     $wial_add = $user_data['wial_add'];
     foreach ($wial_add as $entry_spec) {
       list($language, $pos, $headword) = explode(':', $entry_spec);
-      $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
+      $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
       if ($nid) {
         $flag->flag('flag', $nid, $push_user);
       }
