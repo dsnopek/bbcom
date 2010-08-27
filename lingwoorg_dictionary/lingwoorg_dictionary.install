@@ -62,6 +62,20 @@ function lingwoorg_dictionary_enable() {
   fieldgroup_groups('', FALSE, TRUE);
 }
 
+function lingwoorg_dictionary_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 100 WHERE name = 'lingwoorg_dictionary'");
+  return $ret;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwoorg_dictionary_install() {
+  // we need to happen after lingwo_fields (which has weight of 51)
+  update_sql("UPDATE {system} SET weight = 100 WHERE name = 'lingwoorg_dictionary'");
+}
+
 /**
  * Implementation of hook_disable().
  */
