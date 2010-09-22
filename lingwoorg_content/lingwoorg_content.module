@@ -2,6 +2,13 @@
 
 include_once('lingwoorg_content.features.inc');
 
+function lingwoorg_content_init() {
+  // HACK: we need the jquery.form.js to be loaded (for the theme)
+  if (!empty($_GET['embed']) && preg_match('/^user\//', $_GET['q'])) {
+    drupal_add_js('misc/jquery.form.js', 'core');
+  }
+}
+
 /**
  * Implementation of hook_strongarm()
  */
