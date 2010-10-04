@@ -2,13 +2,6 @@
 
 include_once('lingwoorg_content.features.inc');
 
-function lingwoorg_content_init() {
-  // HACK: we need the jquery.form.js to be loaded (for the theme)
-  if (!empty($_GET['embed']) && preg_match('/^user\//', $_GET['q'])) {
-    drupal_add_js('misc/jquery.form.js', 'core');
-  }
-}
-
 /**
  * Implementation of hook_strongarm()
  */
@@ -23,6 +16,7 @@ function lingwoorg_content_strongarm() {
 
     // lingwo_korpus variables
     'lingwo_korpus_text_content_type' => 'content',
+    'lingwo_korpus_field_remote_url' => 'field_remote_url',
 
     // allow the <anno> tag in "Filtered HTML" (ID 1)
     'allowed_html_1' => "<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd> <word>",
@@ -41,8 +35,9 @@ function lingwoorg_content_strongarm() {
       'language' => -3,
       'body_field' => -2,
       //'field_audio' => -1,
-      'revision_information' => 0,
-      'comment_settings' => 1,
+      //'field_remote_url' => 0,
+      'revision_information' => 1,
+      'comment_settings' => 2,
     ),
 
     // for playing audio on the content items
