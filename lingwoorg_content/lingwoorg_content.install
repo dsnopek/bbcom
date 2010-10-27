@@ -49,3 +49,10 @@ function lingwoorg_content_update_6001() {
   return $ret;
 }
 
+function lingwoorg_content_update_6002() {
+  $verified = flag_get_flag('verified');
+  $verified->global = FALSE;
+  $verified->save();
+  return array();
+}
+

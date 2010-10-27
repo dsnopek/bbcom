@@ -58,7 +58,7 @@ function lingwoorg_content_flag_default_flags() {
     'content_type' => 'node',
     'name' => 'verified',
     'title' => 'Verified',
-    'global' => TRUE,
+    'global' => FALSE,
     'types' => array('entry'),
     'flag_short' => 'Mark as verified',
     'flag_long' => '',
