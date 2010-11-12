@@ -109,3 +109,12 @@ function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+/*
+ * Implementation of hook_form_alter().
+ */
+function lingwoorg_content_form_alter(&$form, $form_state, $form_id) {
+  if ($form_state['view']->name == 'search_content') {
+    $form['submit']['#value'] = t('Search');
+  }
+}
+

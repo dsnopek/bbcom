@@ -132,13 +132,23 @@ function _lingwoorg_content_context_default_contexts() {
     'path' => array(
       '<front>' => '<front>',
       'node/*/annotate' => 'node/*/annotate',
+      'content/search' => 'content/search',
     ),
     'menu' => 'content',
     'block' => array(
+      'views_-exp-search_content-page' => array(
+        'module' => 'views',
+        'delta' => '-exp-search_content-page',
+        'weight' => 18,
+        'region' => 'header',
+        'status' => '0',
+        'label' => 'Exposed form: search_content-page',
+        'type' => 'context_ui',
+      ),
       'lingwoorg_content_0' => array(
         'module' => 'lingwoorg_content',
         'delta' => '0',
-        'weight' => 17,
+        'weight' => 18,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo.org Content: Add Content Block',
@@ -147,7 +157,7 @@ function _lingwoorg_content_context_default_contexts() {
       'lingwo_korpus_0' => array(
         'module' => 'lingwo_korpus',
         'delta' => '0',
-        'weight' => 18,
+        'weight' => 19,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo Korpus: Annotation Reader block',
