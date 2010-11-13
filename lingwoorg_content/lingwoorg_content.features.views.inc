@@ -509,6 +509,7 @@ echo $view->total_rows; ?> entries that match this query.');
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
+  $handler->override_option('title', 'Content');
   $handler->override_option('header_format', '1');
   $handler->override_option('footer_format', '1');
   $handler->override_option('empty_format', '1');
@@ -641,7 +642,7 @@ echo $view->total_rows; ?> entries that match this query.');
         'use_operator' => 0,
         'operator' => 'keys_op',
         'identifier' => 'keywords',
-        'label' => 'Search Content:',
+        'label' => '',
         'optional' => 1,
         'remember' => 0,
       ),
@@ -658,7 +659,7 @@ echo $view->total_rows; ?> entries that match this query.');
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
-  $handler->override_option('title', 'Search Content');
+  $handler->override_option('title', 'Content');
   $handler->override_option('header_format', '1');
   $handler->override_option('footer_format', '1');
   $handler->override_option('empty', 'No results found.');
