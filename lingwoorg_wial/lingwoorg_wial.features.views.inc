@@ -141,6 +141,16 @@ function _lingwoorg_wial_views_default_views() {
       ),
     ),
   ));
+  $handler->override_option('sorts', array(
+    'timestamp' => array(
+      'order' => 'DESC',
+      'granularity' => 'second',
+      'id' => 'timestamp',
+      'table' => 'flag_content',
+      'field' => 'timestamp',
+      'relationship' => 'flag_content_rel',
+    ),
+  ));
   $handler->override_option('arguments', array(
     'uid' => array(
       'default_action' => 'not found',
