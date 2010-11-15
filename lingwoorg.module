@@ -14,3 +14,12 @@ function lingwoorg_strongarm() {
   );
 }
 
+function lingwoorg_mail_alter(&$message) {
+  // Our SMTP server requires that From is an e-mail address that we control
+  // so we always put the 'From' into 'Reply-To' instead and make the 'From'
+  // always be the default.
+  $default_from = variable_get('site_mail', ini_get('sendmail_from'));
+  $message['headers']['Reply-To'] = $message['headers']['From'];
+  $message['headers']['From'] = $message['from'] = $default_from;
+}
+
