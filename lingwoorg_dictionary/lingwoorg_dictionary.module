@@ -77,17 +77,19 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       $language = $node->translation_source->language;
     }
 
-    $node->content['entry_summary'] = array(
-      '#weight' => -1,
-      '#value'  => theme(array(
-        'lingwoorg_dictionary_entry_summary_'. $language .'_'. $pos,
-        'lingwoorg_dictionary_entry_summary_'. $language,
-        'lingwoorg_dictionary_entry_summary'
-      ), $node, $a3, $a4)
-    );
-
+    // hide the fields and summary for non-admin users
     // TODO: should this be 'editor'?
-    if (array_search('admin', $user->roles) == FALSE) {
+    if (array_search('admin', $user->roles) == TRUE) {
+      $node->content['entry_summary'] = array(
+        '#weight' => -1,
+        '#value'  => theme(array(
+          'lingwoorg_dictionary_entry_summary_'. $language .'_'. $pos,
+          'lingwoorg_dictionary_entry_summary_'. $language,
+          'lingwoorg_dictionary_entry_summary'
+        ), $node, $a3, $a4)
+      );
+    }
+    else {
       unset($node->content['lingwo_fields']);
     }
   }
