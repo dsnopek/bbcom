@@ -103,22 +103,20 @@ function lingwoorg_login_menu_alter(&$items) {
 function lingwoorg_login_strongarm() {
   return array(
     // logintoboggan configuration
+    // TODO: I'm not sure what to do, because this should be changable,
+    // yet these are good defaults for deploying a test or new prod server.
+    /*
     'logintoboggan_login_with_email' => TRUE,
     'logintoboggan_confirm_email_at_registration' => TRUE,
     'logintoboggan_redirect_on_confirm' => 'user/%uid/edit',
     'logintoboggan_login_successful_message' => TRUE,
     'logintoboggan_minimum_password_length' => '7',
+    */
 
     // remember_me configuration
     'remember_me_checkbox' => 1,
     'remember_me_managed' => 0,
     'remember_me_phantom_session' => 0,
-
-    // login_destination settings
-    'ld_condition_type' => 'always',
-    'ld_destination' => 1,
-    'ld_url_type' => 'static',
-    'ld_url_destination' => '<front>',
   );
 }
 
@@ -129,13 +127,16 @@ function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
   global $language;
 
   // if you can administer users, then you don't need to enter a registration code
-  if ($form_id == 'user_register' && !user_access('administer users')) {
+  //if ($form_id == 'user_register' && !user_access('administer users')) {
+  if ($form_id == 'user_register') {
+    /*
     $form['registration_code'] = array(
       '#title' => t('Registration Code'),
       '#type' => 'textfield',
       '#required' => TRUE,
       '#description' => t('Format: <em>XXXX-XX-XXXX</em>. You should have received this number from your teacher.'),
     );
+    */
 
     // user's language will be set to whatever the current language is
     $form['language'] = array(
@@ -143,11 +144,11 @@ function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
       '#value' => $language->language,
     );
 
-    $form['#validate'][] = 'lingwoorg_login_user_register_validate';
-    $form['#submit'][] = 'lingwoorg_login_user_register_submit';
+    //$form['#validate'][] = 'lingwoorg_login_user_register_validate';
+    //$form['#submit'][] = 'lingwoorg_login_user_register_submit';
   }
   elseif ($form_id == 'user_login') {
-    $form['#submit'][] = 'lingwoorg_login_user_login_submit';
+    //$form['#submit'][] = 'lingwoorg_login_user_login_submit';
   }
 }
 
