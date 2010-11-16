@@ -171,6 +171,18 @@ function lingwoorg_login_user_register_submit($form, &$form_state) {
 }
 
 /*
+ * Implements hook_fb().
+ */
+function lingwoorg_login_fb($op, $data=NULL, $return=NULL) {
+  if ($op == 'post init') {
+    // if there is no destination set, then we redirect to the front page!
+    if (empty($_REQUEST['destination'])) {
+      fb_js_settings('reload_url', url('<front>', array('absolute' => TRUE)));
+    }
+  }
+}
+
+/*
  * API functions
  */
 
