@@ -1,0 +1,40 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Setup for the newsletter
+ */
+
+/*
+ * Implementation of hook_user().
+ */
+function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
+  if ($op == 'register' || ($category == 'account' && $op == 'form')) {
+    $optin = TRUE;
+    if ($account->uid) {
+      // TODO: load the optin value from the database
+    }
+    $form['bbcom_news'] = array(
+      '#type'  => 'fieldset',
+      '#title' => t('Newsletter'),
+    );
+    $form['bbcom_news']['bbcom_news_optin'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Subscribe to the e-mail newsletter (1-2 e-mails per month)'),
+      '#default_value' => $optin,
+    );
+    return $form;
+  }
+
+  // TODO: update value in the database
+  switch ($op) {
+    case 'insert':
+      break;
+    case 'update':
+      break;
+    case 'delete':
+      break;
+  }
+}
+

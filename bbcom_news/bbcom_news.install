@@ -1,0 +1,48 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ * Install file for bbcom_news
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function bbcom_news_schema() {
+  $schema['bbcom_news_users'] = array(
+    'description' => 'Used to track users on the mailing list',
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'Primary Key: Unique user ID.',
+      ),
+      'optin' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+		'size' => 'tiny',
+        'description' => 'Whether the user is optin(1) or optout(0).',
+      ),
+    ),
+    'primary key' => array('uid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function bbcom_news_install() {
+  drupal_install_schema('bbcom_news');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function bbcom_news_uninstall() {
+  drupal_uninstall_schema('bbcom_news');
+}
+
