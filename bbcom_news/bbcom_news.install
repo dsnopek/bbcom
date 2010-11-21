@@ -22,7 +22,7 @@ function bbcom_news_schema() {
       'optin' => array(
         'type' => 'int',
         'not null' => TRUE,
-		'size' => 'tiny',
+        'size' => 'tiny',
         'description' => 'Whether the user is optin(1) or optout(0).',
       ),
     ),
@@ -37,6 +37,9 @@ function bbcom_news_schema() {
  */
 function bbcom_news_install() {
   drupal_install_schema('bbcom_news');
+
+  // create an entry for all existing users
+  db_query("INSERT INTO {bbcom_news_users} (uid, optin) SELECT uid, 1 FROM {users}");
 }
 
 /**
