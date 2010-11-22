@@ -14,9 +14,13 @@ require_once(drupal_get_path('module', 'lingwoorg_login') .'/base32.php');
 function lingwoorg_login_init() {
   global $user;
 
+  $validating_id = logintoboggan_validating_id();
+  // bail early if the $validating_id is set to a core id
+  if (in_array($validating_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)))
+    return;
+
   // we show this message every time an unvalidated user visits a page that isn't user/%/edit 
   // or one of the magic toboggan pages.
-  $validating_id = logintoboggan_validating_id();
   if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && arg(2) == 'edit') && arg(0) != 'toboggan') {
     if ($purge_interval = variable_get('logintoboggan_purge_unvalidated_user_interval', 0)) {
       // only show after the user has been a user for atleast one minute

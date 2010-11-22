@@ -1,0 +1,3 @@
+
+Remove "allowed_html_1" from the features[variable] list!  We should be using a special filter for these.
+
