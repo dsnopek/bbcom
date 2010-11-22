@@ -29,13 +29,16 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
 
   switch ($op) {
     case 'insert':
-      db_query("INSERT INTO {bbcom_news_users} (uid, optin) VALUES (%d, %d)", $account->uid, $edit['bbcom_news_optin']);
+      $optin = isset($edit['bbcom_news_optin']) ? $edit['bbcom_news_optin'] : TRUE;
+      db_query("INSERT INTO {bbcom_news_users} (uid, optin) VALUES (%d, %d)", $account->uid, $optin);
       unset($edit['bbcom_news_optin']);
       break;
 
     case 'update':
-      db_query("UPDATE {bbcom_news_users} SET optin = %d WHERE uid = %d", $edit['bbcom_news_optin'], $account->uid);
-      unset($edit['bbcom_news_optin']);
+      if (isset($edit['bbcom_news_optin'])) {
+        db_query("UPDATE {bbcom_news_users} SET optin = %d WHERE uid = %d", $edit['bbcom_news_optin'], $account->uid);
+        unset($edit['bbcom_news_optin']);
+      }
       break;
 
     case 'delete':

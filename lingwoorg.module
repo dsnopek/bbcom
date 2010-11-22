@@ -23,3 +23,10 @@ function lingwoorg_mail_alter(&$message) {
   $message['headers']['From'] = $message['from'] = $default_from;
 }
 
+// NOTE: Drupal's format_date() doesn't correctly deal with daylight savings time, nor does it
+// translate the date parts.  This should be put in the theme as well, to handle all dates, particularly
+// the node submitted ones.
+function lingwoorg_format_date($date, $type='medium', $format='') {
+  return date_format_date(date_make_date($date, NULL, DATE_UNIX), $type, $format);
+}
+

@@ -13,8 +13,8 @@ function lingwoorg_login_batches_list() {
 	$series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
   	$rows[] = array(
 		l($series, 'admin/user/reg_codes/'. $batch->batch_id),
-		_format_date($batch->created),
-		_format_date($batch->expires),
+		lingwoorg_format_date($batch->created),
+		lingwoorg_format_date($batch->expires),
 		$batch->note
 	);
   }
@@ -78,13 +78,6 @@ function _lingwoorg_login_random_base32() {
   return $base32->fromDec(rand(0, 1048575), 4);
 }
 
-// NOTE: Drupal's format_date() doesn't correctly deal with daylight savings time, nor does it
-// translate the date parts.  This should be put in the theme as well, to handle all dates, particularly
-// the node submitted ones.
-function _format_date($date, $type='medium', $format='') {
-  return date_format_date(date_make_date($date, NULL, DATE_UNIX), $type, $format);
-}
-
 function lingwoorg_login_batches_add_submit($form, &$form_state) {
   // create the batch
   $batch = (object)array(
@@ -127,13 +120,13 @@ function lingwoorg_login_batch_view($batch_id) {
   $form['created'] = array(
     '#type' => 'item',
     '#title' => t('Created'),
-    '#value' => _format_date($batch->created),
+    '#value' => lingwoorg_format_date($batch->created),
 	'#weight' => 0,
   );
   $form['expires'] = array(
     '#type' => 'item',
     '#title' => t('Expires'),
-    '#value' => _format_date($batch->expires),
+    '#value' => lingwoorg_format_date($batch->expires),
 	'#weight' => 1,
   );
   if ($batch->note) {
@@ -204,8 +197,8 @@ function template_preprocess_lingwoorg_login_registration_page(&$vars) {
   $batch->series = lingwoorg_login_make_code($batch->batch_id, $batch->seed, '????');
   unset($batch->seed);
 
-  $vars['expires'] = _format_date($batch->expires);
-  $vars['created'] = _format_date($batch->created);
+  $vars['expires'] = lingwoorg_format_date($batch->expires);
+  $vars['created'] = lingwoorg_format_date($batch->created);
 }
 
 function theme_lingwoorg_login_registration_sheet($batch, $codes) {
@@ -233,8 +226,8 @@ function theme_lingwoorg_login_registration_sheet($batch, $codes) {
 
 function template_preprocess_lingwoorg_login_registration_card(&$vars) {
   $batch = $vars['batch'];
-  $vars['expires'] = _format_date($batch->expires);
-  $vars['created'] = _format_date($batch->created);
+  $vars['expires'] = lingwoorg_format_date($batch->expires);
+  $vars['created'] = lingwoorg_format_date($batch->created);
 }
 
 function theme_lingwoorg_login_registration_card($batch, $code) {
