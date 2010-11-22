@@ -10,12 +10,13 @@ function lingwoorg_content_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'content_extra_weights_content';
   $strongarm->value = array(
-    'title' => -5,
-    'menu' => -4,
-    'language' => -3,
-    'body_field' => -2,
-    'revision_information' => 1,
-    'comment_settings' => 2,
+    'title' => '-5',
+    'body_field' => '-2',
+    'revision_information' => '2',
+    'comment_settings' => '3',
+    'language' => '-3',
+    'menu' => '-4',
+    'lingwo_korpus_settings' => '-1',
   );
 
   $export['content_extra_weights_content'] = $strongarm;
