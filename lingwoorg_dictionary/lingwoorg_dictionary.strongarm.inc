@@ -98,21 +98,24 @@ function lingwoorg_dictionary_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'lingwo_dictionary_pos_allowed_values';
   $strongarm->value = 'abbreviation|Abbreviation
-  adjective|Adjective
-  adverb|Adverb
-  conjunction|Conjunction
-  exclamation|Exclamation
-  noun|Noun
-  onomatopoeia|Onomatopoeia
-  particle|Particle
-  phrase|Phrase
-  prefix|Prefix
-  preposition|Preposition
-  pronoun|Pronoun
-  suffix|Suffix
-  symbol|Symbol
-  title|Title
-  verb|Verb';
+adjective|Adjective
+adverb|Adverb
+article|Article
+auxilary verb|Auxilary Verb
+conjunction|Conjunction
+determiner|Determiner
+exclamation|Exclamation
+noun|Noun
+onomatopoeia|Onomatopoeia
+particle|Particle
+phrase|Phrase
+prefix|Prefix
+preposition|Preposition
+pronoun|Pronoun
+suffix|Suffix
+symbol|Symbol
+title|Title
+verb|Verb';
 
   $export['lingwo_dictionary_pos_allowed_values'] = $strongarm;
   $strongarm = new stdClass;
@@ -120,8 +123,8 @@ function lingwoorg_dictionary_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'node_options_entry';
   $strongarm->value = array(
-    '0' => 'status',
-    '1' => 'revision',
+    0 => 'status',
+    1 => 'revision',
   );
 
   $export['node_options_entry'] = $strongarm;
