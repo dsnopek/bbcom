@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Helper to implementation of hook_content_default_fields().
+ * Implementation of hook_content_default_fields().
  */
-function _lingwoorg_marketing_content_default_fields() {
+function lingwoorg_marketing_content_default_fields() {
   $fields = array();
 
   // Exported field: field_emvideo
-  $fields[] = array(
+  $fields['story-field_emvideo'] = array(
     'field_name' => 'field_emvideo',
     'type_name' => 'story',
     'display_settings' => array(
@@ -89,59 +89,8 @@ function _lingwoorg_marketing_content_default_fields() {
   );
 
   // Translatables
-  array(
-    t('Video'),
-  );
+  // Included for use with string extractors like potx.
+  t('Video');
 
   return $fields;
-}
-
-/**
- * Helper to implementation of hook_context_default_contexts().
- */
-function _lingwoorg_marketing_context_default_contexts() {
-  $items = array();
-
-  $items[] = array(
-    'namespace' => 'lingwoorg',
-    'attribute' => 'section',
-    'value' => 'marketing',
-    'description' => 'Viewing our marketing materials.',
-    'path' => array(
-      'about' => 'about',
-    ),
-    'menu_trail' => array(
-      'about' => 'about',
-    ),
-    'block' => array(
-      'views_latest_news-block_1' => array(
-        'module' => 'views',
-        'delta' => 'latest_news-block_1',
-        'weight' => 15,
-        'region' => 'content_top',
-        'status' => '0',
-        'label' => 'Story Slideshow',
-        'type' => 'context_ui',
-      ),
-      'webformblock_1449' => array(
-        'module' => 'webformblock',
-        'delta' => '1449',
-        'weight' => 15,
-        'region' => 'content_right',
-        'status' => '0',
-        'label' => 'Webform: Contact Us',
-        'type' => 'context_ui',
-      ),
-      'views_all_news-block_1' => array(
-        'module' => 'views',
-        'delta' => 'all_news-block_1',
-        'weight' => 15,
-        'region' => 'content_bottom',
-        'status' => '0',
-        'label' => 'All News',
-        'type' => 'context_ui',
-      ),
-    ),
-  );
-  return $items;
 }

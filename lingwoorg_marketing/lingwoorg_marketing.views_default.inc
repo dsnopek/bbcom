@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Helper to implementation of hook_views_default_views().
+ * Implementation of hook_views_default_views().
  */
-function _lingwoorg_marketing_views_default_views() {
+function lingwoorg_marketing_views_default_views() {
   $views = array();
 
   // Exported view: all_news
