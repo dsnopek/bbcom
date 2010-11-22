@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Helper to implementation of hook_views_default_views().
+ * Implementation of hook_views_default_views().
  */
-function _lingwoorg_content_views_default_views() {
+function lingwoorg_content_views_default_views() {
   $views = array();
 
   // Exported view: korpus_text_entries

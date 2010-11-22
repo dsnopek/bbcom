@@ -1,55 +1,83 @@
 <?php
 
 /**
- * Implementation of hook_content_default_fields().
- */
-function lingwoorg_content_content_default_fields() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_content_default_fields', $args);
-}
-
-/**
  * Implementation of hook_context_default_contexts().
  */
 function lingwoorg_content_context_default_contexts() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_context_default_contexts', $args);
-}
+  $items = array();
 
-/**
- * Implementation of hook_menu_default_items().
- */
-function lingwoorg_content_menu_default_items() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_menu_default_items', $args);
+  $items['lingwoorg-section-content'] = array(
+    'namespace' => 'lingwoorg',
+    'attribute' => 'section',
+    'value' => 'content',
+    'description' => 'Working in the content area.',
+    'node' => array(
+      '0' => 'content',
+    ),
+    'path' => array(
+      '<front>' => '<front>',
+      'node/*/annotate' => 'node/*/annotate',
+      'content/search' => 'content/search',
+    ),
+    'menu' => 'content',
+    'block' => array(
+      'views_-exp-search_content-page' => array(
+        'module' => 'views',
+        'delta' => '-exp-search_content-page',
+        'weight' => 18,
+        'region' => 'header',
+        'status' => '0',
+        'label' => 'Exposed form: search_content-page',
+        'type' => 'context_ui',
+      ),
+      'lingwoorg_content_0' => array(
+        'module' => 'lingwoorg_content',
+        'delta' => '0',
+        'weight' => 18,
+        'region' => 'right',
+        'status' => '0',
+        'label' => 'Lingwo.org Content: Add Content Block',
+        'type' => 'context_ui',
+      ),
+      'lingwo_korpus_0' => array(
+        'module' => 'lingwo_korpus',
+        'delta' => '0',
+        'weight' => 19,
+        'region' => 'right',
+        'status' => '0',
+        'label' => 'Lingwo Korpus: Annotation Reader block',
+        'type' => 'context_ui',
+      ),
+    ),
+  );
+  return $items;
 }
 
 /**
  * Implementation of hook_node_info().
  */
 function lingwoorg_content_node_info() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.features.node');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_node_info', $args);
+  $items = array(
+    'content' => array(
+      'name' => t('Content'),
+      'module' => 'features',
+      'description' => t('A piece of content used to study.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'has_body' => '1',
+      'body_label' => t('Content'),
+      'min_word_count' => '0',
+      'help' => '',
+    ),
+  );
+  return $items;
 }
 
 /**
- * Implementation of hook_user_default_permissions().
+ * Implementation of hook_views_api().
  */
-function lingwoorg_content_user_default_permissions() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.defaults');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_user_default_permissions', $args);
-}
-
-/**
- * Implementation of hook_views_default_views().
- */
-function lingwoorg_content_views_default_views() {
-  module_load_include('inc', 'lingwoorg_content', 'lingwoorg_content.features.views');
-  $args = func_get_args();
-  return call_user_func_array('_lingwoorg_content_views_default_views', $args);
+function lingwoorg_content_views_api() {
+  return array(
+    'api' => '2',
+  );
 }
