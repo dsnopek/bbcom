@@ -20,7 +20,7 @@ function lingwoorg_wial_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
-      '2' => 'editor',
+      '2' => 'unverified user',
     ),
   );
 
