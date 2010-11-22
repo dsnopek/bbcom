@@ -6,7 +6,8 @@
  * Customize login for our needs
  */
 
-require_once(drupal_get_path('module', 'lingwoorg_login') .'/base32.php');
+include_once('lingwoorg_login.features.inc');
+include_once('base32.php');
 
 /**
  * Implementation of hook_init().

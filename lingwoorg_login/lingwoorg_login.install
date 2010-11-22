@@ -86,6 +86,7 @@ function _lingwoorg_login_set_unvalidated_role() {
 
 function lingwoorg_login_update_6001() {
   _lingwoorg_login_set_unvalidated_role();
+  return array();
 }
 
 /**
