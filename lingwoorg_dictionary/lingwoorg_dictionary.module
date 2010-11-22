@@ -3,60 +3,6 @@
 include_once('lingwoorg_dictionary.features.inc');
 
 /**
- * Implementation of hook_strongarm()
- */
-function lingwoorg_dictionary_strongarm() {
-  return array(
-    /*
-     * 'entry' content type
-     */
-    'node_options_entry' => array('status', 'revision'),
-    // put the fields in the correct order
-    'content_extra_weights_entry' => array(
-      'language'             => 0,
-      'pos'                  => 1,
-      'title'                => 2,
-      'menu'                 => 3,
-      'lingwo_senses'        => 4,
-      'lingwo_fields'        => 5,
-      'flag'                 => 6,
-      'revision_information' => 7,
-      // field_sources       => 8,
-      //'path'               => 8,
-      'comment_settings'     => 9,
-      'translation'          => 10,
-    ),
-    // translation settings
-    'language_content_type_entry' => TRANSLATION_ENABLED,
-    'i18n_node_entry' => LANGUAGE_SUPPORT_NORMAL,
-    'i18n_hide_translation_links' => 1,
-
-    // lingwo_dictionary variables
-    'lingwo_dictionary_lookup_path' => 'dictionary/lookup',
-    'lingwo_dictionary_entry_content_type' => 'entry',
-    'lingwo_dictionary_field_pos' => 'field_pos',
-    'lingwo_dictionary_pos_allowed_values' => "abbreviation|Abbreviation\nadjective|Adjective\nadverb|Adverb\narticle|Article\nauxilary verb|Auxilary Verb\nconjunction|Conjunction\ndeterminer|Determiner\nexclamation|Exclamation\nnoun|Noun\nonomatopoeia|Onomatopoeia\nparticle|Particle\nphrase|Phrase\nprefix|Prefix\npreposition|Preposition\npronoun|Pronoun\nsuffix|Suffix\nsymbol|Symbol\ntitle|Title\nverb|Verb",
-
-    // lingwo_data variables (mappings!)
-    // TODO: We haven't implemented pron yet!
-    //'lingwo_data_field_pron' => 'field_pron'
-    // All the Source fields:
-    'lingwo_data_field_source_copyright' => 'field_source_copyright',
-    'lingwo_data_field_source_license' => 'field_source_license',
-    'lingwo_data_field_source_name' => 'field_source_name',
-    'lingwo_data_field_source_raw' => 'field_source_raw',
-    'lingwo_data_field_source_timestamp' => 'field_source_timestamp',
-    'lingwo_data_field_source_url' => 'field_source_url',
-
-    // services module
-    'services_auth_module' => 'services_keyauth',
-    'services_key_expiry' => 30,
-    'services_use_key' => TRUE,
-    'services_use_sessid' => TRUE,
-  );
-}
-
-/**
  * Implementation of hook_nodeapi().
  */
 // Add entry summary information to the node view
