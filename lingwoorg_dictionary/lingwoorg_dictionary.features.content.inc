@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Helper to implementation of hook_content_default_fields().
+ * Implementation of hook_content_default_fields().
  */
-function _lingwoorg_dictionary_content_default_fields() {
+function lingwoorg_dictionary_content_default_fields() {
   $fields = array();
 
   // Exported field: field_source_copyright
-  $fields[] = array(
+  $fields['entry-field_source_copyright'] = array(
     'field_name' => 'field_source_copyright',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -70,7 +70,7 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Exported field: field_source_license
-  $fields[] = array(
+  $fields['entry-field_source_license'] = array(
     'field_name' => 'field_source_license',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -133,7 +133,7 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Exported field: field_source_name
-  $fields[] = array(
+  $fields['entry-field_source_name'] = array(
     'field_name' => 'field_source_name',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -196,7 +196,7 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Exported field: field_source_raw
-  $fields[] = array(
+  $fields['entry-field_source_raw'] = array(
     'field_name' => 'field_source_raw',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -259,7 +259,7 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Exported field: field_source_timestamp
-  $fields[] = array(
+  $fields['entry-field_source_timestamp'] = array(
     'field_name' => 'field_source_timestamp',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -322,7 +322,7 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Exported field: field_source_url
-  $fields[] = array(
+  $fields['entry-field_source_url'] = array(
     'field_name' => 'field_source_url',
     'type_name' => 'entry',
     'display_settings' => array(
@@ -385,211 +385,13 @@ function _lingwoorg_dictionary_content_default_fields() {
   );
 
   // Translatables
-  array(
-    t('Copyright'),
-    t('License'),
-    t('Raw Data'),
-    t('Source Name'),
-    t('Source URL'),
-    t('Timestamp'),
-  );
+  // Included for use with string extractors like potx.
+  t('Copyright');
+  t('License');
+  t('Raw Data');
+  t('Source Name');
+  t('Source URL');
+  t('Timestamp');
 
   return $fields;
-}
-
-/**
- * Helper to implementation of hook_context_default_contexts().
- */
-function _lingwoorg_dictionary_context_default_contexts() {
-  $items = array();
-
-  $items[] = array(
-    'namespace' => 'lingwoorg',
-    'attribute' => 'section',
-    'value' => 'dictionary',
-    'description' => 'Working in the dictionary',
-    'node' => array(
-      '0' => 'entry',
-    ),
-    'path' => array(
-      'dictionary' => 'dictionary',
-      'dictionary/*' => 'dictionary/*',
-    ),
-    'menu' => 'dictionary',
-    'block' => array(
-      'lingwo_dictionary_0' => array(
-        'module' => 'lingwo_dictionary',
-        'delta' => '0',
-        'weight' => -17,
-        'region' => 'header',
-        'status' => '0',
-        'label' => 'Lingwo Dictionary: Search block',
-        'type' => 'context_ui',
-      ),
-      'lingwoorg_dictionary_0' => array(
-        'module' => 'lingwoorg_dictionary',
-        'delta' => '0',
-        'weight' => 16,
-        'region' => 'right',
-        'status' => '0',
-        'label' => 'Lingwo Dictionary: Add Content Block',
-        'type' => 'context_ui',
-      ),
-    ),
-  );
-  return $items;
-}
-
-/**
- * Helper to implementation of hook_fieldgroup_default_groups().
- */
-function _lingwoorg_dictionary_fieldgroup_default_groups() {
-  $groups = array();
-
-  // Exported group: group_sources
-  $groups[] = array(
-    'group_type' => 'multigroup',
-    'type_name' => 'entry',
-    'group_name' => 'group_sources',
-    'label' => 'Sources',
-    'settings' => array(
-      'form' => array(
-        'style' => 'fieldset_collapsed',
-        'description' => '',
-      ),
-      'display' => array(
-        'teaser' => array(
-          'format' => 'fieldset',
-          'exclude' => 1,
-        ),
-        'full' => array(
-          'format' => 'fieldset_collapsed',
-          'exclude' => 0,
-        ),
-        '4' => array(
-          'format' => 'fieldset',
-        ),
-        'weight' => 6,
-        'label' => 'above',
-        'description' => '',
-      ),
-      'multigroup' => array(
-        'multiple' => 1,
-        'required' => FALSE,
-        'subgroup' => array(
-          'weight' => -20,
-          'label' => 'above',
-          'teaser' => array(
-            'format' => 'fieldset',
-            'exclude' => 0,
-          ),
-          'full' => array(
-            'format' => 'simple',
-            'exclude' => 0,
-          ),
-        ),
-      ),
-    ),
-    'weight' => '8',
-    'fields' => array(
-      '0' => 'field_source_name',
-      '1' => 'field_source_url',
-      '2' => 'field_source_copyright',
-      '3' => 'field_source_license',
-      '4' => 'field_source_raw',
-      '5' => 'field_source_timestamp',
-    ),
-  );
-
-  // Translatables
-  array(
-    t('Sources'),
-  );
-
-  return $groups;
-}
-
-/**
- * Helper to implementation of hook_menu_default_items().
- */
-function _lingwoorg_dictionary_menu_default_items() {
-  $items = array();
-
-  $items[] = array(
-    'title' => 'Dictionary',
-    'path' => 'dictionary',
-    'weight' => '2',
-  );
-  // Translatables
-  array(
-    t('Dictionary'),
-  );
-
-
-  return $items;
-}
-
-/**
- * Helper to implementation of hook_user_default_permissions().
- */
-function _lingwoorg_dictionary_user_default_permissions() {
-  $permissions = array();
-
-  // Exported permission: access content
-  $permissions[] = array(
-    'name' => 'access content',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'authenticated user',
-      '2' => 'device',
-      '3' => 'editor',
-    ),
-  );
-
-  // Exported permission: create entry content
-  $permissions[] = array(
-    'name' => 'create entry content',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'editor',
-    ),
-  );
-
-  // Exported permission: delete any entry content
-  $permissions[] = array(
-    'name' => 'delete any entry content',
-    'roles' => array(
-      '0' => 'admin',
-    ),
-  );
-
-  // Exported permission: delete own entry content
-  $permissions[] = array(
-    'name' => 'delete own entry content',
-    'roles' => array(
-      '0' => 'admin',
-    ),
-  );
-
-  // Exported permission: edit any entry content
-  $permissions[] = array(
-    'name' => 'edit any entry content',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'editor',
-      '2' => 'translator',
-    ),
-  );
-
-  // Exported permission: edit own entry content
-  $permissions[] = array(
-    'name' => 'edit own entry content',
-    'roles' => array(
-      '0' => 'admin',
-      '1' => 'editor',
-      '2' => 'translator',
-    ),
-  );
-
-  return $permissions;
 }

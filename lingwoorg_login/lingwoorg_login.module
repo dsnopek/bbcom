@@ -19,8 +19,8 @@ function lingwoorg_login_init() {
   $validating_id = logintoboggan_validating_id();
   if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && arg(2) == 'edit') && arg(0) != 'toboggan') {
     if ($purge_interval = variable_get('logintoboggan_purge_unvalidated_user_interval', 0)) {
-      // only show after the user has been a user for atleast one hour
-      if (time() - $user->created > 3600) {
+      // only show after the user has been a user for atleast one minute
+      if (time() - $user->created > 60) {
         $purge_time = ($user->created + $purge_interval) - time();
         $purge_days = ceil($purge_time / 86400);
         if ($purge_days > 1) {
