@@ -23,21 +23,11 @@ function lingwoorg_login_init() {
   // we show this message every time an unvalidated user visits a page that isn't user/%/edit 
   // or one of the magic toboggan pages.
   if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && arg(2) == 'edit') && arg(0) != 'toboggan') {
-    if ($purge_interval = variable_get('logintoboggan_purge_unvalidated_user_interval', 0)) {
-      // only show after the user has been a user for atleast one minute
-      if (time() - $user->created > 60) {
-        $purge_time = ($user->created + $purge_interval) - time();
-        $purge_days = ceil($purge_time / 86400);
-        if ($purge_days > 1) {
-          $purge_message = t("If you don't validate your account, after %days days your account will be deleted.", array('%days' => $purge_days));
-        }
-        else {
-          $purge_hours = ceil($purge_time / 3600);
-          $purge_message = t("If you don't validate your account, in %hours hours your account will be deleted!", array('%hours' => $purge_hours));
-        }
-        drupal_set_message(t("You still haven't validated your account!  Check your inbox for the validation e-mail and click the link given."));
-        drupal_set_message(t("!purge-message  <a href=\"@user-edit\">Make sure</a> you entered the correct e-mail address or <a href=\"@resend-email\">re-send</a> the validation e-mail", array('!purge-message' => $purge_message, '@user-edit' => url('user/'. $user->uid .'/edit'), '@resend-email' => url('toboggan/revalidate/'. $user->uid))));
-      }
+    // only show after the user has been a user for atleast one minute
+    if (time() - $user->created > 60) {
+      drupal_set_message('<strong>'. t("You still haven't validated your account!") .'</strong>', 'error');
+      drupal_set_message(t("A validation e-mail has been sent to your e-mail address. In order to gain full access to the site, you will need to follow the instructions in that message."));
+      drupal_set_message(t("<a href=\"@user-edit\">Make sure</a> you entered the correct e-mail address or <a href=\"@resend-email\">re-send</a> the validation e-mail.", array('@user-edit' => url('user/'. $user->uid .'/edit'), '@resend-email' => url('toboggan/revalidate/'. $user->uid))));
     }
   }
 }
