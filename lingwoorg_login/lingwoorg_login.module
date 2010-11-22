@@ -130,29 +130,6 @@ function lingwoorg_login_menu_alter(&$items) {
   $items['user/login']['weight'] = -10;
 }
 
-/**
- * Implementation of hook_strongarm()
- */
-function lingwoorg_login_strongarm() {
-  return array(
-    // logintoboggan configuration
-    // TODO: I'm not sure what to do, because this should be changable,
-    // yet these are good defaults for deploying a test or new prod server.
-    /*
-    'logintoboggan_login_with_email' => TRUE,
-    'logintoboggan_confirm_email_at_registration' => TRUE,
-    'logintoboggan_redirect_on_confirm' => 'user/%uid/edit',
-    'logintoboggan_login_successful_message' => TRUE,
-    'logintoboggan_minimum_password_length' => '7',
-    */
-
-    // remember_me configuration
-    'remember_me_checkbox' => 1,
-    'remember_me_managed' => 0,
-    'remember_me_phantom_session' => 0,
-  );
-}
-
 /*
  * Implementation of hook_form_alter().
  */
