@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_menu().
  */
-function bbcom_embed() {
+function bbcom_embed_menu() {
   $items = array();
 
   $items['embed-reader/lookup_content'] = array(
@@ -89,7 +89,7 @@ function bbcom_embed_form_alter(&$form, $form_state, $form_id) {
       $html = file_get_html($remote_url);
       $content = trim($html->find('.bibliobird-content', 0)->innertext);
       $form['body_field']['body']['#default_value'] = $content;
-      $form['title']['#default_value'] = $html->find('title', 0)->plaintext;
+      $form['title']['#default_value'] = htmlspecialchars_decode($html->find('title', 0)->plaintext);
     }
   }
   // TODO: This should be put in a module with rest of the remote stuff
@@ -168,7 +168,7 @@ function bbcom_embed_lookup_content() {
   _bbcom_embed_jsonp($json);
 }
 
-function lingwo_korpus_lookup_entry() {
+function bbcom_embed_lookup_entry() {
   global $user, $language;
 
   if ($_GET['hash']) {
