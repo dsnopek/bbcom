@@ -223,7 +223,7 @@ function template_preprocess_bbcom_embed_remote_login_page(&$vars) {
 }
 
 function theme_bbcom_embed_remote_login_styles() {
-  $css = url(drupal_get_path('module', 'bbcom_embed') .'/bibliobird-embed-remote-login.css');
+  $css = url(drupal_get_path('module', 'bbcom_embed') .'/bibliobird-remote-login.css');
   return '<link type="text/css" rel="stylesheet" media="all" href="'.$css.'" />'."\n";
 }
 
