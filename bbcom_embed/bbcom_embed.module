@@ -73,6 +73,44 @@ function bbcom_embed_theme() {
   );
 }
 
+/**
+ * Implementation of hook_form_alter().
+ */
+function bbcom_embed_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == (lingwo_korpus_text_content_type() .'_node_form')) {
+    $field_remote_url = 'field_remote_url';
+    if (!empty($field_remote_url) && !empty($_GET['remote_url'])) {
+      $remote_url = urldecode($_GET['remote_url']);
+
+      require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+      $form[$field_remote_url][0]['#default_value']['value'] = $remote_url;
+
+      $html = file_get_html($remote_url);
+      $content = trim($html->find('.bibliobird-content', 0)->innertext);
+      $form['body_field']['body']['#default_value'] = $content;
+      $form['title']['#default_value'] = $html->find('title', 0)->plaintext;
+    }
+  }
+  // TODO: This should be put in a module with rest of the remote stuff
+  elseif ($form_id == 'user_login_block' && $_GET['q'] == 'remote/login') {
+    unset($form['#action']);
+    $form['#submit'] = array('bbcom_embed_remote_login_submit');
+
+    # copied/pasted/modified from modules/user.module user_login_block()
+    $items = array();
+    if (variable_get('user_register', 1)) {
+      $items[] = l(t('Create new account'), 'user/register', array('attributes' => array('title' => t('Create a new user account.'), 'target' => '_blank')));
+    }
+    $items[] = l(t('Request new password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'target' => '_blank')));
+    $form['links'] = array('#value' => theme('item_list', $items));
+
+    // a tiny bit of javascript to focus the username field (tabindex doesn't seem to do the
+    // job in an iframe).
+    $form['js']['#value'] = "<script>document.getElementById('edit-name').focus();</script>";
+  }
+}
+
 /// Copied and modified version of drupal_json()
 function _bbcom_embed_jsonp($var = NULL) {
   // We are returning JavaScript, so tell the browser.
