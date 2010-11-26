@@ -1,0 +1,111 @@
+/**
+ * Eric Meyer's Reset CSS
+ *
+ * v1.0 | 20080212
+ * http://meyerweb.com/eric/tools/css/reset/
+ *
+ * DRS: This has been very abridged, since the page this is going on, is
+ * extremely simple and doesn't include many of things styled here.
+ *
+ */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+/* outline: 0; */
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+
+/* Warning: this may add 1-2 pixels to bottom of page */
+/* See http://drupal.org/node/422006 */
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+/**
+ * Now style it!
+ */
+body {
+  font: 13px/1.5 Verdana, Arial, Helvetica, 'Liberation Sans', FreeSans, sans-serif;
+  margin: 0 10px;
+}
+h1 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+.form-item {
+  margin-bottom: 1px;
+}
+/* Display in a single row */
+.item-list {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+.item-list li {
+  display: inline;
+  margin-right: 20px;
+}
+.item-list li.last {
+  margin-right: 0;
+}
+/* Display as bullets */
+/*
+ul {
+  list-style: disc inside;
+}
+li {
+  margin-left: 15px;
+}
+*/
+.form-required {
+  color: red;
+  font-weight: bold;
+}
+#edit-name-wrapper label,
+#edit-pass-wrapper label {
+  width: 150px;
+  display: block;
+  float: left;
+}
+#edit-remember-me-wrapper {
+  margin-left: 150px;
+}
+#edit-name, #edit-pass {
+  border: 1px solid black;
+  width: 200px;
+}
+#edit-name.error,
+#edit-pass.error {
+  border: 2px solid red;
+}
+#edit-submit {
+  /* 350px - 75px */
+  margin-left: 275px;
+  width: 75px;
+  text-align: center;
+  border: 1px solid black;
+  color: white;
+  background-color: blue;
+}
+.messages {
+  font-weight: bold;
+  margin: 5px 0;
+  color: red;
+}
+

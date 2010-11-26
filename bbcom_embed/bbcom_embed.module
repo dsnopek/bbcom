@@ -1,0 +1,265 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function bbcom_embed() {
+  $items = array();
+
+  $items['embed-reader/lookup_content'] = array(
+    'title' => 'Lookup Content',
+    'page arguments' => array(2),
+    'page callback' => 'bbcom_embed_lookup_content',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  // We provide our own version rather than relying on
+  // the lingwo_korpus one, so that we can add make it JSONP
+  // and bundle some extra data with it.
+  $items['embed-reader/lookup_entry'] = array(
+    'title' => 'Lookup Entry',
+    'page arguments' => array(2),
+    'page callback' => 'bbcom_embed_lookup_entry',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // This stuff is probably destined for an external module, since
+  // in theory its not related to BiblioBird/Lingwo
+  $items['remote/login'] = array(
+    'title' => 'Login to BiblioBird',
+    'page callback' => 'bbcom_embed_remote_login_page',
+    'access callback' => '_bbcom_embed_true',
+    'type' => MENU_CALLBACK,
+  );
+  $items['remote/logout'] = array(
+    'title' => 'Remote Logout',
+    'page callback' => 'bbcom_embed_remote_logout_page',
+    'access callback' => '_bbcom_embed_true',
+    'type' => MENU_CALLBACK,
+  );
+  $items['remote/loggedin'] = array(
+    'title' => 'Login Successful',
+    'page callback' => 'bbcom_embed_remote_loggedin_page',
+    'access callback' => '_bbcom_embed_true',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/*
+ * Implementation of hook_theme().
+ */
+function bbcom_embed_theme() {
+  return array(
+    'bbcom_embed_remote_login_page' => array(
+      'arguments' => array(
+        'content' => NULL,
+        'page_name' => NULL,
+      ),
+      'template' => 'bibliobird-remote-login-page',
+    ),
+    'bbcom_embed_remote_login_relay_iframe' => array(
+      'arguments' => array(
+        'relay_url' => NULL,
+        'message'   => NULL,
+      ),
+      'template' => 'bibliobird-remote-login-relay-iframe',
+    ),
+    'bbcom_embed_remote_login_styles' => array(
+      'arguments' => array(),
+    ),
+  );
+}
+
+/// Copied and modified version of drupal_json()
+function _bbcom_embed_jsonp($var = NULL) {
+  // We are returning JavaScript, so tell the browser.
+  drupal_set_header('Content-Type: text/javascript; charset=utf-8');
+
+  $callback = urldecode($_GET['callback']);
+  if (isset($var)) {
+    if (!empty($callback)) {
+      echo $callback .'('. drupal_to_js($var) .')';
+    }
+  }
+  exit();
+}
+
+// Helper function to return the NID of a content item for the given remote URL
+function _bbcom_embed_lookup_remote_url($url) {
+  $field_remote_url = 'field_remote_url';
+  $text_content_type = lingwo_korpus_text_content_type();
+  if (!empty($field_remote_url) && !empty($text_content_type) && !empty($url)) {
+    $field = content_fields($field_remote_url, $text_content_type);
+    $db_info = content_database_info($field);
+    $res = db_query("SELECT c.nid FROM ".$db_info['table']." AS c, {node} AS n WHERE ".$db_info['columns']['value']['column']." = '%s' AND c.nid = n.nid AND n.status = 1 LIMIT 1", $url);
+    if ($obj = db_fetch_object($res)) {
+      return $obj->nid;
+    }
+  }
+  return NULL;
+}
+
+/*
+ * Our content lookup AJAX callback.
+ */
+function bbcom_embed_lookup_content() {
+  global $user;
+
+  $url = urldecode($_GET['url']);
+
+  $json = array();
+  if ($user->uid != 0) {
+    $json['username'] = $user->name;
+  }
+
+  if ($nid = _bbcom_embed_lookup_remote_url($url)) {
+    $node = node_load($nid);
+
+    $data = lingwo_korpus_filter_text($node->body, $node->language, $node->nid);
+
+    $json['content'] = $data;
+    $json['nid'] = $nid;
+  }
+  else {
+    $json['not_found'] = TRUE;
+  }
+
+  _bbcom_embed_jsonp($json);
+}
+
+function lingwo_korpus_lookup_entry() {
+  global $user, $language;
+
+  if ($_GET['hash']) {
+    // TODO: this should be removed!  We really don't want to be passing "lang" to
+    // every AJAX function!  We'll use the host sub-domain for this...
+    $target_lang = !empty($_GET['lang']) ? $_GET['lang'] : $language->language;
+
+    // by passing TRUE, we return the source if the translation can't be found
+    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $target_lang, TRUE);
+  }
+
+  if ($entry) {
+    // trigger the rule so WIAL stuff happens
+    rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
+
+    // HACK: force the language to be set to whatever the $node->language is!  This is 
+    // necessary for when we are using embed.js and always load from http://www.bibliobird.com
+    $languages = language_list();
+    $language = $languages[$entry->getNode()->language];
+
+    $content = node_view($entry->getNode(), TRUE);
+  }
+  else {
+    $content = t('Entry not found.');
+  }
+
+  // return the HTML to the Ajax caller
+  _bbcom_embed_jsonp(array('content' => $content));
+}
+
+/*
+ * Our remote login stuff.
+ */
+
+function _bbcom_embed_true() {
+  return TRUE;
+}
+
+function _bbcom_embed_remote_login_page($content, $page_name) {
+  drupal_set_header('Content-Type: text/html; charset=utf-8');
+  echo theme('bbcom_embed_remote_login_page', $content, $page_name);
+  exit();
+}
+
+function template_preprocess_bbcom_embed_remote_login_page(&$vars) {
+  $vars['title'] = drupal_get_title();
+  $vars['body_classes'] = 'page-'. $vars['page_name'];
+  // If a theme wants to override this using a CSS file, they can create a theme function
+  // which returns a <link .../> which points to it.
+  $vars['styles'] = theme('bbcom_embed_remote_login_styles');
+  $vars['messages'] = theme('status_messages', 'error');
+}
+
+function theme_bbcom_embed_remote_login_styles() {
+  $css = url(drupal_get_path('module', 'bbcom_embed') .'/bibliobird-embed-remote-login.css');
+  return '<link type="text/css" rel="stylesheet" media="all" href="'.$css.'" />'."\n";
+}
+
+function bbcom_embed_remote_login_page() {
+  global $user;
+  if ($user->uid) {
+    // if we are already logged in, we send the user to bbcom_embed/rloggedin
+    if (empty($_GET['relay'])) {
+      drupal_goto('remote/loggedin');
+    }
+    else {
+      drupal_goto('remote/loggedin', 'relay='.$_GET['relay']);
+    }
+  }
+  else {
+    $content = drupal_get_form('user_login_block');
+    _bbcom_embed_remote_login_page($content, 'login');
+  }
+}
+
+function bbcom_embed_remote_login_submit($form, &$form_state) {
+  global $user;
+  if ($user->uid) {
+    if (empty($_GET['relay'])) {
+      $form_state['redirect'] = 'remote/loggedin';
+    }
+    else {
+      $form_state['redirect'] = array('remote/loggedin', 'relay='.$_GET['relay']);;
+    }
+  }
+}
+
+function bbcom_embed_remote_loggedin_page() {
+  global $user;
+  if ($_GET['callback']) {
+    $json = array();
+    if ($user->uid != 0) {
+      $json['username'] = $user->name;
+    }
+    _bbcom_embed_jsonp($json);
+  }
+  else {
+    if ($_GET['relay']) {
+      $content = theme('bbcom_embed_remote_login_relay_iframe',
+        $_GET['relay'], 'login-successful:'. $user->name);
+    }
+    _bbcom_embed_remote_login_page($content, 'loggedin');
+  }
+}
+
+function bbcom_embed_remote_logout_page() {
+  global $user;
+
+  if ($user->uid) {
+    watchdog('user', 'Session closed for %name.', array('%name' => theme('placeholder', $user->name)));
+
+    // Destroy the current session:
+    session_destroy();
+    $array = array();
+    user_module_invoke('logout', $array, $user);
+
+    // Load the anonymous user
+    $user = drupal_anonymous_user();
+  }
+
+  if (!empty($_GET['relay'])) {
+    if ($_GET['relay']) {
+      $content = theme('bbcom_embed_remote_login_relay_iframe',
+        $_GET['relay'], 'logout-successful');
+    }
+    _bbcom_embed_remote_login_page($content, 'logout');
+  }
+  else {
+    _bbcom_embed_jsonp(array('success' => TRUE));
+  }
+}
+
