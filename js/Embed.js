@@ -23,7 +23,7 @@ require.def(
                             url = url.split('#')[0];
                     };
                     return url;
-                },
+                }
             };
 
         function extend(obj, vals, preserve) {
