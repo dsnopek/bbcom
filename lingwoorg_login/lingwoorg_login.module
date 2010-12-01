@@ -22,7 +22,7 @@ function lingwoorg_login_init() {
 
   // we show this message every time an unvalidated user visits a page that isn't user/%/edit 
   // or one of the magic toboggan pages.
-  if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && arg(2) == 'edit') && arg(0) != 'toboggan') {
+  if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && (arg(2) == 'edit' || arg(1) == 'validate')) && arg(0) != 'toboggan') {
     // only show after the user has been a user for atleast one minute
     if (time() - $user->created > 60) {
       drupal_set_message('<strong>'. t("You still haven't validated your account!") .'</strong>', 'error');
