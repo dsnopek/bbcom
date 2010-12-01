@@ -1,5 +1,5 @@
 
-require.def(
+define(
     ['jquery','lingwo_dictionary/annotation/Reader2'],
     function ($, Reader) {
         var BiblioBird = {},
