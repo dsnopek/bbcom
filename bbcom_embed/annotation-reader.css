@@ -74,7 +74,10 @@ a.external:visited {
   padding:0 0 0 0.5em;
 }
 #lingwo-korpus-entry-view .node ul.links li.first { padding:0; }
-#lingwo-korpus-entry-view .node .lingwo-sense-list li.selected, #lingwo-korpus-entry-view .node .lingwo-sense-list li.selected blockquote { background-color:yellow; }
+#lingwo-korpus-entry-view .node .lingwo-sense-list li.selected, #lingwo-korpus-entry-view .node .lingwo-sense-list li.selected blockquote {
+  background-color:yellow;
+  color:black;
+}
 .bibliobird-embed-titlebar {
   background-color:blue;
   color:white;

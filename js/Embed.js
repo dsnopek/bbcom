@@ -2,15 +2,29 @@
 require.def(
     ['jquery','lingwo_dictionary/annotation/Reader2'],
     function ($, Reader) {
-        var configDefaults = {
-                url: 'http://www.bibliobird.com',
+        var BiblioBird = {},
+            configDefaults = {
+                url: 'http://<lang>.bibliobird.com',
                 lang: 'en',
                 showLinks: true,
                 // TODO: this should be false or not even in this code!
                 //ga: false
-                ga: true
-            },
-            BiblioBird = {};
+                ga: true,
+
+                // can be '#' (remove hash), '?' (remove query string and hash) or '' (raw)
+                pageUrlRemove: '#',
+                getPageUrl: function () {
+                    var url = ''+window.self.location.href;
+                    // We do a switch so '?' does both characters
+                    switch (BiblioBird.pageUrlRemove) {
+                        case '?':
+                            url = url.split('?')[0];
+                        case '#':
+                            url = url.split('#')[0];
+                    };
+                    return url;
+                }
+            };
 
         function extend(obj, vals, preserve) {
             var name;
@@ -19,6 +33,14 @@ require.def(
                     obj[name] = vals[name];
                 }
             }
+        }
+
+        function bburl(path) {
+            var url = BiblioBird.url.replace('<lang>', BiblioBird.lang);
+            if (path) {
+                return url+'/'+path;
+            }
+            return url;
         }
 
         // copy config if it is set!
@@ -40,9 +62,9 @@ require.def(
             // to initialize itself.  That only happens if a .bibliobird-content node is
             // found on the page.
             start: function () {
-                var self = this;
+                var window = this;
                 $('.bibliobird-content').each(function () {
-                    self.contentAreas.push(new ContentArea(this));
+                    window.contentAreas.push(new ContentArea(this));
                 });
             },
 
@@ -122,7 +144,7 @@ require.def(
             logout: function() {
                 var self = this;
                 $.ajax({
-                    url: BiblioBird.url+'/remote/logout',
+                    url: bburl('remote/logout'),
                     dataType: 'jsonp',
                     success: function (res) {
                         self.username = null;
@@ -147,7 +169,7 @@ require.def(
 
             // lookup the entry on the server
             $.ajax({
-                url: BiblioBird.url+'/embed-reader/lookup_entry',
+                url: bburl('embed-reader/lookup_entry'),
                 dataType: 'jsonp',
                 data: { hash: hash, lang: BiblioBird.lang },
                 success: function (res) {
@@ -182,8 +204,8 @@ require.def(
                     $('a', Reader.contentNode).each(function (i, node) {
                         var href = node.href, localHost;
                         if (href) {
-                            localHost = window.location.protocol + '//' + window.location.host;
-                            node.href = href.replace(localHost, BiblioBird.url);
+                            localHost = window.self.location.protocol + '//' + window.self.location.host;
+                            node.href = href.replace(localHost, bburl());
                             node.target = '_blank';
                         }
                     });
@@ -193,10 +215,11 @@ require.def(
 
         ContentArea = function (x) {
             this.node      = x;
-            this.url       = $(x).attr('data-url') || (''+window.location.href).split('#')[0];
+            this.url       = $(x).attr('data-url') || BiblioBird.getPageUrl();
             this.teaser    = $(x).attr('data-teaser') == 'true';
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
             this.data      = {};
+
 
             this.lookupContent();
         }
@@ -205,7 +228,7 @@ require.def(
                 var self = this;
 
                 $.ajax({
-                    url: BiblioBird.url+'/embed-reader/lookup_content',
+                    url: bburl('embed-reader/lookup_content'),
                     dataType: 'jsonp',
                     data: { url: this.url },
                     success: function (res) {
@@ -236,7 +259,7 @@ require.def(
                     links.append('Logged into BiblioBird as '+BiblioBird.username+' ');
                     links.append($('<a></a>')
                         .html('Logout')
-                        .attr('href', BiblioBird.url+'/logout')
+                        .attr('href', bburl('logout'))
                         // TODO: I think we need a special JSONP logout function, because we need to know when
                         // its finished
                         .click(function () { BiblioBird.logout(); return false; })
@@ -246,8 +269,7 @@ require.def(
                     links.append('Not logged into BiblioBird ');
                     links.append($('<a></a>')
                         .html('Login')
-                        //.attr('href', BiblioBird.url+'/user/login')
-                        .attr('href', BiblioBird.url+'/remote/login' +
+                        .attr('href', bburl('remote/login') +
                             (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
                         .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
                     );
@@ -255,7 +277,7 @@ require.def(
                     links.append($('<a></a>')
                         .html('Join BiblioBird')
                         .attr({
-                            href: BiblioBird.url+'/user/register',
+                            href: bburl('user/register'),
                             target: '_blank'
                         })
                     );
@@ -268,7 +290,7 @@ require.def(
                         // TODO: we need some configuration, so we can point the user to the
                         // correct language site!
                         .attr({
-                            href: BiblioBird.url+'/node/add/content?remote_url='+escape(this.url),
+                            href: bburl('node/add/content?remote_url='+escape(this.url)),
                             target: '_blank'
                         })
                     );

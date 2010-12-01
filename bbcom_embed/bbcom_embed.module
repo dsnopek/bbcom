@@ -8,7 +8,6 @@ function bbcom_embed_menu() {
 
   $items['embed-reader/lookup_content'] = array(
     'title' => 'Lookup Content',
-    'page arguments' => array(2),
     'page callback' => 'bbcom_embed_lookup_content',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
@@ -18,8 +17,15 @@ function bbcom_embed_menu() {
   // and bundle some extra data with it.
   $items['embed-reader/lookup_entry'] = array(
     'title' => 'Lookup Entry',
-    'page arguments' => array(2),
     'page callback' => 'bbcom_embed_lookup_entry',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  // for opening remote pages in an iframe so users can 
+  // easily get back to BiblioBird.
+  $items['embed-reader/l/%'] = array(
+    'title' => 'View Remote Page',
+    'page callback' => 'bbcom_embed_view_remote_page',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
@@ -53,6 +59,15 @@ function bbcom_embed_menu() {
  */
 function bbcom_embed_theme() {
   return array(
+    // for wrapping other sites in a BiblioBird iframe
+    'bbcom_embed_view_remote_iframe' => array(
+      'arguments' => array(
+        'url' => NULL,
+      ),
+      'template' => 'bibliobird-view-remote-iframe',
+    ),
+
+    // the remote login stuff
     'bbcom_embed_remote_login_page' => array(
       'arguments' => array(
         'content' => NULL,
@@ -121,6 +136,9 @@ function _bbcom_embed_jsonp($var = NULL) {
     if (!empty($callback)) {
       echo $callback .'('. drupal_to_js($var) .')';
     }
+    else {
+      drupal_json($var);
+    }
   }
   exit();
 }
@@ -168,6 +186,9 @@ function bbcom_embed_lookup_content() {
   _bbcom_embed_jsonp($json);
 }
 
+/*
+ * Entry lookup AJAX (a replacement for the one in lingwo_korpus)
+ */
 function bbcom_embed_lookup_entry() {
   global $user, $language;
 
@@ -197,6 +218,45 @@ function bbcom_embed_lookup_entry() {
 
   // return the HTML to the Ajax caller
   _bbcom_embed_jsonp(array('content' => $content));
+}
+
+/*
+ * Load a remote page inside of BiblioBird.
+ */
+function bbcom_embed_view_remote_page() {
+  $url = 'http://'. implode('/', array_slice(explode('/', $_GET['q']), 2));
+
+  if ($nid = _bbcom_embed_lookup_remote_url($url)) {
+    $node = node_load($nid);
+    drupal_set_title($node->title);
+    // use to add a special template to template_files so that the theme can
+    // easily switch the page template on a remote page.
+    $GLOBALS['bbcom_embed_view_remote_page'] = TRUE;
+    return theme('bbcom_embed_view_remote_iframe', $url);
+  }
+
+  return drupal_not_found();
+}
+
+function bbcom_embed_preprocess_node(&$vars) {
+  // TODO: We are disabling this only temporarily...
+  /*
+  $node = $vars['node'];
+  if ($vars['teaser'] && $node->type == lingwo_korpus_text_content_type() && !empty($node->field_remote_url[0]['value'])) {
+    if (preg_match('@http://(.*)@', $node->field_remote_url[0]['value'], $matches)) {
+      $url = url('embed-reader/l/'. preg_replace('/#.*$/', '', $matches[1]), array('absolute' => TRUE));
+      $vars['node_url'] = $url;
+      $vars['node_url_remote'] = TRUE;
+    }
+  }
+  */
+}
+
+function bbcom_embed_preprocess_page(&$vars) {
+  if ($GLOBALS['bbcom_embed_view_remote_page']) {
+    // sneak in a special template when this is remote
+    array_unshift($vars['template_files'], 'page-embed-reader-remote');
+  }
 }
 
 /*
