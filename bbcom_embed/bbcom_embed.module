@@ -229,6 +229,9 @@ function bbcom_embed_view_remote_page() {
   if ($nid = _bbcom_embed_lookup_remote_url($url)) {
     $node = node_load($nid);
     drupal_set_title($node->title);
+    // use to add a special template to template_files so that the theme can
+    // easily switch the page template on a remote page.
+    $GLOBALS['bbcom_embed_view_remote_page'] = TRUE;
     return theme('bbcom_embed_view_remote_iframe', $url);
   }
 
@@ -243,6 +246,13 @@ function bbcom_embed_preprocess_node(&$vars) {
       $vars['node_url'] = $url;
       $vars['node_url_remote'] = TRUE;
     }
+  }
+}
+
+function bbcom_embed_preprocess_page(&$vars) {
+  if ($GLOBALS['bbcom_embed_view_remote_page']) {
+    // sneak in a special template when this is remote
+    array_unshift($vars['template_files'], 'page-embed-reader-remote');
   }
 }
 
