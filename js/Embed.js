@@ -57,15 +57,38 @@ define(
             embedIframe: null,
             embedWindowShown: false,
             username: null,
+            isRemoteIframe: false,
 
             // this is called at the beginning, but doesn't necessarily cause the object
             // to initialize itself.  That only happens if a .bibliobird-content node is
             // found on the page.
             start: function () {
-                var window = this;
+                if (window.self !== window.top && window.self.location.hash) {
+                    this._readHashOptions();
+                }
+
                 $('.bibliobird-content').each(function () {
-                    window.contentAreas.push(new ContentArea(this));
+                    BiblioBird.contentAreas.push(new ContentArea(this));
                 });
+            },
+
+            _readHashOptions: function () {
+                  var parts = (''+window.self.location.hash).split('&'),
+                      values = {},
+                      i, tmp;
+
+                  for(i = 0; i < parts.length; i++) {
+                      tmp = parts[i].split('=');
+                      values[tmp[0]] = tmp[1];
+                  }
+
+                  if (values['#iam'] == 'bibliobird') {
+                      // mark as living in the remote iframe on BiblioBird
+                      this.isRemoteIframe = true;
+                      // read language from the parent.
+                      // TODO: this is what we want in the end, but right now, maybe not.
+                      //this.lang = values.lang;
+                  }
             },
 
             initialize: function (username) {
