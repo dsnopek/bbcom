@@ -14,7 +14,7 @@ require.def(
                 // can be '#' (remove hash), '?' (remove query string and hash) or '' (raw)
                 pageUrlRemove: '#',
                 getPageUrl: function () {
-                    var url = ''+window.location.href;
+                    var url = ''+window.self.location.href;
                     // We do a switch so '?' does both characters
                     switch (BiblioBird.pageUrlRemove) {
                         case '?':
@@ -62,9 +62,9 @@ require.def(
             // to initialize itself.  That only happens if a .bibliobird-content node is
             // found on the page.
             start: function () {
-                var self = this;
+                var window = this;
                 $('.bibliobird-content').each(function () {
-                    self.contentAreas.push(new ContentArea(this));
+                    window.contentAreas.push(new ContentArea(this));
                 });
             },
 
@@ -204,7 +204,7 @@ require.def(
                     $('a', Reader.contentNode).each(function (i, node) {
                         var href = node.href, localHost;
                         if (href) {
-                            localHost = window.location.protocol + '//' + window.location.host;
+                            localHost = window.self.location.protocol + '//' + window.self.location.host;
                             node.href = href.replace(localHost, bburl());
                             node.target = '_blank';
                         }
