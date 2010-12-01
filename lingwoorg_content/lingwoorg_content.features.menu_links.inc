@@ -16,6 +16,7 @@ function lingwoorg_content_menu_default_menu_links() {
       'attributes' => array(
         'title' => '',
       ),
+      'alter' => TRUE,
     ),
     'module' => 'menu',
     'hidden' => '0',
