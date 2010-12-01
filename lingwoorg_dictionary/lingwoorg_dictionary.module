@@ -101,16 +101,6 @@ function lingwoorg_dictionary_field_formatter_info() {
   );
 }
 
-/*
- * Implementation of hook_link_alter().
- */
-function lingwoorg_dictionary_link_alter(&$links, $node, $comment=NULL) {
-  if (is_null($comment) && $node->type == lingwo_dictionary_settings('entry_content_type')) {
-    // TODO: Seems to contradict docs, this should be $links['comment']['comment_forbidden'] ...
-    unset($links['comment_forbidden']);
-  }
-}
-
 /**
  * Implementation of hook_theme().
  */
