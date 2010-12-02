@@ -194,7 +194,7 @@ define(
                 links.html('');
 
                 if (BiblioBird.username) {
-                    links.append(t('Hello')+', '+BiblioBird.username+'! (');
+                    links.append(t('Hello')+', '+BiblioBird.username+'!  (');
                     links.append($('<a></a>')
                         .html(t('not me!'))
                         .attr('href', bburl('logout'))
@@ -203,7 +203,7 @@ define(
                     links.append(')');
                 }
                 else {
-                    links.append(t('Hello')+'! ');
+                    links.append(t('Hello')+'!  ');
                     links.append($('<a></a>')
                         .html(t('Login'))
                         .attr('href', bburl('remote/login') +
@@ -218,7 +218,7 @@ define(
                             target: '_blank'
                         })
                     );
-                    links.append(' '+t('on BiblioBird')+'!');
+                    links.append(' '+t('on BiblioBird')+'.');
                 }
             }
         });
