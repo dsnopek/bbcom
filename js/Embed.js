@@ -468,35 +468,6 @@ define(
 
                 links.html('');
 
-                if (BiblioBird.username) {
-                    links.append('Logged into BiblioBird as '+BiblioBird.username+' ');
-                    links.append($('<a></a>')
-                        .html('Logout')
-                        .attr('href', bburl('logout'))
-                        // TODO: I think we need a special JSONP logout function, because we need to know when
-                        // its finished
-                        .click(function () { BiblioBird.logout(); return false; })
-                    );
-                }
-                else {
-                    links.append('Not logged into BiblioBird ');
-                    links.append($('<a></a>')
-                        .html('Login')
-                        .attr('href', bburl('remote/login') +
-                            (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
-                        .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
-                    );
-                    links.append(' ');
-                    links.append($('<a></a>')
-                        .html('Join BiblioBird')
-                        .attr({
-                            href: bburl('user/register'),
-                            target: '_blank'
-                        })
-                    );
-                }
-                links.append(' ');
-
                 if (data.not_found) {
                     links.append($('<a></a>')
                         .html('Add to Bibliobird')
