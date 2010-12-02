@@ -362,11 +362,9 @@ define(
             },
 
             refreshAll: function () {
-                /*
                 $.each(this.contentAreas, function () {
                     this.refresh();
                 });
-                */
                 if (this.bottomDock) {
                     this.bottomDock.rebuildLinks();
                 }
@@ -468,7 +466,7 @@ define(
 
                 links.html('');
 
-                if (data.not_found) {
+                if (data.not_found && BiblioBird.username) {
                     links.append($('<a></a>')
                         .html('Add to Bibliobird')
                         // TODO: we need some configuration, so we can point the user to the
