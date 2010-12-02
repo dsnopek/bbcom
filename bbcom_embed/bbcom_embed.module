@@ -252,6 +252,24 @@ function bbcom_embed_preprocess_node(&$vars) {
       $url = url('embed-reader/l/'. preg_replace('/#.*$/', '', $matches[1]), array('absolute' => TRUE));
       $vars['node_url'] = $url;
       $vars['node_url_remote'] = TRUE;
+
+      // add some special links so that we can still easily edit this nodes
+      $links = $node->links;
+      $links['quick-view'] = array(
+        'title' => 'View',
+        'href'  => 'node/'. $node->nid,
+      );
+      $links['quick-edit'] = array(
+        'title' => 'Edit',
+        'href'  => 'node/'. $node->nid .'/edit',
+      );
+      $links['quick-annotate'] = array(
+        'title' => 'Annotate',
+        'href'  => 'node/'. $node->nid .'/annotate',
+      );
+
+      // overwrite existing links
+      $vars['links'] = theme('links', $links, array('class' => 'links inline'));
     }
   }
 }
