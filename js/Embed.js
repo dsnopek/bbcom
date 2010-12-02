@@ -35,7 +35,8 @@ define(
 
         // TODO: make this better (with the require NLS stuff)
         trans['pl'] = {
-            'Translate to': 'Tłumacz na'
+            'Translate to': 'Tłumacz na',
+            'Words I Am Learning': 'Mój osobisty słowniczek'
         };
         function t(s) {
             var v = trans[BiblioBird.lang][s];
@@ -99,7 +100,7 @@ define(
                 });
 
                 // create the WIAL button
-                wialButton = $('<a></a>')
+                wialButton = $('<a id="bibliobird-wial-button"></a>')
                     .css({
                         display: 'block',
                         float: 'right',
@@ -180,6 +181,9 @@ define(
 
             rebuildLinks: function () {
                 var links = $(this.userNode);
+
+                // TODO: this is a hack!
+                $('#bibliobird-wial-button', this.node)[BiblioBird.username ? 'show' : 'hide']();
 
                 links.html('');
 
