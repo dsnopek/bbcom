@@ -245,7 +245,6 @@ function bbcom_embed_view_remote_page() {
 }
 
 function bbcom_embed_preprocess_node(&$vars) {
-  // TODO: We are disabling this only temporarily...
   $node = $vars['node'];
   if ($vars['teaser'] && $node->type == lingwo_korpus_text_content_type() && !empty($node->field_remote_url[0]['value'])) {
     if (preg_match('@http://(.*)@', $node->field_remote_url[0]['value'], $matches)) {
@@ -254,22 +253,26 @@ function bbcom_embed_preprocess_node(&$vars) {
       $vars['node_url_remote'] = TRUE;
 
       // add some special links so that we can still easily edit this nodes
-      $links = $node->links;
-      $links['quick-view'] = array(
-        'title' => 'View',
-        'href'  => 'node/'. $node->nid,
-      );
-      $links['quick-edit'] = array(
-        'title' => 'Edit',
-        'href'  => 'node/'. $node->nid .'/edit',
-      );
-      $links['quick-annotate'] = array(
-        'title' => 'Annotate',
-        'href'  => 'node/'. $node->nid .'/annotate',
-      );
+      if (node_access('update', $node)) {
+        $links = $node->links;
+        $links['quick-view'] = array(
+          'title' => 'View',
+          'href'  => 'node/'. $node->nid,
+        );
+        $links['quick-edit'] = array(
+          'title' => 'Edit',
+          'href'  => 'node/'. $node->nid .'/edit',
+        );
+        if (user_access('annotate lingwo_korpus texts')) {
+          $links['quick-annotate'] = array(
+            'title' => 'Annotate',
+            'href'  => 'node/'. $node->nid .'/annotate',
+          );
+        }
 
-      // overwrite existing links
-      $vars['links'] = theme('links', $links, array('class' => 'links inline'));
+        // overwrite existing links
+        $vars['links'] = theme('links', $links, array('class' => 'links inline'));
+      }
     }
   }
 }
