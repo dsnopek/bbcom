@@ -11,8 +11,20 @@ function lingwoorg_content_content_default_fields() {
     'field_name' => 'field_audio',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '-3',
+      'weight' => 0,
       'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
       ),
@@ -22,10 +34,6 @@ function lingwoorg_content_content_default_fields() {
       ),
       'full' => array(
         'format' => 'swftools',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
         'exclude' => 0,
       ),
     ),
@@ -57,19 +65,28 @@ function lingwoorg_content_content_default_fields() {
     'field_name' => 'field_remote_url',
     'type_name' => 'content',
     'display_settings' => array(
+      'weight' => '1',
+      'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
