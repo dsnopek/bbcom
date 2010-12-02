@@ -36,7 +36,13 @@ define(
         // TODO: make this better (with the require NLS stuff)
         trans['pl'] = {
             'Translate to': 'Tłumacz na',
-            'Words I Am Learning': 'Mój osobisty słowniczek'
+            'Words I Am Learning': 'Mój osobisty słowniczek',
+            'Hello': 'Cześć',
+            'Login': 'Zaloguj się',
+            'or': 'lub',
+            'register': 'utwórz konto',
+            'on BiblioBird': 'w systemie BiblioBird',
+            'not me!': 'to nie ja!'
         };
         function t(s) {
             var v = trans[BiblioBird.lang][s];
@@ -66,7 +72,7 @@ define(
 
                 this.innerNode = $('<div id="bibliobird-dock" class="clear-block"></div>').get(0);
                 this.node = $('<div></div>').css('zIndex', '101').append(this.innerNode).get(0);
-                this.userNode = $('<div></div>').css('float', 'left').get(0);
+                this.userNode = $('<div></div>').css({float: 'left', 'padding-left': 10 }).get(0);
 
                 this._rebuild();
 
@@ -188,31 +194,31 @@ define(
                 links.html('');
 
                 if (BiblioBird.username) {
-                    links.append('Logged into BiblioBird as '+BiblioBird.username+' ');
+                    links.append(t('Hello')+', '+BiblioBird.username+'! (');
                     links.append($('<a></a>')
-                        .html('Logout')
+                        .html(t('not me!'))
                         .attr('href', bburl('logout'))
-                        // TODO: I think we need a special JSONP logout function, because we need to know when
-                        // its finished
                         .click(function () { BiblioBird.logout(); return false; })
                     );
+                    links.append(')');
                 }
                 else {
-                    links.append('Not logged into BiblioBird ');
+                    links.append(t('Hello')+'! ');
                     links.append($('<a></a>')
-                        .html('Login')
+                        .html(t('Login'))
                         .attr('href', bburl('remote/login') +
                             (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
                         .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
                     );
-                    links.append(' ');
+                    links.append(' '+t('or')+' ');
                     links.append($('<a></a>')
-                        .html('Join BiblioBird')
+                        .html(t('register'))
                         .attr({
                             href: bburl('user/register'),
                             target: '_blank'
                         })
                     );
+                    links.append(' '+t('on BiblioBird')+'!');
                 }
             }
         });
@@ -356,9 +362,14 @@ define(
             },
 
             refreshAll: function () {
+                /*
                 $.each(this.contentAreas, function () {
                     this.refresh();
                 });
+                */
+                if (this.bottomDock) {
+                    this.bottomDock.rebuildLinks();
+                }
             }
         });
 
