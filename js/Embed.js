@@ -298,7 +298,7 @@ define(
                 if (this.initialized) return;
 
                 var embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
-                    embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow);
+                    embedIframe = $('<iframe height="100%" width="100%" frameBorder="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow);
 
                 // make the embedWindow / embedIframe
                 embedWindow

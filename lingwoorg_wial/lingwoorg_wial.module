@@ -90,6 +90,6 @@ function lingwoorg_wial_page_access($account) {
 
 function lingwoorg_wial_redirect_page() {
   global $user;
-  drupal_goto('user/'. $user->uid .'/wial');
+  drupal_goto('wial/'. $user->uid .'/edit');
 }
 
