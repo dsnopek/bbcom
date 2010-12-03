@@ -1,11 +1,12 @@
 
 define(
     ['jquery',
+     'lingwo_dictionary/util/declare',
      'lingwo_dictionary/annotation/Reader2',
      'lingwo_dictionary/layout/BottomDock',
-     'lingwo_dictionary/util/declare'
+     'lingwo_dictionary/layout/isPositionFixedSupported'
     ],
-    function ($, Reader, BottomDockLayout, declare) {
+    function ($, declare, Reader, BottomDockLayout, isPositionFixedSupported) {
         var BiblioBird = {},
             configDefaults = {
                 url: 'http://<lang>.bibliobird.com',
@@ -31,6 +32,7 @@ define(
             },
             supportedLanguages = {'en': 'English', 'pl': 'Polski' },
             trans = {'en': {}},
+            positionFixed = isPositionFixedSupported(),
             Dock;
 
         // TODO: make this better (with the require NLS stuff)
@@ -293,7 +295,7 @@ define(
                     .css({
                         width: 400,
                         height: 200,
-                        position: 'fixed',
+                        position: positionFixed ? 'fixed' : 'absolute',
                         border: '1px solid black',
                         background: 'white',
                         display: 'none'
@@ -306,9 +308,16 @@ define(
                 function positionEmbedWindow() {
                     var left = ($(window).width() - 400) / 2,
                         top  = ($(window).height() - 200) / 2;
+                    if (!positionFixed) {
+                        top += $(window).scrollTop();
+                        left += $(window).scrollLeft();
+                    }
                     embedWindow.css({ top: top, left: left });
                 }
                 $(window).resize(positionEmbedWindow);
+                if (!positionFixed) {
+                    $(window).scroll(positionEmbedWindow);
+                }
                 setTimeout(positionEmbedWindow, 0);
 
                 // initialize the Reader object
