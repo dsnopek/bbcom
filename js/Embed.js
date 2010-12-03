@@ -72,7 +72,7 @@ define(
 
                 this.innerNode = $('<div id="bibliobird-dock" class="clear-block"></div>').get(0);
                 this.node = $('<div></div>').css('zIndex', '101').append(this.innerNode).get(0);
-                this.userNode = $('<div></div>').css({float: 'left', 'padding-left': 10 }).get(0);
+                this.userNode = $('<div></div>').css({'float': 'left', 'padding-left': 10 }).get(0);
 
                 this._rebuild();
 
@@ -109,7 +109,7 @@ define(
                 wialButton = $('<a id="bibliobird-wial-button"></a>')
                     .css({
                         display: 'block',
-                        float: 'right',
+                        'float': 'right',
                         background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-left.png') left no-repeat",
                         'padding-left': 11,
                         height: 27,
@@ -129,7 +129,7 @@ define(
                         $('<span></span>')
                             .css({
                                 display: 'block',
-                                float: 'left',
+                                'float': 'left',
                                 background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-right.png') right no-repeat",
                                 'padding-right': 14,
                                 height: 27,
@@ -139,7 +139,7 @@ define(
                                 $('<span></span>')
                                     .css({
                                         display: 'block',
-                                        float: 'left',
+                                        'float': 'left',
                                         background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-middle.png') center repeat-x",
                                         'padding-top': 4,
                                         height: 23,
@@ -159,7 +159,7 @@ define(
                     .append(
                         $('<div>BiblioBird</div>')
                             .css({
-                                float: 'left',
+                                'float': 'left',
                                 background: '#07104C',
                                 'font-weight': 'bold',
                                 //height: size,
@@ -174,7 +174,7 @@ define(
                     .append(
                         $('<div></div>')
                             .css({
-                                float: 'right',
+                                'float': 'right',
                                 'padding-right': '10px'
                             })
                             .append('<label for="bibliobird-language-switcher">'+t('Translate to')+': </label>')
