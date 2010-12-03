@@ -153,23 +153,29 @@ function lingwoorg_login_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/*
 function lingwoorg_login_user_login_submit($form, &$form_state) {
   // should take us to the front page.. I hope.
   $_REQUEST['destination'] = variable_get('site_frontpage', 'node');
 }
+*/
 
+/*
 function lingwoorg_login_user_register_validate($form, &$form_state) {
   if (!lingwoorg_login_check_code($form_state['values']['registration_code'])) {
     form_set_error('registration_code', t('Invalid registration code.'));
   }
 }
+*/
 
+/*
 function lingwoorg_login_user_register_submit($form, &$form_state) {
   list($batch_id, $seed, $code) = lingwoorg_login_parse_code($form_state['values']['registration_code']);
 
   db_query("UPDATE {lingwoorg_login_reg_code} SET uid = %d WHERE batch_id = %d AND code = '%s'",
     $form_state['user']->uid, $batch_id, $code);
 }
+*/
 
 /*
  * Implements hook_fb().

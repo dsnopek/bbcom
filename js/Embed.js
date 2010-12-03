@@ -239,6 +239,7 @@ define(
             username: null,
             isRemoteIframe: false,
             bottomDock: null,
+            hasContent: false,
 
             // this is called at the beginning, but doesn't necessarily cause the object
             // to initialize itself.  That only happens if a .bibliobird-content node is
@@ -272,7 +273,16 @@ define(
                   }
             },
 
-            initialize: function (username) {
+            initialize: function (username, hasContent) {
+                // Only create the bottom dock if one of the ContentArea's has some content
+                if (!this.hasContent && hasContent) {
+                    if (!this.isRemoteIframe) {
+                        this.bottomDock = new Dock();
+                    }
+                    this.hasContent = hasContent;
+                }
+
+                // do only once guard
                 if (this.initialized) return;
 
                 var embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
@@ -315,10 +325,6 @@ define(
                     username:    username,
                     initialized: true
                 });
-
-                if (!this.isRemoteIframe) {
-                    this.bottomDock = new Dock();
-                }
             },
 
             receiveMessage: function (msg) {
@@ -424,13 +430,12 @@ define(
             });
         }
 
-        ContentArea = function (x) {
+        function ContentArea(x) {
             this.node      = x;
             this.url       = $(x).attr('data-url') || BiblioBird.getPageUrl();
             this.teaser    = $(x).attr('data-teaser') == 'true';
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
             this.data      = {};
-
 
             this.lookupContent();
         }
@@ -444,7 +449,7 @@ define(
                     data: { url: this.url },
                     success: function (res) {
                         // we only initialize after we have a username..
-                        BiblioBird.initialize(res.username);
+                        BiblioBird.initialize(res.username, !!res.content);
 
                         self.data = res;
                         self.rebuildLinks();
@@ -466,7 +471,10 @@ define(
 
                 links.html('');
 
-                if (data.not_found && BiblioBird.username) {
+                // TODO: probably *should* only show this if you are logged in, but since
+                // we don't show the bottom dock if there is no content, the user CANT login
+                //if (data.not_found && BiblioBird.username) {
+                if (data.not_found) {
                     links.append($('<a></a>')
                         .html('Add to Bibliobird')
                         // TODO: we need some configuration, so we can point the user to the
