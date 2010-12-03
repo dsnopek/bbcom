@@ -308,7 +308,8 @@ define(
                         position: positionFixed ? 'fixed' : 'absolute',
                         border: '1px solid black',
                         background: 'white',
-                        display: 'none'
+                        display: 'none',
+                        zIndex: 101
                     })
                     .appendTo($('body'));
                 $('.bibliobird-embed-close', embedWindow).click(function () {
