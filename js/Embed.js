@@ -93,7 +93,13 @@ define(
                 this.innerNode.innerHTML = '';
 
                 // build language switcher
-                languageSwitcher = $('<select id="bibliobird-language-switcher"></select>').get(0);
+                languageSwitcher = $('<select id="bibliobird-language-switcher"></select>')
+                    .css({
+                        'float': 'left',
+                        'margin-top': 5,
+                        'margin-left': 5
+                    })
+                    .get(0);
                 for (langCode in supportedLanguages) {
                     option = $('<option>'+supportedLanguages[langCode]+'</option>');
                     option.attr('value', langCode);
@@ -111,7 +117,7 @@ define(
                 wialButton = $('<a id="bibliobird-wial-button"></a>')
                     .css({
                         display: 'block',
-                        'float': 'right',
+                        'float': 'left',
                         background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-left.png') left no-repeat",
                         'padding-left': 11,
                         height: 27,
@@ -179,7 +185,7 @@ define(
                                 'float': 'right',
                                 'padding-right': '10px'
                             })
-                            .append('<label for="bibliobird-language-switcher">'+t('Translate to')+': </label>')
+                            .append('<label for="bibliobird-language-switcher" style="float: left">'+t('Translate to')+': </label>')
                             .append(languageSwitcher)
                             .append(wialButton)
                     );
@@ -276,6 +282,10 @@ define(
             },
 
             initialize: function (username, hasContent) {
+                // TODO: this is totally random, out of place, but it has to happen before
+                // we setup the bottom dock.  Clean up this function when tomorrow isn't a 
+                // launch day.
+                this.username = username;
                 // Only create the bottom dock if one of the ContentArea's has some content
                 if (!this.hasContent && hasContent) {
                     if (!this.isRemoteIframe) {
@@ -342,6 +352,9 @@ define(
                     parts = msg.split(':');
                     if (parts[1]) {
                         this.username = parts[1];
+                    }
+                    else {
+                        alert('Login failed!  Problem with cookies.  Do you use IE6?  If so, try a different browser.');
                     }
 
                     this.hideEmbedWindow();
