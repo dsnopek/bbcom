@@ -47,6 +47,21 @@ function lingwoorg_wial_link_alter(&$links, $node) {
 }
 
 /*
+ * Implementation of hook_menu().
+ */
+function lingwoorg_wial_menu() {
+  $items = array();
+  $items['wial'] = array(
+    'title' => 'Words I Am Learning',
+    'description' => 'Redirect to a user\'s WIAL page',
+    'access arguments' => array('access wial'),
+    'page callback' => 'lingwoorg_wial_redirect_page',
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+/*
  * Implementation of hook_perm().
  */
 function lingwoorg_wial_perm() {
@@ -71,5 +86,10 @@ function lingwoorg_wial_page_access($account) {
 
   return (user_access('access wial') && $user->uid == $account->uid) ||
     user_access('access other wials');
+}
+
+function lingwoorg_wial_redirect_page() {
+  global $user;
+  drupal_goto('wial/'. $user->uid .'/edit');
 }
 

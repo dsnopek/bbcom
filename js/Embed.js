@@ -1,7 +1,12 @@
 
 define(
-    ['jquery','lingwo_dictionary/annotation/Reader2'],
-    function ($, Reader) {
+    ['jquery',
+     'lingwo_dictionary/util/declare',
+     'lingwo_dictionary/annotation/Reader2',
+     'lingwo_dictionary/layout/BottomDock',
+     'lingwo_dictionary/layout/isPositionFixedSupported'
+    ],
+    function ($, declare, Reader, BottomDockLayout, isPositionFixedSupported) {
         var BiblioBird = {},
             configDefaults = {
                 url: 'http://<lang>.bibliobird.com',
@@ -24,7 +29,27 @@ define(
                     };
                     return url;
                 }
-            };
+            },
+            supportedLanguages = {'en': 'English', 'pl': 'Polski' },
+            trans = {'en': {}},
+            positionFixed = isPositionFixedSupported(),
+            Dock;
+
+        // TODO: make this better (with the require NLS stuff)
+        trans['pl'] = {
+            'Translate to': 'Tłumacz na',
+            'Words I Am Learning': 'Mój osobisty słowniczek',
+            'Hello': 'Cześć',
+            'Login': 'Zaloguj się',
+            'or': 'lub',
+            'register': 'utwórz konto',
+            'on BiblioBird': 'w systemie BiblioBird',
+            'not me!': 'to nie ja!'
+        };
+        function t(s) {
+            var v = trans[BiblioBird.lang][s];
+            return v ? v : s;
+        }
 
         function extend(obj, vals, preserve) {
             var name;
@@ -43,6 +68,169 @@ define(
             return url;
         }
 
+        Dock = declare({
+            _constructor: function () {
+                var size = 35;
+
+                this.innerNode = $('<div id="bibliobird-dock" class="clear-block"></div>').get(0);
+                this.node = $('<div></div>').css('zIndex', '101').append(this.innerNode).get(0);
+                this.userNode = $('<div></div>').css({'float': 'left', 'padding-left': 10 }).get(0);
+
+                this._rebuild();
+
+                this._layout = new BottomDockLayout({ node: this.node, size: size });
+                this._layout.layout();
+            },
+
+            /*
+             * TODO: I couldn't imagine uglier code!  This should be replace with a template and an
+             * external CSS file..
+             */
+            _rebuild: function () {
+                var langCode, languageSwitcher, option, wialButton, self=this;
+
+                // clear existing data
+                this.innerNode.innerHTML = '';
+
+                // build language switcher
+                languageSwitcher = $('<select id="bibliobird-language-switcher"></select>')
+                    .css({
+                        'float': 'left',
+                        'margin-top': 5,
+                        'margin-left': 5
+                    })
+                    .get(0);
+                for (langCode in supportedLanguages) {
+                    option = $('<option>'+supportedLanguages[langCode]+'</option>');
+                    option.attr('value', langCode);
+                    if (langCode == BiblioBird.lang) {
+                        option.attr('selected', 'selected');
+                    }
+                    $(languageSwitcher).append(option);
+                }
+                $(languageSwitcher).bind('change', function (evt) {
+                    BiblioBird.lang = $('option:selected', languageSwitcher).val();
+                    self._rebuild();
+                });
+
+                // create the WIAL button
+                wialButton = $('<a id="bibliobird-wial-button"></a>')
+                    .css({
+                        display: 'block',
+                        'float': 'left',
+                        background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-left.png') left no-repeat",
+                        'padding-left': 11,
+                        height: 27,
+                        'margin-left': 10,
+                        'margin-top': 2,
+                        'color': 'white',
+                        'font-size': '12px',
+                        'font-weight': 'bold',
+                        'text-decoration': 'none',
+                        'cursor': 'pointer'
+                    })
+                    .attr({
+                        href: bburl('wial'),
+                        target: '_blank'
+                    })
+                    .append(
+                        $('<span></span>')
+                            .css({
+                                display: 'block',
+                                'float': 'left',
+                                background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-right.png') right no-repeat",
+                                'padding-right': 14,
+                                height: 27,
+                                'cursor': 'pointer'
+                            })
+                            .append(
+                                $('<span></span>')
+                                    .css({
+                                        display: 'block',
+                                        'float': 'left',
+                                        background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-middle.png') center repeat-x",
+                                        'padding-top': 4,
+                                        height: 23,
+                                        'cursor': 'pointer'
+                                    })
+                                    .text(t('Words I Am Learning'))
+                            )
+                    );
+
+                $(this.innerNode)
+                    .css({
+                        height: '100%',
+                        background: '#e5e5f9',
+                        'border-top': '1px solid black',
+                        'font-size': '14pt'
+                    })
+                    .append(
+                        $('<div>BiblioBird</div>')
+                            .css({
+                                'float': 'left',
+                                background: '#07104C',
+                                'font-weight': 'bold',
+                                //height: size,
+                                height: '100%',
+                                color: 'white',
+                                'font-size': '16pt',
+                                padding: '0 10px',
+                                'border-right': '1px solid white'
+                            })
+                    )
+                    .append(this.userNode)
+                    .append(
+                        $('<div></div>')
+                            .css({
+                                'float': 'right',
+                                'padding-right': '10px'
+                            })
+                            .append('<label for="bibliobird-language-switcher" style="float: left">'+t('Translate to')+': </label>')
+                            .append(languageSwitcher)
+                            .append(wialButton)
+                    );
+
+                this.rebuildLinks();
+            },
+
+            rebuildLinks: function () {
+                var links = $(this.userNode);
+
+                // TODO: this is a hack!
+                $('#bibliobird-wial-button', this.node)[BiblioBird.username ? 'show' : 'hide']();
+
+                links.html('');
+
+                if (BiblioBird.username) {
+                    links.append(t('Hello')+', '+BiblioBird.username+'!  (');
+                    links.append($('<a></a>')
+                        .html(t('not me!'))
+                        .attr('href', bburl('logout'))
+                        .click(function () { BiblioBird.logout(); return false; })
+                    );
+                    links.append(')');
+                }
+                else {
+                    links.append(t('Hello')+'!  ');
+                    links.append($('<a></a>')
+                        .html(t('Login'))
+                        .attr('href', bburl('remote/login') +
+                            (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
+                        .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
+                    );
+                    links.append(' '+t('or')+' ');
+                    links.append($('<a></a>')
+                        .html(t('register'))
+                        .attr({
+                            href: bburl('user/register'),
+                            target: '_blank'
+                        })
+                    );
+                    links.append(' '+t('on BiblioBird')+'.');
+                }
+            }
+        });
+        
         // copy config if it is set!
         if (typeof window.BiblioBird != 'undefined') {
             BiblioBird = window.BiblioBird;
@@ -57,32 +245,71 @@ define(
             embedIframe: null,
             embedWindowShown: false,
             username: null,
+            isRemoteIframe: false,
+            bottomDock: null,
+            hasContent: false,
 
             // this is called at the beginning, but doesn't necessarily cause the object
             // to initialize itself.  That only happens if a .bibliobird-content node is
             // found on the page.
             start: function () {
-                var window = this;
+                if (window.self !== window.top && window.self.location.hash) {
+                    this._readHashOptions();
+                }
+
                 $('.bibliobird-content').each(function () {
-                    window.contentAreas.push(new ContentArea(this));
+                    BiblioBird.contentAreas.push(new ContentArea(this));
                 });
             },
 
-            initialize: function (username) {
+            _readHashOptions: function () {
+                  var parts = (''+window.self.location.hash).split('&'),
+                      values = {},
+                      i, tmp;
+
+                  for(i = 0; i < parts.length; i++) {
+                      tmp = parts[i].split('=');
+                      values[tmp[0]] = tmp[1];
+                  }
+
+                  if (values['#iam'] == 'bibliobird') {
+                      // mark as living in the remote iframe on BiblioBird
+                      this.isRemoteIframe = true;
+                      // read language from the parent.
+                      // TODO: this is what we want in the end, but right now, maybe not.
+                      //this.lang = values.lang;
+                  }
+            },
+
+            initialize: function (username, hasContent) {
+                // TODO: this is totally random, out of place, but it has to happen before
+                // we setup the bottom dock.  Clean up this function when tomorrow isn't a 
+                // launch day.
+                this.username = username;
+                // Only create the bottom dock if one of the ContentArea's has some content
+                if (!this.hasContent && hasContent) {
+                    if (!this.isRemoteIframe) {
+                        this.bottomDock = new Dock();
+                    }
+                    this.hasContent = hasContent;
+                }
+
+                // do only once guard
                 if (this.initialized) return;
 
                 var embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
-                    embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow);
+                    embedIframe = $('<iframe height="100%" width="100%" frameBorder="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow);
 
                 // make the embedWindow / embedIframe
                 embedWindow
                     .css({
                         width: 400,
                         height: 200,
-                        position: 'fixed',
+                        position: positionFixed ? 'fixed' : 'absolute',
                         border: '1px solid black',
                         background: 'white',
-                        display: 'none'
+                        display: 'none',
+                        zIndex: 101
                     })
                     .appendTo($('body'));
                 $('.bibliobird-embed-close', embedWindow).click(function () {
@@ -92,9 +319,16 @@ define(
                 function positionEmbedWindow() {
                     var left = ($(window).width() - 400) / 2,
                         top  = ($(window).height() - 200) / 2;
+                    if (!positionFixed) {
+                        top += $(window).scrollTop();
+                        left += $(window).scrollLeft();
+                    }
                     embedWindow.css({ top: top, left: left });
                 }
                 $(window).resize(positionEmbedWindow);
+                if (!positionFixed) {
+                    $(window).scroll(positionEmbedWindow);
+                }
                 setTimeout(positionEmbedWindow, 0);
 
                 // initialize the Reader object
@@ -119,6 +353,9 @@ define(
                     parts = msg.split(':');
                     if (parts[1]) {
                         this.username = parts[1];
+                    }
+                    else {
+                        alert('Login failed!  Problem with cookies.  Do you use IE6?  If so, try a different browser.');
                     }
 
                     this.hideEmbedWindow();
@@ -157,6 +394,9 @@ define(
                 $.each(this.contentAreas, function () {
                     this.refresh();
                 });
+                if (this.bottomDock) {
+                    this.bottomDock.rebuildLinks();
+                }
             }
         });
 
@@ -213,13 +453,12 @@ define(
             });
         }
 
-        ContentArea = function (x) {
+        function ContentArea(x) {
             this.node      = x;
             this.url       = $(x).attr('data-url') || BiblioBird.getPageUrl();
             this.teaser    = $(x).attr('data-teaser') == 'true';
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
             this.data      = {};
-
 
             this.lookupContent();
         }
@@ -233,7 +472,7 @@ define(
                     data: { url: this.url },
                     success: function (res) {
                         // we only initialize after we have a username..
-                        BiblioBird.initialize(res.username);
+                        BiblioBird.initialize(res.username, !!res.content);
 
                         self.data = res;
                         self.rebuildLinks();
@@ -255,35 +494,9 @@ define(
 
                 links.html('');
 
-                if (BiblioBird.username) {
-                    links.append('Logged into BiblioBird as '+BiblioBird.username+' ');
-                    links.append($('<a></a>')
-                        .html('Logout')
-                        .attr('href', bburl('logout'))
-                        // TODO: I think we need a special JSONP logout function, because we need to know when
-                        // its finished
-                        .click(function () { BiblioBird.logout(); return false; })
-                    );
-                }
-                else {
-                    links.append('Not logged into BiblioBird ');
-                    links.append($('<a></a>')
-                        .html('Login')
-                        .attr('href', bburl('remote/login') +
-                            (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
-                        .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
-                    );
-                    links.append(' ');
-                    links.append($('<a></a>')
-                        .html('Join BiblioBird')
-                        .attr({
-                            href: bburl('user/register'),
-                            target: '_blank'
-                        })
-                    );
-                }
-                links.append(' ');
-
+                // TODO: probably *should* only show this if you are logged in, but since
+                // we don't show the bottom dock if there is no content, the user CANT login
+                //if (data.not_found && BiblioBird.username) {
                 if (data.not_found) {
                     links.append($('<a></a>')
                         .html('Add to Bibliobird')
