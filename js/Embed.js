@@ -12,9 +12,11 @@ define(
                 url: 'http://<lang>.bibliobird.com',
                 lang: 'en',
                 showLinks: true,
-                // TODO: this should be false or not even in this code!
-                //ga: false
-                ga: true,
+
+                oninit: function () {},
+                onlogin: function () {},
+                onlogout: function () {},
+                onlookup: function () {},
 
                 // can be '#' (remove hash), '?' (remove query string and hash) or '' (raw)
                 pageUrlRemove: '#',
@@ -345,6 +347,12 @@ define(
                     username:    username,
                     initialized: true
                 });
+
+                // call some event hooks
+                this.oninit();
+                if (username) {
+                    this.onlogin();
+                }
             },
 
             receiveMessage: function (msg) {
@@ -359,6 +367,7 @@ define(
                     }
 
                     this.hideEmbedWindow();
+                    this.onlogin();
                 }
             },
 
@@ -386,6 +395,7 @@ define(
                     success: function (res) {
                         self.username = null;
                         self.refreshAll();
+                        self.onlogout();
                     }
                 });
             },
@@ -415,12 +425,6 @@ define(
                 success: function (res) {
                     Reader.setBubbleContent(res.content);
 
-                    // TODO: this shouldn't be here, but on LinguaTrek somehow!
-                    if (BiblioBird.ga && typeof window['_gaq'] != 'undefined') {
-                        // TODO: determine from the res if we are anonymous or not
-                        _gaq.push(['_trackEvent', 'BiblioBird', 'Anonymous Lookup', BiblioBird.lang]);
-                    }
-
                     $('.node', Reader.contentNode)
                         .removeClass('clear-block')
                         .removeAttr('id');
@@ -449,6 +453,8 @@ define(
                             node.target = '_blank';
                         }
                     });
+
+                    BiblioBird.onlookup();
                 }
             });
         }
