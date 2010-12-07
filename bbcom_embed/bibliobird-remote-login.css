@@ -109,12 +109,12 @@ li {
   color: red;
 }
 
-/* Copied from: drupal/modules/system/defaults.css */
+/* Copied from .clear-block in drupal/modules/system/defaults.css */
 /*
 ** Markup free clearing
 ** Details: http://www.positioniseverything.net/easyclearing.html
 */
-.clear-block:after {
+.form-item:after {
   content: ".";
   display: block;
   height: 0;
@@ -122,15 +122,15 @@ li {
   visibility: hidden;
 }
 
-.clear-block {
+.form-item {
   display: inline-block;
 }
 
 /* Hides from IE-mac \*/
-* html .clear-block {
+* html .form-item {
   height: 1%;
 }
-.clear-block {
+.form-item {
   display: block;
 }
 /* End hide from IE-mac */
