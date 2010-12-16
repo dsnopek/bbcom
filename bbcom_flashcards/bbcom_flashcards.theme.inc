@@ -1,14 +1,20 @@
 <?php
 
-function template_preprocess_bbcom_flashcards_flashcard_front(&$vars) {
+function theme_bbcom_flashcards_flashcard_front(&$vars) {
   $node = $vars['node'];
 
   list ($source_lang, $target_lang) = lingwo_dictionary_entry_get_languages($node, TRUE);
-  $vars['source_lang'] = $source_lang;
-  $vars['target_lang'] = $target_lang;
+  $source_lang = $source_lang;
+  $target_lang = $target_lang;
 
-  $vars['entry_summary'] = theme('lingwoorg_dictionary_entry_summary', FALSE, TRUE);
-  $vars['pos'] = lingwo_dictionary_entry_get_pos($node);
+  $entry_summary = theme('lingwoorg_dictionary_entry_summary', FALSE, TRUE);
+  $pos = lingwo_dictionary_entry_get_pos($node);
+
+  $output  = $source_lang .' =&gt; '. $target_lang .'<br />';
+  $output .= $node->title .' ('. $pos .')<br />';
+  $output .= $entry_summary;
+
+  return $output;
 }
 
 function theme_bbcom_flashcards_flashcard_back($node) {
