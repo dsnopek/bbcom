@@ -27,6 +27,10 @@ Instructions for installing and running AnkiServer:
 
       anki-1.0.1/libanki$ ../../AnkiServer.env/bin/python setup.py install
 
+ 5. Make the egg info files (so paster can see our app):
+
+      $ AnkiServer.env/bin/python setup.py install_egg_info
+
  4. Then we can run AnkiServer like so:
 
       $ AnkiServer.env/bin/paster serve development.ini
