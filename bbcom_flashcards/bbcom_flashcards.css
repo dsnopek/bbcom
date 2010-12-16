@@ -1,5 +1,5 @@
 
-#lingwoorg-flashcards-flashcard {
+#bibliobird-flashcards-flashcard {
   margin: 10px;
   padding: 25px 10px;
   border: 1px solid black;
@@ -7,18 +7,18 @@
   font-size: 14pt;
 }
 
-#lingwoorg-flashcards-flashcard-question {
+#bibliobird-flashcards-flashcard-question {
 }
 
-#lingwoorg-flashcards-flashcard-answer {
+#bibliobird-flashcards-flashcard-answer {
   display: none;
 }
 
-#lingwoorg-flashcards-ease-buttons {
+#bibliobird-flashcards-ease-buttons {
   display: none;
 }
 
-#lingwoorg-flashcards-finished {
+#bibliobird-flashcards-finished {
   font-size: 14pt;
   margin: 10px 0;
 }

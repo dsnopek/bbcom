@@ -1,15 +1,15 @@
 
-Drupal.behaviors.lingwoorg_flashcards = function (context) {
+Drupal.behaviors.bibliobird_flashcards = function (context) {
     var link = $('<a href="#"></a>')
         .text(Drupal.t('Show answer'))
         .click(function (evt) {
-            $('#lingwoorg-flashcards-title').text(Drupal.t('Answer'));
-            $('#lingwoorg-flashcards-flashcard-question').hide();
-            $('#lingwoorg-flashcards-flashcard-answer').show();
-            $('#lingwoorg-flashcards-ease-buttons').show();
+            $('#bibliobird-flashcards-title').text(Drupal.t('Answer'));
+            $('#bibliobird-flashcards-flashcard-question').hide();
+            $('#bibliobird-flashcards-flashcard-answer').show();
+            $('#bibliobird-flashcards-ease-buttons').show();
             link.remove();
             evt.preventDefault();
         })
-        .insertAfter($('#lingwoorg-flashcards-flashcard', context));
+        .insertAfter($('#bibliobird-flashcards-flashcard', context));
 };
 
