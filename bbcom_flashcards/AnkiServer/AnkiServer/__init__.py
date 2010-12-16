@@ -124,7 +124,7 @@ class AnkiServerApp(object):
         finally:
             deck.close()
 
-    def find_fact(self, deck_id, lingwo_id):
+    def find_fact(self, deck_id, bibliobird_id):
         deck = self._open_deck(deck_id)
 
         try:
@@ -136,7 +136,7 @@ class AnkiServerApp(object):
             # then we search for a fact with this field set to the given id
             factId = deck.s.scalar("""
                 SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
-                    value = :lingwoId""", fieldModelId=fieldModelId, lingwoId=lingwo_id)
+                    value = :bibliobirdId""", fieldModelId=fieldModelId, bibliobirdId=bibliobird_id)
             if not factId:
                 # we need to signal somehow to the calling application that no such
                 # deck exists, but without it being considered a "bad error".  404 is 

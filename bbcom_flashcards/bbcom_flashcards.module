@@ -1,26 +1,26 @@
 <?php
 // $Id$
 
-include_once('lingwoorg_flashcards.features.inc');
-include_once('lingwoorg_flashcards.anki.inc');
+include_once('bbcom_flashcards.features.inc');
+include_once('bbcom_flashcards.anki.inc');
 
 /**
  * @file
- * Integrate Anki flashcards into Lingwo.org
+ * Integrate Anki flashcards into BiblioBird.com
  */
 
 /**
  * Implementation of hook_menu().
  */
-function lingwoorg_flashcards_menu() {
+function bbcom_flashcards_menu() {
   $items = array();
   $items['admin/settings/lingwo_dictionary/flashcards'] = array(
     'title' => 'Flashcards',
     'description' => 'Settings for Lingwo.org Flashcards module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwoorg_flashcards_admin_settings'),
-    'file' => 'lingwoorg_flashcards.admin.inc',
+    'page arguments' => array('bbcom_flashcards_admin_settings'),
+    'file' => 'bbcom_flashcards.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
@@ -28,9 +28,9 @@ function lingwoorg_flashcards_menu() {
     'title' => 'Words I Am Learning',
     'access callback' => 'lingwoorg_wial_page_access',
     'access arguments' => array(1),
-    'page callback' => 'lingwoorg_flashcards_page_wial_view',
+    'page callback' => 'bbcom_flashcards_page_wial_view',
     'page arguments' => array(1),
-    'file' => 'lingwoorg_flashcards.pages.inc',
+    'file' => 'bbcom_flashcards.pages.inc',
     'type' => MENU_NORMAL_ITEM
   );
   $items['wial/%user/view'] = array(
@@ -43,8 +43,8 @@ function lingwoorg_flashcards_menu() {
     'access callback' => 'lingwoorg_wial_page_access',
     'access arguments' => array(1),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwoorg_flashcards_page_wial_quiz_form', 1),
-    'file' => 'lingwoorg_flashcards.pages.inc',
+    'page arguments' => array('bbcom_flashcards_page_wial_quiz_form', 1),
+    'file' => 'bbcom_flashcards.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
@@ -58,16 +58,16 @@ function lingwoorg_flashcards_menu() {
 /**
  * Implementation of hook_theme()
  */
-function lingwoorg_flashcards_theme() {
+function bbcom_flashcards_theme() {
   return array(
-    'lingwoorg_flashcards_flashcard_front' => array(
+    'bbcom_flashcards_flashcard_front' => array(
       'arguments' => array('node' => NULL),
-      'file' => 'lingwoorg_flashcards.theme.inc',
+      'file' => 'bbcom_flashcards.theme.inc',
       'template' => 'lingwoorg-flashcards-flashcard-front',
     ),
-    'lingwoorg_flashcards_flashcard_back' => array(
+    'bbcom_flashcards_flashcard_back' => array(
       'arguments' => array('node' => NULL),
-      'file' => 'lingwoorg_flashcards.theme.inc',
+      'file' => 'bbcom_flashcards.theme.inc',
     ),
   );
 }
@@ -75,9 +75,9 @@ function lingwoorg_flashcards_theme() {
 /**
  * Implementation of hook_rules_action_info()
  */
-function lingwoorg_flashcards_rules_action_info() {
+function bbcom_flashcards_rules_action_info() {
   return array(
-    'lingwoorg_flashcards_action_add_to_wial_deck' => array(
+    'bbcom_flashcards_action_add_to_wial_deck' => array(
       'label' => t('Create flashcard in user\'s WIAL deck'),
       'arguments' => array(
         'node' => array('type' => 'node', 'label' => t('Entry')),
@@ -85,7 +85,7 @@ function lingwoorg_flashcards_rules_action_info() {
       ),
       'module' => 'lingwoorg_flashcard',
     ),
-    'lingwoorg_flashcards_action_remove_from_wial_deck' => array(
+    'bbcom_flashcards_action_remove_from_wial_deck' => array(
       'label' => t('Remove flashcard from user\'s WIAL deck'),
       'arguments' => array(
         'node' => array('type' => 'node', 'label' => t('Entry')),
@@ -101,10 +101,10 @@ function lingwoorg_flashcards_rules_action_info() {
  * Actions
  */
 
-function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
+function bbcom_flashcards_action_add_to_wial_deck($node, $user) {
   if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
     try {
-      lingwoorg_flashcards_anki_server_connect()
+      bbcom_flashcards_anki_server_connect()
         ->openWialDeck($user->uid)
         ->addFactForNode($node);
     }
@@ -115,10 +115,10 @@ function lingwoorg_flashcards_action_add_to_wial_deck($node, $user) {
   }
 }
 
-function lingwoorg_flashcards_action_remove_from_wial_deck($node, $user) {
+function bbcom_flashcards_action_remove_from_wial_deck($node, $user) {
   if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
     try {
-      $deck = lingwoorg_flashcards_anki_server_connect()
+      $deck = bbcom_flashcards_anki_server_connect()
         ->openWialDeck($user->uid);
       $deck->deleteFact($deck->findFactForNode($node));
     }
@@ -133,18 +133,18 @@ function lingwoorg_flashcards_action_remove_from_wial_deck($node, $user) {
  * API functions
  */
 
-function lingwoorg_flashcards_anki_server_connect() {
-  return new AnkiServer(lingwoorg_flashcards_anki_server_url());
+function bbcom_flashcards_anki_server_connect() {
+  return new AnkiServer(bbcom_flashcards_anki_server_url());
 }
 
 /*
  * Settings
  */
 
-function lingwoorg_flashcards_anki_server_url($value = NULL) {
+function bbcom_flashcards_anki_server_url($value = NULL) {
   if (is_null($value)) {
-    return variable_get('lingwoorg_flashcards_anki_server_url', 'localhost:5000');
+    return variable_get('bbcom_flashcards_anki_server_url', 'localhost:5000');
   }
-  variable_set('lingwoorg_flashcards_anki_server_url', $value);
+  variable_set('bbcom_flashcards_anki_server_url', $value);
 }
 

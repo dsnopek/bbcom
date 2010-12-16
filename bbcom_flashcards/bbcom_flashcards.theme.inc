@@ -1,6 +1,6 @@
 <?php
 
-function template_preprocess_lingwoorg_flashcards_flashcard_front(&$vars) {
+function template_preprocess_bbcom_flashcards_flashcard_front(&$vars) {
   $node = $vars['node'];
 
   list ($source_lang, $target_lang) = lingwo_dictionary_entry_get_languages($node, TRUE);
@@ -11,7 +11,7 @@ function template_preprocess_lingwoorg_flashcards_flashcard_front(&$vars) {
   $vars['pos'] = lingwo_dictionary_entry_get_pos($node);
 }
 
-function theme_lingwoorg_flashcards_flashcard_back($node) {
+function theme_bbcom_flashcards_flashcard_back($node) {
   $senses = lingwo_senses_get_translations($node);
   # we have to remove the examples because they will give it away
   foreach ($senses as &$sense) {

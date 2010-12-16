@@ -22,16 +22,16 @@ class AnkiDeck {
 
   function addFactForNode($node) {
     $this->addFact(array(
-      'Front' => theme('lingwoorg_flashcards_flashcard_front', $node),
-      'Back'  => theme('lingwoorg_flashcards_flashcard_back', $node),
-      'Lingwo ID' => lingwo_dictionary_entry_get_id($node),
+      'Front' => theme('bbcom_flashcards_flashcard_front', $node),
+      'Back'  => theme('bbcom_flashcards_flashcard_back', $node),
+      'BiblioBird ID' => lingwo_dictionary_entry_get_id($node),
     ));
   }
 
   function findFactForNode($node) {
     return $this->server->request('find_fact', array(
       'deck_id' => $this->deck->id,
-      'lingwo_id' => lingwo_dictionary_entry_get_id($node),
+      'bibliobird_id' => lingwo_dictionary_entry_get_id($node),
     ));
     if (empty($fact)) {
       throw new AnkiServerError("Unable to find fact for node");
