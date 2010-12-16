@@ -15,19 +15,19 @@ except ImportError:
 
 import os
 
-def LingwoModel():
-    m = Model(u'Lingwo')
+def BiblioBirdModel():
+    m = Model(u'BiblioBird')
     # we can only guarantee that the Front will be unique because it will
     # be based on the headword, language, pos.  The Back could be anything!
     m.addFieldModel(FieldModel(u'Front', True, True))
     # while I think that Back should be required, I don't really want this to
     # fail just because of that!!
     m.addFieldModel(FieldModel(u'Back', False, False))
-    m.addFieldModel(FieldModel(u'Lingwo ID', True, True))
+    m.addFieldModel(FieldModel(u'BiblioBird ID', True, True))
     m.addCardModel(CardModel(u'Forward', u'%(Front)s', u'%(Back)s'))
     m.addCardModel(CardModel(u'Reverse', u'%(Back)s', u'%(Front)s'))
 
-    m.tags = u"Lingwo"
+    m.tags = u"BiblioBird"
     return m
 
 class AnkiServerApp(object):
@@ -65,7 +65,7 @@ class AnkiServerApp(object):
         deck = anki.DeckStorage.Deck(full_path)
         try:
             deck.initUndo()
-            deck.addModel(LingwoModel())
+            deck.addModel(BiblioBirdModel())
             deck.save()
         finally:
             deck.close()
@@ -128,10 +128,10 @@ class AnkiServerApp(object):
         deck = self._open_deck(deck_id)
 
         try:
-            # first we need to find a field model id for a field named "Lingwo ID"
-            fieldModelId = deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'Lingwo ID')
+            # first we need to find a field model id for a field named "BiblioBird ID"
+            fieldModelId = deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'BiblioBird ID')
             if not fieldModelId:
-                raise HTTPBadRequest("No field model named 'Lingwo ID'")
+                raise HTTPBadRequest("No field model named 'BiblioBird ID'")
 
             # then we search for a fact with this field set to the given id
             factId = deck.s.scalar("""
