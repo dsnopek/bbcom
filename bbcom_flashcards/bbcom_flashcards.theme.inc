@@ -1,11 +1,7 @@
 <?php
 
-function theme_bbcom_flashcards_flashcard_front(&$vars) {
-  $node = $vars['node'];
-
+function theme_bbcom_flashcards_flashcard_front($node) {
   list ($source_lang, $target_lang) = lingwo_dictionary_entry_get_languages($node, TRUE);
-  $source_lang = $source_lang;
-  $target_lang = $target_lang;
 
   $entry_summary = theme('lingwoorg_dictionary_entry_summary', FALSE, TRUE);
   $pos = lingwo_dictionary_entry_get_pos($node);
