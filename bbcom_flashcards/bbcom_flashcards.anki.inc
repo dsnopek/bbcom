@@ -24,14 +24,14 @@ class AnkiDeck {
     $this->addFact(array(
       'Front' => theme('bbcom_flashcards_flashcard_front', $node),
       'Back'  => theme('bbcom_flashcards_flashcard_back', $node),
-      'BiblioBird ID' => lingwo_dictionary_entry_get_id($node),
+      'External ID' => lingwo_dictionary_entry_get_id($node),
     ));
   }
 
   function findFactForNode($node) {
     return $this->server->request('find_fact', array(
       'deck_id' => $this->deck->id,
-      'bibliobird_id' => lingwo_dictionary_entry_get_id($node),
+      'external_id' => lingwo_dictionary_entry_get_id($node),
     ));
     if (empty($fact)) {
       throw new AnkiServerError("Unable to find fact for node");
@@ -93,14 +93,17 @@ class AnkiServer {
   }
 
   function openDeck($path) {
+    // reduce calls to server
+    /*
     try {
       $deck = $this->request('open_deck', array('path' => $path));
     }
     catch (AnkiServerException $e) {
       $deck = $this->request('create_deck', array('path' => $path));
     }
+    */
 
-    return new AnkiDeck($this, $deck);
+    return new AnkiDeck($this, (object)array('id'=>$path));
   }
 
   function openWialDeck($uid) {
