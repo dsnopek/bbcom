@@ -8,6 +8,9 @@ from anki.facts import Fact
 from anki.stdmodels import BasicModel
 from anki.models import Model, CardModel, FieldModel
 
+from threading import Thread
+from Queue import Queue, PriorityQueue
+
 try:
     import simplejson as json
 except ImportError:
@@ -30,24 +33,74 @@ def BiblioBirdModel():
     m.tags = u"BiblioBird"
     return m
 
-class AnkiServerApp(object):
-    """ Our WSGI app. """
+def log_exception(func):
+    import logging
+    def newFunc(self, *args, **kw):
+        try:
+            return func(self, *args, **kw)
+        except Exception, e:
+            logging.error('DeckHandler[%s] Unable to %s(*%s, **%s): %s'
+                % (self.path, func.func_name, repr(args), repr(kw), e))
+            return e
+    return newFunc
 
-    def __init__(self, data_root, allowed_hosts):
-        self.data_root = os.path.abspath(data_root)
-        self.allowed_hosts = allowed_hosts
+def defer_none(func, priority=0):
+    func = log_exception(func)
+    def newFunc(*args, **kw):
+        self = args[0]
+        self._queue.put((priority, func, args, kw, None))
+    return newFunc
 
-    def _get_path(self, path):
-        npath = os.path.normpath(os.path.join(self.data_root, path))
-        if npath[0:len(self.data_root)] != self.data_root:
-            # attempting to escape our data jail!
-            raise HTTPBadRequest('"%s" is not a valid path/id' % path)
-        return npath
+def defer(func, priority=0):
+    func = log_exception(func)
+    def newFunc(self, *args, **kw):
+        return_queue = Queue()
+        self = args[0]
+        self._queue.put((priority, func, args, kw, return_queue))
+        ret = return_queue.get(True)
+        if isinstance(ret, Exception):
+            raise e
+        return ret
+    return newFunc
 
-    def create_deck(self, path):
+def check_deck(func):
+    def newFunc(self, *args, **kw):
+        if self.deck is None:
+            raise HTTPBadRequest('Cannot do %s with first open_deck or create_deck' % func.func_name)
+        return func(self, *args, **kw)
+    return newFunc
+
+class DeckHandler(object):
+    def __init__(self, path):
+        self.path = path
+        self.deck = None
+
+        self._thread = Thread(target=self._run)
+        self._queue = PriorityQueue()
+        self._running = True
+
+    def _run(self):
+        while self._running:
+            priority, func, args, kw, return_queue = self._queue.get(True)
+            ret = func(*args, **kw)
+            if return_queue is not None:
+                return_queue.put(ret)
+
+    def start(self):
+        self._thread.start()
+
+    @defer_none
+    def stop(self):
+        self.deck.save()
+        self.deck.close()
+        self._running = False
+
+    @defer_none
+    def create_deck(self):
+        if self.deck is not None:
+            return
+
         import errno
-
-        full_path = self._get_path(path)
 
         # mkdir -p the path, because it might not exist
         dir = os.path.dirname(full_path)
@@ -59,16 +112,74 @@ class AnkiServerApp(object):
             else:
                 raise
 
-        if os.path.exists(full_path):
-            raise HTTPBadRequest('"%s" already exists' % path)
-
         deck = anki.DeckStorage.Deck(full_path)
         try:
             deck.initUndo()
             deck.addModel(BiblioBirdModel())
             deck.save()
-        finally:
+        except Exception, e:
+            logging.error('Unable to create_deck(%s): %s' % (self.path, e))
             deck.close()
+            deck = None
+            raise e
+
+        self.deck = deck
+
+    @defer_none
+    def open_deck(self):
+        if self.deck is not None:
+            return
+
+        self.deck = anki.DeckStorage.Deck(self.path)
+
+    @check_deck
+    @defer_none
+    def add_fact(self, fields):
+        fact = self.deck.newFact()
+        for key in fact.keys():
+            fact[key] = unicode(fields[key])
+
+        self.deck.addFact(fact)
+        self.deck.save()
+
+    @check_deck
+    @defer_none
+    def save_fact(self, fact):
+        newFact = deck.s.query(Fact).get(int(fact['id']))
+        for key in newFact.keys():
+            newFact[key] = fact[key]
+
+        newFact.setModified(textChanged=True)
+        deck.setModified()
+        deck.save()
+
+
+class AnkiServerApp(object):
+    """ Our WSGI app. """
+
+    def __init__(self, data_root, allowed_hosts):
+        self.data_root = os.path.abspath(data_root)
+        self.allowed_hosts = allowed_hosts
+        self.decks = {}
+
+    def _get_path(self, path):
+        npath = os.path.normpath(os.path.join(self.data_root, path))
+        if npath[0:len(self.data_root)] != self.data_root:
+            # attempting to escape our data jail!
+            raise HTTPBadRequest('"%s" is not a valid path/id' % path)
+        return npath
+
+    def create_deck(self, path):
+        if not self.decks.has_key(path):
+            full_path = self._get_path(path)
+            if os.path.exists(full_path):
+                raise HTTPBadRequest('"%s" already exists' % path)
+
+            # create our deck handler
+            deck_handler = DeckHandler(full_path)
+            deck_handler.start()
+            deck_handler.create_deck()
+            self.decks[path] = deck_handler
 
         return {'id':path}
 
@@ -77,11 +188,18 @@ class AnkiServerApp(object):
         if not os.path.exists(full_path):
             raise HTTPBadRequest('"%s" doesn\'t exist' % path)
 
-        return anki.DeckStorage.Deck(full_path)
+        if self.decks.has_key(path):
+            deck = self.decks[path]
+        else:
+            deck = self.decks[path] = DeckHandler(full_path)
+            deck.start()
+
+        deck.open_deck()
+        return deck
 
     def open_deck(self, path):
-        # verify that it really exists and is an Anki file
-        self._open_deck(path).close()
+        # open the deck
+        self._open_deck(path)
 
         return {'id':path}
 
@@ -91,24 +209,7 @@ class AnkiServerApp(object):
         return res
 
     def add_fact(self, deck_id, fields):
-        deck = self._open_deck(deck_id)
-
-        try:
-            fact = deck.newFact()
-            try:
-                for key in fact.keys():
-                    fact[key] = unicode(fields[key])
-            except KeyError, e:
-                raise HTTPBadRequest(e)
-
-            deck.addFact(fact)
-            deck.save()
-
-            res = self._output_fact(fact)
-        finally:
-            deck.close()
-
-        return res
+        return self._open_deck(deck_id).add_fact(fields)
 
     def save_fact(self, deck_id, fact):
         deck = self._open_deck(deck_id)
