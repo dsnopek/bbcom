@@ -76,30 +76,30 @@ class AnkiServerApp(object):
         #deck.open_deck()
         return deck
 
-    # these are now mostly noops because we open/create the deck when it
-    # is requested to reduce the number of calls to this server
-    def open_deck(self, path):
-        self._open_deck(path)
-        return {'id':path}
-    create_deck = open_deck
-
-    def add_fact(self, deck_id, fields):
-        return self._open_deck(deck_id).add_fact(fields)
-
-    def save_fact(self, deck_id, fact):
-        return self._open_deck(deck_id).save_fact(fact)
-        
-    def find_fact(self, deck_id, bibliobird_id):
-        return self._open_deck(deck_id).find_fact(bibliobird_id)
-
-    def delete_fact(self, deck_id, fact_id):
-        return self._open_deck(deck_id).delete_fact(fact_id)
-
-    def get_card(self, deck_id):
-        return self._open_deck(deck_id).get_card()
-
-    def answer_card(self, deck_id, card_id, ease):
-        return self._open_deck(deck_id).answer_card(card_id, ease)
+#    # these are now mostly noops because we open/create the deck when it
+#    # is requested to reduce the number of calls to this server
+#    def open_deck(self, path):
+#        self._open_deck(path)
+#        return {'id':path}
+#    create_deck = open_deck
+#
+#    def add_fact(self, deck_id, fields):
+#        return self._open_deck(deck_id).add_fact(fields)
+#
+#    def save_fact(self, deck_id, fact):
+#        return self._open_deck(deck_id).save_fact(fact)
+#        
+#    def find_fact(self, deck_id, bibliobird_id):
+#        return self._open_deck(deck_id).find_fact(bibliobird_id)
+#
+#    def delete_fact(self, deck_id, fact_id):
+#        return self._open_deck(deck_id).delete_fact(fact_id)
+#
+#    def get_card(self, deck_id):
+#        return self._open_deck(deck_id).get_card()
+#
+#    def answer_card(self, deck_id, card_id, ease):
+#        return self._open_deck(deck_id).answer_card(card_id, ease)
 
     @wsgify
     def __call__(self, req):
@@ -110,15 +110,17 @@ class AnkiServerApp(object):
         if req.method != 'POST':
             raise HTTPMethodNotAllowed(allow=['POST'])
 
-        # get the function to call from the path
+        # get the deck and function to call from the path
         func = req.path
         if func[0] == '/':
             func = func[1:]
-        if '/' in func or func[0] == '_':
+        parts = func.split('/')
+        path = '/'.join(parts[:-1])
+        func = parts[-1]
+        if not DeckHandler.external_allowed(func):
             raise HTTPNotFound()
-        if not hasattr(self, func) or not callable(getattr(self, func)):
-            raise HTTPNotFound()
-        func = getattr(self, func)
+        deck = self._open_deck(path)
+        func = getattr(deck, func)
 
         try:
             input = json.loads(req.body)
@@ -134,8 +136,6 @@ class AnkiServerApp(object):
         # run it!
         output = func(**input)
 
-        # TODO: maybe I should make this more RPC-like, and always return a structure
-        # like {'returned': value} where now value could be null (in full JSON RPC-ness).
         if output is None:
             return Response('', content_type='text/plain')
         else:
@@ -155,7 +155,6 @@ def make_app(global_conf, **local_conf):
         data_root=local_conf.get('data_root', '.'),
         allowed_hosts=local_conf.get('allowed_hosts', '*')
     )
-    # TODO: this should be configurable and, um, better.
     # TODO: we should setup the 'translogger' in the *.ini using PasteDeploy
     app = translogger.TransLogger(app)
     return app

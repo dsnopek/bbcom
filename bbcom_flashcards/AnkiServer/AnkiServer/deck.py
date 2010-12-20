@@ -64,6 +64,10 @@ def check_deck(func):
     newFunc.func_name = func.func_name
     return newFunc
 
+def external(func):
+    func.external = True
+    return func
+
 class DeckHandler(object):
     def __init__(self, path):
         self.path = path
@@ -104,6 +108,13 @@ class DeckHandler(object):
     def start(self):
         self._running = True
         self._thread.start()
+
+    @classmethod
+    def external_allowed(cls, name):
+        if hasattr(cls, name):
+            func = getattr(cls, name)
+            return callable(func) and hasattr(func, 'external') and func.external
+        return False
 
     @defer_none
     def stop(self):
@@ -148,6 +159,7 @@ class DeckHandler(object):
 
         self.deck = anki.DeckStorage.Deck(self.path)
 
+    @external
     @defer_none
     @check_deck
     def add_fact(self, fields):
@@ -158,6 +170,7 @@ class DeckHandler(object):
         self.deck.addFact(fact)
         self.deck.save()
 
+    @external
     @defer_none
     @check_deck
     def save_fact(self, fact):
@@ -169,6 +182,7 @@ class DeckHandler(object):
         self.deck.setModified()
         self.deck.save()
 
+    @external
     @defer
     @check_deck
     def find_fact(self, external_id):
@@ -191,12 +205,14 @@ class DeckHandler(object):
         fact = self.deck.s.query(Fact).get(factId)
         return self._output_fact(fact)
 
+    @external
     @defer_none
     @check_deck
     def delete_fact(self, fact_id):
         self.deck.deleteFact(int(fact_id))
         self.deck.save()
 
+    @external
     @defer
     @check_deck
     def get_card(self):
@@ -211,6 +227,7 @@ class DeckHandler(object):
             card['intervals'] = intervals
         return card
 
+    @external
     @defer_none
     @check_deck
     def answer_card(self, card_id, ease):
