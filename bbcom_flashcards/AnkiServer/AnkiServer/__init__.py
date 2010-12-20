@@ -55,7 +55,7 @@ def defer_none(func, priority=0):
 
 def defer(func, priority=0):
     func = log_exception(func)
-    def newFunc(self, *args, **kw):
+    def newFunc(*args, **kw):
         return_queue = Queue()
         self = args[0]
         self._queue.put((priority, func, args, kw, return_queue))
@@ -81,7 +81,14 @@ class DeckHandler(object):
 
         self._thread = Thread(target=self._run)
         self._queue = PriorityQueue()
-        self._running = True
+        self._running = False
+
+        # creates or opens the deck (will be first thing executed
+        # on the thread once it starts)
+        if os.path.exists(self.path):
+            self.open_deck()
+        else:
+            self.create_deck()
 
     def _run(self):
         while self._running:
@@ -90,13 +97,29 @@ class DeckHandler(object):
             if return_queue is not None:
                 return_queue.put(ret)
 
+    # TODO: move to module level scope?
+    def _output_fact(self, fact):
+        res = dict(zip(fact.keys(), fact.values()))
+        res['id'] = str(fact.id)
+        return res
+
+    # TODO: move to module level scope?
+    def _output_card(self, card):
+        return {
+            'id': card.id,
+            'question': card.question,
+            'answer': card.answer,
+        }
+
     def start(self):
+        self._running = True
         self._thread.start()
 
     @defer_none
     def stop(self):
-        self.deck.save()
-        self.deck.close()
+        if self.deck is not None:
+            self.deck.save()
+            self.deck.close()
         self._running = False
 
     @defer_none
@@ -107,7 +130,7 @@ class DeckHandler(object):
         import errno
 
         # mkdir -p the path, because it might not exist
-        dir = os.path.dirname(full_path)
+        dir = os.path.dirname(self.path)
         try:
             os.makedirs(dir)
         except OSError, exc:
@@ -116,13 +139,12 @@ class DeckHandler(object):
             else:
                 raise
 
-        deck = anki.DeckStorage.Deck(full_path)
+        deck = anki.DeckStorage.Deck(self.path)
         try:
             deck.initUndo()
             deck.addModel(BiblioBirdModel())
             deck.save()
         except Exception, e:
-            logging.error('Unable to create_deck(%s): %s' % (self.path, e))
             deck.close()
             deck = None
             raise e
@@ -136,8 +158,8 @@ class DeckHandler(object):
 
         self.deck = anki.DeckStorage.Deck(self.path)
 
-    @check_deck
     @defer_none
+    @check_deck
     def add_fact(self, fields):
         fact = self.deck.newFact()
         for key in fact.keys():
@@ -146,16 +168,68 @@ class DeckHandler(object):
         self.deck.addFact(fact)
         self.deck.save()
 
-    @check_deck
     @defer_none
+    @check_deck
     def save_fact(self, fact):
-        newFact = deck.s.query(Fact).get(int(fact['id']))
+        newFact = self.deck.s.query(Fact).get(int(fact['id']))
         for key in newFact.keys():
             newFact[key] = fact[key]
 
         newFact.setModified(textChanged=True)
-        deck.setModified()
-        deck.save()
+        self.deck.setModified()
+        self.deck.save()
+
+    @defer
+    @check_deck
+    def find_fact(self, bibliobird_id):
+        # first we need to find a field model id for a field named "BiblioBird ID"
+        fieldModelId = self.deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'BiblioBird ID')
+        if not fieldModelId:
+            raise HTTPBadRequest("No field model named 'BiblioBird ID'")
+
+        # then we search for a fact with this field set to the given id
+        factId = self.deck.s.scalar("""
+            SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
+                value = :bibliobirdId""", fieldModelId=fieldModelId, bibliobirdId=bibliobird_id)
+        if not factId:
+            # we need to signal somehow to the calling application that no such
+            # deck exists, but without it being considered a "bad error".  404 is 
+            # inappropriate that refers to the resource (ie. /find_fact) which is
+            # here obviously.
+            return None
+
+        fact = self.deck.s.query(Fact).get(factId)
+        return self._output_fact(fact)
+
+    @defer_none
+    @check_deck
+    def delete_fact(self, fact_id):
+        self.deck.deleteFact(int(fact_id))
+        self.deck.save()
+
+    @defer
+    @check_deck
+    def get_card(self):
+        card = self.deck.getCard()
+        if card:
+            # grab the interval strings
+            intervals = []
+            for i in range(1, 5):
+                intervals.append(self.deck.nextIntervalStr(card, i))
+
+            card = self._output_card(card)
+            card['intervals'] = intervals
+        return card
+
+    @defer_none
+    @check_deck
+    def answer_card(self, card_id, ease):
+        ease = int(ease)
+        card = self.deck.cardFromId(card_id)
+        if card:
+            self.deck.answerCard(card, ease)
+            self.deck.save()
+
 
 servers = []
 def shutdown():
@@ -188,24 +262,29 @@ class AnkiServerApp(object):
             raise HTTPBadRequest('"%s" is not a valid path/id' % path)
         return npath
 
-    def create_deck(self, path):
-        if not self.decks.has_key(path):
-            full_path = self._get_path(path)
-            if os.path.exists(full_path):
-                raise HTTPBadRequest('"%s" already exists' % path)
-
-            # create our deck handler
-            deck_handler = DeckHandler(full_path)
-            deck_handler.start()
-            deck_handler.create_deck()
-            self.decks[path] = deck_handler
-
-        return {'id':path}
+#    def create_deck(self, path):
+#        if not self.decks.has_key(path):
+#            full_path = self._get_path(path)
+#            if os.path.exists(full_path):
+#                raise HTTPBadRequest('"%s" already exists' % path)
+#
+#            # create our deck handler
+#            deck_handler = DeckHandler(full_path)
+#            deck_handler.start()
+#            deck_handler.create_deck()
+#            self.decks[path] = deck_handler
+#
+#        return {'id':path}
+#
+#    def open_deck(self, path):
+#        # open the deck
+#        self._open_deck(path)
+#        return {'id':path}
 
     def _open_deck(self, path):
         full_path = self._get_path(path)
-        if not os.path.exists(full_path):
-            raise HTTPBadRequest('"%s" doesn\'t exist' % path)
+        #if not os.path.exists(full_path):
+        #    raise HTTPBadRequest('"%s" doesn\'t exist' % path)
 
         if self.decks.has_key(path):
             deck = self.decks[path]
@@ -213,106 +292,33 @@ class AnkiServerApp(object):
             deck = self.decks[path] = DeckHandler(full_path)
             deck.start()
 
-        deck.open_deck()
+        #deck.open_deck()
         return deck
 
+    # these are now mostly noops because we open/create the deck when it
+    # is requested to reduce the number of calls to this server
     def open_deck(self, path):
-        # open the deck
         self._open_deck(path)
-
         return {'id':path}
-
-    def _output_fact(self, fact):
-        res = dict(zip(fact.keys(), fact.values()))
-        res['id'] = str(fact.id)
-        return res
+    create_deck = open_deck
 
     def add_fact(self, deck_id, fields):
         return self._open_deck(deck_id).add_fact(fields)
 
     def save_fact(self, deck_id, fact):
-        deck = self._open_deck(deck_id)
+        return self._open_deck(deck_id).save_fact(fact)
         
-        try:
-            newFact = deck.s.query(Fact).get(int(fact['id']))
-            for key in newFact.keys():
-                newFact[key] = fact[key]
-
-            newFact.setModified(textChanged=True)
-            deck.setModified()
-            deck.save()
-        finally:
-            deck.close()
-
     def find_fact(self, deck_id, bibliobird_id):
-        deck = self._open_deck(deck_id)
-
-        try:
-            # first we need to find a field model id for a field named "BiblioBird ID"
-            fieldModelId = deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'BiblioBird ID')
-            if not fieldModelId:
-                raise HTTPBadRequest("No field model named 'BiblioBird ID'")
-
-            # then we search for a fact with this field set to the given id
-            factId = deck.s.scalar("""
-                SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
-                    value = :bibliobirdId""", fieldModelId=fieldModelId, bibliobirdId=bibliobird_id)
-            if not factId:
-                # we need to signal somehow to the calling application that no such
-                # deck exists, but without it being considered a "bad error".  404 is 
-                # inappropriate that refers to the resource (ie. /find_fact) which is
-                # here obviously.
-                return None
-
-            fact = deck.s.query(Fact).get(factId)
-
-            res = self._output_fact(fact)
-        finally:
-            deck.close()
-
-        return res
+        return self._open_deck(deck_id).find_fact(bibliobird_id)
 
     def delete_fact(self, deck_id, fact_id):
-        deck = self._open_deck(deck_id)
-        try:
-            deck.deleteFact(int(fact_id))
-            deck.save()
-        finally:
-            deck.close()
-
-    def _output_card(self, card):
-        return {
-            'id': card.id,
-            'question': card.question,
-            'answer': card.answer,
-        }
+        return self._open_deck(deck_id).delete_fact(fact_id)
 
     def get_card(self, deck_id):
-        deck = self._open_deck(deck_id)
-        try:
-            card = deck.getCard()
-            if card:
-                # grab the interval strings
-                intervals = []
-                for i in range(1, 5):
-                    intervals.append(deck.nextIntervalStr(card, i))
-
-                card = self._output_card(card)
-                card['intervals'] = intervals
-        finally:
-            deck.close()
-        return card
+        return self._open_deck(deck_id).get_card()
 
     def answer_card(self, deck_id, card_id, ease):
-        ease = int(ease)
-        deck = self._open_deck(deck_id)
-        try:
-            card = deck.cardFromId(card_id)
-            if card:
-                deck.answerCard(card, ease)
-                deck.save()
-        finally:
-            deck.close()
+        return self._open_deck(deck_id).answer_card(card_id, ease)
 
     @wsgify
     def __call__(self, req):
