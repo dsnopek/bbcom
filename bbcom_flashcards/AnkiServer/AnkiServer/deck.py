@@ -237,6 +237,3 @@ class DeckHandler(object):
             self.deck.answerCard(card, ease)
             self.deck.save()
 
-
-
-

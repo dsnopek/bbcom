@@ -43,29 +43,8 @@ class AnkiServerApp(object):
             raise HTTPBadRequest('"%s" is not a valid path/id' % path)
         return npath
 
-#    def create_deck(self, path):
-#        if not self.decks.has_key(path):
-#            full_path = self._get_path(path)
-#            if os.path.exists(full_path):
-#                raise HTTPBadRequest('"%s" already exists' % path)
-#
-#            # create our deck handler
-#            deck_handler = DeckHandler(full_path)
-#            deck_handler.start()
-#            deck_handler.create_deck()
-#            self.decks[path] = deck_handler
-#
-#        return {'id':path}
-#
-#    def open_deck(self, path):
-#        # open the deck
-#        self._open_deck(path)
-#        return {'id':path}
-
     def _open_deck(self, path):
         full_path = self._get_path(path)
-        #if not os.path.exists(full_path):
-        #    raise HTTPBadRequest('"%s" doesn\'t exist' % path)
 
         if self.decks.has_key(path):
             deck = self.decks[path]
@@ -73,33 +52,7 @@ class AnkiServerApp(object):
             deck = self.decks[path] = DeckHandler(full_path)
             deck.start()
 
-        #deck.open_deck()
         return deck
-
-#    # these are now mostly noops because we open/create the deck when it
-#    # is requested to reduce the number of calls to this server
-#    def open_deck(self, path):
-#        self._open_deck(path)
-#        return {'id':path}
-#    create_deck = open_deck
-#
-#    def add_fact(self, deck_id, fields):
-#        return self._open_deck(deck_id).add_fact(fields)
-#
-#    def save_fact(self, deck_id, fact):
-#        return self._open_deck(deck_id).save_fact(fact)
-#        
-#    def find_fact(self, deck_id, bibliobird_id):
-#        return self._open_deck(deck_id).find_fact(bibliobird_id)
-#
-#    def delete_fact(self, deck_id, fact_id):
-#        return self._open_deck(deck_id).delete_fact(fact_id)
-#
-#    def get_card(self, deck_id):
-#        return self._open_deck(deck_id).get_card()
-#
-#    def answer_card(self, deck_id, card_id, ease):
-#        return self._open_deck(deck_id).answer_card(card_id, ease)
 
     @wsgify
     def __call__(self, req):

@@ -87,16 +87,6 @@ class AnkiServer {
   }
 
   function openDeck($path) {
-    // reduce calls to server
-    /*
-    try {
-      $deck = $this->request('open_deck', array('path' => $path));
-    }
-    catch (AnkiServerException $e) {
-      $deck = $this->request('create_deck', array('path' => $path));
-    }
-    */
-
     return new AnkiDeck($this, $path);
   }
 
