@@ -14,6 +14,9 @@ setup(
     entry_points="""
     [paste.app_factory]
     main = AnkiServer:make_app
+
+    [paste.server_runner]
+    server = AnkiServer:server_runner
     """,
 )
 

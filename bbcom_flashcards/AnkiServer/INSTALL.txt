@@ -29,7 +29,7 @@ Instructions for installing and running AnkiServer:
 
  5. Make the egg info files (so paster can see our app):
 
-      $ AnkiServer.env/bin/python setup.py install_egg_info
+      $ AnkiServer.env/bin/python setup.py egg_info
 
  4. Then we can run AnkiServer like so:
 

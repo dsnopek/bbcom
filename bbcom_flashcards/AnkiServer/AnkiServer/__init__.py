@@ -42,6 +42,7 @@ def log_exception(func):
             logging.error('DeckHandler[%s] Unable to %s(*%s, **%s): %s'
                 % (self.path, func.func_name, repr(args), repr(kw), e))
             return e
+    newFunc.func_name = func.func_name
     return newFunc
 
 def defer_none(func, priority=0):
@@ -49,6 +50,7 @@ def defer_none(func, priority=0):
     def newFunc(*args, **kw):
         self = args[0]
         self._queue.put((priority, func, args, kw, None))
+    newFunc.func_name = func.func_name
     return newFunc
 
 def defer(func, priority=0):
@@ -61,13 +63,15 @@ def defer(func, priority=0):
         if isinstance(ret, Exception):
             raise e
         return ret
+    newFunc.func_name = func.func_name
     return newFunc
 
 def check_deck(func):
     def newFunc(self, *args, **kw):
         if self.deck is None:
-            raise HTTPBadRequest('Cannot do %s with first open_deck or create_deck' % func.func_name)
+            raise HTTPBadRequest('Cannot do %s without first doing open_deck or create_deck' % func.func_name)
         return func(self, *args, **kw)
+    newFunc.func_name = func.func_name
     return newFunc
 
 class DeckHandler(object):
@@ -153,6 +157,13 @@ class DeckHandler(object):
         deck.setModified()
         deck.save()
 
+servers = []
+def shutdown():
+    global servers
+    # clean up our application
+    for server in servers:
+        server.shutdown()
+    servers = []
 
 class AnkiServerApp(object):
     """ Our WSGI app. """
@@ -160,6 +171,14 @@ class AnkiServerApp(object):
     def __init__(self, data_root, allowed_hosts):
         self.data_root = os.path.abspath(data_root)
         self.allowed_hosts = allowed_hosts
+        self.decks = {}
+
+        # add to the server list
+        servers.append(self)
+
+    def shutdown(self):
+        for deck in self.decks.values():
+            deck.stop()
         self.decks = {}
 
     def _get_path(self, path):
@@ -352,4 +371,11 @@ def make_app(global_conf, **local_conf):
     # TODO: this should be configurable and, um, better.
     app = translogger.TransLogger(app)
     return app
+
+def server_runner(app, global_conf, **kw):
+    from paste.httpserver import server_runner as paste_server_runner
+    try:
+        paste_server_runner(app, global_conf, **kw)
+    finally:
+        shutdown()
 
