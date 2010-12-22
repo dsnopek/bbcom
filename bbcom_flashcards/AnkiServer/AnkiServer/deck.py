@@ -15,7 +15,7 @@ try:
 except ImportError:
     import json
 
-import os, errno
+import os, errno, time, logging
 
 __all__ = ['DeckThread']
 
@@ -35,7 +35,6 @@ def ExternalModel():
     return m
 
 def _log_exception(func):
-    import logging
     def newFunc(self, *args, **kw):
         try:
             return func(self, *args, **kw)
@@ -92,8 +91,15 @@ class DeckThread(object):
         self._queue = PriorityQueue()
         self._thread = None
         self._running = False
+        self.last_timestamp = time.time()
+
+    @property
+    def running(self):
+        return self._running
 
     def _run(self):
+        logging.info('DeckThread[%s]: Starting...' % self.path)
+
         # creates or opens the deck
         if os.path.exists(self.path):
             self.open_deck()
@@ -103,34 +109,23 @@ class DeckThread(object):
         try:
             while self._running:
                 priority, func, args, kw, return_queue = self._queue.get(True)
+                self.last_timestamp = time.time()
                 ret = func(*args, **kw)
                 if return_queue is not None:
                     return_queue.put(ret)
         finally:
             self.close_deck()
-            # in case we got here via an exception
-            self._running = False
             # clean out old thread object
             self._thread = None
+            # in case we got here via an exception
+            self._running = False
 
-    # TODO: move to module level scope?
-    def _output_fact(self, fact):
-        res = dict(zip(fact.keys(), fact.values()))
-        res['id'] = str(fact.id)
-        return res
-
-    # TODO: move to module level scope?
-    def _output_card(self, card):
-        return {
-            'id': card.id,
-            'question': card.question,
-            'answer': card.answer,
-        }
+            logging.info('DeckThread[%s]: Stopped!' % self.path)
 
     def start(self):
         if not self._running:
-            assert self._thread is None
             self._running = True
+            assert self._thread is None
             self._thread = Thread(target=self._run)
             self._thread.start()
 
@@ -151,6 +146,20 @@ class DeckThread(object):
             return callable(func) and hasattr(func, 'external') and func.external
         return False
 
+    # TODO: move to module level scope?
+    def _output_fact(self, fact):
+        res = dict(zip(fact.keys(), fact.values()))
+        res['id'] = str(fact.id)
+        return res
+
+    # TODO: move to module level scope?
+    def _output_card(self, card):
+        return {
+            'id': card.id,
+            'question': card.question,
+            'answer': card.answer,
+        }
+
     @_defer_none
     def create_deck(self):
         global thread_pool
@@ -159,7 +168,7 @@ class DeckThread(object):
             return
 
         # acquire the lock to this deck
-        thread_pool._lock(self.path)
+        thread_pool.lock(self.path)
 
         # mkdir -p the path, because it might not exist
         dir = os.path.dirname(self.path)
@@ -191,7 +200,7 @@ class DeckThread(object):
             return
 
         # acquire the lock to this deck
-        thread_pool._lock(self.path)
+        thread_pool.lock(self.path)
 
         self.deck = anki.DeckStorage.Deck(self.path)
 
@@ -206,7 +215,7 @@ class DeckThread(object):
         self.deck = None
 
         # release our lock to the deck
-        thread_pool._unlock(self.path)
+        thread_pool.unlock(self.path)
 
     @_external
     @_defer_none
@@ -291,6 +300,24 @@ class DeckThreadPool(object):
         self.decks = {}
         self.locks = {}
 
+        self.monitor_frequency = 5
+        self.monitor_inactivity = 30
+
+        monitor = Thread(target=self._monitor_run)
+        monitor.daemon = True
+        monitor.start()
+
+        self._monitor_thread = monitor
+
+    def _monitor_run(self):
+        """ Monitors threads for inactivity and shuts them down. """
+        while True:
+            cur = time.time()
+            for path, deck in self.decks.items():
+                if deck.running and cur - deck.last_timestamp >= self.monitor_inactivity:
+                    deck.stop()
+            time.sleep(self.monitor_frequency)
+
     def open_deck(self, path):
         path = os.path.abspath(path)
 
@@ -298,7 +325,8 @@ class DeckThreadPool(object):
             deck = self.decks[path]
         except KeyError:
             deck = self.decks[path] = DeckThread(path)
-            deck.start()
+
+        deck.start()
 
         return deck
 
@@ -307,31 +335,15 @@ class DeckThreadPool(object):
             deck.stop()
         self.decks = {}
 
-    def _lock(self, path):
+    def lock(self, path):
         try:
             lock = self.locks[path]
         except KeyError:
             lock = self.locks[path] = Lock()
         lock.acquire()
 
-    def _unlock(self, path):
-        self.locks[path].release()
-
-    def lock(self, path):
-        """ Gets exclusive access to this deck path.  If there is a DeckThread running on this
-        deck, this will wait for its current operations to complete before temporarily stopping
-        it. """
-
-        if self.decks.has_key(path):
-            self.decks[path].stop_and_wait()
-        self._lock(path)
-
     def unlock(self, path):
-        """ Release exclusive access to this deck path.  If there is a DeckThread for this path,
-        then start it up again. """
-        self._unlock(path)
-        if self.decks.has_key(path):
-            self.decks[path].start()
+        self.locks[path].release()
 
 thread_pool = DeckThreadPool()
 
@@ -384,7 +396,11 @@ class DeckApp(object):
         pprint(input)
 
         # run it!
-        output = func(**input)
+        try:
+            output = func(**input)
+        except Exception, e:
+            logging.error(e)
+            return HTTPInternalServerError()
 
         if output is None:
             return Response('', content_type='text/plain')

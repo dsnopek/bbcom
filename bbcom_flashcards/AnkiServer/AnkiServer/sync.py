@@ -10,8 +10,6 @@ from anki.utils import checksum
 
 import MySQLdb
 
-import AnkiServer.deck
-
 import os, zlib, tempfile, time
 
 def makeArgs(mdict):
@@ -46,6 +44,22 @@ class FileIterator(object):
                 raise StopIteration
         return self.c.compress(data)
 
+def lock_deck(path):
+    """ Gets exclusive access to this deck path.  If there is a DeckThread running on this
+    deck, this will wait for its current operations to complete before temporarily stopping
+    it. """
+
+    from AnkiServer.deck import thread_pool
+
+    if thread_pool.decks.has_key(path):
+        thread_pool.decks[path].stop_and_wait()
+    thread_pool.lock(path)
+
+def unlock_deck(path):
+    """ Release exclusive access to this deck path. """
+    from AnkiServer.deck import thread_pool
+    thread_pool.unlock(path)
+
 class UserSyncServer(HttpSyncServer):
     operations = ['getDecks','summary','applyPayload','finish','createDeck','getOneWayPayload']
 
@@ -60,7 +74,7 @@ class UserSyncServer(HttpSyncServer):
         for fn in os.listdir(self.data_root):
             if len(fn) > 5 and fn[-5:] == '.anki':
                 d = os.path.join(self.data_root, fn)
-                AnkiServer.deck.thread_pool.lock(d)
+                lock_deck(d)
                 try:
                     conn = sqlite.connect(d)
                     cur = conn.cursor()
@@ -71,7 +85,7 @@ class UserSyncServer(HttpSyncServer):
                     cur.close()
                     conn.close()
                 finally:
-                    AnkiServer.deck.thread_pool.unlock(d)
+                    unlock_deck(d)
 
         return HttpSyncServer.getDecks(self, libanki, client, sources, pversion)
 
@@ -193,7 +207,7 @@ class SyncApp(object):
                 if d[:len(self.data_root)] != self.data_root:
                     raise HTTPBadRequest('Bad deck name')
                 # lock the deck for the duration of this operation
-                AnkiServer.deck.thread_pool.lock(d)
+                lock_deck(d)
 
             try:
                 if url in UserSyncServer.operations:
@@ -224,7 +238,7 @@ class SyncApp(object):
                     resp = Response(status='200 OK', content_type='application/text', body='OK '+str(lastSync))
             finally:
                 if d is not None:
-                    AnkiServer.deck.thread_pool.unlock(d)
+                    unlock_deck(d)
 
             return resp
 
