@@ -225,12 +225,17 @@ class DeckThread(object):
     @_defer_none
     @_check_deck
     def add_fact(self, fields):
-        fact = self.deck.newFact()
-        for key in fact.keys():
-            fact[key] = unicode(fields[key])
+        fact_id = self._find_fact(fields['External ID'])
+        if fact_id is not None:
+            fields['id'] = fact_id
+            self.save_fact(fields)
+        else:
+            fact = self.deck.newFact()
+            for key in fact.keys():
+                fact[key] = unicode(fields[key])
 
-        self.deck.addFact(fact)
-        self.deck.save()
+            self.deck.addFact(fact)
+            self.deck.save()
 
     @_external
     @_defer_none
