@@ -12,7 +12,7 @@ Instructions for installing and running AnkiServer:
     the dependencies we need there:
 
       $ virtualenv AnkiServer.env
-      $ AnkiServer.env/bin/easy_install webob PasteDeploy PasteScript sqlalchemy simplejson
+      $ AnkiServer.env/bin/easy_install webob PasteDeploy PasteScript sqlalchemy simplejson MySQL-python
 
  3. Download and install libanki.  You can find the latest release of Anki here:
 

@@ -8,6 +8,8 @@ from anki.sync import HttpSyncServer, CHUNK_SIZE
 from anki.db import sqlite
 from anki.utils import checksum
 
+import MySQLdb
+
 import AnkiServer.deck
 
 import os, zlib, tempfile, time
@@ -85,28 +87,49 @@ class UserSyncServer(HttpSyncServer):
 class SyncApp(object):
     valid_urls = UserSyncServer.operations + ['fullup','fulldown']
 
-    def __init__(self, data_root, base_url='/'):
-        self.data_root = data_root
+    def __init__(self, **kw):
+        self.data_root = kw.get('data_root', '.')
+        self.base_url  = kw.get('base_url', '/')
 
-        if base_url[-1] != '/':
-            base_url = base_url + '/'
-        self.base_url = base_url
+        # make sure the base_url has a trailing slash
+        if len(self.base_url) == 0:
+            self.base_url = '/'
+        elif self.base_url[-1] != '/':
+            self.base_url = base_url + '/'
 
-    def username2dirname(self, username):
-        # TODO: in the future we need to make this call into the database.
-        # I think we should put a SELECT statement into development.ini which
-        # pulls the username from the Drupal db.
-        # TODO: we need to provide a way to say that a user doesn't exist and
-        # that we should deny them!  (Maybe if the above SELECT returns no rows?)
-        return '1';
+        # setup mysql connection
+        mysql_args = {}
+        for k, v in kw.items():
+            if k.startswith('mysql.'):
+                mysql_args[k[6:]] = v
+        if len(mysql_args) > 0:
+            self.conn = MySQLdb.connect(**mysql_args)
+        else:
+            self.conn = None
+
+        # get SQL statements
+        self.sql_check_password = kw.get('sql_check_password')
+        self.sql_username2dirname = kw.get('sql_username2dirname')
 
     def check_password(self, username, password):
-        # TODO: in the future we need to make this call into the database.
-        # I think we should put a SELECT statement into development.ini which
-        # does the comparison.
-        # TODO: we need to provide a way to say that a user doesn't exist and
-        # that we should deny them!  (Maybe if the above SELECT returns no rows?)
+        if self.conn is not None and self.sql_check_password is not None:
+            cur = self.conn.cursor()
+            cur.execute(self.sql_check_password, (username, password))
+            row = cur.fetchone()
+            return row is not None
+
         return True
+
+    def username2dirname(self, username):
+        if self.conn is not None and self.sql_username2dirname is not None:
+            cur = self.conn.cursor()
+            cur.execute(self.sql_username2dirname, (username,))
+            row = cur.fetchone()
+            if row is None:
+                return None
+            return str(row[0])
+
+        return username
 
     def _fullup(self, path, infile):
         # DRS: most of this function was graciously copied from anki.sync
@@ -150,7 +173,10 @@ class SyncApp(object):
                 raise HTTPBadRequest('Must pass username and password')
             if not self.check_password(u, p):
                 raise HTTPBadRequest('Incorrect username or password')
-            user_path = os.path.join(self.data_root, self.username2dirname(u))
+            dirname = self.username2dirname(u)
+            if dirname is None:
+                raise HTTPBadRequest('Incorrect username or password')
+            user_path = os.path.join(self.data_root, dirname)
 
             # get and lock the (optional) deck for this request
             d = None
@@ -174,7 +200,7 @@ class SyncApp(object):
                     userSync = UserSyncServer(user_path)
                     try:
                         if d is not None:
-                            userSync.deck = anki.DeckStorage.Deck(d+'.anki')
+                            userSync.deck = anki.DeckStorage.Deck(d)
 
                         func = getattr(userSync, url)
                         args = makeArgs(req.str_params)
@@ -207,10 +233,7 @@ class SyncApp(object):
 
 # Our entry point
 def make_app(global_conf, **local_conf):
-    return SyncApp(
-        data_root=local_conf.get('data_root', '.'),
-        base_url=local_conf.get('base_url', '/'),
-    )
+    return SyncApp(**local_conf)
 
 def main():
     from wsgiref.simple_server import make_server

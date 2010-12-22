@@ -91,7 +91,7 @@ class AnkiServer {
   }
 
   function openWialDeck($uid) {
-    return $this->openDeck("decks/$uid/bibliobird.anki");
+    return $this->openDeck("$uid/bibliobird.anki");
   }
 }
 
