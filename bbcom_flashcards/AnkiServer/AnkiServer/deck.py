@@ -7,7 +7,7 @@ import anki
 from anki.facts import Fact
 from anki.models import Model, CardModel, FieldModel
 
-from threading import Thread
+from threading import Thread, Lock, current_thread
 from Queue import Queue, PriorityQueue
 
 try:
@@ -15,7 +15,7 @@ try:
 except ImportError:
     import json
 
-import os
+import os, errno
 
 __all__ = ['DeckThread']
 
@@ -50,15 +50,20 @@ def _defer_none(func, priority=0):
     func = _log_exception(func)
     def newFunc(*args, **kw):
         self = args[0]
-        self._queue.put((priority, func, args, kw, None))
+        if current_thread() is self._thread:
+            func(*args, **kw)
+        else:
+            self._queue.put((priority, func, args, kw, None))
     newFunc.func_name = func.func_name
     return newFunc
 
 def _defer(func, priority=0):
     func = _log_exception(func)
     def newFunc(*args, **kw):
-        return_queue = Queue()
         self = args[0]
+        if current_thread() == self._thread:
+            return func(*args, **kw)
+        return_queue = Queue()
         self._queue.put((priority, func, args, kw, return_queue))
         ret = return_queue.get(True)
         if isinstance(ret, Exception):
@@ -84,23 +89,29 @@ class DeckThread(object):
         self.path = os.path.abspath(path)
         self.deck = None
 
-        self._thread = Thread(target=self._run)
         self._queue = PriorityQueue()
+        self._thread = None
         self._running = False
 
-        # creates or opens the deck (will be first thing executed
-        # on the thread once it starts)
+    def _run(self):
+        # creates or opens the deck
         if os.path.exists(self.path):
             self.open_deck()
         else:
             self.create_deck()
 
-    def _run(self):
-        while self._running:
-            priority, func, args, kw, return_queue = self._queue.get(True)
-            ret = func(*args, **kw)
-            if return_queue is not None:
-                return_queue.put(ret)
+        try:
+            while self._running:
+                priority, func, args, kw, return_queue = self._queue.get(True)
+                ret = func(*args, **kw)
+                if return_queue is not None:
+                    return_queue.put(ret)
+        finally:
+            self.close_deck()
+            # in case we got here via an exception
+            self._running = False
+            # clean out old thread object
+            self._thread = None
 
     # TODO: move to module level scope?
     def _output_fact(self, fact):
@@ -118,8 +129,20 @@ class DeckThread(object):
 
     def start(self):
         if not self._running:
+            assert self._thread is None
             self._running = True
+            self._thread = Thread(target=self._run)
             self._thread.start()
+
+    @_defer_none
+    def stop(self):
+        self._running = False
+
+    def stop_and_wait(self):
+        """ Tell the thread to stop and wait for it to happen. """
+        self.stop()
+        if self._thread is not None:
+            self._thread.join()
 
     @classmethod
     def external_allowed(cls, name):
@@ -129,18 +152,14 @@ class DeckThread(object):
         return False
 
     @_defer_none
-    def stop(self):
-        if self.deck is not None:
-            self.deck.save()
-            self.deck.close()
-        self._running = False
-
-    @_defer_none
     def create_deck(self):
+        global thread_pool
+
         if self.deck is not None:
             return
 
-        import errno
+        # acquire the lock to this deck
+        thread_pool._lock(self.path)
 
         # mkdir -p the path, because it might not exist
         dir = os.path.dirname(self.path)
@@ -166,10 +185,28 @@ class DeckThread(object):
 
     @_defer_none
     def open_deck(self):
+        global thread_pool
+
         if self.deck is not None:
             return
 
+        # acquire the lock to this deck
+        thread_pool._lock(self.path)
+
         self.deck = anki.DeckStorage.Deck(self.path)
+
+    @_defer_none
+    def close_deck(self):
+        global thread_pool
+
+        if self.deck is None:
+            return
+
+        self.deck.close()
+        self.deck = None
+
+        # release our lock to the deck
+        thread_pool._unlock(self.path)
 
     @_external
     @_defer_none
@@ -252,6 +289,7 @@ class DeckThread(object):
 class DeckThreadPool(object):
     def __init__(self):
         self.decks = {}
+        self.locks = {}
 
     def open_deck(self, path):
         path = os.path.abspath(path)
@@ -269,17 +307,31 @@ class DeckThreadPool(object):
             deck.stop()
         self.decks = {}
 
+    def _lock(self, path):
+        try:
+            lock = self.locks[path]
+        except KeyError:
+            lock = self.locks[path] = Lock()
+        lock.acquire()
+
+    def _unlock(self, path):
+        self.locks[path].release()
+
     def lock(self, path):
-        # TODO: lock the deck!
-        # TODO: we should do this by setting a semaphore or other lock, then
-        # calling some deferred function on the thread (if one exists) to wait
-        # on the lock.
-        pass
+        """ Gets exclusive access to this deck path.  If there is a DeckThread running on this
+        deck, this will wait for its current operations to complete before temporarily stopping
+        it. """
+
+        if self.decks.has_key(path):
+            self.decks[path].stop_and_wait()
+        self._lock(path)
 
     def unlock(self, path):
-        # TODO: unlock the deck!
-        # TODO: here we can simply remove the lock...  I think.
-        pass
+        """ Release exclusive access to this deck path.  If there is a DeckThread for this path,
+        then start it up again. """
+        self._unlock(path)
+        if self.decks.has_key(path):
+            self.decks[path].start()
 
 thread_pool = DeckThreadPool()
 
