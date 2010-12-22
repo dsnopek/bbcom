@@ -269,6 +269,18 @@ class DeckThreadPool(object):
             deck.stop()
         self.decks = {}
 
+    def lock(self, path):
+        # TODO: lock the deck!
+        # TODO: we should do this by setting a semaphore or other lock, then
+        # calling some deferred function on the thread (if one exists) to wait
+        # on the lock.
+        pass
+
+    def unlock(self, path):
+        # TODO: unlock the deck!
+        # TODO: here we can simply remove the lock...  I think.
+        pass
+
 thread_pool = DeckThreadPool()
 
 class DeckApp(object):

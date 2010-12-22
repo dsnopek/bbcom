@@ -14,6 +14,7 @@ setup(
     entry_points="""
     [paste.app_factory]
     deckapp = AnkiServer.deck:make_app
+    syncapp = AnkiServer.sync:make_app
 
     [paste.server_runner]
     server = AnkiServer:server_runner
