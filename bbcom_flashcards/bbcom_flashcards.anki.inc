@@ -48,6 +48,12 @@ class AnkiDeck {
     ));
   }
 
+  function resyncFacts($ids) {
+    return $this->server->request($this->path, 'resync_facts', array(
+      'external_ids' => $ids,
+    ));
+  }
+
   function getCard() {
     return $this->server->request($this->path, 'get_card');
   }

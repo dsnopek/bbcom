@@ -66,7 +66,7 @@ def _defer(func, priority=0):
         self._queue.put((priority, func, args, kw, return_queue))
         ret = return_queue.get(True)
         if isinstance(ret, Exception):
-            raise e
+            raise ret
         return ret
     newFunc.func_name = func.func_name
     return newFunc
@@ -214,6 +214,10 @@ class DeckThread(object):
         self.deck.close()
         self.deck = None
 
+        # delete the cache for 'External ID' on this deck
+        if hasattr(self, '_external_field_id'):
+            delattr(self, '_external_field_id')
+
         # release our lock to the deck
         thread_pool.unlock(self.path)
 
@@ -240,16 +244,19 @@ class DeckThread(object):
         self.deck.setModified()
         self.deck.save()
 
-    def _find_fact(self, external_id):
-        # first we need to find a field model id for a field named "External ID"
-        fieldModelId = self.deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'External ID')
-        if not fieldModelId:
+    @property
+    def external_field_id(self):
+        if not hasattr(self, '_external_field_id'):
+            # find a field model id for a field named "External ID"
+            self._external_field_id = self.deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'External ID')
+        if self._external_field_id is None:
             raise HTTPBadRequest("No field model named 'External ID'")
+        return self._external_field_id
 
-        # then we search for a fact with this field set to the given id
+    def _find_fact(self, external_id):
         return self.deck.s.scalar("""
             SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
-                value = :externalId""", fieldModelId=fieldModelId, externalId=external_id)
+                value = :externalId""", fieldModelId=self._external_field_id, externalId=external_id)
 
     @_external
     @_defer
@@ -275,6 +282,32 @@ class DeckThread(object):
         if fact_id is not None:
             self.deck.deleteFact(int(fact_id))
             self.deck.save()
+
+    @_external
+    @_defer
+    @_check_deck
+    def resync_facts(self, external_ids):
+        from anki.facts import fieldsTable
+        from sqlalchemy.sql import select, and_, not_
+
+        # remove extra cards
+        selectExtra = select([fieldsTable.c.factId],
+            and_(
+                fieldsTable.c.fieldModelId == self.external_field_id,
+                not_(fieldsTable.c.value.in_(external_ids))
+            )
+        )
+        for factId, in self.deck.s.execute(selectExtra).fetchall():
+            self.deck.deleteFact(factId)
+        self.deck.save()
+
+        # find ids that should be on this deck but which aren't
+        missing_ids = []
+        for external_id in external_ids:
+            if self._find_fact(external_id) is None:
+                missing_ids.append(external_id)
+
+        return {'missing':missing_ids}
 
     @_external
     @_defer

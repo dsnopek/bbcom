@@ -95,6 +95,17 @@ function bbcom_flashcards_rules_action_info() {
   );
 }
 
+/*
+ * Implementation of hook_user_operations().
+ */
+function bbcom_flashcards_user_operations() {
+  return array(
+    'bbcom_flashcards_resync' => array(
+      'label' => t('Re-sync user\'s flashcards'),
+      'callback' => 'bbcom_flashcards_user_operations_resync'
+    ),
+  );
+}
 
 /*
  * Actions
@@ -125,6 +136,48 @@ function bbcom_flashcards_action_remove_from_wial_deck($node, $user) {
     catch (AnkiServerException $e) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
       drupal_set_message(t('Unable to remove flashcard from your "Words I am Learning" deck.'), 'error');
+    }
+  }
+}
+
+/*
+ * User operations.
+ */
+
+function bbcom_flashcards_user_operations_resync($accounts) {
+  $flag = flag_get_flag('wial');
+  foreach ($accounts as $uid) {
+    // get an array of Lingwo IDs for every word on this user's WIAL
+    $res = db_query('SELECT le.language as slang, n.language as tlang, le.headword, le.pos FROM {lingwo_dictionary_entry} le, {node} n, {flag_content} fc WHERE fc.fid = %d AND fc.uid = %d AND fc.content_id = n.nid AND n.tnid = le.nid', $flag->fid, $uid);
+    $ids = array();
+    while ($obj = db_fetch_object($res)) {
+      $ids[] = "$obj->slang-$obj->tlang/$obj->headword($obj->pos)";
+    }
+
+    // call resyncFacts and so the AnkiServer can tell us which flashcards
+    // are missing that we should add
+    try {
+      $deck = bbcom_flashcards_anki_server_connect()
+        ->openWialDeck($uid);
+      $res = $deck->resyncFacts($ids);
+    }
+    catch (AnkiServerException $e) {
+      watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+      drupal_set_message(t('Unable to resync flashcards for user !uid.', array('!uid' => $uid)), 'error');
+      continue;
+    }
+
+    // add all the missing cards!
+    foreach ($res->missing as $id) {
+      $entry = LingwoEntry::fromLingwoId($id);
+
+      try {
+        $deck->addFactForNode($entry->getNode());
+      }
+      catch (AnkiServerException $e) {
+        watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+        drupal_set_message(t('Unable to add missing flashcard for user !uid', array('!uid' => $uid)), 'error');
+      }
     }
   }
 }
