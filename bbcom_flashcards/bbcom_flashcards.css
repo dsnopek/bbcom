@@ -1,0 +1,25 @@
+
+#bibliobird-flashcards-flashcard {
+  margin: 10px;
+  padding: 25px 10px;
+  border: 1px solid black;
+  background: white;
+  font-size: 14pt;
+}
+
+#bibliobird-flashcards-flashcard-question {
+}
+
+#bibliobird-flashcards-flashcard-answer {
+  display: none;
+}
+
+#bibliobird-flashcards-ease-buttons {
+  display: none;
+}
+
+#bibliobird-flashcards-finished {
+  font-size: 14pt;
+  margin: 10px 0;
+}
+
