@@ -42,6 +42,12 @@ class AnkiDeck {
     ));
   }
 
+  function deleteFactForNode($node) {
+    $this->server->request($this->path, 'delete_fact', array(
+      'external_id' => lingwo_dictionary_entry_get_id($node),
+    ));
+  }
+
   function getCard() {
     return $this->server->request($this->path, 'get_card');
   }

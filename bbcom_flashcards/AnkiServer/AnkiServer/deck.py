@@ -240,19 +240,22 @@ class DeckThread(object):
         self.deck.setModified()
         self.deck.save()
 
-    @_external
-    @_defer
-    @_check_deck
-    def find_fact(self, external_id):
+    def _find_fact(self, external_id):
         # first we need to find a field model id for a field named "External ID"
         fieldModelId = self.deck.s.scalar("SELECT id FROM fieldModels WHERE name = :name", name=u'External ID')
         if not fieldModelId:
             raise HTTPBadRequest("No field model named 'External ID'")
 
         # then we search for a fact with this field set to the given id
-        factId = self.deck.s.scalar("""
+        return self.deck.s.scalar("""
             SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
                 value = :externalId""", fieldModelId=fieldModelId, externalId=external_id)
+
+    @_external
+    @_defer
+    @_check_deck
+    def find_fact(self, external_id):
+        factId = self._find_fact(external_id)
         if not factId:
             # we need to signal somehow to the calling application that no such
             # deck exists, but without it being considered a "bad error".  404 is 
@@ -266,9 +269,12 @@ class DeckThread(object):
     @_external
     @_defer_none
     @_check_deck
-    def delete_fact(self, fact_id):
-        self.deck.deleteFact(int(fact_id))
-        self.deck.save()
+    def delete_fact(self, fact_id=None, external_id=None):
+        if fact_id is None and external_id is not None:
+            fact_id = self._find_fact(external_id)
+        if fact_id is not None:
+            self.deck.deleteFact(int(fact_id))
+            self.deck.save()
 
     @_external
     @_defer

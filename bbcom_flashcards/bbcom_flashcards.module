@@ -119,7 +119,8 @@ function bbcom_flashcards_action_remove_from_wial_deck($node, $user) {
     try {
       $deck = bbcom_flashcards_anki_server_connect()
         ->openWialDeck($user->uid);
-      $deck->deleteFact($deck->findFactForNode($node));
+      #$deck->deleteFact($deck->findFactForNode($node));
+      $deck->deleteFactForNode($node);
     }
     catch (AnkiServerException $e) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
