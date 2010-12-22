@@ -142,7 +142,7 @@ function bbcom_flashcards_anki_server_connect() {
 
 function bbcom_flashcards_anki_server_url($value = NULL) {
   if (is_null($value)) {
-    return variable_get('bbcom_flashcards_anki_server_url', 'localhost:5000');
+    return variable_get('bbcom_flashcards_anki_server_url', 'localhost:5000/decks');
   }
   variable_set('bbcom_flashcards_anki_server_url', $value);
 }
