@@ -24,6 +24,8 @@ function bbcom_flashcards_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  // TODO: these pages aren't ready yet!
+  /*
   $items['wial/%user'] = array(
     'title' => 'Words I Am Learning',
     'access callback' => 'lingwoorg_wial_page_access',
@@ -47,6 +49,7 @@ function bbcom_flashcards_menu() {
     'file' => 'bbcom_flashcards.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
+  */
 
   return $items;
 }
