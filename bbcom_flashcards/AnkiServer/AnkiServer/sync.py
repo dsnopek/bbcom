@@ -70,22 +70,23 @@ class UserSyncServer(HttpSyncServer):
     def getDecks(self, libanki, client, sources, pversion):
         self.decks = {}
 
-        # It is a dict of {'deckName':[modified,lastSync]}
-        for fn in os.listdir(self.data_root):
-            if len(fn) > 5 and fn[-5:] == '.anki':
-                d = os.path.join(self.data_root, fn)
-                lock_deck(d)
-                try:
-                    conn = sqlite.connect(d)
-                    cur = conn.cursor()
-                    cur.execute("select modified, lastSync from decks")
+        if os.path.exists(self.data_root):
+            # It is a dict of {'deckName':[modified,lastSync]}
+            for fn in os.listdir(self.data_root):
+                if len(fn) > 5 and fn[-5:] == '.anki':
+                    d = os.path.join(self.data_root, fn)
+                    lock_deck(d)
+                    try:
+                        conn = sqlite.connect(d)
+                        cur = conn.cursor()
+                        cur.execute("select modified, lastSync from decks")
 
-                    self.decks[fn[:-5]] = list(cur.fetchone())
+                        self.decks[fn[:-5]] = list(cur.fetchone())
 
-                    cur.close()
-                    conn.close()
-                finally:
-                    unlock_deck(d)
+                        cur.close()
+                        conn.close()
+                    finally:
+                        unlock_deck(d)
 
         return HttpSyncServer.getDecks(self, libanki, client, sources, pversion)
 
