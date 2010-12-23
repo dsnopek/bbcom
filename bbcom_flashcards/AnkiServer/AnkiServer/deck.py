@@ -113,6 +113,8 @@ class DeckThread(object):
                 ret = func(*args, **kw)
                 if return_queue is not None:
                     return_queue.put(ret)
+        except Exception, e:
+            logging.error('DeckThread[%s]: Thread crashed! Exception: %s' % e)
         finally:
             self.close_deck()
             # clean out old thread object
@@ -261,7 +263,7 @@ class DeckThread(object):
     def _find_fact(self, external_id):
         return self.deck.s.scalar("""
             SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
-                value = :externalId""", fieldModelId=self._external_field_id, externalId=external_id)
+                value = :externalId""", fieldModelId=self.external_field_id, externalId=external_id)
 
     @_external
     @_defer
@@ -359,6 +361,7 @@ class DeckThreadPool(object):
             cur = time.time()
             for path, deck in self.decks.items():
                 if deck.running and cur - deck.last_timestamp >= self.monitor_inactivity:
+                    logging.info('Monitor is stopping inactive DeckThread[%s]' % deck.path)
                     deck.stop()
             time.sleep(self.monitor_frequency)
 
