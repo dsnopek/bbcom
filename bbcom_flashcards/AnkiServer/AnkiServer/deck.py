@@ -34,54 +34,28 @@ def ExternalModel():
     m.tags = u"External"
     return m
 
-def _log_exception(func):
-    def newFunc(self, *args, **kw):
-        try:
-            return func(self, *args, **kw)
-        except Exception, e:
-            logging.error('DeckThread[%s] Unable to %s(*%s, **%s): %s'
-                % (self.path, func.func_name, repr(args), repr(kw), e))
-            return e
-    newFunc.func_name = func.func_name
-    return newFunc
+def _defer(*func, **opts):
+    def decorator(func):
+        def newFunc(*args, **kw):
+            self = args[0]
+            if current_thread() == self._thread:
+                ret = func(*args, **kw)
+                # don't return 'ret' if this isn't a wait function, to keep the API
+                # consistent even when inside the thread itself (hopefully, help
+                # avoid weird problems in the future)
+                if opts.get('waitForReturn', True):
+                    return ret
+            else:
+                return self._enqueue(func, args, kw, **opts)
+        newFunc.func_name = func.func_name
+        return newFunc
 
-def _defer_none(func, priority=0):
-    func = _log_exception(func)
-    def newFunc(*args, **kw):
-        self = args[0]
-        if current_thread() is self._thread:
-            func(*args, **kw)
-        else:
-            self._queue.put((priority, func, args, kw, None))
-    newFunc.func_name = func.func_name
-    return newFunc
+    if len(func) == 1:
+        return decorator(func[0])
+    elif len(func) > 1:
+        raise TypeError
 
-def _defer(func, priority=0):
-    func = _log_exception(func)
-    def newFunc(*args, **kw):
-        self = args[0]
-        if current_thread() == self._thread:
-            return func(*args, **kw)
-        return_queue = Queue()
-        self._queue.put((priority, func, args, kw, return_queue))
-        ret = return_queue.get(True)
-        if isinstance(ret, Exception):
-            raise ret
-        return ret
-    newFunc.func_name = func.func_name
-    return newFunc
-
-def _check_deck(func):
-    def newFunc(self, *args, **kw):
-        if self.deck is None:
-            raise HTTPBadRequest('Cannot do %s without first doing open_deck or create_deck' % func.func_name)
-        return func(self, *args, **kw)
-    newFunc.func_name = func.func_name
-    return newFunc
-
-def _external(func):
-    func.external = True
-    return func
+    return decorator
 
 class DeckThread(object):
     def __init__(self, path):
@@ -97,8 +71,22 @@ class DeckThread(object):
     def running(self):
         return self._running
 
+    def _enqueue(self, func, args, kw, waitForReturn=True, priority=0):
+        if waitForReturn:
+            return_queue = Queue()
+        else:
+            return_queue = None
+
+        self._queue.put((priority, func, args, kw, return_queue))
+
+        if return_queue is not None:
+            ret = return_queue.get(True)
+            if isinstance(ret, Exception):
+                raise ret
+            return ret
+
     def _run(self):
-        logging.info('DeckThread[%s]: Starting...' % self.path)
+        logging.info('DeckThread[%s]: Starting...', self.path)
 
         # creates or opens the deck
         if os.path.exists(self.path):
@@ -106,15 +94,29 @@ class DeckThread(object):
         else:
             self.create_deck()
 
+        if self.deck is None:
+            logging.error('DeckThread[%s]: Unable to open or create deck.  Exiting thread...', self.path)
+            self._running = False
+
         try:
             while self._running:
                 priority, func, args, kw, return_queue = self._queue.get(True)
+
+                logging.info('DeckThread[%s]: Running %s(*%s, **%s)', self.path, func.func_name, repr(args), repr(kw))
                 self.last_timestamp = time.time()
-                ret = func(*args, **kw)
+
+                try:
+                    ret = func(*args, **kw)
+                except Exception, e:
+                    logging.error('DeckThread[%s]: Unable to %s(*%s, **%s): %s',
+                        self.path, func.func_name, repr(args), repr(kw), e, exc_info=True)
+                    # we return the Exception which will be raise'd on the other end
+                    ret = e
+
                 if return_queue is not None:
                     return_queue.put(ret)
         except Exception, e:
-            logging.error('DeckThread[%s]: Thread crashed! Exception: %s' % e)
+            logging.error('DeckThread[%s]: Thread crashed! Exception: %s', e, exc_info=True)
         finally:
             self.close_deck()
             # clean out old thread object
@@ -131,7 +133,7 @@ class DeckThread(object):
             self._thread = Thread(target=self._run)
             self._thread.start()
 
-    @_defer_none
+    @_defer(waitForReturn=False)
     def stop(self):
         self._running = False
 
@@ -141,20 +143,11 @@ class DeckThread(object):
         if self._thread is not None:
             self._thread.join()
 
-    @classmethod
-    def external_allowed(cls, name):
-        if hasattr(cls, name):
-            func = getattr(cls, name)
-            return callable(func) and hasattr(func, 'external') and func.external
-        return False
-
-    # TODO: move to module level scope?
     def _output_fact(self, fact):
         res = dict(zip(fact.keys(), fact.values()))
         res['id'] = str(fact.id)
         return res
 
-    # TODO: move to module level scope?
     def _output_card(self, card):
         return {
             'id': card.id,
@@ -162,7 +155,7 @@ class DeckThread(object):
             'answer': card.answer,
         }
 
-    @_defer_none
+    @_defer(waitForReturn=False)
     def create_deck(self):
         global thread_pool
 
@@ -194,7 +187,7 @@ class DeckThread(object):
 
         self.deck = deck
 
-    @_defer_none
+    @_defer(waitForReturn=False)
     def open_deck(self):
         global thread_pool
 
@@ -206,7 +199,7 @@ class DeckThread(object):
 
         self.deck = anki.DeckStorage.Deck(self.path)
 
-    @_defer_none
+    @_defer(waitForReturn=False)
     def close_deck(self):
         global thread_pool
 
@@ -223,9 +216,7 @@ class DeckThread(object):
         # release our lock to the deck
         thread_pool.unlock(self.path)
 
-    @_external
-    @_defer_none
-    @_check_deck
+    @_defer(waitForReturn=False)
     def add_fact(self, fields):
         fact_id = self._find_fact(fields['External ID'])
         if fact_id is not None:
@@ -239,9 +230,7 @@ class DeckThread(object):
             self.deck.addFact(fact)
             self.deck.save()
 
-    @_external
-    @_defer_none
-    @_check_deck
+    @_defer(waitForReturn=False)
     def save_fact(self, fact):
         newFact = self.deck.s.query(Fact).get(int(fact['id']))
         for key in newFact.keys():
@@ -265,9 +254,7 @@ class DeckThread(object):
             SELECT factId FROM fields WHERE fieldModelId = :fieldModelId AND
                 value = :externalId""", fieldModelId=self.external_field_id, externalId=external_id)
 
-    @_external
     @_defer
-    @_check_deck
     def find_fact(self, external_id):
         factId = self._find_fact(external_id)
         if not factId:
@@ -280,9 +267,7 @@ class DeckThread(object):
         fact = self.deck.s.query(Fact).get(factId)
         return self._output_fact(fact)
 
-    @_external
-    @_defer_none
-    @_check_deck
+    @_defer(waitForReturn=False)
     def delete_fact(self, fact_id=None, external_id=None):
         if fact_id is None and external_id is not None:
             fact_id = self._find_fact(external_id)
@@ -290,9 +275,7 @@ class DeckThread(object):
             self.deck.deleteFact(int(fact_id))
             self.deck.save()
 
-    @_external
     @_defer
-    @_check_deck
     def resync_facts(self, external_ids):
         from anki.facts import fieldsTable
         from sqlalchemy.sql import select, and_, not_
@@ -316,9 +299,7 @@ class DeckThread(object):
 
         return {'missing':missing_ids}
 
-    @_external
     @_defer
-    @_check_deck
     def get_card(self):
         card = self.deck.getCard()
         if card:
@@ -331,9 +312,7 @@ class DeckThread(object):
             card['intervals'] = intervals
         return card
 
-    @_external
-    @_defer_none
-    @_check_deck
+    @_defer(waitForReturn=False)
     def answer_card(self, card_id, ease):
         ease = int(ease)
         card = self.deck.cardFromId(card_id)
@@ -360,7 +339,7 @@ class DeckThreadPool(object):
         while True:
             cur = time.time()
             for path, deck in self.decks.items():
-                if deck.running and cur - deck.last_timestamp >= self.monitor_inactivity:
+                if deck.running and deck._queue.empty() and cur - deck.last_timestamp >= self.monitor_inactivity:
                     logging.info('Monitor is stopping inactive DeckThread[%s]' % deck.path)
                     deck.stop()
             time.sleep(self.monitor_frequency)
@@ -397,6 +376,9 @@ thread_pool = DeckThreadPool()
 class DeckApp(object):
     """ Our WSGI app. """
 
+    direct_operations = ['add_fact', 'save_fact', 'find_fact', 'delete_fact', 'resync_facts',
+        'get_card', 'answer_card']
+
     def __init__(self, data_root, allowed_hosts):
         self.data_root = os.path.abspath(data_root)
         self.allowed_hosts = allowed_hosts
@@ -430,7 +412,7 @@ class DeckApp(object):
         parts = func.split('/')
         path = '/'.join(parts[:-1])
         func = parts[-1]
-        if not DeckThread.external_allowed(func):
+        if func not in self.direct_operations:
             raise HTTPNotFound()
         deck = thread_pool.open_deck(self._get_path(path))
         func = getattr(deck, func)

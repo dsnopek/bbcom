@@ -175,13 +175,14 @@ function bbcom_flashcards_user_operations_resync($accounts) {
     // TODO: should only mess with missing, but for now we readd everything
     foreach ($ids as $id) {
       $entry = LingwoEntry::fromLingwoId($id);
-
-      try {
-        $deck->addFactForNode($entry->getNode());
-      }
-      catch (AnkiServerException $e) {
-        watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-        drupal_set_message(t('Unable to add missing flashcard for user !uid', array('!uid' => $uid)), 'error');
+      if (lingwo_dictionary_entry_is_translation($entry->getNode())) {
+        try {
+          $deck->addFactForNode($entry->getNode());
+        }
+        catch (AnkiServerException $e) {
+          watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+          drupal_set_message(t('Unable to add missing flashcard for user !uid', array('!uid' => $uid)), 'error');
+        }
       }
     }
   }
