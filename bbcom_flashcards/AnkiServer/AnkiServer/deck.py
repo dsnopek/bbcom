@@ -410,7 +410,11 @@ class DeckApp(object):
         global thread_pool
 
         if self.allowed_hosts != '*':
-            if req.remote_addr != self.allowed_hosts:
+            try:
+                remote_addr = req.headers['X-Forwarded-For']
+            except KeyError:
+                remote_addr = req.remote_addr
+            if remote_addr != self.allowed_hosts:
                 raise HTTPForbidden()
 
         if req.method != 'POST':
