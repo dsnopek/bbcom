@@ -14,6 +14,7 @@
 #
 
 import anki.sync
+import anki.lang
 
 # production
 anki.sync.SYNC_URL = 'http://anki.bibliobird.com/sync/'
@@ -24,4 +25,15 @@ anki.sync.SYNC_PORT = 80
 #anki.sync.SYNC_URL = 'http://localhost:27701/sync/'
 #anki.sync.SYNC_HOST = 'localhost'
 #anki.sync.SYNC_PORT = 27701
+
+# Monkey patch the "_" function to replace the "Create free account" links.
+# TODO: There are probably better ways to do this but this was the easiest!
+create_free_account_link = '<a href="http://www.bibliobird.com/user/register">'
+def t(s):
+    global create_free_account_link
+    return anki.lang._(s).replace('<a href="http://anki.ichi2.net/">', create_free_account_link)
+import ankiqt.forms.preferences
+import ankiqt.ui.main
+ankiqt.forms.preferences._ = t
+ankiqt.ui.main._ = t
 
