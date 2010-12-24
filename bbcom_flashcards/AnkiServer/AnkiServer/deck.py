@@ -168,7 +168,7 @@ class DeckThread(object):
         except Exception, e:
             logging.error('DeckThread[%s]: Thread crashed! Exception: %s', e, exc_info=True)
         finally:
-            self.wrapper.close_deck()
+            self.wrapper.close()
             # clean out old thread object
             self._thread = None
             # in case we got here via an exception
