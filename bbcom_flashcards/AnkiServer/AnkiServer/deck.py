@@ -7,7 +7,7 @@ import anki
 from anki.facts import Fact
 from anki.models import Model, CardModel, FieldModel
 
-from threading import Thread, Lock, current_thread
+from threading import Thread
 from Queue import Queue, PriorityQueue
 
 try:
@@ -118,6 +118,7 @@ class DeckThread(object):
         return self._queue.empty()
 
     def current(self):
+        from threading import current_thread
         return current_thread() == self._thread
 
     def execute(self, func, args=[], kw={}, waitForReturn=True, priority=0):
@@ -196,7 +197,6 @@ class DeckThread(object):
 class DeckThreadPool(object):
     def __init__(self):
         self.threads = {}
-        self.locks = {}
 
         self.monitor_frequency = 5
         self.monitor_inactivity = 30
@@ -207,8 +207,8 @@ class DeckThreadPool(object):
         #self._monitor_thread = monitor
 
     # TODO: I don't think this is safe, because something can be
-    # added to the queue after the thread is stopped, which means it active
-    # we have no way to abort!
+    # added to the queue after the thread is stopped, which means its active
+    # but we have no way to abort the stop!
     def _monitor_run(self):
         """ Monitors threads for inactivity and shuts them down. """
         while True:
@@ -235,16 +235,6 @@ class DeckThreadPool(object):
         for thread in self.threads.values():
             thread.stop()
         self.threads = {}
-
-    def lock(self, path):
-        try:
-            lock = self.locks[path]
-        except KeyError:
-            lock = self.locks[path] = Lock()
-        lock.acquire()
-
-    def unlock(self, path):
-        self.locks[path].release()
 
 thread_pool = DeckThreadPool()
 

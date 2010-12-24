@@ -104,8 +104,8 @@ class SyncAppHandler(HttpSyncServer):
 #                        cur.close()
 #                        conn.close()
 
-                    self.decks[fn[:-5]] = ["%.5f" % x for x in res]
-                    #self.decks[fn[:-5]] = res
+                    #self.decks[fn[:-5]] = ["%.5f" % x for x in res]
+                    self.decks[fn[:-5]] = res
 
         return HttpSyncServer.getDecks(self, libanki, client, sources, pversion)
 
@@ -169,7 +169,8 @@ class SyncApp(object):
         wrapper.close()
         path = wrapper.path
 
-        # DRS: most of this function was graciously copied from anki.sync
+        # DRS: most of this function was graciously copied
+        # from anki.sync.SyncTools.fullSyncFromServer()
         (fd, tmpname) = tempfile.mkstemp(dir=os.getcwd(), prefix="fullsync")
         outfile = open(tmpname, 'wb')
         decomp = zlib.decompressobj()
@@ -188,8 +189,11 @@ class SyncApp(object):
         # reset the deck name
         c = sqlite.connect(path)
         lastSync = time.time()
-        c.execute("update decks set syncName = ?, lastSync = ?",
-                  [checksum(path.encode("utf-8")), lastSync])
+        # TODO: I have a feeling that syncName being a hash of the path, is 
+        # an anki 1.1.10 thing too...
+        #c.execute("update decks set syncName = ?, lastSync = ?",
+        #          [checksum(path.encode("utf-8")), lastSync])
+        c.execute("update decks set lastSync = ?", [lastSync])
         c.commit()
         c.close()
 
@@ -246,6 +250,7 @@ class SyncApp(object):
                         ret = func(**args)
                         handler.deck.save()
                         return ret
+                    runFunc.func_name = url
                     ret = thread.execute(runFunc, [thread.wrapper])
                 else:
                     # Otherwise, we can simply execute it in this thread.
@@ -256,18 +261,22 @@ class SyncApp(object):
             elif url == 'fulldown':
                 # set the syncTime before we send it
                 def setupForSync(wrapper):
-                    deck = wrapper.open()
-                    deck.lastSync = time.time()
-                    deck.syncName = checksum(wrapper.path.encode("utf-8"))
-                    deck.save()
+                    wrapper.close()
+                    c = sqlite.connect(d)
+                    lastSync = time.time()
+                    c.execute("update decks set lastSync = ?", [lastSync])
+                    c.commit()
+                    c.close()
                 thread.execute(setupForSync, [thread.wrapper])
 
                 return Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d)+'"', app_iter=FileIterable(d))
             elif url == 'fullup':
                 infile = req.str_params['deck'].file
                 lastSync = thread.execute(self._fullup, [thread.wrapper, infile])
+                # TODO: 'OK' + the last sync is for anki version 1.1.X!  We need to check versions..
                 #body = 'OK '+str(lastSync)
-                boky = 'OK %.5f' % lastSync
+                #body = 'OK %.5f' % lastSync
+                body = 'OK'
                 return Response(status='200 OK', content_type='application/text', body=body)
 
         return Response(status='200 OK', content_type='text/plain', body='Anki Server')
