@@ -199,24 +199,26 @@ class DeckThreadPool(object):
         self.threads = {}
 
         self.monitor_frequency = 5
-        self.monitor_inactivity = 30
+        self.monitor_inactivity = 10
 
-        #monitor = Thread(target=self._monitor_run)
-        #monitor.daemon = True
-        #monitor.start()
-        #self._monitor_thread = monitor
+        monitor = Thread(target=self._monitor_run)
+        monitor.daemon = True
+        monitor.start()
+        self._monitor_thread = monitor
 
-    # TODO: I don't think this is safe, because something can be
-    # added to the queue after the thread is stopped, which means its active
-    # but we have no way to abort the stop!
+    # TODO: it would be awesome to have a safe way to stop inactive threads completely!
     def _monitor_run(self):
-        """ Monitors threads for inactivity and shuts them down. """
+        """ Monitors threads for inactivity and closes the deck on them
+        (leaves the thread itself running -- hopefully waiting peacefully with only a
+        small memory footprint!) """
         while True:
             cur = time.time()
             for path, thread in self.threads.items():
-                if thread.running and thread.qempty() and cur - thread.last_timestamp >= self.monitor_inactivity:
-                    logging.info('Monitor is stopping inactive DeckThread[%s]' % thread.path)
-                    thread.stop()
+                if thread.running and thread.wrapper.opened() and thread.qempty() and cur - thread.last_timestamp >= self.monitor_inactivity:
+                    logging.info('Monitor is closing deck on inactive DeckThread[%s]' % thread.path)
+                    def closeDeck(wrapper):
+                        wrapper.close()
+                    thread.execute(closeDeck, [thread.wrapper], waitForReturn=False)
             time.sleep(self.monitor_frequency)
 
     def start(self, path):
