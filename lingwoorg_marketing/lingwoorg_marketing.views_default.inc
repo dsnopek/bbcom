@@ -194,7 +194,7 @@ function lingwoorg_marketing_views_default_views() {
       'hide_empty' => 0,
       'empty_zero' => 0,
       'link_to_node' => 0,
-      'exclude' => 1,
+      'exclude' => 0,
       'id' => 'nid',
       'table' => 'node',
       'field' => 'nid',

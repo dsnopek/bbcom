@@ -8,6 +8,8 @@ from anki.sync import HttpSyncServer, CHUNK_SIZE
 from anki.db import sqlite
 from anki.utils import checksum
 
+import AnkiServer.deck
+
 import MySQLdb
 
 import os, zlib, tempfile, time
@@ -60,7 +62,7 @@ def unlock_deck(path):
     from AnkiServer.deck import thread_pool
     thread_pool.unlock(path)
 
-class UserSyncServer(HttpSyncServer):
+class SyncAppHandler(HttpSyncServer):
     operations = ['getDecks','summary','applyPayload','finish','createDeck','getOneWayPayload']
 
     def __init__(self, data_root):
@@ -68,24 +70,42 @@ class UserSyncServer(HttpSyncServer):
         HttpSyncServer.__init__(self)
 
     def getDecks(self, libanki, client, sources, pversion):
+        from AnkiServer.deck import thread_pool
+
         self.decks = {}
 
-        # It is a dict of {'deckName':[modified,lastSync]}
-        for fn in os.listdir(self.data_root):
-            if len(fn) > 5 and fn[-5:] == '.anki':
-                d = os.path.join(self.data_root, fn)
-                lock_deck(d)
-                try:
-                    conn = sqlite.connect(d)
-                    cur = conn.cursor()
-                    cur.execute("select modified, lastSync from decks")
+        if os.path.exists(self.data_root):
+            # It is a dict of {'deckName':[modified,lastSync]}
+            for fn in os.listdir(self.data_root):
+                if len(fn) > 5 and fn[-5:] == '.anki':
+                    d = os.path.abspath(os.path.join(self.data_root, fn))
 
-                    self.decks[fn[:-5]] = list(cur.fetchone())
+                    # For simplicity, we will always open a thread.  But this probably
+                    # isn't necessary!
+                    thread = thread_pool.start(d)
+                    def lookupModifiedLastSync(wrapper):
+                        deck = wrapper.open()
+                        return [deck.modified, deck.lastSync]
+                    res = thread.execute(lookupModifiedLastSync, [thread.wrapper])
 
-                    cur.close()
-                    conn.close()
-                finally:
-                    unlock_deck(d)
+#                    if thread_pool.threads.has_key(d):
+#                        thread = thread_pool.threads[d]
+#                        def lookupModifiedLastSync(wrapper):
+#                            deck = wrapper.open()
+#                            return [deck.modified, deck.lastSync]
+#                        res = thread.execute(lookup, [thread.wrapper])
+#                    else:
+#                        conn = sqlite.connect(d)
+#                        cur = conn.cursor()
+#                        cur.execute("select modified, lastSync from decks")
+#
+#                        res = list(cur.fetchone())
+#
+#                        cur.close()
+#                        conn.close()
+
+                    #self.decks[fn[:-5]] = ["%.5f" % x for x in res]
+                    self.decks[fn[:-5]] = res
 
         return HttpSyncServer.getDecks(self, libanki, client, sources, pversion)
 
@@ -99,7 +119,7 @@ class UserSyncServer(HttpSyncServer):
         return self.stuff("OK")
 
 class SyncApp(object):
-    valid_urls = UserSyncServer.operations + ['fullup','fulldown']
+    valid_urls = SyncAppHandler.operations + ['fullup','fulldown']
 
     def __init__(self, **kw):
         self.data_root = kw.get('data_root', '.')
@@ -116,28 +136,42 @@ class SyncApp(object):
         for k, v in kw.items():
             if k.startswith('mysql.'):
                 mysql_args[k[6:]] = v
-        if len(mysql_args) > 0:
-            self.conn = MySQLdb.connect(**mysql_args)
-        else:
-            self.conn = None
+        self.mysql_args = mysql_args
+        self.conn = None
 
         # get SQL statements
         self.sql_check_password = kw.get('sql_check_password')
         self.sql_username2dirname = kw.get('sql_username2dirname')
 
-    def check_password(self, username, password):
-        if self.conn is not None and self.sql_check_password is not None:
+    def _connect_mysql(self):
+        if self.conn is None and len(self.mysql_args) > 0:
+            self.conn = MySQLdb.connect(**self.mysql_args)
+
+    def _execute_sql(self, sql, args=()):
+        self._connect_mysql()
+        try:
             cur = self.conn.cursor()
-            cur.execute(self.sql_check_password, (username, password))
+            cur.execute(sql, args)
+        except MySQLdb.OperationalError, e:
+            if e.args[0] == 2006:
+                # MySQL server has gone away message
+                self.conn = None
+                self._connect_mysql()
+                cur = self.conn.cursor()
+                cur.execute(sql, args)
+        return cur
+
+    def check_password(self, username, password):
+        if len(self.mysql_args) > 0 and self.sql_check_password is not None:
+            cur = self._execute_sql(self.sql_check_password, (username, password))
             row = cur.fetchone()
             return row is not None
 
         return True
 
     def username2dirname(self, username):
-        if self.conn is not None and self.sql_username2dirname is not None:
-            cur = self.conn.cursor()
-            cur.execute(self.sql_username2dirname, (username,))
+        if len(self.mysql_args) > 0 and self.sql_username2dirname is not None:
+            cur = self._execute_sql(self.sql_username2dirname, (username,))
             row = cur.fetchone()
             if row is None:
                 return None
@@ -145,8 +179,12 @@ class SyncApp(object):
 
         return username
 
-    def _fullup(self, path, infile):
-        # DRS: most of this function was graciously copied from anki.sync
+    def _fullup(self, wrapper, infile):
+        wrapper.close()
+        path = wrapper.path
+
+        # DRS: most of this function was graciously copied
+        # from anki.sync.SyncTools.fullSyncFromServer()
         (fd, tmpname) = tempfile.mkstemp(dir=os.getcwd(), prefix="fullsync")
         outfile = open(tmpname, 'wb')
         decomp = zlib.decompressobj()
@@ -165,8 +203,11 @@ class SyncApp(object):
         # reset the deck name
         c = sqlite.connect(path)
         lastSync = time.time()
-        c.execute("update decks set syncName = ?, lastSync = ?",
-                  [checksum(path.encode("utf-8")), lastSync])
+        # TODO: I have a feeling that syncName being a hash of the path, is 
+        # an anki 1.1.10 thing too...
+        #c.execute("update decks set syncName = ?, lastSync = ?",
+        #          [checksum(path.encode("utf-8")), lastSync])
+        c.execute("update decks set lastSync = ?", [lastSync])
         c.commit()
         c.close()
 
@@ -206,42 +247,51 @@ class SyncApp(object):
                 d = os.path.abspath(os.path.join(user_path, d)+'.anki')
                 if d[:len(self.data_root)] != self.data_root:
                     raise HTTPBadRequest('Bad deck name')
-                # lock the deck for the duration of this operation
-                lock_deck(d)
+                thread = AnkiServer.deck.thread_pool.start(d)
+            else:
+                thread = None
 
-            try:
-                if url in UserSyncServer.operations:
-                    userSync = UserSyncServer(user_path)
-                    try:
-                        if d is not None:
-                            userSync.deck = anki.DeckStorage.Deck(d)
+            if url in SyncAppHandler.operations:
+                handler = SyncAppHandler(user_path)
+                func = getattr(handler, url)
+                args = makeArgs(req.str_params)
 
-                        func = getattr(userSync, url)
-                        args = makeArgs(req.str_params)
-                        resp = Response(status='200 OK', content_type='application/json', content_encoding='deflate', body=func(**args))
-                    finally:
-                        if userSync.deck is not None:
-                            userSync.deck.save()
-                            userSync.deck.close()
-                elif url == 'fulldown':
-                    # set the syncTime before we send it
+                if thread is not None:
+                    # If this is for a specific deck, then it needs to run
+                    # inside of the DeckThread.
+                    def runFunc(wrapper):
+                        handler.deck = wrapper.open()
+                        ret = func(**args)
+                        handler.deck.save()
+                        return ret
+                    runFunc.func_name = url
+                    ret = thread.execute(runFunc, [thread.wrapper])
+                else:
+                    # Otherwise, we can simply execute it in this thread.
+                    ret = func(**args)
+
+                return Response(status='200 OK', content_type='application/json', content_encoding='deflate', body=ret)
+
+            elif url == 'fulldown':
+                # set the syncTime before we send it
+                def setupForSync(wrapper):
+                    wrapper.close()
                     c = sqlite.connect(d)
                     lastSync = time.time()
                     c.execute("update decks set lastSync = ?", [lastSync])
                     c.commit()
                     c.close()
+                thread.execute(setupForSync, [thread.wrapper])
 
-                    resp = Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d)+'"', app_iter=FileIterable(d))
-                elif url == 'fullup':
-                    infile = req.str_params['deck'].file
-                    lastSync = self._fullup(d, infile)
-                    resp = Response(status='200 OK', content_type='application/text', body='OK '+str(lastSync))
-            finally:
-                if d is not None:
-                    unlock_deck(d)
-
-            return resp
-
+                return Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d)+'"', app_iter=FileIterable(d))
+            elif url == 'fullup':
+                infile = req.str_params['deck'].file
+                lastSync = thread.execute(self._fullup, [thread.wrapper, infile])
+                # TODO: 'OK' + the last sync is for anki version 1.1.X!  We need to check versions..
+                #body = 'OK '+str(lastSync)
+                #body = 'OK %.5f' % lastSync
+                body = 'OK'
+                return Response(status='200 OK', content_type='application/text', body=body)
 
         return Response(status='200 OK', content_type='text/plain', body='Anki Server')
 
