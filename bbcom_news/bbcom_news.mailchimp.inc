@@ -23,7 +23,7 @@ function _bbcom_news_mailchimp_object() {
 
 function _bbcom_news_mailchimp_list_id($q) {
   $list_name = variable_get('bbcom_news_mailchimp_list_name', 'BiblioBird.com Newsletter');
-  $lists = $q->lists(array('list_name' => $list_name)));
+  $lists = $q->lists(array('list_name' => $list_name));
   if ($q->errorCode) {
     watchdog('mailchimp', 'Unable to get lists: (!code) !message',
       array('!code' => $q->errorCode, '!message' => $q->errorMessage),
@@ -38,7 +38,7 @@ function _bbcom_news_mailchimp_list_id($q) {
 }
 
 function _bbcom_news_mailchimp_update($account, $subscribe) {
-  if ($q = _bbcom_news_mailchimp_object() && $list_id = _bbcom_news_mailchimp_list_id($q)) {
+  if (($q = _bbcom_news_mailchimp_object()) && ($list_id = _bbcom_news_mailchimp_list_id($q))) {
     if ($subscribe) {
       $lang_list = language_list();
       $name_parts = explode(' ', $account->name);
@@ -52,6 +52,7 @@ function _bbcom_news_mailchimp_update($account, $subscribe) {
           ),
         ),
       );
+      watchdog('mailchimp', 'merge_vars: '.print_r($merge_vars, TRUE), array(), WATCHDOG_DEBUG);
     }
 
     $sub_info = $q->listMemberInfo($list_id, array($account->mail));
@@ -64,17 +65,26 @@ function _bbcom_news_mailchimp_update($account, $subscribe) {
 
     if (@$sub_info['data'][0]['status'] != 'subscribed') {
       if ($subscribe) {
+        watchdog('mailchimp', 'Subscribing !user', array('!user' => $account->name), WATCHDOG_INFO);
         $q->listSubscribe($list_id, $account->mail, $merge_vars, 'html', FALSE, TRUE);
       }
     }
     else {
       if ($subscribe) {
+        watchdog('mailchimp', 'Updating member info for !user', array('!user' => $account->name), WATCHDOG_INFO);
         $email_type = $sub_info['data'][0]['email_type'];
         $q->listUpdateMember($list_id, $account->mail, $merge_vars, $email_type);
       }
       else {
+        watchdog('mailchimp', 'Unsubscribing !user', array('!user' => $account->name), WATCHDOG_INFO);
         $q->listUnsubscribe($list_id, $account->mail);
       }
+    }
+
+    if ($q->errorCode) {
+      watchdog('mailchimp', 'Error for user !username: (!code) !message',
+        array('!username' => $account->name, '!code' => $q->errorCode, '!message' => $q->errorMessage),
+        WATCHDOG_ERROR);
     }
   }
 }
