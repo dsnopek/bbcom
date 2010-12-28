@@ -52,7 +52,7 @@ function _bbcom_news_mailchimp_update($account, $subscribe) {
           ),
         ),
       );
-      watchdog('mailchimp', 'merge_vars: '.print_r($merge_vars, TRUE), array(), WATCHDOG_DEBUG);
+      //watchdog('mailchimp', 'merge_vars: '.print_r($merge_vars, TRUE), array(), WATCHDOG_DEBUG);
     }
 
     $sub_info = $q->listMemberInfo($list_id, array($account->mail));

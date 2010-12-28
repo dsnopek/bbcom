@@ -70,13 +70,13 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
       break;
   }
 
-  if ($optin) {
-    # TODO: we need to check if they are verified or not!
-  }
-
-  if (in_array($op, array('insert','after_update','delete')) && variable_get('bbcom_news_mailchimp_integration', FALSE)) {
-    module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
-    _bbcom_news_mailchimp_update($account, $optin);
+  if (in_array($op, array('after_update','delete')) && variable_get('bbcom_news_mailchimp_integration', FALSE)) {
+    // don't integrate with mailchimp if this user isn't validated
+    $validating_id = logintoboggan_validating_id();
+    if (!in_array($validating_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)) && !isset($account->roles[$validating_id])) {
+      module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
+      _bbcom_news_mailchimp_update($account, $optin);
+    }
   }
 }
 
