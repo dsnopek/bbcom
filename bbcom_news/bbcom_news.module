@@ -61,12 +61,20 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
       }
       break;
 
+    case 'after_update':
+      $optin = bbcom_news_is_optin($account);
+      break;
+
     case 'delete':
       db_query("DELETE FROM {bbcom_news_users} WHERE uid = %d", $account->uid);
       break;
   }
 
-  if (in_array($op, array('insert','update','delete')) && variable_get('bbcom_news_mailchimp_integration', FALSE)) {
+  if ($optin) {
+    # TODO: we need to check if they are verified or not!
+  }
+
+  if (in_array($op, array('insert','after_update','delete')) && variable_get('bbcom_news_mailchimp_integration', FALSE)) {
     module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
     _bbcom_news_mailchimp_update($account, $optin);
   }
