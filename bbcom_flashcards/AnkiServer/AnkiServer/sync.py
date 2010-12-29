@@ -12,6 +12,11 @@ import AnkiServer.deck
 
 import MySQLdb
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 import os, zlib, tempfile, time
 
 def makeArgs(mdict):
@@ -63,51 +68,10 @@ def unlock_deck(path):
     thread_pool.unlock(path)
 
 class SyncAppHandler(HttpSyncServer):
-    operations = ['getDecks','summary','applyPayload','finish','createDeck','getOneWayPayload']
+    operations = ['summary','applyPayload','finish','createDeck','getOneWayPayload']
 
-    def __init__(self, data_root):
-        self.data_root = data_root
+    def __init__(self):
         HttpSyncServer.__init__(self)
-
-    def getDecks(self, libanki, client, sources, pversion):
-        from AnkiServer.deck import thread_pool
-
-        self.decks = {}
-
-        if os.path.exists(self.data_root):
-            # It is a dict of {'deckName':[modified,lastSync]}
-            for fn in os.listdir(self.data_root):
-                if len(fn) > 5 and fn[-5:] == '.anki':
-                    d = os.path.abspath(os.path.join(self.data_root, fn))
-
-                    # For simplicity, we will always open a thread.  But this probably
-                    # isn't necessary!
-                    thread = thread_pool.start(d)
-                    def lookupModifiedLastSync(wrapper):
-                        deck = wrapper.open()
-                        return [deck.modified, deck.lastSync]
-                    res = thread.execute(lookupModifiedLastSync, [thread.wrapper])
-
-#                    if thread_pool.threads.has_key(d):
-#                        thread = thread_pool.threads[d]
-#                        def lookupModifiedLastSync(wrapper):
-#                            deck = wrapper.open()
-#                            return [deck.modified, deck.lastSync]
-#                        res = thread.execute(lookup, [thread.wrapper])
-#                    else:
-#                        conn = sqlite.connect(d)
-#                        cur = conn.cursor()
-#                        cur.execute("select modified, lastSync from decks")
-#
-#                        res = list(cur.fetchone())
-#
-#                        cur.close()
-#                        conn.close()
-
-                    #self.decks[fn[:-5]] = ["%.5f" % x for x in res]
-                    self.decks[fn[:-5]] = res
-
-        return HttpSyncServer.getDecks(self, libanki, client, sources, pversion)
 
     def createDeck(self, name):
         # The HttpSyncServer.createDeck doesn't return a valid value!  This seems to be
@@ -119,11 +83,12 @@ class SyncAppHandler(HttpSyncServer):
         return self.stuff("OK")
 
 class SyncApp(object):
-    valid_urls = SyncAppHandler.operations + ['fullup','fulldown']
+    valid_urls = SyncAppHandler.operations + ['getDecks','fullup','fulldown']
 
     def __init__(self, **kw):
-        self.data_root = kw.get('data_root', '.')
+        self.data_root = os.path.abspath(kw.get('data_root', '.'))
         self.base_url  = kw.get('base_url', '/')
+        self.users = {}
 
         # make sure the base_url has a trailing slash
         if len(self.base_url) == 0:
@@ -142,6 +107,27 @@ class SyncApp(object):
         # get SQL statements
         self.sql_check_password = kw.get('sql_check_password')
         self.sql_username2dirname = kw.get('sql_username2dirname')
+
+    default_libanki_version = '.'.join(anki.version.split('.')[:2])
+
+    def user_libanki_version(self, u):
+        try:
+            s = self.users[u]['libanki']
+        except KeyError:
+            return self.default_libanki_version
+
+        parts = s.split('.')
+        if parts[0] == '1':
+            if parts[1] == '0':
+                return '1.0'
+            elif parts[1] in ('1','2'):
+                return '1.2'
+
+        return self.default_libanki_version
+
+    # Mimcs from anki.sync.SyncTools.stuff()
+    def _stuff(self, data):
+        return zlib.compress(json.dumps(data))
 
     def _connect_mysql(self):
         if self.conn is None and len(self.mysql_args) > 0:
@@ -179,7 +165,50 @@ class SyncApp(object):
 
         return username
 
-    def _fullup(self, wrapper, infile):
+    def _getDecks(self, user_path):
+        decks = {}
+
+        if os.path.exists(user_path):
+            # It is a dict of {'deckName':[modified,lastSync]}
+            for fn in os.listdir(user_path):
+                if len(fn) > 5 and fn[-5:] == '.anki':
+                    d = os.path.abspath(os.path.join(user_path, fn))
+
+                    # For simplicity, we will always open a thread.  But this probably
+                    # isn't necessary!
+                    thread = AnkiServer.deck.thread_pool.start(d)
+                    def lookupModifiedLastSync(wrapper):
+                        deck = wrapper.open()
+                        return [deck.modified, deck.lastSync]
+                    res = thread.execute(lookupModifiedLastSync, [thread.wrapper])
+
+#                    if thread_pool.threads.has_key(d):
+#                        thread = thread_pool.threads[d]
+#                        def lookupModifiedLastSync(wrapper):
+#                            deck = wrapper.open()
+#                            return [deck.modified, deck.lastSync]
+#                        res = thread.execute(lookup, [thread.wrapper])
+#                    else:
+#                        conn = sqlite.connect(d)
+#                        cur = conn.cursor()
+#                        cur.execute("select modified, lastSync from decks")
+#
+#                        res = list(cur.fetchone())
+#
+#                        cur.close()
+#                        conn.close()
+
+                    #self.decks[fn[:-5]] = ["%.5f" % x for x in res]
+                    decks[fn[:-5]] = res
+
+        # same as HttpSyncServer.getDecks()
+        return self._stuff({
+            "status": "OK",
+            "decks": decks,
+            "timestamp": time.time(),
+            })
+
+    def _fullup(self, wrapper, infile, version):
         wrapper.close()
         path = wrapper.path
 
@@ -203,15 +232,22 @@ class SyncApp(object):
         # reset the deck name
         c = sqlite.connect(path)
         lastSync = time.time()
-        # TODO: I have a feeling that syncName being a hash of the path, is 
-        # an anki 1.1.10 thing too...
-        #c.execute("update decks set syncName = ?, lastSync = ?",
-        #          [checksum(path.encode("utf-8")), lastSync])
-        c.execute("update decks set lastSync = ?", [lastSync])
+        if version == '1':
+            c.execute("update decks set lastSync = ?", [lastSync])
+        elif version == '2':
+            c.execute("update decks set syncName = ?, lastSync = ?",
+                      [checksum(path.encode("utf-8")), lastSync])
         c.commit()
         c.close()
 
         return lastSync
+
+    def _stuffedResp(self, data):
+        return Response(
+            status='200 OK',
+            content_type='application/json',
+            content_encoding='deflate',
+            body=data)
 
     @wsgify
     def __call__(self, req):
@@ -227,7 +263,8 @@ class SyncApp(object):
             except KeyError:
                 raise HTTPBadRequest('Must pass username and password')
             if not self.check_password(u, p):
-                raise HTTPBadRequest('Incorrect username or password')
+                #raise HTTPBadRequest('Incorrect username or password')
+                return self._stuffedResp(self._stuff({'status':'invalidUserPass'}))
             dirname = self.username2dirname(u)
             if dirname is None:
                 raise HTTPBadRequest('Incorrect username or password')
@@ -245,14 +282,20 @@ class SyncApp(object):
             if d is not None:
                 # get the full deck path name
                 d = os.path.abspath(os.path.join(user_path, d)+'.anki')
-                if d[:len(self.data_root)] != self.data_root:
+                if d[:len(user_path)] != user_path:
                     raise HTTPBadRequest('Bad deck name')
                 thread = AnkiServer.deck.thread_pool.start(d)
             else:
                 thread = None
 
-            if url in SyncAppHandler.operations:
-                handler = SyncAppHandler(user_path)
+            if url == 'getDecks':
+                # store the data the user passes us keyed with the username.  This
+                # will be used later by SyncAppHandler for version compatibility.
+                self.users[u] = makeArgs(req.str_params)
+                return self._stuffedResp(self._getDecks(user_path))
+
+            elif url in SyncAppHandler.operations:
+                handler = SyncAppHandler()
                 func = getattr(handler, url)
                 args = makeArgs(req.str_params)
 
@@ -270,7 +313,11 @@ class SyncApp(object):
                     # Otherwise, we can simply execute it in this thread.
                     ret = func(**args)
 
-                return Response(status='200 OK', content_type='application/json', content_encoding='deflate', body=ret)
+                # clean-up user data stored in getDecks
+                if url == 'finish':
+                    del self.users[u]
+
+                return self._stuffedResp(ret)
 
             elif url == 'fulldown':
                 # set the syncTime before we send it
@@ -285,12 +332,20 @@ class SyncApp(object):
 
                 return Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d)+'"', app_iter=FileIterable(d))
             elif url == 'fullup':
+                #version = self.user_libanki_version(u)
+                try:
+                    version = req.str_params.getone('v')
+                except KeyError:
+                    version = '1'
+
                 infile = req.str_params['deck'].file
-                lastSync = thread.execute(self._fullup, [thread.wrapper, infile])
-                # TODO: 'OK' + the last sync is for anki version 1.1.X!  We need to check versions..
-                #body = 'OK '+str(lastSync)
-                #body = 'OK %.5f' % lastSync
+                lastSync = thread.execute(self._fullup, [thread.wrapper, infile, version])
+
+                # append the 'lastSync' value for libanki 1.1 and 1.2
                 body = 'OK'
+                if version == 2:
+                    body = 'OK '+str(lastSync)
+
                 return Response(status='200 OK', content_type='application/text', body=body)
 
         return Response(status='200 OK', content_type='text/plain', body='Anki Server')
