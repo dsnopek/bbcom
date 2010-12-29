@@ -6,6 +6,24 @@
  * Setup for the newsletter
  */
 
+/**
+ * Implementation of hook_menu().
+ */
+function bbcom_news_menu() {
+  $items = array();
+  $items['admin/settings/lingwo_dictionary/news'] = array(
+    'title' => 'News',
+    'description' => 'Settings for BiblioBird.com News module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_news_admin_settings'),
+    'file' => 'bbcom_news.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
 /*
  * Implementation of hook_user().
  */
@@ -27,6 +45,7 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
     return $form;
   }
 
+  $optin = FALSE;
   switch ($op) {
     case 'insert':
       $optin = isset($edit['bbcom_news_optin']) ? $edit['bbcom_news_optin'] : TRUE;
@@ -36,14 +55,28 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
 
     case 'update':
       if (isset($edit['bbcom_news_optin'])) {
-        db_query("UPDATE {bbcom_news_users} SET optin = %d WHERE uid = %d", $edit['bbcom_news_optin'], $account->uid);
+        $optin = $edit['bbcom_news_optin'];
+        db_query("UPDATE {bbcom_news_users} SET optin = %d WHERE uid = %d", $optin, $account->uid);
         unset($edit['bbcom_news_optin']);
       }
+      break;
+
+    case 'after_update':
+      $optin = bbcom_news_is_optin($account);
       break;
 
     case 'delete':
       db_query("DELETE FROM {bbcom_news_users} WHERE uid = %d", $account->uid);
       break;
+  }
+
+  if (in_array($op, array('after_update','delete')) && variable_get('bbcom_news_mailchimp_integration', FALSE)) {
+    // don't integrate with mailchimp if this user isn't validated
+    $validating_id = logintoboggan_validating_id();
+    if (!in_array($validating_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)) && !isset($account->roles[$validating_id])) {
+      module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
+      _bbcom_news_mailchimp_update($account, $optin);
+    }
   }
 }
 
