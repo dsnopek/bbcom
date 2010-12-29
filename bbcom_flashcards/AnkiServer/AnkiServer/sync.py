@@ -342,9 +342,10 @@ class SyncApp(object):
                 lastSync = thread.execute(self._fullup, [thread.wrapper, infile, version])
 
                 # append the 'lastSync' value for libanki 1.1 and 1.2
-                body = 'OK'
                 if version == '2':
-                    body += str(lastSync)
+                    body = 'OK '+str(lastSync)
+                else:
+                    body = 'OK'
 
                 return Response(status='200 OK', content_type='application/text', body=body)
 
