@@ -343,8 +343,8 @@ class SyncApp(object):
 
                 # append the 'lastSync' value for libanki 1.1 and 1.2
                 body = 'OK'
-                if version == 2:
-                    body = 'OK '+str(lastSync)
+                if version == '2':
+                    body += str(lastSync)
 
                 return Response(status='200 OK', content_type='application/text', body=body)
 
