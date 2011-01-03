@@ -23,7 +23,7 @@ function lingwoorg_dictionary_context_default_contexts() {
       'lingwo_dictionary_0' => array(
         'module' => 'lingwo_dictionary',
         'delta' => '0',
-        'weight' => -17,
+        'weight' => 20,
         'region' => 'header',
         'status' => '0',
         'label' => 'Lingwo Dictionary: Search block',
@@ -32,7 +32,7 @@ function lingwoorg_dictionary_context_default_contexts() {
       'lingwoorg_dictionary_0' => array(
         'module' => 'lingwoorg_dictionary',
         'delta' => '0',
-        'weight' => 16,
+        'weight' => -21,
         'region' => 'right',
         'status' => '0',
         'label' => 'Lingwo Dictionary: Add Content Block',
