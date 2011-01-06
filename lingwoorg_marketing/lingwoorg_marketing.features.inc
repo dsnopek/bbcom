@@ -14,35 +14,23 @@ function lingwoorg_marketing_context_default_contexts() {
     'path' => array(
       'about' => 'about',
     ),
-    'menu_trail' => array(
-      'about' => 'about',
-    ),
     'block' => array(
       'views_latest_news-block_1' => array(
         'module' => 'views',
         'delta' => 'latest_news-block_1',
-        'weight' => 15,
+        'weight' => 18,
         'region' => 'content_top',
         'status' => '0',
         'label' => 'Story Slideshow',
         'type' => 'context_ui',
       ),
-      'webformblock_1449' => array(
-        'module' => 'webformblock',
-        'delta' => '1449',
-        'weight' => 15,
-        'region' => 'content_right',
-        'status' => '0',
-        'label' => 'Webform: Contact Us',
-        'type' => 'context_ui',
-      ),
       'views_all_news-block_1' => array(
         'module' => 'views',
         'delta' => 'all_news-block_1',
-        'weight' => 15,
+        'weight' => 18,
         'region' => 'content_bottom',
         'status' => '0',
-        'label' => 'All News',
+        'label' => 'Aktualności',
         'type' => 'context_ui',
       ),
     ),
