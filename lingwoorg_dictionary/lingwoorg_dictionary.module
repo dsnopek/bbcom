@@ -14,14 +14,13 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       return NULL;
     }
 
+    $entry = LingwoEntry::fromNode($node);
+
     // get the pos
-    $pos = lingwo_dictionary_entry_get_pos($node);
+    $pos = $entry->getPos();
 
     // get the source language
-    $language = $node->language;
-    if (lingwo_dictionary_entry_load_translation_source($node)) {
-      $language = $node->translation_source->language;
-    }
+    $language = $entry->getSourceLanguage();
 
     // hide the fields and summary for non-admin users
     // TODO: should this be 'editor'?
@@ -121,15 +120,16 @@ function lingwoorg_dictionary_theme() {
 
 function template_preprocess_lingwoorg_dictionary_entry_summary(&$vars, $hook) {
   $node = $vars['node'];
+  $entry = LingwoEntry::fromNode($node);
 
   // TODO: we need to get some "human" readable versions of the pos as well,
   // including the translations for other languages.
-  $vars['pos'] = lingwo_dictionary_entry_get_pos($node);
+  $vars['pos'] = $entry->getPos();
 
-  $translation_source = lingwo_dictionary_entry_load_translation_source($node);
+  $translation_source = $entry->getTranslationSource();
   $vars['source_node'] = $translation_source ? $translation_source : $node;
   $vars['source_lang'] = $vars['source_node']->language;
-  $vars['is_translation'] = lingwo_dictionary_entry_is_translation($node);
+  $vars['is_translation'] = _ld_is_translation($node);
 
   // get the source fields (we always deal with the source fields, so this should be
   // no surprise and we can name it simply $fields).

@@ -115,7 +115,7 @@ function bbcom_flashcards_user_operations() {
  */
 
 function bbcom_flashcards_action_add_to_wial_deck($node, $user) {
-  if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
+  if ($node->type == 'entry' && _ld_is_translation($node)) {
     try {
       bbcom_flashcards_anki_server_connect()
         ->openWialDeck($user->uid)
@@ -129,7 +129,7 @@ function bbcom_flashcards_action_add_to_wial_deck($node, $user) {
 }
 
 function bbcom_flashcards_action_remove_from_wial_deck($node, $user) {
-  if ($node->type == 'entry' && lingwo_dictionary_entry_is_translation($node)) {
+  if ($node->type == 'entry' && _ld_is_translation($node)) {
     try {
       $deck = bbcom_flashcards_anki_server_connect()
         ->openWialDeck($user->uid);
@@ -175,7 +175,7 @@ function bbcom_flashcards_user_operations_resync($accounts) {
     // TODO: should only mess with missing, but for now we readd everything
     foreach ($ids as $id) {
       $entry = LingwoEntry::fromLingwoId($id);
-      if (lingwo_dictionary_entry_is_translation($entry->getNode())) {
+      if (_ld_is_translation($entry->getNode())) {
         try {
           $deck->addFactForNode($entry->getNode());
         }

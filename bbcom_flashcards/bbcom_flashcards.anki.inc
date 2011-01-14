@@ -23,13 +23,13 @@ class AnkiDeck {
     $this->addFact(array(
       'Front' => theme('bbcom_flashcards_flashcard_front', $node),
       'Back'  => theme('bbcom_flashcards_flashcard_back', $node),
-      'External ID' => lingwo_dictionary_entry_get_id($node),
+      'External ID' => LingwoEntry::fromNode($node)->getLingwoId(),
     ));
   }
 
   function findFactForNode($node) {
     return $this->server->request($this->path, 'find_fact', array(
-      'external_id' => lingwo_dictionary_entry_get_id($node),
+      'external_id' => LingwoEntry::fromNode($node)->getLingwoId(),
     ));
     if (empty($fact)) {
       throw new AnkiServerError("Unable to find fact for node");
@@ -44,7 +44,7 @@ class AnkiDeck {
 
   function deleteFactForNode($node) {
     $this->server->request($this->path, 'delete_fact', array(
-      'external_id' => lingwo_dictionary_entry_get_id($node),
+      'external_id' => LingwoEntry::fromNode($node)->getLingwoId(),
     ));
   }
 

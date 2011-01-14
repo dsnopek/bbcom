@@ -24,7 +24,7 @@ function lingwoorg_device_service_export_entry($nid) {
   $base_revid = $node->vid;
   $entry = array(
     'language' => $node->language,
-    'pos' => lingwo_dictionary_entry_get_pos($node),
+    'pos' => $node->pos,
     'headword' => $node->title,
     # TODO: maybe a timestamp would be better?  We would just take the newest timestamp from
     # among the source and all the translations?
@@ -126,7 +126,7 @@ function lingwoorg_device_service_get_content_item($software_version, $device_na
   $res = db_query("SELECT language, pos, headword FROM {lingwo_korpus_entry} WHERE nid = %d", $nid);
   while ($obj = db_fetch_object($res)) {
     $entry = lingwoorg_device_service_export_entry(
-      lingwo_dictionary_entry_lookup($obj->language, $obj->pos, $obj->headword));
+      LingwoEntry::key2nid($obj->language, $obj->pos, $obj->headword));
     if ($entry) {
       $entries[] = $entry;
     }
@@ -191,7 +191,7 @@ function lingwoorg_device_service_push_update($software_version, $device_name, $
     $wial_add = $user_data['wial_add'];
     foreach ($wial_add as $entry_spec) {
       list($language, $pos, $headword) = explode(':', $entry_spec);
-      $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
+      $nid = LingwoEntry::key2nid($language, $pos, $headword);
       if ($nid) {
         $flag->flag('flag', $nid, $push_user);
       }
