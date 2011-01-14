@@ -15,7 +15,7 @@ function theme_bbcom_flashcards_flashcard_front($node) {
 }
 
 function theme_bbcom_flashcards_flashcard_back($node) {
-  $senses = lingwo_senses_get_translations($node);
+  $senses = LingwoEntry::fromNode($node)->senses->getTranslations();
   # we have to remove the examples because they will give it away
   foreach ($senses as &$sense) {
     unset($sense['data']['example_translation']);
