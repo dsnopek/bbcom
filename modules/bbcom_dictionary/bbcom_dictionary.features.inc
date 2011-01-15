@@ -35,7 +35,7 @@ function bbcom_dictionary_context_default_contexts() {
         'weight' => -21,
         'region' => 'right',
         'status' => '0',
-        'label' => 'Lingwo Dictionary: Add Content Block',
+        'label' => 'BiblioBird.com Dictionary: Add Content Block',
         'type' => 'context_ui',
       ),
     ),
