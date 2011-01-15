@@ -16,7 +16,7 @@
   <?php print $scripts; ?>
 
   <!--[if lte IE 6]>
-  <link type="text/css" rel="stylesheet" media="all" href="/<?php print drupal_get_path('theme', 'lingwoorg_theme') .'/styles/ie6.css' ?>" />
+  <link type="text/css" rel="stylesheet" media="all" href="/<?php print drupal_get_path('theme', 'bbcom_theme') .'/styles/ie6.css' ?>" />
   <![endif]-->
 
   <style>

@@ -21,25 +21,25 @@
       <td class="tcol-label" style="background-color: yellow;">
         ja <span style="font-weight: bold; color: red;">(<?php print t('key form') ?>)</span>
       </td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.singular.1p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.singular.1p']) ?></td>
       <td class="tcol-label">my</td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.plural.1p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.plural.1p']) ?></td>
     </tr>
     <tr>
       <td class="tcol-label">ty</td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.singular.2p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.singular.2p']) ?></td>
       <td class="tcol-label">wy</td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.plural.2p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.plural.2p']) ?></td>
     </tr>
     <tr>
       <td class="tcol-label" style="background-color: yellow;">
         on/ona/ono <span style="font-weight: bold; color: red;">(<?php print t('key form') ?>)</span>
       </td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.singular.3p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.singular.3p']) ?></td>
       <td class="tcol-label" style="background-color: yellow;">
         oni/one <span style="font-weight: bold; color: red;">(<?php print t('key form') ?>)</span>
       </td>
-      <td><?php print lingwoorg_render_no_title($fields['nonpast.plural.3p']) ?></td>
+      <td><?php print bbcom_render_no_title($fields['nonpast.plural.3p']) ?></td>
     </tr>
   </tbody>
 </table>

@@ -1,7 +1,7 @@
 
 Drupal.behaviors.bibliobird = function (context) {
     /* JavaScript for the language switcher */
-    var form = $('#lingwoorg-theme-language-switcher-form', context);
+    var form = $('#bbcom-theme-language-switcher-form', context);
     if (form) {
         $('#edit-my-language-select', form).change(function (evt) { 
             document.location.href=evt.target.options[evt.target.selectedIndex].value;

@@ -165,7 +165,7 @@ ul.links.main-menu li.active {
 #edit-my-language-select {
 }
 /* Hide the submit button when JavaScript is enabled. */
-html.js #lingwoorg-theme-language-switcher-form .form-submit {
+html.js #bbcom-theme-language-switcher-form .form-submit {
   display: none;
 }
 

@@ -8,7 +8,7 @@
  */
 
 jquery_ui_add(array('ui.tabs'));
-drupal_add_js(drupal_get_path('theme', 'lingwoorg_theme') .'/js/marketing-deck.js', 'theme');
+drupal_add_js(drupal_get_path('theme', 'bbcom_theme') .'/js/marketing-deck.js', 'theme');
 //drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/default/ui.all.css');
 ?>
 <?php if (!empty($title)): ?>

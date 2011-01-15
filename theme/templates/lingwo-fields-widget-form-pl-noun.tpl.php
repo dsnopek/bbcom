@@ -23,39 +23,39 @@
     <?php if ($widget): ?>
     <tr>
       <td class="tcol-label" style="background-color: yellow">*<?php print t('Stem') ?></td>
-      <td style="background-color: yellow;"><?php print lingwoorg_render_no_title($fields['*stem.singular']) ?>
-      <td style="background-color: yellow;"><?php print lingwoorg_render_no_title($fields['*stem.plural']) ?>
+      <td style="background-color: yellow;"><?php print bbcom_render_no_title($fields['*stem.singular']) ?>
+      <td style="background-color: yellow;"><?php print bbcom_render_no_title($fields['*stem.plural']) ?>
     </tr>
     <?php endif; ?>
     <tr>
       <td class="tcol-label"><?php print t('Nominative') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['nominative.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['nominative.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['nominative.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['nominative.plural']) ?>
     </tr>
     <tr>
       <td class="tcol-label"><?php print t('Genitive') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['genitive.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['genitive.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['genitive.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['genitive.plural']) ?>
     </tr>
     <tr>
       <td class="tcol-label"><?php print t('Accusative') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['accusative.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['accusative.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['accusative.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['accusative.plural']) ?>
     </tr>
     <tr>
       <td class="tcol-label"><?php print t('Instrumental') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['instrumental.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['instrumental.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['instrumental.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['instrumental.plural']) ?>
     </tr>
     <tr>
       <td class="tcol-label"><?php print t('Locative') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['locative.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['locative.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['locative.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['locative.plural']) ?>
     </tr>
     <tr>
       <td class="tcol-label"><?php print t('Dative') ?></td>
-      <td><?php print lingwoorg_render_no_title($fields['dative.singular']) ?>
-      <td><?php print lingwoorg_render_no_title($fields['dative.plural']) ?>
+      <td><?php print bbcom_render_no_title($fields['dative.singular']) ?>
+      <td><?php print bbcom_render_no_title($fields['dative.plural']) ?>
     </tr>
   </tbody>
 </table>

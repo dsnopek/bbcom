@@ -1,7 +1,7 @@
 
   ; The name and description of the theme used on the admin/build/themes page.
-name        = Lingwo.org Theme
-description = Theme for the Lingwo.org website
+name        = BiblioBird.com Theme
+description = Theme for the BiblioBird.com
 
 # Doesn't actually do anything, but it should!
 dependencies[] = conditional_styles

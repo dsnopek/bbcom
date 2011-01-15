@@ -66,7 +66,7 @@
 /**
  * Implementation of HOOK_theme().
  */
-function lingwoorg_theme_theme(&$existing, $type, $theme, $path) {
+function bbcom_theme_theme(&$existing, $type, $theme, $path) {
   return array(
     'lt_username_title' => array(
       'arguments' => array('form_id'),
@@ -77,26 +77,26 @@ function lingwoorg_theme_theme(&$existing, $type, $theme, $path) {
     'lt_password_description' => array(
       'arguments' => array('form_id'),
     ),
-    'lingwoorg_join_btn' => array(
-      'template' => 'lingwoorg-join-btn',
-      'path' => drupal_get_path('theme', 'lingwoorg_theme') .'/templates',
+    'bbcom_join_btn' => array(
+      'template' => 'bbcom-join-btn',
+      'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
       'arguments' => array(
         'url' => NULL,
         'label' => NULL,
       ),
     ),
-    'lingwoorg_account_links' => array(
+    'bbcom_account_links' => array(
       'arguments' => array('items' => NULL),
-      'template' => 'lingwoorg-account-links',
-      'path' => drupal_get_path('theme', 'lingwoorg_theme') .'/templates',
+      'template' => 'bbcom-account-links',
+      'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
     ),
-    'lingwoorg_language_flag' => array(
+    'bbcom_language_flag' => array(
       'arguments' => array('lang' => NULL),
     ),
     'lingwo_dictionary_search_form' => array(
       'arguments' => array('form' => NULL),
       'template' => 'lingwo-dictionary-search-form',
-      'path' => drupal_get_path('theme', 'lingwoorg_theme') .'/templates',
+      'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
     ),
   );
 }
@@ -105,19 +105,19 @@ function lingwoorg_theme_theme(&$existing, $type, $theme, $path) {
  * Customize Login form using the theme hooks provided by logintoboggan.
  */
 
-function lingwoorg_theme_lt_username_title($form_id) {
+function bbcom_theme_lt_username_title($form_id) {
   return t('Username or e-mail');
 }
 
-function lingwoorg_theme_lt_username_description($form_id) {
+function bbcom_theme_lt_username_description($form_id) {
   return '';
 }
 
-function lingwoorg_theme_lt_password_description($form_id) {
+function bbcom_theme_lt_password_description($form_id) {
   return '';
 }
 
-function lingwoorg_theme_language_switcher_form(&$form_state) {
+function bbcom_theme_language_switcher_form(&$form_state) {
   global $language;
 
   $path = drupal_is_front_page() ? '<front>' : $_GET['q'];
@@ -147,7 +147,7 @@ function lingwoorg_theme_language_switcher_form(&$form_state) {
   return $form;
 }
 
-function lingwoorg_theme_language_switcher_form_submit($form, &$form_state) {
+function bbcom_theme_language_switcher_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['my_language_select'])) {
     drupal_goto($form_state['values']['my_language_select']);
   }
@@ -156,14 +156,14 @@ function lingwoorg_theme_language_switcher_form_submit($form, &$form_state) {
 /*
  * Our language flags
  */
-function lingwoorg_theme_lingwoorg_language_flag($lang, $content=NULL, $notext=NULL) {
+function bbcom_theme_bbcom_language_flag($lang, $content=NULL, $notext=NULL) {
   if ($lang == 'en') {
     $country = 'gb';
   }
   else {
     $country = $lang;
   }
-  $src = url(drupal_get_path('theme', 'lingwoorg_theme') .'/images/flags/'. $country .'.png', array('absolute' => TRUE, 'language' => ''));
+  $src = url(drupal_get_path('theme', 'bbcom_theme') .'/images/flags/'. $country .'.png', array('absolute' => TRUE, 'language' => ''));
   $languages = language_list();
   return '<img class="flag" src="'. $src .'" alt="'. $languages[$lang]->name .'" />';
 }
@@ -177,7 +177,7 @@ function lingwoorg_theme_lingwoorg_language_flag($lang, $content=NULL, $notext=N
  *   The name of the template being rendered (name of the .tpl.php file.)
  */
 /* -- Delete this line if you want to use this function
-function lingwoorg_theme_preprocess(&$vars, $hook) {
+function bbcom_theme_preprocess(&$vars, $hook) {
   $vars['sample_variable'] = t('Lorem ipsum.');
 }
 // */
@@ -190,24 +190,24 @@ function lingwoorg_theme_preprocess(&$vars, $hook) {
  * @param $hook
  *   The name of the template being rendered ("page" in this case.)
  */
-function lingwoorg_theme_preprocess_page(&$vars, $hook) {
+function bbcom_theme_preprocess_page(&$vars, $hook) {
   global $user;
 
   $vars['always_right'] = TRUE;
   $vars['inner_title'] = FALSE;
 
   if (isset($vars['node'])) {
-    $func = 'lingwoorg_theme_preprocess_node_'. $vars['node']->type;
+    $func = 'bbcom_theme_preprocess_node_'. $vars['node']->type;
     if (function_exists($func)) {
       $func($vars, $hook);
     }
   }
 
-  $vars['language_switcher'] = drupal_get_form('lingwoorg_theme_language_switcher_form');
+  $vars['language_switcher'] = drupal_get_form('bbcom_theme_language_switcher_form');
 
   if ($user->uid) {
-    $vars['account_links'] = theme('lingwoorg_account_links', array(
-      theme('lingwoorg_join_btn', url("wial/{$user->uid}/edit"), t('Words I Am Learning')),
+    $vars['account_links'] = theme('bbcom_account_links', array(
+      theme('bbcom_join_btn', url("wial/{$user->uid}/edit"), t('Words I Am Learning')),
       l(t('My Account'), 'user/'. $user->uid),
       l(t('Sign out'), 'logout')
     ));
@@ -217,8 +217,8 @@ function lingwoorg_theme_preprocess_page(&$vars, $hook) {
     if ($_GET['q'] != 'user/login') {
       $login_options['query']['destination'] = $_GET['q'];
     }
-    $vars['account_links'] = theme('lingwoorg_account_links', array(
-      theme('lingwoorg_join_btn', url('user/register'), t('JOIN')),
+    $vars['account_links'] = theme('bbcom_account_links', array(
+      theme('bbcom_join_btn', url('user/register'), t('JOIN')),
       l(t('Sign in'), 'user/login', $login_options)
     ));
   }
@@ -237,14 +237,14 @@ function lingwoorg_theme_preprocess_page(&$vars, $hook) {
  * @param $hook
  *   The name of the template being rendered ("node" in this case.)
  */
-function lingwoorg_theme_preprocess_node(&$vars, $hook) {
-  $func = 'lingwoorg_theme_preprocess_node_'. $vars['node']->type;
+function bbcom_theme_preprocess_node(&$vars, $hook) {
+  $func = 'bbcom_theme_preprocess_node_'. $vars['node']->type;
   if (function_exists($func)) {
     $func($vars, $hook);
   }
 }
 
-function lingwoorg_theme_preprocess_node_entry(&$vars, $hook) {
+function bbcom_theme_preprocess_node_entry(&$vars, $hook) {
   $node = $vars['node'];
   $entry = LingwoEntry::fromNode($node);
 
@@ -255,13 +255,13 @@ function lingwoorg_theme_preprocess_node_entry(&$vars, $hook) {
 
   if (!$vars['teaser']) {
     $languages = language_list();
-    $image_spec = theme('lingwoorg_language_flag', $node->language);
+    $image_spec = theme('bbcom_language_flag', $node->language);
     $text_spec = $languages[$node->language]->name;
 
     $source_node = $entry->getTranslationSource();
     if ($source_node) {
-      $image_spec = theme('lingwoorg_language_flag', $source_node->language) .
-                    '<img class="arrow-right" alt=" -&gt; " src="'. url(drupal_get_path('theme', 'lingwoorg_theme') .'/images/arrow_right.gif', array('absolute' => TRUE, 'language' => TRUE)) .'" />' .
+      $image_spec = theme('bbcom_language_flag', $source_node->language) .
+                    '<img class="arrow-right" alt=" -&gt; " src="'. url(drupal_get_path('theme', 'bbcom_theme') .'/images/arrow_right.gif', array('absolute' => TRUE, 'language' => TRUE)) .'" />' .
                     $image_spec;
       $text_spec = $languages[$source_node->language]->name .' -&gt; '. $text_spec;
     }
@@ -274,17 +274,17 @@ function lingwoorg_theme_preprocess_node_entry(&$vars, $hook) {
   }
 }
 
-function lingwoorg_theme_preprocess_node_webform(&$vars, $hook) {
+function bbcom_theme_preprocess_node_webform(&$vars, $hook) {
   $vars['inner_title'] = TRUE;
   unset($vars['submitted']);
 }
 
-function lingwoorg_theme_preprocess_node_content(&$vars, $hook) {
+function bbcom_theme_preprocess_node_content(&$vars, $hook) {
   $node = $vars['node'];
 
   $languages = language_list();
 
-  $vars['lang_spec'] = '<span class="langspec deem">'. theme('lingwoorg_language_flag', $node->language) .'</span> ';
+  $vars['lang_spec'] = '<span class="langspec deem">'. theme('bbcom_language_flag', $node->language) .'</span> ';
   //$vars['title'] = '<span class="langspec deem">'. $vars['lang_spec'] .'</span> '. $vars['title'];
   $vars['head_title'] = '['. $languages[$node->language]->name .'] '. $vars['head_title'];
 
@@ -293,7 +293,7 @@ function lingwoorg_theme_preprocess_node_content(&$vars, $hook) {
   }
 }
 
-function lingwoorg_theme_preprocess_node_page(&$vars, $hook) {
+function bbcom_theme_preprocess_node_page(&$vars, $hook) {
   // disable our default, of always including space for a right sidebar
   $vars['always_right'] = FALSE;
   // put the title on the inside
@@ -309,7 +309,7 @@ function lingwoorg_theme_preprocess_node_page(&$vars, $hook) {
  *   The name of the template being rendered ("comment" in this case.)
  */
 /* -- Delete this line if you want to use this function
-function lingwoorg_theme_preprocess_comment(&$vars, $hook) {
+function bbcom_theme_preprocess_comment(&$vars, $hook) {
   $vars['sample_variable'] = t('Lorem ipsum.');
 }
 // */
@@ -322,7 +322,7 @@ function lingwoorg_theme_preprocess_comment(&$vars, $hook) {
  * @param $hook
  *   The name of the template being rendered ("block" in this case.)
  */
-function lingwoorg_theme_preprocess_block(&$vars, $hook) {
+function bbcom_theme_preprocess_block(&$vars, $hook) {
   $block = $vars['block'];
   if ($block->module == 'lingwo_dictionary' && $block->delta == 0) {
     unset($block->subject);
@@ -332,7 +332,7 @@ function lingwoorg_theme_preprocess_block(&$vars, $hook) {
 /*
  * Mark some of the node form elements as inline
  */
-function lingwoorg_theme_node_form($form) {
+function bbcom_theme_node_form($form) {
   if ($form['#node']->type == _lingwo_dictionary_settings('entry_content_type')) {
     $form['title']['#inline'] = TRUE;
     $form['language']['#inline'] = TRUE;
@@ -345,7 +345,7 @@ function lingwoorg_theme_node_form($form) {
 /*
  * By default, mark all the lingwo_fields widget elements as inline.
  */
-function lingwoorg_theme_preprocess_lingwo_fields_widget_form(&$variables) {
+function bbcom_theme_preprocess_lingwo_fields_widget_form(&$variables) {
   foreach (element_children($variables['element']) as $name) {
     $variables['element'][$name]['value']['#inline'] = TRUE;
   }
@@ -358,7 +358,7 @@ function lingwoorg_theme_preprocess_lingwo_fields_widget_form(&$variables) {
 /*
  * Let the view template know that its operating in view mode.
  */
-function lingwoorg_theme_preprocess_lingwo_fields_view(&$variables) {
+function bbcom_theme_preprocess_lingwo_fields_view(&$variables) {
   $variables['widget'] = FALSE;
   $variables['view'] = TRUE;
 }
@@ -366,7 +366,7 @@ function lingwoorg_theme_preprocess_lingwo_fields_view(&$variables) {
 /*
  * Change the way forms generate.
  */
-function lingwoorg_theme_form_element($element, $value) {
+function bbcom_theme_form_element($element, $value) {
   // This is also used in the installer, pre-database setup.
   $t = get_t();
 
@@ -405,14 +405,14 @@ function lingwoorg_theme_form_element($element, $value) {
 /*
  * Helper function for using in tpl.php files for rendering form elements without titles.
  */
-function _lingwoorg_unset_title(&$element) {
+function _bbcom_unset_title(&$element) {
   unset($element['#title']);
   foreach (element_children($element) as $name) {
-    _lingwoorg_unset_title($element[$name]);
+    _bbcom_unset_title($element[$name]);
   }
 }
-function lingwoorg_render_no_title(&$element) {
-  #_lingwoorg_unset_title($element);
+function bbcom_render_no_title(&$element) {
+  #_bbcom_unset_title($element);
   unset($element['value']['#title']);
   return drupal_render($element);
 }
