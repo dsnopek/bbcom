@@ -6,8 +6,8 @@
 function bbcom_dictionary_context_default_contexts() {
   $items = array();
 
-  $items['lingwoorg-section-dictionary'] = array(
-    'namespace' => 'lingwoorg',
+  $items['bbcom-section-dictionary'] = array(
+    'namespace' => 'bbcom',
     'attribute' => 'section',
     'value' => 'dictionary',
     'description' => 'Working in the dictionary',
