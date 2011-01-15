@@ -5,7 +5,7 @@
  * The actual callbacks for this service
  */
 
-function _lingwoorg_device_service_get_revcount($nid) {
+function _bbcom_device_service_get_revcount($nid) {
   # we default to 1, because having any translation counts for 1 (this is helpful
   # when, for example, an entry is already on the device BUT not for a specific translation
   # and then that translation is added).
@@ -19,7 +19,7 @@ function _lingwoorg_device_service_get_revcount($nid) {
 }
 
 // TODO: should probably be in lingwo_data!
-function lingwoorg_device_service_export_entry($nid) {
+function bbcom_device_service_export_entry($nid) {
   $node = node_load($nid);
   $base_revid = $node->vid;
   $entry = array(
@@ -62,7 +62,7 @@ function lingwoorg_device_service_export_entry($nid) {
 
     # take the translation revisions into account with the overall revid
     # TODO: See note above about how a timestamp would be good instead...
-    $entry['revid'] += _lingwoorg_device_service_get_revcount($tnode->nid);
+    $entry['revid'] += _bbcom_device_service_get_revcount($tnode->nid);
 
     $translations = array();
     foreach ($tnode->lingwo_senses as $sense) {
@@ -105,9 +105,9 @@ function lingwoorg_device_service_export_entry($nid) {
 }
 
 /*
- * lingwoorg_device.get_content_item
+ * bbcom_device.get_content_item
  */
-function lingwoorg_device_service_get_content_item($software_version, $device_name, $nid, $vid = '') {
+function bbcom_device_service_get_content_item($software_version, $device_name, $nid, $vid = '') {
   if ($device_name != 'device_1') {
     return services_error("Unknown device name", 400);
   }
@@ -125,7 +125,7 @@ function lingwoorg_device_service_get_content_item($software_version, $device_na
   $entries = array();
   $res = db_query("SELECT language, pos, headword FROM {lingwo_korpus_entry} WHERE nid = %d", $nid);
   while ($obj = db_fetch_object($res)) {
-    $entry = lingwoorg_device_service_export_entry(
+    $entry = bbcom_device_service_export_entry(
       LingwoEntry::key2nid($obj->language, $obj->pos, $obj->headword));
     if ($entry) {
       $entries[] = $entry;
@@ -149,9 +149,9 @@ function lingwoorg_device_service_get_content_item($software_version, $device_na
 }
 
 /*
- * lingwoorg_device.pull_update
+ * bbcom_device.pull_update
  */
-function lingwoorg_device_service_pull_update($software_version, $device_name) {
+function bbcom_device_service_pull_update($software_version, $device_name) {
   # TODO: make this really work!  For now, just give everything to 'device_1' and 
   # no one else.
   if ($device_name == 'device_1') {
@@ -169,9 +169,9 @@ function lingwoorg_device_service_pull_update($software_version, $device_name) {
 }
 
 /*
- * lingwoorg_device.push_update
+ * bbcom_device.push_update
  */
-function lingwoorg_device_service_push_update($software_version, $device_name, $data) {
+function bbcom_device_service_push_update($software_version, $device_name, $data) {
   global $user;
 
   if ($device_name != 'device_1') {

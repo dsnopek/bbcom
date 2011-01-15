@@ -3,12 +3,12 @@
 /**
  * Implementation of hook_service().
  */
-function lingwoorg_device_service() {
+function bbcom_device_service() {
   return array(
     array(
-      '#method' => 'lingwoorg_device.get_content_item',
-      '#callback' => 'lingwoorg_device_service_get_content_item',
-      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_device'),
+      '#method' => 'bbcom_device.get_content_item',
+      '#callback' => 'bbcom_device_service_get_content_item',
+      '#file' => array('file' => 'service.inc', 'module' => 'bbcom_device'),
       '#access arguments' => array('access content'),
       '#args' => array(
         array(
@@ -39,10 +39,10 @@ function lingwoorg_device_service() {
     ),
 
     array(
-      '#method' => 'lingwoorg_device.pull_update',
-      '#callback' => 'lingwoorg_device_service_pull_update',
-      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_device'),
-      '#access arguments' => array('call bibliobird_device.pull_update'),
+      '#method' => 'bbcom_device.pull_update',
+      '#callback' => 'bbcom_device_service_pull_update',
+      '#file' => array('file' => 'service.inc', 'module' => 'bbcom_device'),
+      '#access arguments' => array('call bbcom_device.pull_update'),
       '#args' => array(
         array(
           '#name' => 'software_version',
@@ -60,9 +60,9 @@ function lingwoorg_device_service() {
     ),
 
     array(
-      '#method' => 'lingwoorg_device.push_update',
-      '#callback' => 'lingwoorg_device_service_push_update',
-      '#file' => array('file' => 'service.inc', 'module' => 'lingwoorg_device'),
+      '#method' => 'bbcom_device.push_update',
+      '#callback' => 'bbcom_device_service_push_update',
+      '#file' => array('file' => 'service.inc', 'module' => 'bbcom_device'),
       '#access arguments' => array('access content'),
       '#args' => array(
         array(
@@ -90,7 +90,7 @@ function lingwoorg_device_service() {
 /**
  * Implementation of hook_perm().
  */
-function lingwoorg_device_perm() {
-  return array('call bibliobird_device.pull_update');
+function bbcom_device_perm() {
+  return array('call bbcom_device.pull_update');
 }
 

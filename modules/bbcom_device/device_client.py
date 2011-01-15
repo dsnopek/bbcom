@@ -94,13 +94,13 @@ class ServerInterface(object):
         return res
 
     def get_content_item(self, software_version, device_name, id):
-        return self._call_method(self.server.lingwoorg_device.get_content_item, software_version, device_name, id)
+        return self._call_method(self.server.bbcom_device.get_content_item, software_version, device_name, id)
 
     def pull_update(self, software_version, device_name):
-        return self._call_method(self.server.lingwoorg_device.pull_update, software_version, device_name)
+        return self._call_method(self.server.bbcom_device.pull_update, software_version, device_name)
 
     def push_update(self, software_version, device_name, data):
-        return self._call_method(self.server.lingwoorg_device.push_update, software_version, device_name, data)
+        return self._call_method(self.server.bbcom_device.push_update, software_version, device_name, data)
 
     def server_ctrl(self, cmd):
         try:

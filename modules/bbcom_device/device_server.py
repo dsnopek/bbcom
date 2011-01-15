@@ -80,13 +80,13 @@ def user_logout(sessid):
     del sessions[sessid]
     return True
 
-def lingwoorg_device_get_content_item(sessid, software_version, device_name, id):
+def bbcom_device_get_content_item(sessid, software_version, device_name, id):
     if id == '211' or id == '394':
         return content[id]
 
     raise Exception('No such content item')
 
-def lingwoorg_device_pull_update(sessid, software_version, device_name):
+def bbcom_device_pull_update(sessid, software_version, device_name):
     dev = devices[device_name]
     data = {
         # id:revid of the content
@@ -109,7 +109,7 @@ def lingwoorg_device_pull_update(sessid, software_version, device_name):
 
     return data
 
-def lingwoorg_device_push_update(sessid, software_version, device_name, data):
+def bbcom_device_push_update(sessid, software_version, device_name, data):
     # check if the device exists
     devices[device_name]
     iam = sessions[sessid]
@@ -129,9 +129,9 @@ def lingwoorg_device_push_update(sessid, software_version, device_name, data):
 server.register_function(system_connect, 'system.connect')
 register_wrapped_function(user_login, 'user.login')
 register_wrapped_function(user_logout, 'user.logout')
-register_wrapped_function(lingwoorg_device_get_content_item, 'lingwoorg_device.get_content_item')
-register_wrapped_function(lingwoorg_device_pull_update, 'lingwoorg_device.pull_update')
-register_wrapped_function(lingwoorg_device_push_update, 'lingwoorg_device.push_update')
+register_wrapped_function(bbcom_device_get_content_item, 'bbcom_device.get_content_item')
+register_wrapped_function(bbcom_device_pull_update, 'bbcom_device.pull_update')
+register_wrapped_function(bbcom_device_push_update, 'bbcom_device.push_update')
 
 def test(cmd):
     global software_update
