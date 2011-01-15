@@ -77,25 +77,11 @@ function lingwoorg_login_schema() {
   return $schema;
 }
 
-function _lingwoorg_login_set_unvalidated_role() {
-  $res = db_query("SELECT rid FROM {role} WHERE name = '%s'", "unverified user");
-  if ($res && $obj = db_fetch_object($res)) {
-  	variable_set('logintoboggan_pre_auth_role', $obj->rid);
-  }
-}
-
-function lingwoorg_login_update_6001() {
-  _lingwoorg_login_set_unvalidated_role();
-  return array();
-}
-
 /**
  * Implementation of hook_install().
  */
 function lingwoorg_login_install() {
-  variable_set('lingwoorg_login_schema_version', 6000);
   drupal_install_schema('lingwoorg_login');
-  _lingwoorg_login_set_unvalidated_role();
 }
 
 /**
@@ -103,6 +89,5 @@ function lingwoorg_login_install() {
  */
 function lingwoorg_login_uninstall() {
   drupal_uninstall_schema('lingwoorg_login');
-  variable_del('lingwoorg_login_schema_version');
 }
 

@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_strongarm().
  */
-function lingwoorg_login_strongarm() {
+function bbcom_login_strongarm() {
   $export = array();
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

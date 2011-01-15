@@ -1,0 +1,70 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Customize login for our needs
+ */
+
+require_once('bbcom_login.features.inc');
+
+/**
+ * Implementation of hook_init().
+ */
+function bbcom_login_init() {
+  global $user;
+
+  $validating_id = logintoboggan_validating_id();
+  // bail early if the $validating_id is set to a core id
+  if (in_array($validating_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)))
+    return;
+
+  // we show this message every time an unvalidated user visits a page that isn't user/%/edit 
+  // or one of the magic toboggan pages.
+  if (isset($user->roles[$validating_id]) && !(arg(0) == 'user' && (arg(2) == 'edit' || arg(1) == 'validate')) && arg(0) != 'toboggan') {
+    // only show after the user has been a user for a moment
+    if (time() - $user->created > 10) {
+      drupal_set_message('<strong>'. t("You still haven't validated your account!") .'</strong>', 'error');
+      drupal_set_message(t("A validation e-mail has been sent to your e-mail address. In order to gain full access to the site, you will need to follow the instructions in that message."));
+      drupal_set_message(t("<a href=\"@user-edit\">Make sure</a> you entered the correct e-mail address or <a href=\"@resend-email\">re-send</a> the validation e-mail.", array('@user-edit' => url('user/'. $user->uid .'/edit'), '@resend-email' => url('toboggan/revalidate/'. $user->uid))));
+    }
+  }
+}
+
+/**
+ * Implemantation of hook_menu_alter().
+ */
+function bbcom_login_menu_alter(&$items) {
+  // Rename 'User Account' to user login
+  $items['user']['title'] = t('User Login');
+  // Move the 'Login' tab to the front
+  $items['user/login']['weight'] = -10;
+}
+
+/*
+ * Implementation of hook_form_alter().
+ */
+function bbcom_login_form_alter(&$form, &$form_state, $form_id) {
+  global $language;
+
+  if ($form_id == 'user_register') {
+    // user's language will be set to whatever the current language is
+    $form['language'] = array(
+      '#type' => 'hidden',
+      '#value' => $language->language,
+    );
+  }
+}
+
+/*
+ * Implements hook_fb().
+ */
+function bbcom_login_fb($op, $data=NULL, $return=NULL) {
+  if ($op == 'post init') {
+    // if there is no destination set, then we redirect to the front page!
+    if (empty($_REQUEST['destination'])) {
+      fb_js_settings('reload_url', url('<front>', array('absolute' => TRUE)));
+    }
+  }
+}
+
