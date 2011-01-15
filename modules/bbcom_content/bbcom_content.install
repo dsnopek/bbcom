@@ -29,30 +29,3 @@ function bbcom_content_disable() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 }
 
-function bbcom_content_update_6001() {
-  db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
-
-  $filename = serialize(array(
-    'value' => '[filefield-onlyname].[filefield-extension]',
-    'tolower' => 0,
-    'autopath' => 0,
-    'transliterate' => 0,
-  ));
-  $filepath = serialize(array(
-    'value' => 'audio/[nid]',
-    'tolower' => 0,
-    'autopath' => 0,
-    'transliterate' => 0,
-  ));
-
-  $ret[] = update_sql("INSERT INTO {filefield_paths} (type, field, filename, filepath) VALUES ('content', 'field_audio', '". $filename ."', '". $filepath ."')");
-  return $ret;
-}
-
-function bbcom_content_update_6002() {
-  $verified = flag_get_flag('verified');
-  $verified->global = FALSE;
-  $verified->save();
-  return array();
-}
-
