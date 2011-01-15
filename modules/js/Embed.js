@@ -62,8 +62,9 @@ define(
             }
         }
 
-        function bburl(path) {
-            var url = BiblioBird.url.replace('<lang>', BiblioBird.lang);
+        function bburl(path,lang) {
+            lang = (typeof lang == 'undefined') ? BiblioBird.lang : lang;
+            var url = BiblioBird.url.replace('<lang>', lang);
             if (path) {
                 return url+'/'+path;
             }
@@ -120,7 +121,7 @@ define(
                     .css({
                         display: 'block',
                         'float': 'left',
-                        background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-left.png') left no-repeat",
+                        background: "transparent url('"+bburl('sites/all/themes/bbcom_theme/images/join-btn-left.png','www')+"') left no-repeat",
                         'padding-left': 11,
                         height: 27,
                         'margin-left': 10,
@@ -140,7 +141,7 @@ define(
                             .css({
                                 display: 'block',
                                 'float': 'left',
-                                background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-right.png') right no-repeat",
+                                background: "transparent url('"+bburl('sites/all/themes/bbcom_theme/images/join-btn-right.png','www')+"') right no-repeat",
                                 'padding-right': 14,
                                 height: 27,
                                 'cursor': 'pointer'
@@ -150,7 +151,7 @@ define(
                                     .css({
                                         display: 'block',
                                         'float': 'left',
-                                        background: "transparent url('http://en.bibliobird.com/sites/all/themes/lingwoorg_theme/images/join-btn-middle.png') center repeat-x",
+                                        background: "transparent url('"+bburl('sites/all/themes/bbcom_theme/images/join-btn-middle.png','www')+"') center repeat-x",
                                         'padding-top': 4,
                                         height: 23,
                                         'cursor': 'pointer'
