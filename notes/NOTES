@@ -1,4 +1,49 @@
 
+For web-services!!  You write callbacks and it can work with XMLRPC, JSON, REST, SOAP, AMF, etc..
+
+http://drupal.org/project/services
+
+Users have a certain number of points:
+
+http://drupal.org/project/userpoints
+
+Ubercart integration for userpoints (can pay for things with userpoints):
+
+http://drupal.org/project/userpoints_ubercart
+
+For inviting a friend:
+
+http://drupal.org/project/invite
+
+Messaging/Notifications -- Allows users to configure how they want notifications (e-mail, SMS, XMPP):
+
+http://drupal.org/project/messaging
+http://drupal.org/project/notifications
+
+XMPP support for Drupal:
+
+http://drupal.org/project/xmppframework
+
+IM between users:
+
+http://drupal.org/project/im
+
+For "buddy lists" between users:
+
+http://drupal.org/project/user_relationships
+
+** Also, note that Ubercart can now do 6.x! **
+
+http://drupal.org/project/ubercart
+
+For enforcing unique nodes based on various fields:
+
+http://drupal.org/project/unique_field
+
+Command line admin for Drupal:
+
+http://drupal.org/project/drush
+
 Check out this for providing the "verified" entries:
 
 http://drupal.org/project/content_moderation

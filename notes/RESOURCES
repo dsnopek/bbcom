@@ -1,0 +1,78 @@
+
+Mentioned on Lexicography Mailing list
+=====
+
+ * Atkins, B. T. Sue, and Michael Rundell. 2008. The Oxford Guide to Practical Lexicography Oxford: Oxford University Press.
+
+ * Fontenelle, Thierry (ed.). 2008. Practical lexicography: a reader. Oxford: Oxford University Press.
+
+Books at the library
+=====
+
+* Dictionaries : the art and craft of lexicography / Sidney I. Landau.
+* Practical polyglot technical lexicography and the professional polyglot technician, by Lewis L. Sell, PH.D.
+
+Found on the Wikipedia entry:
+=====
+
+# Landau, Sidney, Dictionaries: The Art and Craft of Lexicography, 2nd ed., 2001
+# Bergenholtz, Henning/Tarp, Sven (eds.): Manual of Specialised Lexicography, 1995
+# Bejoint, Henri, Modern Lexicography: An Introduction, 2000
+# Hartmann, R. R. K., Teaching and Researching Lexicography, 2001
+# Hartmann, R. R. K./James, Gregory (comps.): Dictionary of Lexicography, 1998/2001
+# Nielsen, Sandro: The Bilingual LSP Dictionary, 1994
+# Ooi, Vincent, Computer Corpus Lexicography, 1998 http://www.fas.nus.edu.sg/ell/Vincent/
+# Jonathon Green, "Chasing the Sun - Dictionary-Makers and the Dictionaries They Made," Pimlico, ISBN 0-7126-6216-2
+
+Very complete XML format for dictionaries
+=====
+
+http://www.tei-c.org/release/doc/tei-p5-doc/en/html/DI.html
+
+CKAN - Comprehensive Knowledge Archive Network
+=====
+
+Collection of "knowledge" collections.
+
+http://ckan.net/
+
+There I was able to find a couple interesting things:
+
+http://ckan.net/package/read/linkvoj
+http://ckan.net/package/read/k12-open-dictionary
+http://ckan.net/package/read/index-translationum
+http://ckan.net/package/read/gemet
+http://ckan.net/package/read/gdt
+
+Tag: dictionary:
+
+http://ckan.net/tag/read/dictionary
+
+Fluentizer
+=====
+
+A Java version of what Lingwo Classroom would do, that uses XDXF dictionaries.
+
+http://www.fluentizer.com/
+
+Apertium
+=====
+
+Machine translation.  Has a morphology engine, pos-tagging with hidden Markov models, uses
+translating dictionaries for something in there.  Written in C++.
+
+http://www.apertium.org/
+
+This article gives a little glimpse into how they configure their morphology engine:
+
+http://wiki.apertium.org/wiki/Apertium_New_Language_Pair_HOWTO
+
+DDP
+===
+
+Development Process (DDP)
+
+DDP is a method for rapidly collecting the lexemes of a previously undocumented language. It uses a list of 1800 semantic domains to help native speakers of a language to think of and write down the words and lexical phrases of their language. Each domain includes elicitation questions and sample words. Several hundred dictionary projects have used DDP to collect 10,000-25,000 lexemes in a two week workshop. The DDP materials have been incorporated into Fieldworks Language Explorer. Other software such as Toolbox and LexiquePro support DDP.
+
+Website: http://www.sil.org/computing/ddp/index.htm
+

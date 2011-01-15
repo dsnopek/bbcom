@@ -1,0 +1,168 @@
+
+== 2010-04-08 ==
+
+ * Explore using CoffeeScript to implement the language definitions, rather than JavaScript
+   because it is way more user friendly and concise!
+
+   http://jashkenas.github.com/coffee-script/
+
+== 2010-03-14 ==
+
+ * Senses:
+
+   - When an Entry has only one sense, that sense should still get an ID (rather than '*')
+     so that adding a sense to the entry doesn't invalidate all the existing annotated texts.
+     Some UI would be required saying "The original sense" or something until the entry is
+     finally saved.
+
+   - We need a "Same As: [_______]" field translatations with multiple senses.  This would
+     allow merging them when languages share the same sense divisions for the some words.
+
+   - It would also be good to store a big table somewhere, with senses stored according to
+     their IDs.  Columns like: sense_id, source_lang, target_lang, data.  This would allow
+     us to simply refer to a sense_id (is source_lang necessary since they are unique??) 
+     and be able to look-up the sense data.  There might be a way to leverage this to make
+     the annotation look-up faster (maybe).
+
+   - We should move the sense ID from being inside the serialized 'data' field into its
+     own database column.
+
+== 2010-03-07 ==
+
+ * Dealing with headwords with multiple words:
+
+   - We should treat the space (' ') as the word seperator.
+
+   - Add new function called Entry.getWords() which returns an array of all the parsed words.
+
+   - Entry.getWord() will by default return the first word from Entry.getWords() except
+     when a word in the headword string is surrounded by brackes (ie. "first [second]") where
+     that word will be returned.
+
+   - Fields automatic functions can return an array of word objects, which will be joined
+     with a space (' ') when returning from Entry.getField().
+
+   ** This System should accomidate English language phrasal verbs ("wake up") returning
+      multi-word forms ("to live") and Polish reflexive verbs ("udać się").
+
+== 2010-01-17 ==
+
+ * I think that lingwo_dictionary should be dependent on i18ntaxonomy, because without it, the
+   Part Of Speech isn't copied over in translations.  Although, you could say that lingwo_dictionary
+   could maybe be useful without translations..  Not sure yet.
+
+== 2009-11-05 ==
+
+ * We need to figure out the best way to store 'fields' so that views can do searches
+   on the individual field values.  We *will* want to be able to create a view that
+   shows only Polish feminine nouns, or all the Polish soft adjectives, etc..  This
+   probably means having (name, value) pairs in the database and *may* require doing
+   views integration manually instead of via default CCK action.
+
+== 2009-11-04 ==
+
+ * Begin implementing the below described idea by first keeping the type of data that
+   would be stored a language definition (besides the morphology) hard-coded and let
+   it be retreived using lingwo_dictionary_language_settings($lang).  Later this function
+   will be converted to a much more sophisticated look-up.
+
+   Phase two will be eventually creating the content-type and just putting raw JavaScript
+   into it.
+
+   Phase three will be implementing the JavaScript IDE with only support for messing with
+   which fields are available and their UI properties.
+
+   Phase four will be packing the morphology definitions into the IDE and the testing stuff
+   (since I won't be able to develop new morphology definitions if I can't do testing).
+
+   Then these can be completely exposed for others to mess with.
+
+ * New idea for the "language definitions".  Right now I've been hacking on putting
+   "Dictionary Fields" under the "Edit Language" page and saving the data as a dumped Array.
+   But it would be better to store a language definition as a special node and then have
+   something on the "Edit Language" page that selects this language definition as the 
+   canonical one.
+
+   The advantages of this are that anyone could create a 'language definition' node, edit
+   it and test it, then it can be swapped as the canonical language node.  It would also
+   allow for integrated testing, speed, all good things.
+
+   So, I'm thinking we store a PHP Array or JSON Object as the body of the 'language definition'
+   node.  Then we include a special JavaScript'd out editor, which will provide a two paned view
+   (like in an IDE) with a tree of things to edit on the left and an editting area on the right.
+   [For degradability, this could be done as a <ul> on the left and a series of <div>'s with
+   <textareas> on the right, which is magically converted to the JavaScript'd out controls]
+
+   Things that can be edited, would include the list of classes/options/forms for each
+   POS (as taken from the POS taxonomy).  Each of these would contain (possibly) some 
+   UI information (order, description, where they should go) and the possibility of a
+   JavaScript function to be put in the morphology definition.  JavaScript fields would
+   get some slick JS-enabled editor.
+
+   The code for generating the alphabet would also be there, along with a way to view the
+   resulting alphabet and see if it matches what you want.
+
+   All these little bits would be combined to create the morphology definition, which would
+   definitely be cached on disk when its selected as the canonical definition.
+
+   There would be a section that contains test cases.  Test cases can be imported from the
+   existing dictionary and modified or simply created here (they'd be new Entry({ ... })
+   bits stashed in some array and a list of expected outcomes).
+
+ * Create a 'Language' CCK field, which allows you to select a language from either
+   (1) any Drupal language code, or (2) any activated language.  This would allow people to
+   mark things as belonging to a language without changing its translation status in Drupal.
+
+== 2009-07-06 ==
+
+ * Remove 'weight' and 'remove_sense' from each sense before it is saved.
+
+ * Put the info from "Translate" tab on the "View" area for original entries.  Also, make a more
+   convenient/obvious link back to the original entry.
+ 
+ * Remove the "Select translations for ___" section from the "Translation" tab.
+ 
+ * Restore the links to the pages for translated words.
+
+ * Fix the bug where new translations have one too many senses listed.
+
+ * Try and fix AHAH!  There are so many weird issues with it I'm not sure what to do..
+
+== 2009-07-03 ==
+
+ * Make it so that we could use either the normal taxonomy form stuff or a content_taxonomy
+   CCK field.  (Ie. it needs to disable it correctly).
+ 
+== 2009-07-02 ==
+
+ * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
+   language.
+  
+ * Use some validate hook to validate that "title", "language" and "Part of Speech" can't be 
+   changed on an existing node or on a translation.
+
+ * Hi-jack node save (or some validate hook?) and make sure that entries are unique by language,
+   pos and title, add new nodes to the lingwo_dictionary_entry table.
+
+== 2009-02-26 ==
+
+ * Get searching and looking up definitions alot tighter (meaning easier to use for the end
+   user).
+
+== 2009-02-15 ==
+
+ * Figure out proper 404 behaviour.
+
+ * Figure out a good way to do the title on the translation view/edit pages.
+
+ * Figure out a good way to link back to the entry from the translation view/edit pages.
+ 
+ * Seperate the word translation from the "note" (ie. some info to go into paranthesis,
+   or maybe just use convention, which is, if they write anything in parantheses?).  Or
+   maybe the reverse, that either the whole thing is the word, or the contents of [brackets]
+   are.  So, then the English translation of "szkolny", would be "pertaining to [school:noun]".
+   Putting ":noun" is necessary because "szkolny" is an adjective, so it would default to link
+   to "[school:adjective]".
+ 
+ * Add the "Same as" selector on translation senses, so that senses can be consolidated.
+

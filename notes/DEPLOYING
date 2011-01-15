@@ -1,0 +1,71 @@
+
+== From Scratch ==
+
+ * Create a 'lingwo' directory.
+
+ * Check out all our required bzr repo's:
+
+    - drupal/mainline
+    - ahah_helper/mainline
+    - i18n/mainline
+    - logintoboggan/mainline
+    - lingwo_dictionary/mainline
+    - lingwoorg/mainline
+    - lingwoorg_theme/mainline
+
+ * Enable the following modules:
+ 
+    - lingwoorg_dictionary
+    - lingwoorg_content
+    - lingwoorg_wial
+    - lingwoorg_login
+    - admin
+    - adminrole
+
+ * Set the administrator role at: /admin/user/settings
+
+ * Enable the required languages at: /admin/settings/language
+
+ * Import the translations: /admin/build/translate
+   (this might happen automatically based on the data in lingwo/lingwoorg/translations)
+ 
+ * Delete the default 'bookmarks' flag at: /admin/build/flags
+
+ * Create a key for the importer at: /admin/build/services/keys/add
+   Be sure to select the following methods:
+
+     - linwgo_data.update_entry
+     - system.connect
+     - user.login
+
+ * And create user for the importer here: /admin/user/user/create
+   Be sure to make them an "editor"!
+ 
+== Updates ==
+
+  * Put the site offline: /admin/settings/site-maintenance
+
+  * Backup the database: /admin/content/backup_migrate
+    (Send to "Manual Backups Directory", which is $HOME/prj/lingwo_backups/manual)
+
+  * Backup the code:
+
+    cd ~/prj
+	tar -cjvpf lingwo-2010-XX-XX.tar.bz2 lingwo
+
+  * Check out all the new code
+
+    cd ~/prj/lingwo
+	for d in *; do if [ -d $d ]; then (cd $d && bzr up); fi; done
+
+  * Update database: /update.php
+
+  * Save the modules page: /admin/build/modules
+    (should enable new dependencies)
+
+  * Check if features are overridden: /admin/build/features
+
+  * TODO: Clear the views cache??
+
+  * TODO: Clear some other caches??
+
