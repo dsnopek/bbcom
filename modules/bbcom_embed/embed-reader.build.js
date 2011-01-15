@@ -1,8 +1,8 @@
 {
-    baseUrl: "../../lingwo_dictionary/js/require",
+    baseUrl: "../../../lingwo_dictionary/js/require",
     paths: {
         lingwo_dictionary: "..",
-        bibliobird: "../../../lingwoorg/js"
+        bibliobird: "../../../bbcom/modules/js"
     },
     out: "embed-reader.uncompressed.js",
     optimize: "none",
