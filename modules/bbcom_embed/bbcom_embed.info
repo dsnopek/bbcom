@@ -1,5 +1,5 @@
 core = "6.x"
-dependencies[] = "lingwoorg_content"
+dependencies[] = "bbcom_content"
 description = "Embed BiblioBird in other sites"
 name = "BiblioBird.com Embed"
 package = "BiblioBird.com"

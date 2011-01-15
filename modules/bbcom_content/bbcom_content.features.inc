@@ -6,8 +6,8 @@
 function bbcom_content_context_default_contexts() {
   $items = array();
 
-  $items['lingwoorg-section-content'] = array(
-    'namespace' => 'lingwoorg',
+  $items['bbcom-section-content'] = array(
+    'namespace' => 'bbcom',
     'attribute' => 'section',
     'value' => 'content',
     'description' => 'Working in the content area.',

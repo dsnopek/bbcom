@@ -1,5 +1,5 @@
 core = "6.x"
-dependencies[] = "lingwoorg_content"
+dependencies[] = "bbcom_content"
 description = "Provides interface with our hardware devices: tablets, etc"
 name = "Lingwo.org Device"
 package = "Lingwo.org"
