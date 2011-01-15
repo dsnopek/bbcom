@@ -48,7 +48,7 @@ function bbcom_content_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
       $blocks[0] = array(
-        'info' => t('Lingwo.org Content: Add Content Block'),
+        'info' => t('BiblioBird.com Content: Add Content Block'),
       );
       return $blocks;
 

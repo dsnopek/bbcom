@@ -47,7 +47,7 @@ function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
       $blocks[0] = array(
-        'info' => t('Lingwo Dictionary: Add Content Block'),
+        'info' => t('BiblioBird.com Dictionary: Add Content Block'),
       );
       return $blocks;
 

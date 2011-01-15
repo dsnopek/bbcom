@@ -16,7 +16,7 @@ function bbcom_flashcards_menu() {
   $items = array();
   $items['admin/settings/lingwo_dictionary/flashcards'] = array(
     'title' => 'Flashcards',
-    'description' => 'Settings for Lingwo.org Flashcards module.',
+    'description' => 'Settings for BiblioBird.com Flashcards module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_flashcards_admin_settings'),

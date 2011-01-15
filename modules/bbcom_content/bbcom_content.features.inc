@@ -36,7 +36,7 @@ function bbcom_content_context_default_contexts() {
         'weight' => -21,
         'region' => 'right',
         'status' => '0',
-        'label' => 'Lingwo.org Content: Add Content Block',
+        'label' => 'BiblioBird.com Content: Add Content Block',
         'type' => 'context_ui',
       ),
       'lingwo_korpus_0' => array(
