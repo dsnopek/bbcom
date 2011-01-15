@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_views_default_views().
  */
-function lingwoorg_wial_views_default_views() {
+function bbcom_wial_views_default_views() {
   $views = array();
 
   // Exported view: wial_list
@@ -235,7 +235,7 @@ function lingwoorg_wial_views_default_views() {
     'type' => 'php',
     'code' => '<?php
 $parts = explode(\'/\', $_GET[\'q\']);
-return lingwoorg_wial_page_access($parts[1]);
+return bbcom_wial_page_access($parts[1]);
 ?>',
   ));
   $handler->override_option('cache', array(

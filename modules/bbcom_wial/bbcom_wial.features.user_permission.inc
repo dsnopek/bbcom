@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_user_default_permissions().
  */
-function lingwoorg_wial_user_default_permissions() {
+function bbcom_wial_user_default_permissions() {
   $permissions = array();
 
   // Exported permission: access other wials

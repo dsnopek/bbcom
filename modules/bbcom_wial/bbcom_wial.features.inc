@@ -3,17 +3,17 @@
 /**
  * Implementation of hook_rules_defaults().
  */
-function lingwoorg_wial_rules_defaults() {
+function bbcom_wial_rules_defaults() {
   return array(
     'rules' => array(
-      'lingwoorg_wial_1' => array(
+      'bbcom_wial_1' => array(
         '#type' => 'rule',
         '#set' => 'event_lingwo_korpus_lookup',
         '#label' => 'When a user looks up a word from the annotation reader, it should be added to their WIAL list.',
         '#active' => 1,
         '#weight' => '0',
         '#categories' => array(
-          'lingwoorg_wial' => 'lingwoorg_wial',
+          'bbcom_wial' => 'bbcom_wial',
         ),
         '#status' => 'default',
         '#conditions' => array(),
@@ -63,7 +63,7 @@ function lingwoorg_wial_rules_defaults() {
 /**
  * Implementation of hook_views_api().
  */
-function lingwoorg_wial_views_api() {
+function bbcom_wial_views_api() {
   return array(
     'api' => '2',
   );

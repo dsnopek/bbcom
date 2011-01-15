@@ -1,0 +1,4 @@
+core = "6.x"
+description = "Gives each user a list of entries they are learning"
+name = "Lingwo.org WIAL (Words I Am Learning)"
+package = "Lingwo.org (deprecated)"
