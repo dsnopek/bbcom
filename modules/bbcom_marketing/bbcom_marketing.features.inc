@@ -6,8 +6,8 @@
 function bbcom_marketing_context_default_contexts() {
   $items = array();
 
-  $items['lingwoorg-section-marketing'] = array(
-    'namespace' => 'lingwoorg',
+  $items['bbcom-section-marketing'] = array(
+    'namespace' => 'bbcom',
     'attribute' => 'section',
     'value' => 'marketing',
     'description' => 'Viewing our marketing materials.',
@@ -18,7 +18,7 @@ function bbcom_marketing_context_default_contexts() {
       'views_latest_news-block_1' => array(
         'module' => 'views',
         'delta' => 'latest_news-block_1',
-        'weight' => 18,
+        'weight' => 20,
         'region' => 'content_top',
         'status' => '0',
         'label' => 'Story Slideshow',
@@ -27,10 +27,10 @@ function bbcom_marketing_context_default_contexts() {
       'views_all_news-block_1' => array(
         'module' => 'views',
         'delta' => 'all_news-block_1',
-        'weight' => 18,
+        'weight' => 20,
         'region' => 'content_bottom',
         'status' => '0',
-        'label' => 'Aktualności',
+        'label' => 'All News',
         'type' => 'context_ui',
       ),
     ),
