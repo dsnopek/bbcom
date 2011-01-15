@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_context_default_contexts().
  */
-function lingwoorg_marketing_context_default_contexts() {
+function bbcom_marketing_context_default_contexts() {
   $items = array();
 
   $items['lingwoorg-section-marketing'] = array(
@@ -41,7 +41,7 @@ function lingwoorg_marketing_context_default_contexts() {
 /**
  * Implementation of hook_ctools_plugin_api().
  */
-function lingwoorg_marketing_ctools_plugin_api() {
+function bbcom_marketing_ctools_plugin_api() {
   list($module, $api) = func_get_args();
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
@@ -51,7 +51,7 @@ function lingwoorg_marketing_ctools_plugin_api() {
 /**
  * Implementation of hook_node_info().
  */
-function lingwoorg_marketing_node_info() {
+function bbcom_marketing_node_info() {
   $items = array(
     'story' => array(
       'name' => t('Story'),
@@ -71,7 +71,7 @@ function lingwoorg_marketing_node_info() {
 /**
  * Implementation of hook_views_api().
  */
-function lingwoorg_marketing_views_api() {
+function bbcom_marketing_views_api() {
   return array(
     'api' => '2',
   );

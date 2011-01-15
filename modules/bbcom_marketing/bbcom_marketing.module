@@ -1,0 +1,4 @@
+<?php
+
+include_once('bbcom_marketing.features.inc');
+

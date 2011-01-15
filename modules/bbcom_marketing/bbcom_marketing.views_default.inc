@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_views_default_views().
  */
-function lingwoorg_marketing_views_default_views() {
+function bbcom_marketing_views_default_views() {
   $views = array();
 
   // Exported view: all_news
