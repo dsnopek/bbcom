@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_context_default_contexts().
  */
-function lingwoorg_dictionary_context_default_contexts() {
+function bbcom_dictionary_context_default_contexts() {
   $items = array();
 
   $items['lingwoorg-section-dictionary'] = array(
@@ -29,8 +29,8 @@ function lingwoorg_dictionary_context_default_contexts() {
         'label' => 'Lingwo Dictionary: Search block',
         'type' => 'context_ui',
       ),
-      'lingwoorg_dictionary_0' => array(
-        'module' => 'lingwoorg_dictionary',
+      'bbcom_dictionary_0' => array(
+        'module' => 'bbcom_dictionary',
         'delta' => '0',
         'weight' => -21,
         'region' => 'right',
@@ -46,7 +46,7 @@ function lingwoorg_dictionary_context_default_contexts() {
 /**
  * Implementation of hook_ctools_plugin_api().
  */
-function lingwoorg_dictionary_ctools_plugin_api() {
+function bbcom_dictionary_ctools_plugin_api() {
   list($module, $api) = func_get_args();
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
@@ -56,7 +56,7 @@ function lingwoorg_dictionary_ctools_plugin_api() {
 /**
  * Implementation of hook_node_info().
  */
-function lingwoorg_dictionary_node_info() {
+function bbcom_dictionary_node_info() {
   $items = array(
     'entry' => array(
       'name' => t('Entry'),
@@ -76,7 +76,7 @@ function lingwoorg_dictionary_node_info() {
 /**
  * Implementation of hook_views_api().
  */
-function lingwoorg_dictionary_views_api() {
+function bbcom_dictionary_views_api() {
   return array(
     'api' => '2',
   );

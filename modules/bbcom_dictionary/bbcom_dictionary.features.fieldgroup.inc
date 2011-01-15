@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_fieldgroup_default_groups().
  */
-function lingwoorg_dictionary_fieldgroup_default_groups() {
+function bbcom_dictionary_fieldgroup_default_groups() {
   $groups = array();
 
   // Exported group: group_sources

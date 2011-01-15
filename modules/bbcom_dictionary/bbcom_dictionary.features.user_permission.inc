@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_user_default_permissions().
  */
-function lingwoorg_dictionary_user_default_permissions() {
+function bbcom_dictionary_user_default_permissions() {
   $permissions = array();
 
   // Exported permission: create entry content

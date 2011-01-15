@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_views_default_views().
  */
-function lingwoorg_dictionary_views_default_views() {
+function bbcom_dictionary_views_default_views() {
   $views = array();
 
   // Exported view: recent_entries

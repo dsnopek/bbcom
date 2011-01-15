@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_menu_default_menu_links().
  */
-function lingwoorg_dictionary_menu_default_menu_links() {
+function bbcom_dictionary_menu_default_menu_links() {
   $menu_links = array();
 
   // Exported menu link: primary-links:dictionary

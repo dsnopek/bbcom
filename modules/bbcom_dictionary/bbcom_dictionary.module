@@ -1,12 +1,12 @@
 <?php
 
-include_once('lingwoorg_dictionary.features.inc');
+include_once('bbcom_dictionary.features.inc');
 
 /**
  * Implementation of hook_nodeapi().
  */
 // Add entry summary information to the node view
-function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
+function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   global $user;
 
   if ($op == 'view') {
@@ -28,9 +28,9 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       $node->content['entry_summary'] = array(
         '#weight' => -1,
         '#value'  => theme(array(
-          'lingwoorg_dictionary_entry_summary_'. $language .'_'. $pos,
-          'lingwoorg_dictionary_entry_summary_'. $language,
-          'lingwoorg_dictionary_entry_summary'
+          'bbcom_dictionary_entry_summary_'. $language .'_'. $pos,
+          'bbcom_dictionary_entry_summary_'. $language,
+          'bbcom_dictionary_entry_summary'
         ), $node, $a3, $a4)
       );
     }
@@ -43,7 +43,7 @@ function lingwoorg_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 /**
  * Implementation of hook_block().
  */
-function lingwoorg_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
+function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
       $blocks[0] = array(
@@ -68,14 +68,14 @@ function lingwoorg_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
  *
  */
 /*
-function lingwoorg_dictionary_link($type, $node, $teaser=FALSE) {
+function bbcom_dictionary_link($type, $node, $teaser=FALSE) {
   if ($type == 'node' && $node->type == _lingwo_dictionary_settings('entry_content_type') &&
       ($source_node = lingwo_dictionary_entry_load_translation_source($node))) {
     
     $languages = language_list();
     $language_name = $languages[$source_node->language]->name;
     return array(
-      'lingwoorg_dictionary-source' => array(
+      'bbcom_dictionary-source' => array(
         'title' => t('Source entry in @lang', array('@lang' => $language_name)),
         'href'  => lingwo_dictionary_entry_path($source_node),
       )
@@ -87,7 +87,7 @@ function lingwoorg_dictionary_link($type, $node, $teaser=FALSE) {
 /**
  * Implementation of hook_field_formatter_info().
  */
-function lingwoorg_dictionary_field_formatter_info() {
+function bbcom_dictionary_field_formatter_info() {
   return array(
     'text_link' => array(
       'label' => t('Link'),
@@ -103,22 +103,22 @@ function lingwoorg_dictionary_field_formatter_info() {
 /**
  * Implementation of hook_theme().
  */
-function lingwoorg_dictionary_theme() {
+function bbcom_dictionary_theme() {
   return array(
-    'lingwoorg_dictionary_entry_summary' => array(
+    'bbcom_dictionary_entry_summary' => array(
       'arguments' => array('node' => NULL, 'teaser' => FALSE, 'page' => FALSE),
-      'pattern' => 'lingwoorg_dictionary_entry_summary_',
+      'pattern' => 'bbcom_dictionary_entry_summary_',
     ),
-    'lingwoorg_dictionary_formatter_text_link' => array(
+    'bbcom_dictionary_formatter_text_link' => array(
       'arguments' => array('element' => NULL),
     ),
-    'lingwoorg_dictionary_formatter_text_pre' => array(
+    'bbcom_dictionary_formatter_text_pre' => array(
       'arguments' => array('element' => NULL),
     ),
   );
 }
 
-function template_preprocess_lingwoorg_dictionary_entry_summary(&$vars, $hook) {
+function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
   $node = $vars['node'];
   $entry = LingwoEntry::fromNode($node);
 
@@ -136,18 +136,18 @@ function template_preprocess_lingwoorg_dictionary_entry_summary(&$vars, $hook) {
   $vars['fields'] = lingwo_fields_map_items($vars['source_node']->lingwo_fields);
 }
 
-function theme_lingwoorg_dictionary_entry_summary($node, $teaser=FALSE, $page=FALSE) {
+function theme_bbcom_dictionary_entry_summary($node, $teaser=FALSE, $page=FALSE) {
   // TODO: is there some default that makes sense?
   return '';
 }
 
-function theme_lingwoorg_dictionary_formatter_text_link($element) {
+function theme_bbcom_dictionary_formatter_text_link($element) {
   // we cheat by calling the default formatter first
   $value = theme('text_formatter_default', $element);
   return l($value, $value);
 }
 
-function theme_lingwoorg_dictionary_formatter_text_pre($element) {
+function theme_bbcom_dictionary_formatter_text_pre($element) {
   // we cheat by calling the default formatter first
   $value = theme('text_formatter_default', $element);
   // TODO: I'm not sure if this is the right thing to do..  Do we want a semantic <pre>?
