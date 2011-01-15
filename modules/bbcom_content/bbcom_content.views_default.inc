@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_views_default_views().
  */
-function lingwoorg_content_views_default_views() {
+function bbcom_content_views_default_views() {
   $views = array();
 
   // Exported view: korpus_text_entries

@@ -1,11 +1,11 @@
 <?php
 
-include_once('lingwoorg_content.features.inc');
+include_once('bbcom_content.features.inc');
 
 /*
  * Implementation of hook_flag_default_flags().
  */
-function lingwoorg_content_flag_default_flags() {
+function bbcom_content_flag_default_flags() {
   $flags = array();
   $flags[] = array(
     'content_type' => 'node',
@@ -34,7 +34,7 @@ function lingwoorg_content_flag_default_flags() {
 /*
  * Implementation of hook_nodeapi().
  */
-function lingwoorg_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+function bbcom_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type == lingwo_korpus_text_content_type() && $op == 'view') {
     drupal_add_js(drupal_get_path('module', 'flag') .'/theme/flag.js');
     drupal_add_css(drupal_get_path('module', 'flag') .'/theme/flag.css');
@@ -44,7 +44,7 @@ function lingwoorg_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 /**
  * Implementation of hook_block().
  */
-function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
+function bbcom_content_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
       $blocks[0] = array(
@@ -65,7 +65,7 @@ function lingwoorg_content_block($op = 'list', $delta = 0, $edit = array()) {
 /*
  * Implementation of hook_form_alter().
  */
-function lingwoorg_content_form_alter(&$form, $form_state, $form_id) {
+function bbcom_content_form_alter(&$form, $form_state, $form_id) {
   if ($form_state['view']->name == 'search_content') {
     $form['submit']['#value'] = t('Search');
   }

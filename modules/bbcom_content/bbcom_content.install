@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_enable().
  */
-function lingwoorg_content_enable() {
+function bbcom_content_enable() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 
   $filename = serialize(array(
@@ -25,11 +25,11 @@ function lingwoorg_content_enable() {
 /**
  * Implementation of hook_disable().
  */
-function lingwoorg_content_disable() {
+function bbcom_content_disable() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 }
 
-function lingwoorg_content_update_6001() {
+function bbcom_content_update_6001() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 
   $filename = serialize(array(
@@ -49,7 +49,7 @@ function lingwoorg_content_update_6001() {
   return $ret;
 }
 
-function lingwoorg_content_update_6002() {
+function bbcom_content_update_6002() {
   $verified = flag_get_flag('verified');
   $verified->global = FALSE;
   $verified->save();

@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_user_default_permissions().
  */
-function lingwoorg_content_user_default_permissions() {
+function bbcom_content_user_default_permissions() {
   $permissions = array();
 
   // Exported permission: create content content

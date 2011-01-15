@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_content_default_fields().
  */
-function lingwoorg_content_content_default_fields() {
+function bbcom_content_content_default_fields() {
   $fields = array();
 
   // Exported field: field_audio

@@ -3,7 +3,7 @@
 /**
  * Implementation of hook_context_default_contexts().
  */
-function lingwoorg_content_context_default_contexts() {
+function bbcom_content_context_default_contexts() {
   $items = array();
 
   $items['lingwoorg-section-content'] = array(
@@ -30,8 +30,8 @@ function lingwoorg_content_context_default_contexts() {
         'label' => 'Exposed form: search_content-page',
         'type' => 'context_ui',
       ),
-      'lingwoorg_content_0' => array(
-        'module' => 'lingwoorg_content',
+      'bbcom_content_0' => array(
+        'module' => 'bbcom_content',
         'delta' => '0',
         'weight' => -21,
         'region' => 'right',
@@ -56,7 +56,7 @@ function lingwoorg_content_context_default_contexts() {
 /**
  * Implementation of hook_ctools_plugin_api().
  */
-function lingwoorg_content_ctools_plugin_api() {
+function bbcom_content_ctools_plugin_api() {
   list($module, $api) = func_get_args();
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
@@ -66,7 +66,7 @@ function lingwoorg_content_ctools_plugin_api() {
 /**
  * Implementation of hook_node_info().
  */
-function lingwoorg_content_node_info() {
+function bbcom_content_node_info() {
   $items = array(
     'content' => array(
       'name' => t('Content'),
@@ -86,7 +86,7 @@ function lingwoorg_content_node_info() {
 /**
  * Implementation of hook_views_api().
  */
-function lingwoorg_content_views_api() {
+function bbcom_content_views_api() {
   return array(
     'api' => '2',
   );
