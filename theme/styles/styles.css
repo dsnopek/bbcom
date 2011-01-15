@@ -1,0 +1,523 @@
+/* $Id: styles.css,v 1.1 2009/01/31 21:28:46 dvessel Exp $ */
+
+body {
+  background-color: #04081D;
+}
+body.admin-expanded {
+  background-image: none;
+}
+
+#page {
+  background-color: #CCCEDA;
+}
+
+#logo {
+ /* This is a nasty way to do this.  Basically, remove the img from the flow but keep the span
+    in the flow, so the image push the primary menu down.
+
+	TODO: Do this better! */
+
+ position: relative;
+ height: 30px;
+}
+#logo img {
+ position: absolute;
+}
+
+#main-wrapper {
+  margin-top: 10px;
+}
+
+#site-name {
+  font-size: 2em;
+  margin-bottom: 0;
+  height: 50px;
+}
+#site-name a {
+  text-decoration: none;
+  font-size: 110%;
+  /*
+  font-weight: bold;
+  */
+  color: white;
+}
+
+#site-name a:hover {
+  text-decoration: underline;
+}
+
+#site-header-wrapper {
+  background: #07104C url('../images/site-header.png') center top no-repeat;
+  color: white;
+}
+#site-header-wrapper a,
+#site-header-wrapper a:visited {
+  color: white;
+}
+
+#site-header {
+  /* background-color: #0066FF; */
+  height: 75px;
+}
+
+#account-links {
+  float: right;
+  padding-top: 2px;
+}
+#account-links a {
+  color: white;
+}
+#account-links li {
+  display: block;
+  float: left;
+}
+#account-links li {
+  display: block;
+  float: left;
+  margin-left: 5px;
+}
+
+#join-btn {
+  display: block;
+  float: left;
+  background: transparent url('../images/join-btn-left.png') left no-repeat;
+  padding-left: 11px;
+  height: 27px;
+
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+#join-btn span {
+  display: block;
+  float: left;
+  background: transparent url('../images/join-btn-right.png') right no-repeat;
+  padding-right: 14px;
+  height: 27px;
+  cursor: pointer;
+}
+#join-btn span span {
+  display: block;
+  float: left;
+  background: transparent url('../images/join-btn-middle.png') center repeat-x;
+  height: 25px;
+  padding: 2px 0 0 0;
+  cursor: pointer;
+}
+
+/*
+#site-header,
+*/
+#header-region,
+#footer-region,
+.column,
+.node,
+.comment,
+.block {
+  margin-bottom: 10px;
+}
+
+/*
+ * Primary menu
+ */
+ul.links.main-menu li {
+  background: #CCCEDA url('../images/primary-link.png') repeat-x;
+  /*
+  border-right: 1px solid #CCCEDA;
+  */
+  /*
+  padding-top: 2px;
+  */
+  height: 25px;
+  display: block;
+  float: left;
+  margin-right: 1px;
+  color: black;
+}
+
+ul.links.main-menu li a,
+ul.links.main-menu li a:visited {
+  text-decoration: none;
+  color: black !important;
+  font-weight: bold;
+  font-size: 120%;
+}
+
+ul.links.main-menu li.active {
+  background-image: none;
+}
+
+/*
+** DRS: The language switcher.
+*/
+#language-switcher {
+  height: 25px;
+  text-align: right;
+}
+#edit-my-language-select-wrapper {
+  display: inline;
+  margin: 0;
+}
+#edit-my-language-select-wrapper label {
+  color: white;
+  display: inline;
+}
+#edit-my-language-select {
+}
+/* Hide the submit button when JavaScript is enabled. */
+html.js #lingwoorg-theme-language-switcher-form .form-submit {
+  display: none;
+}
+
+/*
+** DRS: basic text stylings.
+*/
+h1,h2,h3,h4,h5,h6 {
+  margin-bottom: 0;
+}
+
+ul, ol {
+  margin-left: 2em;
+}
+
+fieldset {
+  border: 1px solid black;
+}
+/* Required for collapsed fieldsets to look right under IE7. */
+/*
+fieldset legend {
+  float: left;
+}
+*/
+fieldset legend a {
+  padding-right: 5px;
+}
+
+table {
+  width: 100%;
+}
+
+.deem {
+  color: gray;
+}
+
+.langspec {
+  font-size: 12px;
+}
+
+/*
+ * DRS: Messages
+ */
+div.messages,
+div.status,
+div.warning,
+div.error {
+  min-height: 21px;
+  margin: 0 0 10px 0;
+  border: 2px solid #fc0;
+  padding: 5px 5px 5px 35px;
+  color: #000;
+  background: #ffc url('../images/messages-status.png') 5px 5px no-repeat;
+}
+
+div.warning {
+  border-color: #fc0;
+  background-image: url('../images/messages-warning.png');
+}
+
+div.warning,
+tr.warning {
+  border-color: #000;
+  background-color: #ffc;
+}
+
+div.error {
+  border-color: #c00;
+  background-image: url('../images/messages-error.png');
+}
+
+div.error,
+tr.error {
+  color: #900;
+  background-color: #fee;
+}
+
+div.messages ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/*
+ * DRS: Content area
+ */
+
+/* DRS: spacing between content and title or header (if there is no title). */
+/*
+.tabs, #main-content-wrapper.without-tabs {
+  margin-top: 15px;
+}
+*/
+#content-wrapper {
+  background-color: white;
+  border: 1px solid black;
+
+  box-shadow: 3px 3px 4px #555;
+  -webkit-box-shadow: 3px 3px 4px #555;
+  -moz-box-shadow: 3px 3px 4px #555;
+
+  filter: 
+    progid:DXImageTransform.Microsoft.Shadow(color=#555555,direction=90,strength=5)
+    progid:DXImageTransform.Microsoft.Shadow(color=#555555,direction=180,strength=5);
+  -ms-filter: 
+    progid:DXImageTransform.Microsoft.Shadow(color=#555555,direction=90,strength=5)
+    progid:DXImageTransform.Microsoft.Shadow(color=#555555,direction=180,strength=5);
+}
+
+/* Correct for the 1px border on #content-wrapper */
+.content-region {
+  margin: -1px;
+}
+
+#content-main-inner {
+  padding: 10px;
+}
+
+#content-top-inner {
+  padding: 10px 10px 0 10px;
+}
+
+.node .meta {
+  font-size: 8pt;
+  color: #555;
+  font-style: italic;
+}
+.node .content {
+  margin-top: 10px;
+}
+.node .links li {
+  padding: 0 0 0 .5em;
+}
+.node .links li.first {
+  padding: 0;
+}
+
+/* DRS: Tabs connected to the content */
+ul.primary {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+ul.primary li.active a {
+  border-color: black black transparent black;
+  font-weight: bold;
+  color: black;
+}
+ul.primary li a {
+  background-color: #F5F6FD;
+  border-color: #5D5D5D;
+  color: #3D3D3D;
+}
+.form-item {
+  margin-top: 0;
+}
+
+/* DRS: put the content bottom on in the footer. */
+#content-footer {
+  padding-top: 10px;
+}
+
+#footer-wrapper {
+  background-color: #04081D;
+}
+
+#footer {
+  background-color: #04081D;
+  color: white;
+}
+
+#copyright {
+  text-align: center;
+}
+
+/*
+ * DRS: Our main search block.
+ *
+ * NOTE: This is some of the ugliest CSS ever..  It really needs some
+ * oocss love, really.
+ */
+#block-lingwo_dictionary-0,
+#block-views--exp-search_content-page {
+  margin: 0;
+}
+#block-views--exp-search_content-page .views-exposed-form,
+#block-views--exp-search_content-page .views-exposed-widget {
+  padding: 0;
+  margin: 0;
+}
+#block-lingwo_dictionary-0 .form-item,
+#block-views--exp-search_content-page {
+  margin: 0;
+}
+#edit-search-word,
+#edit-keywords {
+  display: block;
+  background: transparent url('../images/search-bar.png') no-repeat;
+  width: 528px;
+  height: 32px;
+  padding: 10px 20px 0 20px;
+  margin-right: 6px;
+  border: 0;
+  font-size: 14pt;
+  float: left;
+}
+#lingwo-dictionary-search-form .form-submit,
+#edit-submit-search-content {
+  display: block;
+  background: transparent url('../images/search-btn.png') no-repeat;
+  width: 43px;
+  height: 42px;
+  border: 0;
+  cursor: pointer;
+  margin: 0;
+
+  /* Move the text into oblivion. */
+  text-indent: -9999px;
+  /* Required for IE7 to abide by the text-indent. */
+  text-transform: capitalize;
+}
+#edit-search-language-wrapper label {
+  float: left;
+  margin-right: 5px;
+}
+
+/*
+ * DRS: Our add button
+ */
+#create-content-link {
+  display: block;
+  background: transparent url('../images/add-btn.png') no-repeat;
+  height: 40px;
+  width: 300px;
+  padding: 6px 0 0 0;
+  font-size: 14pt;
+  color: black;
+  text-decoration: none;
+  text-align: center;
+}
+
+/*
+ * DRS: Blocks created in the database.
+ */
+.block-block {
+  background: white;
+  padding: 5px;
+  border: 4px solid gray;
+}
+.block-block h2 {
+  text-decoration: underline;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+/*
+** DRS: Icons
+*/
+
+.i-en {
+  background: transparent url('../images/flags/us.png') left center no-repeat;
+  padding-left: 20px;
+}
+
+.i-pl {
+  background: transparent url('../images/flags/pl.png') left center no-repeat;
+  padding-left: 20px;
+}
+
+/*
+** WIAL list
+*/
+.view-id-wial_list .view-header {
+  border: 1px solid #c00;
+  color: #900;
+  background-color: #fee;
+  padding: 5px;
+}
+
+/*
+** DRS: Inline form stuff!!
+*/
+
+.form-item .description {
+  clear: left;
+}
+
+.inline-form-item label {
+  display: inline;
+  width: 24%;
+  float: left;
+  padding: 0;
+  position: relative;
+}
+
+.inline-form-item .form-required {
+  color: #c00;
+}
+
+.inline-form-item input.form-text {
+  display: inline;
+  /* DRS: we leave a 4% margin of error */
+  width: 70%;
+}
+
+.inline-form-item label.option {
+  width: auto;
+}
+
+/* clear floats */
+.inline-form-item:after {
+  content: ".";
+  display: "block";
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+  clear: both;
+  min-height: 0;
+  visibility: hidden;
+}
+
+/*
+ * DRS: Entry customizations.
+ */
+.field-field-source-raw .field-item {
+  border: 1px solid gray;
+  background-color: LightGray;
+  overflow: auto;
+  width: 545px;
+  height: 200px;
+}
+
+/*
+** Formatting for administration page
+**
+** The admin panel styles are a mess. IE has problems with this so this is
+** only a temporary fix. This should be fixed in core.
+*/
+div.admin-panel {
+  padding: 0;
+}
+
+div.admin-panel .body {
+  padding: 0 !important;
+}
+
+div.admin .left,
+div.admin .right {
+  width: 50%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+div.admin .right .admin-panel {
+  margin-left: 10px;
+}
+

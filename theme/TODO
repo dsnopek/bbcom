@@ -1,0 +1,32 @@
+
+== 2009-11-20 ==
+
+lingwo-fields-view-pl-adjective.tpl.php:
+
+  * We should show the forms that can be table-ized in a table the same way they are on the
+    edit entry page.  We should try and make these templates shared between the "view" and "widget"
+    templates somehow.  This probably involves making the template variables the same.  Maybe even
+    creating new theme functions for the "pretty data" that we can just theme('pretty', ...) on.
+
+  * We should show the rest of the forms somehow.  I'm not sure what to do, because we want to be
+    able to see all the forms in case something weird is up (like an exception set where there really
+    shouldn't be an exception) but I don't want to clutter the node up with useless data, especially,
+    when senses comes after fields and it is a much more useful field when on the View tab.  Here are
+    some options that should be considered with UI ease above everything else:
+
+    - Have an additional forms tab.
+
+    - Put the rest of the forms in an expandable area, so that they are only shown if asked for.
+
+    - Put them below the senses.
+
+  * Exceptions (meaning non-automatic fields) need to be marked especially clearly.  This will 
+    probably turn up where ever we decide to list all forms.
+
+  * Fields not taken into account by the template should be rendered somewhere.  Not entirely
+    sure how to do this when we aren't using drupal_render() for the individual fields.  But it
+    is essential for admin/editor type people to be able to see all set fields on an entry.  For
+    example, it doesn't make sense for a normal user to see "Soft" on an adjective, but it does
+    make sense for an administrator to see it, since an adjective improperly marked soft could
+    cause problems in the dictionary.
+

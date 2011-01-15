@@ -1,0 +1,14 @@
+--- language.inc-old	2010-03-18 18:25:48.000000000 +0100
++++ language.inc	2010-03-18 18:35:53.000000000 +0100
+@@ -50,6 +50,11 @@
+         return language_default();
+       }
+       break;
++    case 127:
++      if (isset($languages[$_SESSION['language']])) {
++        return $languages[$_SESSION['language']];
++      }
++      break;
+   }
+ 
+   // User language.

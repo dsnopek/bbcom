@@ -1,0 +1,32 @@
+
+/*
+ * Tables used when theming lingwo_fields_widget_form
+ */
+
+.lingwo-fields-table td {
+  padding: .25em;
+  border-right: 1px solid #777777;
+  border-bottom: 1px solid #777777;
+}
+
+.lingwo-fields-table td.tcol-label {
+  background-color: #EEEEEE;
+}
+
+.lingwo-fields-table thead td {
+  font-weight: bold;
+  border-right: 0;
+}
+
+.lingwo-fields-table .form-item {
+  margin: 0 0;
+}
+
+.lingwo-fields-table .form-item label {
+  display: none;
+}
+.lingwo-fields-table .form-item label.option {
+  display: inline;
+}
+
+

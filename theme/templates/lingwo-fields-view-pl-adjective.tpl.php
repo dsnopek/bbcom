@@ -1,0 +1,1 @@
+lingwo-fields-widget-form-pl-adjective.tpl.php
