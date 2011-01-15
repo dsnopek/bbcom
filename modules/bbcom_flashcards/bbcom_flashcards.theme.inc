@@ -4,7 +4,7 @@ function theme_bbcom_flashcards_flashcard_front($node) {
   $entry = LingwoEntry::fromNode($node);
   list ($source_lang, $target_lang) = $entry->getLanguages(TRUE);
 
-  $entry_summary = theme('lingwoorg_dictionary_entry_summary', FALSE, TRUE);
+  $entry_summary = theme('bbcom_dictionary_entry_summary', FALSE, TRUE);
   $pos = $entry->getPos(TRUE);
 
   $output  = $source_lang .' =&gt; '. $target_lang .'<br />';

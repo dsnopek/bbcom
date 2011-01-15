@@ -28,7 +28,7 @@ function bbcom_flashcards_menu() {
   /*
   $items['wial/%user'] = array(
     'title' => 'Words I Am Learning',
-    'access callback' => 'lingwoorg_wial_page_access',
+    'access callback' => 'bbcom_wial_page_access',
     'access arguments' => array(1),
     'page callback' => 'bbcom_flashcards_page_wial_view',
     'page arguments' => array(1),
@@ -42,7 +42,7 @@ function bbcom_flashcards_menu() {
   );
   $items['wial/%user/quiz'] = array(
     'title' => 'Quiz',
-    'access callback' => 'lingwoorg_wial_page_access',
+    'access callback' => 'bbcom_wial_page_access',
     'access arguments' => array(1),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_flashcards_page_wial_quiz_form', 1),
@@ -85,7 +85,7 @@ function bbcom_flashcards_rules_action_info() {
         'node' => array('type' => 'node', 'label' => t('Entry')),
         'user' => array('type' => 'user', 'label' => t('User')),
       ),
-      'module' => 'lingwoorg_flashcard',
+      'module' => 'bbcom_flashcards',
     ),
     'bbcom_flashcards_action_remove_from_wial_deck' => array(
       'label' => t('Remove flashcard from user\'s WIAL deck'),
@@ -93,7 +93,7 @@ function bbcom_flashcards_rules_action_info() {
         'node' => array('type' => 'node', 'label' => t('Entry')),
         'user' => array('type' => 'user', 'label' => t('User')),
       ),
-      'module' => 'lingwoorg_flashcard',
+      'module' => 'bbcom_flashcards',
     ),
   );
 }
