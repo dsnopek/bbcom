@@ -5,3 +5,4 @@ AnkiServer.env
 modules/bbcom_embed/embed-reader-jquery1.4.2.uncompressed.js
 modules/bbcom_embed/embed-reader.uncompressed.js
 server.log
+tests/test.ini
