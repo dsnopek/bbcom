@@ -1,6 +1,7 @@
 
 from __future__ import with_statement
 from fabric.api import *
+import os
 
 # I'm a little weary of this being here by default, since I don't want to accidently
 # do something on production (with the exception of pulling data down for testing)
@@ -9,6 +10,7 @@ prod_host = 'code.hackyourlife.org'
 
 env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
 env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
+env.local_python_env_dir = env.local_prj_dir = env.remote_prj_dir+'/lingwo/python-env'
 
 class _Drush(object):
     def __init__(self, remote=False):
@@ -43,6 +45,29 @@ class _Drush(object):
     def dis(self, *args):
         for mod in args:
             self.run('dis', mod, '--yes')
+
+class _VirtualEnv(object):
+    def __init__(self, path):
+        self.path = path
+
+    @staticmethod
+    def create(path):
+        local('virtualenv '+path)
+        return _VirtualEnv(path)
+
+    def _command(self, command, *args):
+        if len(args) == 1 and isinstance(args, list):
+            args = args[0]
+        local(os.path.join(self.path, 'bin', command)+' '+' '.join(args), capture=False)
+
+    def install(self, *args):
+        self._command('pip', 'install', '-I', *args)
+
+    def python(self, *args):
+        self._command('python', *args)
+
+    def install_from_url(self, url):
+        from tempfile import mkdtemp
 
 @hosts(prod_host)
 def pull_live_db():
@@ -88,4 +113,26 @@ def make_testing_safe():
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
     drush.en('devel')
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
+
+def setup_python_env():
+    """Sets up our python environment."""
+    
+    if os.path.exists(env.local_python_env_dir):
+        abort('Python environment already exists!  Remove and run again to recreate it.')
+
+    venv = _VirtualEnv.create(env.local_python_env_dir)
+    #venv.install_from_url('http://nltk.googlecode.com/files/nltk-2.0b9.zip')
+    #venv.install_from_url('http://html5lib.googlecode.com/files/html5lib-0.90.zip')
+    venv.install(
+        'webob',
+        'PasteDeploy',
+        'PasteScript',
+        'sqlalchemy',
+        'simplejson',
+        'MySQL-python',
+        'PyYAML',
+
+        'http://nltk.googlecode.com/files/nltk-2.0b9.zip',
+        'http://html5lib.googlecode.com/files/html5lib-0.90.zip',
+    )
 
