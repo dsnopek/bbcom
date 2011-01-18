@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE=$HOME/prj/lingwo/bbcom/bbcom_flashcards/AnkiServer
+SOURCE=$HOME/prj/lingwo/bbcom/AnkiServer
 WEBAPP=$HOME/webapps/anki_server
 
 #LOG_FILE=$HOME/logs/user/anki_server/access_log.%Y%m%d

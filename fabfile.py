@@ -46,23 +46,26 @@ class _Drush(object):
         for mod in args:
             self.run('dis', mod, '--yes')
 
-def _python_env_requirements(eggs):
+def _python_env_requirements(limit_to=None):
     f = open('python-env-requirements.txt', 'rt')
     versions = []
     for line in f.readlines():
+        if line.startswith('#'):
+            continue
+        if line == '\n':
+            continue
         line = line[:-1]
-        for egg in eggs:
-            if line.startswith(egg):
-                versions.append(line)
+        if limit_to is not None and line.split('==')[0] not in limit_to:
+            continue
+
+        versions.append(line)
     return versions
 
+# TODO: these should be put into some kind of object so it can go both local and remote
 def _pip(*args):
     local(os.path.join(env.local_python_env_dir, 'bin', 'pip')+' '+' '.join(args), capture=False)
-
-def _get(source, destdir):
-    pass
-
-    def install_from_url(self, url):
+def _python(*args):
+    local(os.path.join(env.local_python_env_dir, 'bin', 'python')+' '+' '.join(args), capture=False)
 
 @hosts(prod_host)
 def pull_live_db():
@@ -122,7 +125,8 @@ def create_bootstrap():
 
     def extend_parser(parser):
         for opt in ['clear','no-site-packages','unzip-setuptools','relocatable','distribute','setuptools']:
-            parser.remove_option('--'+opt)
+            if parser.has_option('--'+opt):
+                parser.remove_option('--'+opt)
 
         parser.add_option('--bbcom-branch', dest='bbcom_branch', metavar='BRANCH',
             help='Location of the bbcom_branch',
@@ -152,6 +156,8 @@ def create_bootstrap():
             subprocess.call([join(home_dir, 'bin', 'bzr'),
                 'co', options.bbcom_branch,
                 join(options.bbcom_project_dir, 'bbcom')])
+            subprocess.call([join(home_dir, 'bin', 'fab'),
+                '-f', join(options.bbcom_project_dir, 'bbcom', 'fabfile.py'), 'bootstrap'])
     """.format(deps=deps)))
 
     f = open('bootstrap.py', 'w')
@@ -162,7 +168,42 @@ def setup_python_env():
     """Sets up our python environment."""
     # TODO: if the python-env doesn't exist, we should create it with the bootstrap script
 
-    # due to a weirdness in nltk, we have to install PyYAML before the rest of the requirements
-    _pip('install', _python_env_requirements('PyYAML')[0])
-    _pip('install', '-r', 'python-env-requirements.txt')
+    tarball_installs = {
+        'nltk==2.0b9':    'http://nltk.googlecode.com/files/nltk-2.0b9.zip#egg=nltk',
+        'html5lib==0.90': 'http://html5lib.googlecode.com/files/html5lib-0.90.zip#egg=html5lib',
+    }
+    anki_tarball = 'http://anki.googlecode.com/files/anki-1.0.1.tgz'
+    requirements = _python_env_requirements()
+
+    for i, r in enumerate(requirements[:]):
+        if tarball_installs.has_key(r):
+            requirements[i] = tarball_installs[r]
+        elif r.split('==')[0] == 'anki':
+            # we handle Anki special at the end
+            del requirements[i]
+
+    # we have to install PyYAML first due to a weird bug in nltk
+    _pip('install', '-U', *_python_env_requirements(['PyYAML']))
+    # install (almost) all the requirements
+    _pip('install', '-U', *requirements)
+
+    # install libanki special
+    from tempfile import mkdtemp
+    from shutil import rmtree
+    tempdir = mkdtemp()
+    try:
+        fn = os.path.basename(anki_tarball)
+        dn = os.path.splitext(fn)[0]
+
+        with cd(tempdir):
+            local('wget '+anki_tarball, capture=False)
+            local('tar -xzvf '+fn, capture=False)
+        with cd(os.path.join(tempdir, dn, 'libanki')):
+            _python('setup.py', 'install')
+    finally:
+        rmtree(tempdir)
+
+def bootstrap():
+    """Takes an empty project directory, populates and sets everything up."""
+    setup_python_env()
 
