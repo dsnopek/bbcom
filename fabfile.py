@@ -59,28 +59,10 @@ def _python_env_requirements(eggs):
 def _pip(*args):
     local(os.path.join(env.local_python_env_dir, 'bin', 'pip')+' '+' '.join(args), capture=False)
 
-class _VirtualEnv(object):
-    def __init__(self, path):
-        self.path = path
-
-    @staticmethod
-    def create(path):
-        local('virtualenv '+path)
-        return _VirtualEnv(path)
-
-    def _command(self, command, *args):
-        if len(args) == 1 and isinstance(args, list):
-            args = args[0]
-        local(os.path.join(self.path, 'bin', command)+' '+' '.join(args), capture=False)
-
-    def install(self, *args):
-        self._command('pip', 'install', '-I', *args)
-
-    def python(self, *args):
-        self._command('python', *args)
+def _get(source, destdir):
+    pass
 
     def install_from_url(self, url):
-        from tempfile import mkdtemp
 
 @hosts(prod_host)
 def pull_live_db():
@@ -127,9 +109,59 @@ def make_testing_safe():
     drush.en('devel')
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
 
+def create_bootstrap():
+    """Creates the boostrap.py for bootstrapping our development environment."""
+
+    import virtualenv, textwrap
+
+    deps = ['pip', 'virtualenv', 'fabric', 'bzr', 'pycrypto', 'paramiko']
+    deps = ', '.join(["'{0}'".format(x) for x in _python_env_requirements(deps)])
+
+    output = virtualenv.create_bootstrap_script(textwrap.dedent("""
+    import os, sys, subprocess
+
+    def extend_parser(parser):
+        for opt in ['clear','no-site-packages','unzip-setuptools','relocatable','distribute','setuptools']:
+            parser.remove_option('--'+opt)
+
+        parser.add_option('--bbcom-branch', dest='bbcom_branch', metavar='BRANCH',
+            help='Location of the bbcom_branch',
+            default='bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/lingwoorg/refactor-1')
+
+        parser.add_option('--only-virtualenv', dest='only_virtualenv', action='store_true',
+            help='Only create the virtualenv, not the entire BiblioBird project directory',
+            default=False)
+
+    def adjust_options(options, args):
+        if len(args) > 0:
+            if os.path.exists(args[0]):
+                print >> sys.stderr, "ERROR: %s already exists!" % args[0]
+                sys.exit(1)
+            if not options.only_virtualenv:
+                os.mkdir(args[0])
+                options.bbcom_project_dir = args[0]
+                args[0] = join(args[0], 'python-env')
+
+        options.no_site_packages = True
+        options.prompt = 'bibliobird'
+
+    def after_install(options, home_dir):
+        subprocess.call([join(home_dir, 'bin', 'pip'),
+            'install', '-U', {deps}])
+        if not options.only_virtualenv:
+            subprocess.call([join(home_dir, 'bin', 'bzr'),
+                'co', options.bbcom_branch,
+                join(options.bbcom_project_dir, 'bbcom')])
+    """.format(deps=deps)))
+
+    f = open('bootstrap.py', 'w')
+    f.write(output)
+    f.close()
+
 def setup_python_env():
     """Sets up our python environment."""
-    
+    # TODO: if the python-env doesn't exist, we should create it with the bootstrap script
+
     # due to a weirdness in nltk, we have to install PyYAML before the rest of the requirements
     _pip('install', _python_env_requirements('PyYAML')[0])
     _pip('install', '-r', 'python-env-requirements.txt')
