@@ -46,6 +46,19 @@ class _Drush(object):
         for mod in args:
             self.run('dis', mod, '--yes')
 
+def _python_env_requirements(eggs):
+    f = open('python-env-requirements.txt', 'rt')
+    versions = []
+    for line in f.readlines():
+        line = line[:-1]
+        for egg in eggs:
+            if line.startswith(egg):
+                versions.append(line)
+    return versions
+
+def _pip(*args):
+    local(os.path.join(env.local_python_env_dir, 'bin', 'pip')+' '+' '.join(args), capture=False)
+
 class _VirtualEnv(object):
     def __init__(self, path):
         self.path = path
@@ -117,22 +130,7 @@ def make_testing_safe():
 def setup_python_env():
     """Sets up our python environment."""
     
-    if os.path.exists(env.local_python_env_dir):
-        abort('Python environment already exists!  Remove and run again to recreate it.')
-
-    venv = _VirtualEnv.create(env.local_python_env_dir)
-    #venv.install_from_url('http://nltk.googlecode.com/files/nltk-2.0b9.zip')
-    #venv.install_from_url('http://html5lib.googlecode.com/files/html5lib-0.90.zip')
-    venv.install(
-        'webob',
-        'PasteDeploy',
-        'PasteScript',
-        'sqlalchemy',
-        'simplejson',
-        'MySQL-python',
-        'PyYAML',
-
-        'http://nltk.googlecode.com/files/nltk-2.0b9.zip',
-        'http://html5lib.googlecode.com/files/html5lib-0.90.zip',
-    )
+    # due to a weirdness in nltk, we have to install PyYAML before the rest of the requirements
+    _pip('install', _python_env_requirements('PyYAML')[0])
+    _pip('install', '-r', 'python-env-requirements.txt')
 
