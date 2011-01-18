@@ -157,7 +157,8 @@ def create_bootstrap():
                 'co', options.bbcom_branch,
                 join(options.bbcom_project_dir, 'bbcom')])
             subprocess.call([join(home_dir, 'bin', 'fab'),
-                '-f', join(options.bbcom_project_dir, 'bbcom', 'fabfile.py'), 'bootstrap'])
+                '-f', join(options.bbcom_project_dir, 'bbcom', 'fabfile.py'), 'bootstrap'],
+                cwd=join(options.bbcom_project_dir, 'bbcom'))
     """.format(deps=deps)))
 
     f = open('bootstrap.py', 'w')
