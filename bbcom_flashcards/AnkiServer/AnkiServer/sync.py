@@ -227,7 +227,8 @@ class SyncApp(object):
         outfile.close()
         os.close(fd)
         # if we were successful, overwrite old deck
-        os.unlink(path)
+        if os.path.exists(path):
+            os.unlink(path)
         os.rename(tmpname, path)
         # reset the deck name
         c = sqlite.connect(path)
