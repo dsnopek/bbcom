@@ -63,6 +63,8 @@
   * Save the modules page: /admin/build/modules
     (should enable new dependencies)
 
+    --- (I think the last two steps can be covered by 'drush updatedb') ---
+
   * Check if features are overridden: /admin/build/features
 
   * TODO: Clear the views cache??
