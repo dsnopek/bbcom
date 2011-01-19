@@ -11,14 +11,13 @@
  */
 function bbcom_news_menu() {
   $items = array();
-  $items['admin/settings/lingwo_dictionary/news'] = array(
+  $items['admin/settings/bbcom/news'] = array(
     'title' => 'News',
     'description' => 'Settings for BiblioBird.com News module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_news_admin_settings'),
     'file' => 'bbcom_news.admin.inc',
-    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;

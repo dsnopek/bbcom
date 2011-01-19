@@ -1,5 +1,24 @@
 <?php
 
+/*
+ * Implementation of hook_menu().
+ */
+function bbcom_misc_menu() {
+  return array(
+    'admin/settings/bbcom' => array(
+      'title' => 'BiblioBird.com',
+      'description' => 'Settings for BiblioBird.com',
+      'access arguments' => array('administer site configuration'),
+      'page callback' => 'system_admin_menu_block_page',
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+    ),
+  );
+}
+
+/*
+ * Implementation of hook_misc_mail_alter().
+ */
 function bbcom_misc_mail_alter(&$message) {
   // Our SMTP server requires that From is an e-mail address that we control
   // so we always put the 'From' into 'Reply-To' instead and make the 'From'

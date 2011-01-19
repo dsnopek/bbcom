@@ -14,14 +14,13 @@ include_once('bbcom_flashcards.anki.inc');
  */
 function bbcom_flashcards_menu() {
   $items = array();
-  $items['admin/settings/lingwo_dictionary/flashcards'] = array(
+  $items['admin/settings/bbcom/flashcards'] = array(
     'title' => 'Flashcards',
     'description' => 'Settings for BiblioBird.com Flashcards module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_flashcards_admin_settings'),
     'file' => 'bbcom_flashcards.admin.inc',
-    'type' => MENU_LOCAL_TASK,
   );
 
   // TODO: these pages aren't ready yet!
