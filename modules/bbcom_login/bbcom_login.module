@@ -48,11 +48,28 @@ function bbcom_login_form_alter(&$form, &$form_state, $form_id) {
   global $language;
 
   if ($form_id == 'user_register') {
+    // honey pot field
+    $form['url'] = array(
+      '#title' => t('URL'),
+      '#type' => 'textfield',
+    );
+
     // user's language will be set to whatever the current language is
     $form['language'] = array(
       '#type' => 'hidden',
       '#value' => $language->language,
     );
+
+    $form['#validate'][] = 'bbcom_login_user_register_validate';
+
+    drupal_add_css(drupal_get_path('module', 'bbcom_login') .'/bbcom_login.css');
+  }
+}
+
+function bbcom_login_user_register_validate($form, &$form_state) {
+  # check our honey pot!
+  if (!empty($form_state['values']['url'])) {
+    form_set_error('url', t('Please leave the URL field blank.  It is there to catch bots!'));
   }
 }
 
