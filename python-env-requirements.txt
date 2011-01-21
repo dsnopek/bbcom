@@ -6,6 +6,10 @@ PasteScript==1.7.3
 SQLAlchemy==0.6.6
 MySQL-python==1.2.3
 
+# for testing
+#selenium==2.0b1
+-e svn+http://selenium.googlecode.com/svn/trunk
+
 # these are install from zip/tarball (NOT pypi!)
 anki==1.0.1
 html5lib==0.90
