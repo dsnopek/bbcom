@@ -55,10 +55,6 @@ function bbcom_flashcards_menu() {
 }
 
 /**
- * Implementation of hook_perm
- */
-
-/**
  * Implementation of hook_theme()
  */
 function bbcom_flashcards_theme() {
@@ -108,6 +104,18 @@ function bbcom_flashcards_user_operations() {
       'callback' => 'bbcom_flashcards_user_operations_resync'
     ),
   );
+}
+
+/*
+ * Implementation of hook_user().
+ */
+function bbcom_flashcards_user($op, &$edit, &$account, $category=NULL) {
+  if ($op == 'insert') {
+     // create the WIAL deck for all new users
+     bbcom_flashcards_anki_server_connect()
+      ->openWialDeck($account->uid)
+      ->setup();
+  }
 }
 
 /*
