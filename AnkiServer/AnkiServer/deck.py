@@ -286,6 +286,11 @@ class DeckAppHandler(object):
         }
 
     @opts(waitForReturn=False)
+    def setup(self):
+        # will create the deck if it doesn't exist
+        self.wrapper.open()
+
+    @opts(waitForReturn=False)
     def add_fact(self, fields):
         fact_id = self.wrapper.find_fact(fields['External ID'])
         if fact_id is not None:

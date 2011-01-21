@@ -13,6 +13,10 @@ class AnkiDeck {
     $this->path = $path;
   }
 
+  function setup() {
+    $this->server->request($this->path, 'setup', array());
+  }
+
   function addFact($fields) {
     $this->server->request($this->path, 'add_fact', array(
       'fields' => $fields
