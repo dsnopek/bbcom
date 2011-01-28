@@ -1,6 +1,0 @@
-core = "6.x"
-dependencies[] = "lingwoorg"
-description = "Setup for our newsletter"
-name = "BiblioBird.com Newsletter"
-package = "BiblioBird.com"
-

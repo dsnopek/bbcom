@@ -1,0 +1,5 @@
+core = "6.x"
+description = "Setup for our newsletter"
+name = "BiblioBird.com Newsletter"
+package = "BiblioBird.com"
+

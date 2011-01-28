@@ -1,0 +1,42 @@
+
+Compact Forms
+=============
+
+Putting a fields label as the content of the field for more concise presentation:
+
+Drupal module:
+
+http://drupal.org/project/compact_forms
+
+A List Apart article:
+
+http://www.alistapart.com/articles/makingcompactformsmoreaccessible/
+
+
+Inline Forms
+============
+
+Drupal discussion of the topic:
+
+http://groups.drupal.org/node/12560
+
+Uni-form
+--------
+
+http://www.sprawsm.com/uni-form/
+
+Uni-form is a very cool looking set of styles that take the same type of output that 
+Drupal gives for its forms, but allows more "table-like" inline display.  It probably
+couldn't/shouldn't be used directly, but rather learned from and have the same techniques
+reused in our theme.
+
+Fancy Buttons
+=============
+
+This code could *easily* be integrated into a theme to provide much nicer looking buttons
+for the site:
+
+http://www.p51labs.com/simply-buttons-v2/
+
+It would just be theme_button (or whatever creates the submit buttons) and some CSS.
+

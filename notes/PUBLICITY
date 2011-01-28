@@ -1,0 +1,52 @@
+
+== CKAN ==
+
+od	Jonathan Gray <jonathan.gray@okfn.org>
+odpowiedz do	"Discussion of development and bugs, no announcements" <freedict-beta@lists.sourceforge.net>
+do	"Discussion of development and bugs, no announcements" <freedict-beta@lists.sourceforge.net>,
+Rufus Pollock <rufus.pollock@okfn.org>
+data	5 stycznia 2009 03:45
+temat	Re: [Freedict-beta] Freedict on CKAN
+Lista adresowa	freedict-beta.lists.sourceforge.net Filtruj wiadomości z tej listy mailingowej
+wysłana przez	lists.sourceforge.net
+	
+ukryj szczegóły 03:45 (3 godzin temu)
+	
+	
+Odpowiedz
+	
+	
+On Sun, Jan 4, 2009 at 3:20 PM, Jimmy O'Regan <joregan@gmail.com> wrote:
+> You could start with this dictionary: http://www-user.tu-chemnitz.de/~fri/ding/
+> which is GPLd. It's quite large.
+
+This looks fantastic!
+
+I've added an entry for this at:
+
+ http://ckan.net/package/read/ding
+
+To see other dictionaries on CKAN, see:
+
+ http://ckan.net/tag/read/dictionary
+
+(At the moment there is a minor bug in the most recent revision over
+Christmas - to see each package you have to manually type:
+http://ckan.net/package/read/[packagename]...)
+
+To add to the list you can create a new package, and include the tag
+'dictionary':
+
+ http://ckan.net/package/new
+
+If anyone knows of any other free/open source dictionaries - it would
+be great to register these!
+
+I'll do a blog post with an overview of various open (as in
+opendefinition.org) dictionary projects some time in the next couple
+of weeks - any historical/background information would be much
+appreciated!
+
+Warm regards,
+
+Jonathan

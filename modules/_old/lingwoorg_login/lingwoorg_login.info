@@ -1,0 +1,5 @@
+core = "6.x"
+description = "Customize the login system for our needs"
+name = "Lingwo.org Login"
+package = "Lingwo.org (deprecated)"
+

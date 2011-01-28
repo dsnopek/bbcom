@@ -1,0 +1,95 @@
+<?php
+// $Id$
+
+include_once('bbcom_wial.features.inc');
+
+/**
+ * @file
+ * Gives each user a list of entries they are learning
+ */
+
+/*
+ * Implementation of hook_flag_default_flags().
+ */
+function bbcom_wial_flag_default_flags() {
+  $flags = array();
+  $flags[] = array(
+    'content_type' => 'node',
+    'name' => 'wial',
+    'title' => 'Words I Am Learning',
+    'global' => FALSE,
+    'types' => array('entry'),
+    'flag_short' => 'Add to "Words I Am Learning"',
+    'flag_long' => '',
+    'flag_message' => '',
+    'unflag_short' => 'Remove from "Words I Am Learning"',
+    'unflag_long' => '',
+    'unflag_message' => '',
+    'show_on_page' => TRUE,
+    'show_on_teaser' => TRUE,
+    'show_on_form' => FALSE,
+    // enabled by default
+    'status' => TRUE,
+  );
+  return $flags;
+}
+
+/*
+ * Implementation of hook_link_alter().
+ */
+function bbcom_wial_link_alter(&$links, $node) {
+  if ($entry = LingwoEntry::fromNode($node)) {
+    if (!$entry->isTranslation()) {
+      // Only translations can be added!
+      unset($links['flag-wial']);
+    }
+  }
+}
+
+/*
+ * Implementation of hook_menu().
+ */
+function bbcom_wial_menu() {
+  $items = array();
+  $items['wial'] = array(
+    'title' => 'Words I Am Learning',
+    'description' => 'Redirect to a user\'s WIAL page',
+    'access arguments' => array('access wial'),
+    'page callback' => 'bbcom_wial_redirect_page',
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+/*
+ * Implementation of hook_perm().
+ */
+function bbcom_wial_perm() {
+  return array(
+    // TODO: we need to make is so users without 'access wial' don't see any signs of!
+    'access wial',
+    'access other wials'
+  );
+}
+
+function bbcom_wial_page_access($account) {
+  global $user;
+
+  // root user
+  if ($user->uid == 1) {
+    return TRUE;
+  }
+
+  if (is_numeric($account)) {
+    $account = (object)array('uid' => $account);
+  }
+
+  return (user_access('access wial') && $user->uid == $account->uid) ||
+    user_access('access other wials');
+}
+
+function bbcom_wial_redirect_page() {
+  global $user;
+  drupal_goto('wial/'. $user->uid .'/edit');
+}
+

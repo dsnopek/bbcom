@@ -1,0 +1,19 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ * Install file for bbcom_login.
+ */
+
+/**
+ * Implementation of hook_enable().
+ */
+function bbcom_login_enable() {
+  // setup invalidated role
+  $res = db_query("SELECT rid FROM {role} WHERE name = '%s'", "unverified user");
+  if ($res && $obj = db_fetch_object($res)) {
+  	variable_set('logintoboggan_pre_auth_role', $obj->rid);
+  }
+}
+

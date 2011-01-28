@@ -1,0 +1,85 @@
+<?php
+
+/**
+ * Implementation of hook_enable().
+ */
+function bbcom_dictionary_enable() {
+  features_rebuild(array('bbcom_dictionary' => array('node', 'content')));
+
+  // we have to set it in like 3 places!
+  $field_sources_weight = 6;
+
+  // create field group
+  $field_sources = array(
+    'type_name'  => 'entry',
+    'group_type' => 'multigroup',
+    'group_name' => 'group_sources',
+    'label'      => 'Sources',
+    // NOTE: for some reason, this causes the whole field group not to be added...
+    //'weight'     => $field_sources_weight
+  );
+  $field_sources['settings'] = field_group_default_settings('multigroup');
+  $field_sources['settings']['form']['style'] = 'fieldset_collapsed';
+  $field_sources['settings']['display']['teaser']['exclude'] = 1;
+  $field_sources['settings']['display']['full']['format'] = 'fieldset_collapsed';
+  $field_sources['settings']['display']['full']['exclude'] = 0;
+  $field_sources['settings']['display']['weight'] = $field_sources_weight;
+  $field_sources['settings']['display']['label'] = 'above';
+  $field_sources['settings']['display']['description'] = '';
+  $field_sources['settings']['multigroup']['required'] = FALSE;
+  $field_sources['settings']['multigroup']['multiple'] = 1;
+  $field_sources['settings']['multigroup']['subgroup'] = array(
+    'weight' => -20,
+    'label'  => 'above',
+    'teaser' => array(
+      'format' => 'fieldset',
+      'exclude' => 0
+    ),
+    'full' => array(
+      'format' => 'simple',
+      'exclude' => 0,
+    )
+  );
+  fieldgroup_save_group('entry', $field_sources);
+
+  // add our fields to the field group
+  foreach(array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $field_name) {
+    $field_name = 'field_source_'. $field_name;
+    fieldgroup_update_fields(array(
+      'field_name' => $field_name,
+      'group'      => 'group_sources',
+      'type_name'  => 'entry'
+    ));
+  }
+  // set the correct weight (for some reason I can set with fieldgroup_save_group).
+  db_query("UPDATE {content_group} SET weight = %d WHERE type_name = '%s' AND group_name = '%s'",
+    $field_sources_weight, 'entry', 'group_sources');
+
+  // we should clear a bunch of caches
+  drupal_flush_all_caches();
+
+  // clear this one too for good measure
+  fieldgroup_groups('', FALSE, TRUE);
+}
+
+function bbcom_dictionary_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 100 WHERE name = 'bbcom_dictionary'");
+  return $ret;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function bbcom_dictionary_install() {
+  // we need to happen after lingwo_fields (which has weight of 51)
+  update_sql("UPDATE {system} SET weight = 100 WHERE name = 'bbcom_dictionary'");
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function bbcom_dictionary_disable() {
+  fieldgroup_delete('entry', 'group_sources');
+}
+
