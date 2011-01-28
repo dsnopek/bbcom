@@ -129,7 +129,7 @@ def branch(target, source='mainline'):
             local('bzr bind {0}'.format(remote), capture=False)
 
 def activate_branch(branch):
-     for repo in env.repos:
+    for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo')):
             source = repo+'.'+branch
             if not os.path.exists(os.path.join(env.local_prj_dir, 'lingwo', source)):
@@ -143,6 +143,19 @@ def activate_branch(branch):
             for link in links:
                 local('rm -f {0}'.format(link), capture=False)
                 local('ln -s {0} {1}'.format(source, link), capture=False)
+
+def merge(source, target='mainline', message=None):
+    base_message = 'Merging {0} branch.'.format(source) 
+    if message is None:
+        message = base_message
+    else:
+        message = base_message + '  ' + message
+    
+    for repo in env.repos:
+        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
+            output = local('bzr merge ../{0} 2>&1'.format(repo+'.'+source), capture=True)
+            if output != 'Nothing to do.':
+                local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
 
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
