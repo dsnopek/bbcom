@@ -159,16 +159,15 @@ def merge(source, target='mainline', message=None):
     
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
-            output = local('bzr merge ../{0} 2>&1'.format(repo+'.'+source), capture=True)
-            # TODO: we should also be able to test output.stderr
-            if output != 'Nothing to do.':
+            output = local('bzr merge ../{0}'.format(repo+'.'+source), capture=True)
+            if output.stderr != 'Nothing to do.':
                 local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
 
-def make_release(name):
-    """Merges mainline into production and tags it for release."""
+def tag_release(name):
+    """Tags production for release."""
 
     # merge mainline into production
-    merge('mainline', 'production', 'Creating release {0}'.format(name))
+    #merge('mainline', 'production', 'Creating release {0}'.format(name))
 
     # tag production with release name
     for repo in env.repos:
@@ -185,14 +184,14 @@ def deploy(release_name):
 
     # backup the code
     with cd(env.remote_prj_dir):
-        run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d'))
+        run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
 
     # check out the new code
     repos = env.repos[:]
     # TODO: for now, we have to deal with lingwoorg really living inside bbcom
     repos[repos.index('lingwoorg')] = 'bbcom'
     for repo in repos:
-        with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo):
+        with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo)):
             run('bzr up -r tag:{0}'.format(release_name))
 
     # update the database (should also force new dependencies to be enabled)
