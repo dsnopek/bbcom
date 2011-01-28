@@ -10,7 +10,9 @@ prod_host = 'code.hackyourlife.org'
 
 env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
 env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
-env.local_python_env_dir = env.local_prj_dir = env.remote_prj_dir+'/lingwo/python-env'
+env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/lingwo/python-env'
+
+env.repos = ['lingwoorg','lingwo_dictionary','linguatrek','drupal']
 
 class _Drush(object):
     def __init__(self, remote=False):
@@ -111,6 +113,36 @@ def make_testing_safe():
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
     drush.en('devel')
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
+
+def branch(target, source='mainline'):
+    for repo in env.repos:
+        dest = os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)
+        if os.path.exists(dest):
+            print("Not branching {0}, branch {1} already exists".format(repo, target))
+            continue
+
+        with cd(os.path.join(env.local_prj_dir, 'lingwo')):
+            local('bzr branch {repo}.{source} {repo}.{target}'.format(repo=repo, source=source, target=target), capture=False)
+        with cd(dest):
+            remote = 'bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/{repo}/{target}'.format(repo=repo, target=target)
+            local('bzr push {0}'.format(remote), capture=False)
+            local('bzr bind {0}'.format(remote), capture=False)
+
+def activate_branch(branch):
+     for repo in env.repos:
+        with cd(os.path.join(env.local_prj_dir, 'lingwo')):
+            source = repo+'.'+branch
+            if not os.path.exists(os.path.join(env.local_prj_dir, 'lingwo', source)):
+                abort('Branch {0} doesn\'t exist'.format(repo+'.'+target))
+
+            # also do the 'bbcom' repo if necessary
+            links = [repo]
+            if repo == 'lingwoorg':
+                links.append('bbcom')
+
+            for link in links:
+                local('rm -f {0}'.format(link), capture=False)
+                local('ln -s {0} {1}'.format(source, link), capture=False)
 
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
