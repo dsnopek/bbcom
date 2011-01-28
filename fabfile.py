@@ -1,7 +1,7 @@
 
 from __future__ import with_statement
 from fabric.api import *
-import os
+import os, datetime
 
 # I'm a little weary of this being here by default, since I don't want to accidently
 # do something on production (with the exception of pulling data down for testing)
@@ -115,6 +115,8 @@ def make_testing_safe():
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
 
 def branch(target, source='mainline'):
+    """Branch all the repos to create a new family of branches."""
+
     for repo in env.repos:
         dest = os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)
         if os.path.exists(dest):
@@ -129,6 +131,8 @@ def branch(target, source='mainline'):
             local('bzr bind {0}'.format(remote), capture=False)
 
 def activate_branch(branch):
+    """Switch all our symlinks to point to the given family of branches."""
+
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo')):
             source = repo+'.'+branch
@@ -145,6 +149,8 @@ def activate_branch(branch):
                 local('ln -s {0} {1}'.format(source, link), capture=False)
 
 def merge(source, target='mainline', message=None):
+    """Merge a family of branches into another family (by default, "mainline")."""
+
     base_message = 'Merging {0} branch.'.format(source) 
     if message is None:
         message = base_message
@@ -154,11 +160,55 @@ def merge(source, target='mainline', message=None):
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
             output = local('bzr merge ../{0} 2>&1'.format(repo+'.'+source), capture=True)
+            # TODO: we should also be able to test output.stderr
             if output != 'Nothing to do.':
                 local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
 
+def make_release(name):
+    """Merges mainline into production and tags it for release."""
+
+    # merge mainline into production
+    merge('mainline', 'production', 'Creating release {0}'.format(name))
+
+    # tag production with release name
+    for repo in env.repos:
+        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.production')):
+            local('bzr tag release--{0}'.format(name))
+
+@hosts(prod_host)
+def deploy(release_name):
+    drush = _Drush(remote=True)
+    today = datetime.date.today()
+
+    # backup the database
+    drush.run('bam-backup', 'db', 'manual', 'default')
+
+    # backup the code
+    with cd(env.remote_prj_dir):
+        run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d'))
+
+    # check out the new code
+    repos = env.repos[:]
+    # TODO: for now, we have to deal with lingwoorg really living inside bbcom
+    repos[repos.index('lingwoorg')] = 'bbcom'
+    for repo in repos:
+        with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo):
+            run('bzr up -r tag:{0}'.format(release_name))
+
+    # update the database (should also force new dependencies to be enabled)
+    drush.run('updatedb')
+
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
+
+    # TODO: The bootstrap should also add this to bin/activate:
+    #
+    #  # DRS: make our fabfile always get called
+    #  alias fab='fab -f /home/dsnopek/prj/lingwo/bbcom/fabfile.py'
+    #
+    # TODO: The bootstrap should initialize the top project directory
+    # as a Bazaar repository, so that revisiions are shared between branches.
+    #
 
     import virtualenv, textwrap
 
