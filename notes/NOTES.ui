@@ -1,0 +1,20 @@
+
+== Search Block ==
+
+[_______________________] [Search]
+-- Advanced Options --
+[X] Verified entries only
+[<From>] [<To>]
+
+This should load up: /entry/<word>?from=<from>&to=<to>&verified=<verified>
+
+If no word with the exact form entered is found, then it returns a 
+special 404 page, with the following options:
+
+ * Search Near-by (similar search, via PyLucene on the backend, ?similar=1 here)
+ * Create entry
+
+If the word is found, it is displayed, potentially with the "from" or
+"to" filter applied.  There will be an "Edit" tab above which goes to the
+edit screen.
+

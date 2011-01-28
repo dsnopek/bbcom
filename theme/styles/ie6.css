@@ -1,0 +1,21 @@
+
+#join-btn {
+  background-image: url('../images/ie6/join-btn-left.png');
+}
+#join-btn span {
+  background-image: url('../images/ie6/join-btn-right.png');
+}
+#join-btn span span {
+  background-image: url('../images/ie6/join-btn-middle.png');
+}
+div.messages,
+div.status {
+  background-image: url('../images/ie6/messages-status.png');
+}
+div.warning {
+  background-image: url('../images/ie6/messages-warning.png');
+}
+div.error {
+  background-image: url('../images/ie6/messages-error.png');
+}
+

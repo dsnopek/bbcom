@@ -1,0 +1,5 @@
+core = "6.x"
+description = "Provides interface with our hardware devices: tablets, etc"
+name = "Lingwo.org Device"
+package = "Lingwo.org (deprecated)"
+

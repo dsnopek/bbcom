@@ -1,0 +1,53 @@
+
+TEI P5 Ch.9 provides a standardized XML format for describing dictionaries, here I would like
+to describe our relationship to it.
+
+Representing our dictionaries
+-----------------------------
+
+We should use a modified TEI to store our dictionary XML dumps.  We need to extend TEI to store
+the following:
+
+  * revision-id
+  * verified (on a whole dictionary)
+  * forms (with our form names)
+  * computed
+  * created and updated dates
+
+We should have a default converter from our internal data model to TEI that holds all the data
+but which isn't pretty and not intended for print.
+
+The language definition could contain some XSLT for converting the default TEI to a print friendly
+version which contains the same data, but has it hidden (<form><orth value="blah"/></form>).  This
+will allow us to print just a reduced list of forms in some standardized way (ie. for Polish masculine
+nouns, the genitive singular; for verbs the "key forms", but only when irregular).
+
+Other data from the language definition will also be pulled to form the header and front matter
+of the dictionary.  This will include a description of the alphabet and the morphology definitions
+(which may also be converted into inflection tables for human consumption).
+
+At first, we should provide this stuff as part of the dump script with some additional code per
+language to make it happen.  When we have enough examples of what needs to be done, this should be
+integrated into the language definition format so that no custom code is needed.
+
+Importing other dictionaries
+----------------------------
+
+We need to be as accepting as possible, so we can import other dictionaries with as little data
+massaging as possible.  However, they will have to be reduced to our data model, so an
+import/export will likely generate a very different dictionary.  I'm not sure how to avoid this
+because TEI is capable of representing such diverse data and our data model has to be constrained
+to remain easy to use/edit.
+
+The header data should be converted into source documents in the database ("Source" will be another
+data type with revisions just like "Entry" and "Language").  Each entry will link back to its 
+source.
+
+Entry ids will have to be remade as UUIDs unless we are sure that the id referred to was created
+by the Lingwo dictionary itself (ie. an export then import).  It would be nice to preserve the 
+original IDs somewhere, possibly for use when re-exporting as TEI.
+
+(Or maybe just have a "human-readable ID" option in the TEI export process that makes the
+IDs nicer?  Then we could have xml:id="human-readable" lingwo:id="XXXX-XXXX-XXXX-XXXX" in our
+extended TEI?)
+

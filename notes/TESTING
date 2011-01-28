@@ -1,0 +1,39 @@
+
+How to update your test server with data from the live server?
+==============================================================
+
+ 1. Do a "Quick Backup" to "Download" of the database:
+
+    http://www.bibliobird.com/admin/content/backup_migrate
+
+ 2. On the test server, restore using the backup file:
+
+    zcat ~/dl/Lingwo.org-XXXX-XX-XXTXX-XX-XX.mysql.gz | drush sql-cli
+
+    # Should be this way, but it didn't work last time..
+    #http://localhost:35637/admin/content/backup_migrate/restore
+
+ 3. Perform a number of changes to make things "safe" for development:
+
+    drush cc all
+    drush sql-query "UPDATE languages SET domain = 'http://en.localdomain:35637', prefix = '' WHERE language = 'en'"
+    drush sql-query "UPDATE languages SET domain = 'http://pl.localdomain:35637', prefix = '' WHERE language = 'pl'"
+    drush vset --yes language_negotiation "3"
+    drush vset --yes preprocess_css "0"
+    drush vset --yes preprocess_js  "0"
+    drush vset --yes site_name "TESTING"
+	drush vset --yes bbcom_news_mailchimp_integration "0"
+    drush sql-query "DROP TABLE devel_queries; DROP TABLE devel_times"
+	drush sql-query "UPDATE backup_migrate_schedules SET enabled = 0"
+	drush dis googleanalytics --yes
+
+ 4. Enable the development module:
+    
+    drush en devel --yes
+ 
+ 5. Configure the devel module to eat e-mail messages:
+
+    http://localhost:35637/admin/settings/devel
+
+    Set "SMTP Library" to "Log only".
+

@@ -1,0 +1,5 @@
+core = "6.x"
+description = "The global customizations for Lingwo.org"
+name = "Lingwo.org Global Module"
+package = "Lingwo.org (deprecated)"
+

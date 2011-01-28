@@ -1,0 +1,68 @@
+
+  ; The name and description of the theme used on the admin/build/themes page.
+name        = BiblioBird.com Theme
+description = Theme for the BiblioBird.com
+
+# Doesn't actually do anything, but it should!
+dependencies[] = conditional_styles
+
+  ; "core" specifies the version of Drupal that this theme is compatible with.
+  ; "base theme" specifies that this is a theme that uses the "zen" theme as its
+  ; base theme. Its unlikely you will ever need to change these, but they are
+  ; required fields for a Zen sub-theme. The "engine" field is not used in a
+  ; sub-theme since the engine is inherited from its base theme.
+core       = 6.x
+base theme = ninesixty
+
+  ; This section adds CSS files to your theme. The media type is specified in
+  ; the brackets. Typical CSS media types include "all", "screen", "print", and
+  ; "handheld". See http://www.w3.org/TR/CSS21/media.html#media-types for a full
+  ; list of stylesheet media types in CSS 2.1. The iPhone's preferred media type
+  ; is based on the CSS3 Media queries. http://www.w3.org/TR/css3-mediaqueries/
+  ;
+  ; You can also override any of Zen's stylesheets or any module's stylesheets,
+  ; an /extremely/ useful feature. See the excellent Drupal 6 Theme Guide at
+  ; http://drupal.org/node/171209 for more details.
+stylesheets[all][] = styles/styles.css
+stylesheets[all][] = styles/lingwo.css
+stylesheets[all][] = styles/marketing.css
+; stylesheets[handheld][] = styles/mobile.css
+; stylesheets[only screen and (max-device-width: 480px)][] = styles/iphone.css
+
+  ; Set the conditional stylesheets that are processed by IE.
+//conditional-stylesheets[if IE][all][]       = styles/ie.css
+conditional-stylesheets[if lte IE 6][all][] = styles/ie6.css
+
+  ; Optionally add some JavaScripts to your theme.
+scripts[] = js/default.js
+
+  ; The regions defined in Zen's default page.tpl.php file.  The name in
+  ; brackets is the name of the variable in the page.tpl.php file, (e.g.
+  ; "[content_top]" in the .info file means there should be a $content_top
+  ; variable in the page.tpl.php file.) The text after the equals sign is a
+  ; descriptive text used on the admin/build/blocks page.
+  ;
+  ; To add a new region, copy Zen's page.tpl.php to your sub-theme's directory,
+  ; add a line line to this file, and then add the new variable to your
+  ; page.tpl.php template.
+regions[header] = Header
+regions[left]   = Left Sidebar
+regions[right]  = Right Sidebar
+regions[footer] = Footer
+regions[content_top] = Content Top
+regions[content_right] = Content Right
+regions[content_bottom] = Content Bottom
+
+  ; Various page elements output by the theme can be toggled on and off. The
+  ; "features" control which of these check boxes display on the
+  ; admin/build/themes config page. This is useful for suppressing check boxes
+  ; for elements not used by your sub-theme. To suppress a check box, omit the
+  ; entry for it below. See the Drupal 6 Theme Guide for more info:
+  ; http://drupal.org/node/171205#features
+features[] = logo
+features[] = name
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = favicon
+features[] = primary_links
+

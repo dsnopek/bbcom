@@ -1,0 +1,16 @@
+
+ * For everything in "lingwo_dictionary" which doesn't require JavaScript, we will test using
+   Drupal's SimpleTest.  I believe this is best since that code will be Open Source and living
+   on Drupal.org, so it needs to follow The Drupal Way.
+ 
+ * For the bits that need JavaScript (ie. "lingwo_korpus", "lingwo_fields") we will write the
+   tests in Python/Selenium 2.0 and they will live here.  I'll consider moving it to those packages
+   at some later date.  But this code will be Open Source and still allow us to test stuff before
+   it is commited.
+ 
+ * For the bits that are specific to BiblioBird, we will also test them here, in Python/Selenium 2.0.
+
+ * If it were eventually possible to replace the SimpleTest internal browser with Selenium 2.0, then we
+   should do that!  And, of course, move the "lingwo_korpus" and "lingwo_fields" tests to live with
+   them.
+

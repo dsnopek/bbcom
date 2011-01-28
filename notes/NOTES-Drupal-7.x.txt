@@ -1,0 +1,4 @@
+
+http://blog.davereid.net/content/preparing-your-modules-drupal-7
+
+http://drupal.org/node/224333

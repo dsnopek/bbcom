@@ -1,0 +1,80 @@
+
+#latest-news-slideshow-container {
+    position: relative;
+}
+
+#latest-news-slideshow {
+    width: 620px;
+    height: 375px;
+    background-color: black;
+}
+
+#latest-news-slideshow .slide-text {
+    position: absolute;
+    top: 290px;
+    left: 0px;
+    border-top: 1px solid white;
+    color: white;
+    width: 600px;
+    height: 65px;
+    padding: 10px;
+}
+
+#latest-news-slideshow .slide-text-title {
+    font-weight: bold;
+    float: left;
+    width: 195px;
+}
+
+#latest-news-slideshow .slide-text-body {
+    font-size: 8pt;
+    float: left;
+    width: 402px;
+    height: 65px;
+    overflow: hidden;
+}
+
+#latest-news-slideshow-pager {
+    /*
+    background-color: #CCCEDA;
+    */
+    display: block;
+    position: absolute;
+    z-index: 50;
+    left: 425px;
+    top: 0px;
+    width: 195px;
+    height: 290px;
+    padding: 0;
+    overflow: auto;
+}
+
+#latest-news-slideshow-pager li {
+    background-color: black;
+    display: block;
+    border-bottom: 1px solid white;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0;
+}
+
+#latest-news-slideshow-pager li.activeSlide {
+    background-color: #333333;
+}
+
+#latest-news-slideshow-pager li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/*
+#latest-news-slideshow-pager li.activeSlide a {
+    color: black;
+}
+*/
+
+#latest-news-slideshow-pager li a:hover {
+    text-decoration: underline;
+}
+

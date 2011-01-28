@@ -1,0 +1,6 @@
+core = "6.x"
+// This is required by the theme (but themes can't have dependencies)
+dependencies[] = "jquery_ui"
+description = "Miscellaneous customizations for BiblioBird.com"
+name = "BiblioBird.com Misc"
+package = "BiblioBird.com"

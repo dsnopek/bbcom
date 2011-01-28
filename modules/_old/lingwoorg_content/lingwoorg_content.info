@@ -1,0 +1,4 @@
+core = "6.x"
+description = "The default Content related settings for Lingwo.org"
+name = "Lingwo.org Content Feature"
+package = "Lingwo.org (deprecated)"

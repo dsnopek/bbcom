@@ -2,6 +2,8 @@ AnkiServer.egg-info
 build
 dist
 AnkiServer.env
-bbcom_embed/embed-reader-jquery1.4.2.uncompressed.js
-bbcom_embed/embed-reader.uncompressed.js
+modules/bbcom_embed/embed-reader-jquery1.4.2.uncompressed.js
+modules/bbcom_embed/embed-reader.uncompressed.js
 server.log
+tests/test.ini
+bootstrap.py

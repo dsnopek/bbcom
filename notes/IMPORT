@@ -1,0 +1,101 @@
+
+Possible sources for import
+====
+
+Wiktionary
+----
+
+http://www.wikitionary.org/
+
+Import will probably be complicated.  But the payoff will be big because 
+alot of their data was also imported.
+
+Here are some ideas they had about importing data!
+
+http://en.wiktionary.org/wiki/Wiktionary:Using_public_domain_works_as_a_base
+
+Here is an awesome entry in the Polish wiktionary:
+
+http://pl.wiktionary.org/wiki/pud%C5%82o
+
+OmegaWiki
+----
+
+Not sure what this is yet...
+
+http://www.omegawiki.org/Meta:Main_Page
+
+
+FreeDict
+----
+
+http://freedict.org/en/
+
+Imported dictionaries from all around!
+
+The use a DICT daemon which can serve dictionary contents via 
+the DICT protocol (rfc2229).
+
+They also may have some Wikitionary import code.
+
+Paper describes very complete English-Polish dictionary:
+
+http://www.lrec-conf.org/proceedings/lrec2008/summaries/651.html
+
+sjp.pl
+----
+
+http://www.sjp.pl/
+
+Another wiki-like free dictionary.  Includes morphological forms
+as well.  Its real value is those morphological forms.
+
+OTWARTY SŁOWNIK POLSKO-ANGIELSKI
+----
+
+http://elektronikjk.republika.pl/m25.html
+
+Updates appear periodically, but use different web addresses.  So a Google
+search will be necessary to locate the newest version.
+
+Includes a bunch of other Polish to XXX dictionaries:
+
+http://elektronikjk.republika.pl/y0.html
+
+Kids Open Dictionary Builder
+----
+
+http://dictionary.k12opened.com/
+
+Very simple wiki-based open dictionary, aim at children.
+
+Lingvoj - Language names RDF
+----
+
+Could be used to map iso-639-3 codes to there various names in the various languages!
+
+http://www.lingvoj.org/
+
+The data itself:
+
+http://www.lingvoj.org/lingvoj.rdf
+
+Also, you can link to the individual language RDF files to say "its this language".  This
+is all kinds of semantic.
+
+Ethnologue
+----
+
+Has a page for every single iso-639-3 code.
+
+http://www.ethnologue.com/web.asp
+
+XDXF
+----
+
+XDXF is another format for dictionaries (other than TEI P5 ch.9).  Here is a link
+to a whole bunch of dictionaries in this format:
+
+http://xdxf.revdanica.com/down/index.php
+
+

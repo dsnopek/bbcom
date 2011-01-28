@@ -1,0 +1,103 @@
+
+Forum post about encrypting in Flash and decrypting in PHP:
+
+http://forums.whirlpool.net.au/forum-replies-archive.cfm/592747.html
+
+Some action script encryption libraries:
+
+http://sourceforge.net/projects/actioncrypt/
+http://sourceforge.net/projects/rc4crypt/
+http://code.google.com/p/as3crypto/
+
+Encrypting Flash programs themselves:
+
+http://www.amayeta.com/
+http://www.kindisoft.com/secureSWF/download_ww.php?gclid=CI23sbnA-J0CFYOOzAodljvopg
+
+FireGPG - PGP encryption for Firefox
+
+http://pl.getfiregpg.org/s/home
+
+A commercial product for decrypting SWF applications with valid licenses:
+
+http://www.insideria.com/2008/04/encryption-in-flex-application-2.html
+
+Ideas for how our application could work:
+
+ (*) There is a wrapper application, which downloads the actual application and runs it.  The
+     actual application would exist in a number of random variants for deobfuscating the messages
+     which come from the server.  The variants would have to be generated automatically on the
+     server at a particular internal (every hour?) and rotated frequently during the user
+     process.
+
+ (*) For version 1.0 of this, we will be working primarily on obscurity (both of our product,
+     but also the works included) so I don't think we will need to worry as much as the above
+     point.  So, I say it works like this:
+
+       - There is a wrapper application, which has a public key for the server.  Using this
+         public key, it can send many things "for the server's eyes only".  Everything will
+         be sent to a single SSL end-point on the server (https://secure.lingwo.org/XXX-product-key).
+
+       A. The wrapper logs into the server with the users credentials.  The server returns a
+          special format packet, with the real SWF application, an encryption key to 
+          decrypt it (AES maybe) and a session id.
+    
+       B. The real application starts up and has use of the same server public key and the
+          session id.  It then requests an encryption key for decrypting the content.  All
+          requests from this point on will be sent to the same end-point, in a special format
+          for the server encrypted with the server public key, and results will be returned
+          in the content encryption key.
+       
+       - Both the flash applications will be obfuscated as much as possible via some commericial
+         product.
+    
+       - Our security (by obscurity) will come from the special format in which things are passed
+         between the client and server.  This should be good enough until there is enough attention
+         on the site or its content.
+
+       - The content would initially exist in the database as some series of nodes, but be hidden
+         away so users can't get it.  A cronjob would pull the content from the database, put it into
+         encrypted files on disk and stash the encryption key somewhere.  This key would be
+         occasionally rotated.
+
+       - Step 1 in this is writting the actual application, which has the server public key (RSA)
+         and the content encryption key (AES) and can use the secure end-point to load and display
+         content in a way that can't be copy-pasted, with a small enough frame to make OCR
+         impractical and with network communications that can't be 3rd party sniffed to determine
+         the content of the work.
+
+== Integration with an e-book reader ==
+
+Another possibility entirely, is integrating with an existing e-book reader that provides
+its own DRM system, so we don't have to worry about it.
+
+On possibility is the Adobe Reader (which I think has an e-book plugin?) for which our own
+plugin could be developed:
+
+http://www.adobe.com/products/reader/
+
+JavaScript plugins can interact with web-services:
+
+http://www.adobe.com/devnet/acrobat/pdfs/reader_overview.pdf
+
+So..  This integration would be good, whether we planned to sell said e-books or not, since
+it would drive traffic to the site.
+
+Things that prevent us from selling such e-books include: How do we package audio with this?  How do we annotate the text?
+
+== Arguments against DRM for e-books ==
+
+http://www.bradsreader.com/2009/01/jk-rowling-harry-potter-ebooks-and-the-definition-of-irony/
+http://www.usatoday.com/life/books/news/2005-06-14-rowling-refuses-ebooks_x.htm
+http://techdirt.com/articles/20070206/105458.shtml
+http://dearauthor.com/wordpress/2009/01/25/why-epublishing-needs-to-grow-up/
+
+The more I think about this, the more I am convinced that any encryption/DRM scheme is doomed
+to fail and we should simply work with publishers/authors for whom this is not a problem.
+
+== Open eBook Format: EPUB ==
+
+http://en.wikipedia.org/wiki/Epub
+
+Can this format be extended to hold annotations?  It looks like the content is XHTML so that is likely YES!
+

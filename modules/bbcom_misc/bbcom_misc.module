@@ -1,0 +1,48 @@
+<?php
+
+/*
+ * Implementation of hook_menu().
+ */
+function bbcom_misc_menu() {
+  return array(
+    'admin/settings/bbcom' => array(
+      'title' => 'BiblioBird.com',
+      'description' => 'Settings for BiblioBird.com',
+      'access arguments' => array('administer site configuration'),
+      'page callback' => 'system_admin_menu_block_page',
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+    ),
+  );
+}
+
+/*
+ * Implementation of hook_misc_mail_alter().
+ */
+function bbcom_misc_mail_alter(&$message) {
+  // Our SMTP server requires that From is an e-mail address that we control
+  // so we always put the 'From' into 'Reply-To' instead and make the 'From'
+  // always be the default.
+  $default_from = variable_get('site_mail', ini_get('sendmail_from'));
+  $message['headers']['Reply-To'] = $message['headers']['From'];
+  $message['headers']['From'] = $message['from'] = $default_from;
+}
+
+// NOTE: Drupal's format_date() doesn't correctly deal with daylight savings time, nor does it
+// translate the date parts.  This should be put in the theme as well, to handle all dates, particularly
+// the node submitted ones.
+function bbcom_misc_format_date($date, $type='medium', $format='') {
+  return date_format_date(date_make_date($date, NULL, DATE_UNIX), $type, $format);
+}
+
+/*
+ * Implementation of hook_link_alter().
+ */
+function bbcom_misc_link_alter(&$links, $node, $comment=NULL) {
+  if (is_null($comment)) {
+    // I hate this particular link...
+    // TODO: Seems to contradict docs, this should be $links['comment']['comment_forbidden'] ...
+    unset($links['comment_forbidden']);
+  }
+}
+

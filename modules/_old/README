@@ -1,0 +1,5 @@
+
+Old modules neutered and moved here.  This allows us to remove all the functionality but optionally
+leave the uninstall code, so that when we finally disable the modules, they will remove their junk
+from the database.
+
