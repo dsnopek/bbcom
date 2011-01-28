@@ -175,16 +175,19 @@ def tag_release(name):
             local('bzr tag release--{0}'.format(name))
 
 @hosts(prod_host)
-def deploy(release_name):
+def backup_live_db():
     drush = _Drush(remote=True)
-    today = datetime.date.today()
-
-    # backup the database
     drush.run('bam-backup', 'db', 'manual', 'default')
 
-    # backup the code
+@hosts(prod_host)
+def backup_live_code():
+    today = datetime.date.today()
     with cd(env.remote_prj_dir):
         run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
+
+@hosts(prod_host)
+def unsafe_deploy():
+    """UNSAFE: Does deployment without first backing things up!"""
 
     # check out the new code
     repos = env.repos[:]
@@ -195,7 +198,15 @@ def deploy(release_name):
             run('bzr up -r tag:{0}'.format(release_name))
 
     # update the database (should also force new dependencies to be enabled)
+    drush = _Drush(remote=True)
     drush.run('updatedb')
+
+
+@hosts(prod_host)
+def deploy(release_name):
+    backup_live_db()
+    backup_live_code()
+    unsafe_deploy()
 
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
