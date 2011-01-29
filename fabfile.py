@@ -166,13 +166,18 @@ def merge(source, target='mainline', message=None):
 def tag_release(name):
     """Tags production for release."""
 
-    # merge mainline into production
-    #merge('mainline', 'production', 'Creating release {0}'.format(name))
-
     # tag production with release name
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.production')):
             local('bzr tag release--{0}'.format(name))
+
+def make_release(name):
+    """Merges mainline into production and then tags for release."""
+
+    # merge mainline into production
+    merge('mainline', 'production', 'Creating release {0}'.format(name))
+    
+    tag_release(name)
 
 @hosts(prod_host)
 def backup_live_db():
@@ -186,7 +191,7 @@ def backup_live_code():
         run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
 
 @hosts(prod_host)
-def unsafe_deploy():
+def unsafe_deploy(release_name):
     """UNSAFE: Does deployment without first backing things up!"""
 
     # check out the new code
@@ -195,7 +200,7 @@ def unsafe_deploy():
     repos[repos.index('lingwoorg')] = 'bbcom'
     for repo in repos:
         with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo)):
-            run('bzr up -r tag:{0}'.format(release_name))
+            run('bzr up -r tag:release--{0}'.format(release_name))
 
     # update the database (should also force new dependencies to be enabled)
     drush = _Drush(remote=True)
@@ -204,9 +209,10 @@ def unsafe_deploy():
 
 @hosts(prod_host)
 def deploy(release_name):
+    """Backs up db/code and the deploys a release."""
     backup_live_db()
     backup_live_code()
-    unsafe_deploy()
+    unsafe_deploy(release_name)
 
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
