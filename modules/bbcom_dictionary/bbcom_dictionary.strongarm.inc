@@ -10,16 +10,17 @@ function bbcom_dictionary_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'content_extra_weights_entry';
   $strongarm->value = array(
-    'language' => 0,
-    'pos' => 1,
-    'title' => 2,
-    'menu' => 3,
-    'lingwo_senses' => 4,
-    'lingwo_fields' => 5,
-    'flag' => 6,
-    'revision_information' => 7,
-    'comment_settings' => 9,
-    'translation' => 10,
+    'title' => '2',
+    'revision_information' => '7',
+    'comment_settings' => '9',
+    'language' => '0',
+    'translation' => '10',
+    'menu' => '3',
+    'path' => '11',
+    'flag' => '6',
+    'lingwo_senses' => '4',
+    'pos' => '1',
+    'lingwo_fields' => '5',
   );
 
   $export['content_extra_weights_entry'] = $strongarm;
