@@ -188,6 +188,12 @@ def backup_live_db():
 def backup_live_code():
     today = datetime.date.today()
     with cd(env.remote_prj_dir):
+        # TODO: we should specifically target certain directories!  We don't want to backup
+        # "python-env" along with the other code.  It should be:
+        #
+        #   env.repos + ['anki_files']
+        #   (remember to swap bbcom in if it hasn't been yet)
+        #
         run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
 
 @hosts(prod_host)
