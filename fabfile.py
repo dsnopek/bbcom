@@ -12,7 +12,7 @@ env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
 env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
 env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/lingwo/python-env'
 
-env.repos = ['lingwoorg','lingwo_dictionary','linguatrek','drupal']
+env.repos = ['bbcom','lingwo_dictionary','linguatrek','drupal']
 
 class _Drush(object):
     def __init__(self, remote=False):
@@ -107,7 +107,7 @@ def make_testing_safe():
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
 
     # disable dangerous modules
-    drush.dis('googleanalytics')
+    drush.dis('googleanalytics', 'spambot')
 
     # enable the development module
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
@@ -140,13 +140,9 @@ def activate_branch(branch):
                 abort('Branch {0} doesn\'t exist'.format(repo+'.'+target))
 
             # also do the 'bbcom' repo if necessary
-            links = [repo]
-            if repo == 'lingwoorg':
-                links.append('bbcom')
-
-            for link in links:
-                local('rm -f {0}'.format(link), capture=False)
-                local('ln -s {0} {1}'.format(source, link), capture=False)
+            link = repo
+            local('rm -f {0}'.format(link), capture=False)
+            local('ln -s {0} {1}'.format(source, link), capture=False)
 
 def merge(source, target='mainline', message=None):
     """Merge a family of branches into another family (by default, "mainline")."""
@@ -162,6 +158,17 @@ def merge(source, target='mainline', message=None):
             output = local('bzr merge ../{0}'.format(repo+'.'+source), capture=True)
             if output.stderr != 'Nothing to do.':
                 local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
+            else:
+                print output.stderr
+
+def up(branch=None):
+    """Update all the code on a given branch."""
+
+    for repo in env.repos:
+        if branch is not None:
+            repo += '.'+branch
+        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo)):
+            local('bzr up', capture=False)
 
 def tag_release(name):
     """Tags production for release."""
@@ -201,10 +208,7 @@ def unsafe_deploy(release_name):
     """UNSAFE: Does deployment without first backing things up!"""
 
     # check out the new code
-    repos = env.repos[:]
-    # TODO: for now, we have to deal with lingwoorg really living inside bbcom
-    repos[repos.index('lingwoorg')] = 'bbcom'
-    for repo in repos:
+    for repo in env.repos:
         with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo)):
             run('bzr up -r tag:release--{0}'.format(release_name))
 
@@ -247,7 +251,7 @@ def create_bootstrap():
 
         parser.add_option('--bbcom-branch', dest='bbcom_branch', metavar='BRANCH',
             help='Location of the bbcom_branch',
-            default='bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/lingwoorg/refactor-1')
+            default='bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/bbcom/mainline')
 
         parser.add_option('--only-virtualenv', dest='only_virtualenv', action='store_true',
             help='Only create the virtualenv, not the entire BiblioBird project directory',
