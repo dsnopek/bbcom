@@ -152,14 +152,14 @@ def merge(source, target='mainline', message=None):
         message = base_message
     else:
         message = base_message + '  ' + message
+
+    # TODO: we need to check for uncommited changes!
     
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
             output = local('bzr merge ../{0}'.format(repo+'.'+source), capture=True)
             if output.stderr != 'Nothing to do.':
                 local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
-            else:
-                print output.stderr
 
 def up(branch=None):
     """Update all the code on a given branch."""
