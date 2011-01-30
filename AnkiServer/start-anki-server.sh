@@ -8,7 +8,7 @@ LOG_FILE=$WEBAPP/access.log
 PID_FILE=$WEBAPP/paster.pid
 
 #ROTATELOGS="/home/dsnopek/lingwo-phpstack/httpd-2.2.15/bin/rotatelogs $LOG_FILE 86400"
-PASTER=$WEBAPP/AnkiServer.env/bin/paster
+PASTER=$HOME/prj/lingwo/python-env/bin/paster
 SERVE_ARGS="--daemon --log-file=$LOG_FILE --pid-file=$PID_FILE"
 #SERVE_ARGS=""
 
