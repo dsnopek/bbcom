@@ -114,8 +114,19 @@ def make_testing_safe():
     drush.en('devel')
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
 
-def branch(target, source='mainline'):
+def branch(source=None, target=None):
     """Branch all the repos to create a new family of branches."""
+
+    # We do some argument shuffling magic, so that we can specify one argument
+    # to branch from 'mainline', specify both in a sane order...  Not very pythonic
+    # but it stops me from losing my mind with how this is supposed to work!
+    if source is None and target is None:
+        raise TypeError('Must pass atleast one argument')
+    if target is None:
+        target = source
+        source = 'mainline'
+    if source is None:
+        source = 'mainline'
 
     for repo in env.repos:
         dest = os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)
