@@ -141,6 +141,11 @@ def branch(source=None, target=None):
             local('bzr push {0}'.format(remote), capture=False)
             local('bzr bind {0}'.format(remote), capture=False)
 
+    # we have to copy our drupal setting from mainline to the new branch
+    with cd(os.path.join(env.local_prj_dir, 'lingwo')):
+        local("cp drupal.mainline/sites/default/settings.php drupal.{0}/sites/default".format(target))
+        local("cp linguatrek.mainline/sites/default/settings.php linguatrek.{0}/sites/default".format(target))
+
 def activate_branch(branch):
     """Switch all our symlinks to point to the given family of branches."""
 
