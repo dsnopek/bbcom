@@ -30,7 +30,7 @@ function bbcom_forum_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'advanced_forum_style';
-  $strongarm->value = 'cloudless_day_stacked';
+  $strongarm->value = 'cloudless_day';
 
   $export['advanced_forum_style'] = $strongarm;
   $strongarm = new stdClass;
