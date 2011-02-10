@@ -1,0 +1,8 @@
+core = "6.x"
+dependencies[] = "advanced_forum"
+dependencies[] = "nodecomment"
+dependencies[] = "features"
+name = "BiblioBird.com Forum"
+description = "The forum on BiblioBird.com"
+package = "BiblioBird.com"
+
