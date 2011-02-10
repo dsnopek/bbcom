@@ -148,6 +148,76 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_forum';
+  $strongarm->value = '2';
+
+  $export['node_comment_forum'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_forum_reply';
+  $strongarm->value = '2';
+
+  $export['node_comment_forum_reply'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_plural_forum';
+  $strongarm->value = 'replies';
+
+  $export['node_comment_plural_forum'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_plural_forum_reply';
+  $strongarm->value = 'replies';
+
+  $export['node_comment_plural_forum_reply'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_topic_review_forum';
+  $strongarm->value = '0';
+
+  $export['node_comment_topic_review_forum'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_topic_review_forum_reply';
+  $strongarm->value = '0';
+
+  $export['node_comment_topic_review_forum_reply'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_type_forum';
+  $strongarm->value = 'forum_reply';
+
+  $export['node_comment_type_forum'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_type_forum_reply';
+  $strongarm->value = 'forum_reply';
+
+  $export['node_comment_type_forum_reply'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_view_forum';
+  $strongarm->value = 'nodecomments';
+
+  $export['node_comment_view_forum'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_comment_view_forum_reply';
+  $strongarm->value = 'nodecomments';
+
+  $export['node_comment_view_forum_reply'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_options_forum';
   $strongarm->value = array(
     0 => 'status',
