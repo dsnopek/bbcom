@@ -28,6 +28,7 @@ stylesheets[all][] = styles/lingwo.css
 stylesheets[all][] = styles/marketing.css
 ; stylesheets[handheld][] = styles/mobile.css
 ; stylesheets[only screen and (max-device-width: 480px)][] = styles/iphone.css
+stylesheets[all][] = styles/comment_notify.css
 
   ; Set the conditional stylesheets that are processed by IE.
 //conditional-stylesheets[if IE][all][]       = styles/ie.css
