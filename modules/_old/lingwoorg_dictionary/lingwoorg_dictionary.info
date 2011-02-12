@@ -1,5 +1,0 @@
-core = "6.x"
-description = "The default Dictionary related settings for Lingwo.org"
-name = "Lingwo.org Dictionary Feature"
-package = "Lingwo.org (deprecated)"
-

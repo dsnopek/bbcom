@@ -197,6 +197,10 @@ table {
   width: 100%;
 }
 
+tbody {
+  border: 0;
+}
+
 .deem {
   color: gray;
 }

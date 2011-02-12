@@ -1,0 +1,6 @@
+Sync decks to BiblioBird.com instead of AnkiWeb.
+
+This allows BiblioBird users to access a special "bibliobird" deck, which contains flashcards for all the words in their "Words I Am Learning" list on BiblioBird.com.  Changes on BiblioBird will automatically be sync'ed to this deck and vice-a-versa.
+
+You can also sync any other decks you like to BiblioBird -- for the time being, there are no restrictions what-so-ever.
+

@@ -1,4 +1,0 @@
-core = "6.x"
-description = "For our marketing pages, features, etc..."
-name = "Lingwo.org Marketing"
-package = "Lingwo.org (deprecated)"

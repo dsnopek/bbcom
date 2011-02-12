@@ -12,7 +12,7 @@ env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
 env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
 env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/lingwo/python-env'
 
-env.repos = ['lingwoorg','lingwo_dictionary','linguatrek','drupal']
+env.repos = ['bbcom','lingwo_dictionary','linguatrek','drupal']
 
 class _Drush(object):
     def __init__(self, remote=False):
@@ -107,15 +107,26 @@ def make_testing_safe():
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
 
     # disable dangerous modules
-    drush.dis('googleanalytics')
+    drush.dis('googleanalytics', 'spambot')
 
     # enable the development module
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
     drush.en('devel')
     drush.vset(smtp_library="sites/all/modules/devel/devel.module")
 
-def branch(target, source='mainline'):
+def branch(source=None, target=None):
     """Branch all the repos to create a new family of branches."""
+
+    # We do some argument shuffling magic, so that we can specify one argument
+    # to branch from 'mainline', specify both in a sane order...  Not very pythonic
+    # but it stops me from losing my mind with how this is supposed to work!
+    if source is None and target is None:
+        raise TypeError('Must pass atleast one argument')
+    if target is None:
+        target = source
+        source = 'mainline'
+    if source is None:
+        source = 'mainline'
 
     for repo in env.repos:
         dest = os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)
@@ -130,6 +141,11 @@ def branch(target, source='mainline'):
             local('bzr push {0}'.format(remote), capture=False)
             local('bzr bind {0}'.format(remote), capture=False)
 
+    # we have to copy our drupal setting from mainline to the new branch
+    with cd(os.path.join(env.local_prj_dir, 'lingwo')):
+        local("cp drupal.mainline/sites/default/settings.php drupal.{0}/sites/default".format(target))
+        local("cp linguatrek.mainline/sites/default/settings.php linguatrek.{0}/sites/default".format(target))
+
 def activate_branch(branch):
     """Switch all our symlinks to point to the given family of branches."""
 
@@ -140,13 +156,9 @@ def activate_branch(branch):
                 abort('Branch {0} doesn\'t exist'.format(repo+'.'+target))
 
             # also do the 'bbcom' repo if necessary
-            links = [repo]
-            if repo == 'lingwoorg':
-                links.append('bbcom')
-
-            for link in links:
-                local('rm -f {0}'.format(link), capture=False)
-                local('ln -s {0} {1}'.format(source, link), capture=False)
+            link = repo
+            local('rm -f {0}'.format(link), capture=False)
+            local('ln -s {0} {1}'.format(source, link), capture=False)
 
 def merge(source, target='mainline', message=None):
     """Merge a family of branches into another family (by default, "mainline")."""
@@ -156,6 +168,8 @@ def merge(source, target='mainline', message=None):
         message = base_message
     else:
         message = base_message + '  ' + message
+
+    # TODO: we need to check for uncommited changes!
     
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
@@ -163,16 +177,30 @@ def merge(source, target='mainline', message=None):
             if output.stderr != 'Nothing to do.':
                 local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
 
+def up(branch=None):
+    """Update all the code on a given branch."""
+
+    for repo in env.repos:
+        if branch is not None:
+            repo += '.'+branch
+        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo)):
+            local('bzr up', capture=False)
+
 def tag_release(name):
     """Tags production for release."""
-
-    # merge mainline into production
-    #merge('mainline', 'production', 'Creating release {0}'.format(name))
 
     # tag production with release name
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.production')):
             local('bzr tag release--{0}'.format(name))
+
+def make_release(name):
+    """Merges mainline into production and then tags for release."""
+
+    # merge mainline into production
+    merge('mainline', 'production', 'Creating release {0}'.format(name))
+    
+    tag_release(name)
 
 @hosts(prod_host)
 def backup_live_db():
@@ -183,19 +211,22 @@ def backup_live_db():
 def backup_live_code():
     today = datetime.date.today()
     with cd(env.remote_prj_dir):
+        # TODO: we should specifically target certain directories!  We don't want to backup
+        # "python-env" along with the other code.  It should be:
+        #
+        #   env.repos + ['anki_files']
+        #   (remember to swap bbcom in if it hasn't been yet)
+        #
         run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
 
 @hosts(prod_host)
-def unsafe_deploy():
+def unsafe_deploy(release_name):
     """UNSAFE: Does deployment without first backing things up!"""
 
     # check out the new code
-    repos = env.repos[:]
-    # TODO: for now, we have to deal with lingwoorg really living inside bbcom
-    repos[repos.index('lingwoorg')] = 'bbcom'
-    for repo in repos:
+    for repo in env.repos:
         with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo)):
-            run('bzr up -r tag:{0}'.format(release_name))
+            run('bzr up -r tag:release--{0}'.format(release_name))
 
     # update the database (should also force new dependencies to be enabled)
     drush = _Drush(remote=True)
@@ -204,9 +235,10 @@ def unsafe_deploy():
 
 @hosts(prod_host)
 def deploy(release_name):
+    """Backs up db/code and the deploys a release."""
     backup_live_db()
     backup_live_code()
-    unsafe_deploy()
+    unsafe_deploy(release_name)
 
 def create_bootstrap():
     """Creates the boostrap.py for bootstrapping our development environment."""
@@ -235,7 +267,7 @@ def create_bootstrap():
 
         parser.add_option('--bbcom-branch', dest='bbcom_branch', metavar='BRANCH',
             help='Location of the bbcom_branch',
-            default='bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/lingwoorg/refactor-1')
+            default='bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/bbcom/mainline')
 
         parser.add_option('--only-virtualenv', dest='only_virtualenv', action='store_true',
             help='Only create the virtualenv, not the entire BiblioBird project directory',

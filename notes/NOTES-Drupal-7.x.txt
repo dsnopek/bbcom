@@ -2,3 +2,17 @@
 http://blog.davereid.net/content/preparing-your-modules-drupal-7
 
 http://drupal.org/node/224333
+
+Replacement for CCK 3.x fieldgroup and multigroup
+==================================
+
+ * http://drupal.org/project/field_group
+
+ * http://drupal.org/project/field_collection
+
+   o Ticket: http://drupal.org/node/939836
+ 
+ * CCK3 and Drupal 7 relationship:
+
+   http://drupal.org/node/690140
+
