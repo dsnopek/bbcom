@@ -12,13 +12,17 @@ function bbcom_forum_context_default_contexts() {
     'value' => 'forum',
     'description' => 'The forum context.',
     'node' => array(
-      '0' => 'forum',
-      '1' => 'forum_reply',
+      '0' => 'forum_reply',
+      '1' => 'forum',
     ),
     'path' => array(
       'forum' => 'forum',
       'forum/*' => 'forum/*',
     ),
+    'menu_trail' => array(
+      'forum' => 'forum',
+    ),
+    'menu' => 'forum',
   );
   return $items;
 }
