@@ -170,7 +170,7 @@ class SyncApp(object):
 
         if os.path.exists(user_path):
             # It is a dict of {'deckName':[modified,lastSync]}
-            for fn in os.listdir(user_path):
+            for fn in os.listdir(unicode(user_path, 'utf-8')):
                 if len(fn) > 5 and fn[-5:] == '.anki':
                     d = os.path.abspath(os.path.join(user_path, fn))
 
@@ -331,7 +331,7 @@ class SyncApp(object):
                     c.close()
                 thread.execute(setupForSync, [thread.wrapper])
 
-                return Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d)+'"', app_iter=FileIterable(d))
+                return Response(status='200 OK', content_type='application/octet-stream', content_encoding='deflate', content_disposition='attachment; filename="'+os.path.basename(d).encode('utf-8')+'"', app_iter=FileIterable(d))
             elif url == 'fullup':
                 #version = self.user_libanki_version(u)
                 try:
