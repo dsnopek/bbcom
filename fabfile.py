@@ -310,7 +310,7 @@ def setup_python_env():
         'nltk==2.0b9':    'http://nltk.googlecode.com/files/nltk-2.0b9.zip#egg=nltk',
         'html5lib==0.90': 'http://html5lib.googlecode.com/files/html5lib-0.90.zip#egg=html5lib',
     }
-    anki_tarball = 'http://anki.googlecode.com/files/anki-1.0.1.tgz'
+    anki_tarball = 'http://anki.googlecode.com/files/anki-1.2.7.tgz'
     requirements = _python_env_requirements()
 
     for i, r in enumerate(requirements[:]):
