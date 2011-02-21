@@ -312,7 +312,7 @@ class DeckAppHandler(object):
         for key in newFact.keys():
             newFact[key] = fact[key]
 
-        newFact.setModified(textChanged=True)
+        newFact.setModified(textChanged=True, deck=deck)
         deck.setModified()
         deck.save()
 

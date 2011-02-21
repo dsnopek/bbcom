@@ -256,7 +256,7 @@ class SyncApp(object):
             url = req.path[len(self.base_url):]
             if url not in self.valid_urls:
                 raise HTTPNotFound()
-
+            
             # get and check username and password
             try:
                 u = req.str_params.getone('u')
@@ -290,6 +290,11 @@ class SyncApp(object):
                 thread = None
 
             if url == 'getDecks':
+                # force the version up to 1.2.x
+                v = req.str_params.getone('libanki')
+                if v.startswith('0.') or v.startswith('1.0'):
+                    return self._stuffedResp(self._stuff({'status':'oldVersion'}))
+
                 # store the data the user passes us keyed with the username.  This
                 # will be used later by SyncAppHandler for version compatibility.
                 self.users[u] = makeArgs(req.str_params)
