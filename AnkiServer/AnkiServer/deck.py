@@ -28,8 +28,11 @@ def ExternalModel():
     # fail just because of that!!
     m.addFieldModel(FieldModel(u'Back', False, False))
     m.addFieldModel(FieldModel(u'External ID', True, True))
-    m.addCardModel(CardModel(u'Forward', u'%(Front)s', u'%(Back)s'))
-    m.addCardModel(CardModel(u'Reverse', u'%(Back)s', u'%(Front)s'))
+
+    front = u'<span style="font-family: Arial; font-size: 20px; color: #000000; white-space: pre-wrap;">{{{Front}}}</span>'
+    back = u'<span style="font-family: Arial; font-size: 20px; color: #000000; white-space: pre-wrap;">{{{Back}}}</span>'
+    m.addCardModel(CardModel(u'Forward', front, back))
+    m.addCardModel(CardModel(u'Reverse', back, front))
 
     m.tags = u"External"
     return m
