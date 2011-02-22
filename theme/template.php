@@ -333,7 +333,7 @@ function bbcom_theme_preprocess_block(&$vars, $hook) {
  * Mark some of the node form elements as inline
  */
 function bbcom_theme_node_form($form) {
-  if ($form['#node']->type == _lingwo_dictionary_settings('entry_content_type')) {
+  if ($form['#node']->type == LingwoEntry::$settings->entry_content_type) {
     $form['title']['#inline'] = TRUE;
     $form['language']['#inline'] = TRUE;
     $form['pos']['#inline'] = TRUE;

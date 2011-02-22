@@ -10,7 +10,7 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   global $user;
 
   if ($op == 'view') {
-    if ($node->type != _lingwo_dictionary_settings('entry_content_type')) {
+    if ($node->type != LingwoEntry::$settings->entry_content_type) {
       return NULL;
     }
 
@@ -69,7 +69,7 @@ function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
  */
 /*
 function bbcom_dictionary_link($type, $node, $teaser=FALSE) {
-  if ($type == 'node' && $node->type == _lingwo_dictionary_settings('entry_content_type') &&
+  if ($type == 'node' && $node->type == LingwoEntry::$settings->entry_content_type &&
       ($source_node = lingwo_dictionary_entry_load_translation_source($node))) {
     
     $languages = language_list();
