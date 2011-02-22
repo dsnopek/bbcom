@@ -129,7 +129,7 @@ function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
   $translation_source = $entry->getTranslationSource();
   $vars['source_node'] = $translation_source ? $translation_source : $node;
   $vars['source_lang'] = $vars['source_node']->language;
-  $vars['is_translation'] = _ld_is_translation($node);
+  $vars['is_translation'] = _lingwo_is_translation($node);
 
   // get the source fields (we always deal with the source fields, so this should be
   // no surprise and we can name it simply $fields).
