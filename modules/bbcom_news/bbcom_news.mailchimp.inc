@@ -37,6 +37,23 @@ function _bbcom_news_mailchimp_list_id($q) {
   return $lists['data'][0]['id'];
 }
 
+function _bbcom_news_mailchimp_subinfo($account, $q=NULL) {
+  if (is_null($q)) {
+    $q = _bbcom_news_mailchimp_object();
+  }
+  if ($q && ($list_id = _bbcom_news_mailchimp_list_id($q))) {
+    $subinfo = $q->listMemberInfo($list_id, array($account->mail));
+    if ($q->errorCode) {
+      watchdog('mailchimp', 'Unable to get listMemberInfo for user !username: (!code) !message',
+        array('!username' => $account->name, '!code' => $q->errorCode, '!message' => $q->errorMessage),
+        WATCHDOG_ERROR);
+      return;
+    }
+
+    return $subinfo['data'][0];
+  }
+}
+
 function _bbcom_news_mailchimp_update($account, $subscribe) {
   if (($q = _bbcom_news_mailchimp_object()) && ($list_id = _bbcom_news_mailchimp_list_id($q))) {
     if ($subscribe) {
@@ -55,15 +72,9 @@ function _bbcom_news_mailchimp_update($account, $subscribe) {
       //watchdog('mailchimp', 'merge_vars: '.print_r($merge_vars, TRUE), array(), WATCHDOG_DEBUG);
     }
 
-    $sub_info = $q->listMemberInfo($list_id, array($account->mail));
-    if ($q->errorCode) {
-      watchdog('mailchimp', 'Unable to get listMemberInfo for user !username: (!code) !message',
-        array('!username' => $account->name, '!code' => $q->errorCode, '!message' => $q->errorMessage),
-        WATCHDOG_ERROR);
-      return;
-    }
+    $subinfo = _bbcom_news_mailchimp_subinfo($account, $q);
 
-    if (@$sub_info['data'][0]['status'] != 'subscribed') {
+    if ($subinfo['status'] != 'subscribed') {
       if ($subscribe) {
         watchdog('mailchimp', 'Subscribing !user', array('!user' => $account->name), WATCHDOG_INFO);
         $q->listSubscribe($list_id, $account->mail, $merge_vars, 'html', FALSE, TRUE);
@@ -72,7 +83,7 @@ function _bbcom_news_mailchimp_update($account, $subscribe) {
     else {
       if ($subscribe) {
         watchdog('mailchimp', 'Updating member info for !user', array('!user' => $account->name), WATCHDOG_INFO);
-        $email_type = $sub_info['data'][0]['email_type'];
+        $email_type = $subinfo['email_type'];
         $q->listUpdateMember($list_id, $account->mail, $merge_vars, $email_type);
       }
       else {

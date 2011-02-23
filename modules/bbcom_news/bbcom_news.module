@@ -30,7 +30,7 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
   if ($op == 'register' || ($category == 'account' && $op == 'form')) {
     $optin = TRUE;
     if ($account->uid) {
-      $optin = bbcom_news_is_optin($account);
+      $optin = bbcom_news_optin($account);
     }
     $form['bbcom_news'] = array(
       '#type'  => 'fieldset',
@@ -49,19 +49,19 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
     case 'insert':
       $optin = isset($edit['bbcom_news_optin']) ? $edit['bbcom_news_optin'] : TRUE;
       db_query("INSERT INTO {bbcom_news_users} (uid, optin) VALUES (%d, %d)", $account->uid, $optin);
-      unset($edit['bbcom_news_optin']);
+      //unset($edit['bbcom_news_optin']);
       break;
 
     case 'update':
       if (isset($edit['bbcom_news_optin'])) {
         $optin = $edit['bbcom_news_optin'];
         db_query("UPDATE {bbcom_news_users} SET optin = %d WHERE uid = %d", $optin, $account->uid);
-        unset($edit['bbcom_news_optin']);
+        //unset($edit['bbcom_news_optin']);
       }
       break;
 
     case 'after_update':
-      $optin = bbcom_news_is_optin($account);
+      $optin = isset($account->bbcom_news_optin) ? $account->bbcom_news_optin : bbcom_news_optin($account);
       break;
 
     case 'delete':
@@ -79,8 +79,16 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
   }
 }
 
-function bbcom_news_is_optin($account) {
+function bbcom_news_optin($account) {
   if ($account->status) {
+    if (variable_get('bbcom_news_mailchimp_integration', FALSE)) {
+      module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
+      $subinfo = _bbcom_news_mailchimp_subinfo($account);
+      if (!empty($subinfo)) {
+        return $subinfo['status'] == 'subscribed';
+      }
+    }
+
     $res = db_query("SELECT optin FROM {bbcom_news_users} WHERE uid = %d", $account->uid);
     if ($obj = db_fetch_object($res)) {
       return $obj->optin;
