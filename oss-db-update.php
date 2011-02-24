@@ -2,15 +2,18 @@
 
 function variable_move($old, $new) {
   $val = variable_get($old, NULL);
-  variable_set($new, $val);
-  variable_del($old);
+  if (!is_null($value)) {
+    variable_set($new, $val);
+    variable_del($old);
+  }
 }
 
 function variable_mass_move($old_base, $new_base) {
-  $res = db_query("SELECT name FROM variable WHERE name LIKE '%s'", $old_base .'_%');
+  $res = db_query("SELECT name FROM variable WHERE name LIKE '%s_%%'", $old_base);
   while ($obj = db_fetch_object($res)) {
     $old = $obj->name;
     $new = preg_replace("/^$old_base/", $new_base, $old);
+    //print ("$old => $new\n");
     variable_move($old, $new);
   }
 }

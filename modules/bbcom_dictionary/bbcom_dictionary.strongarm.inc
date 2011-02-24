@@ -90,14 +90,14 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_lookup_path';
+  $strongarm->name = 'lingwo_entry_lookup_path';
   $strongarm->value = 'dictionary/lookup';
 
-  $export['lingwo_dictionary_lookup_path'] = $strongarm;
+  $export['lingwo_entry_lookup_path'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_pos_allowed_values';
+  $strongarm->name = 'lingwo_entry_pos_allowed_values';
   $strongarm->value = 'abbreviation|Abbreviation
 adjective|Adjective
 adverb|Adverb
@@ -118,7 +118,7 @@ symbol|Symbol
 title|Title
 verb|Verb';
 
-  $export['lingwo_dictionary_pos_allowed_values'] = $strongarm;
+  $export['lingwo_entry_pos_allowed_values'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
