@@ -1,0 +1,25 @@
+<?php
+
+function variable_move($old, $new) {
+  $val = variable_get($old, NULL);
+  variable_set($new, $val);
+  variable_del($old);
+}
+
+function variable_mass_move($old_base, $new_base) {
+  $res = db_query("SELECT name FROM variable WHERE name LIKE '%s'", $old_base .'_%');
+  while ($obj = db_fetch_object($res)) {
+    $old = $obj->name;
+    $new = preg_replace("/^$old_base/", $new_base, $old);
+    variable_move($old, $new);
+  }
+}
+
+function rename_lingwo_entry() {
+  db_query("INSERT INTO lingwo_entry (language, pos, headword, nid, entry_hash) SELECT language, pos, headword, nid, entry_hash FROM lingwo_dictionary_entry");
+  variable_move("lingwo_dictionary_entry_content_type", "lingwo_entry_content_type");
+  variable_mass_move("lingwo_dictionary", "lingwo_entry");
+}
+
+rename_lingwo_entry();
+

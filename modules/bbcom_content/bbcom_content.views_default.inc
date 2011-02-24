@@ -30,7 +30,7 @@ function bbcom_content_views_default_views() {
       'label' => 'entry node',
       'required' => 0,
       'id' => 'nid',
-      'table' => 'lingwo_dictionary_entry',
+      'table' => 'lingwo_entry',
       'field' => 'nid',
       'relationship' => 'entry_hash',
     ),

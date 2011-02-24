@@ -93,7 +93,7 @@ function bbcom_theme_theme(&$existing, $type, $theme, $path) {
     'bbcom_language_flag' => array(
       'arguments' => array('lang' => NULL),
     ),
-    'lingwo_dictionary_search_form' => array(
+    'lingwo_entry_search_form' => array(
       'arguments' => array('form' => NULL),
       'template' => 'lingwo-dictionary-search-form',
       'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
@@ -324,7 +324,7 @@ function bbcom_theme_preprocess_comment(&$vars, $hook) {
  */
 function bbcom_theme_preprocess_block(&$vars, $hook) {
   $block = $vars['block'];
-  if ($block->module == 'lingwo_dictionary' && $block->delta == 0) {
+  if ($block->module == 'lingwo_entry' && $block->delta == 0) {
     unset($block->subject);
   }
 }
@@ -333,7 +333,7 @@ function bbcom_theme_preprocess_block(&$vars, $hook) {
  * Mark some of the node form elements as inline
  */
 function bbcom_theme_node_form($form) {
-  if ($form['#node']->type == LingwoEntry::$settings->entry_content_type) {
+  if ($form['#node']->type == LingwoEntry::$settings->content_type) {
     $form['title']['#inline'] = TRUE;
     $form['language']['#inline'] = TRUE;
     $form['pos']['#inline'] = TRUE;

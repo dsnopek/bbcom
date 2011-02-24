@@ -158,7 +158,7 @@ function bbcom_flashcards_user_operations_resync($accounts) {
   $flag = flag_get_flag('wial');
   foreach ($accounts as $uid) {
     // get an array of Lingwo IDs for every word on this user's WIAL
-    $res = db_query('SELECT le.language as slang, n.language as tlang, le.headword, le.pos FROM {lingwo_dictionary_entry} le, {node} n, {flag_content} fc WHERE fc.fid = %d AND fc.uid = %d AND fc.content_id = n.nid AND n.tnid = le.nid', $flag->fid, $uid);
+    $res = db_query('SELECT le.language as slang, n.language as tlang, le.headword, le.pos FROM {lingwo_entry} le, {node} n, {flag_content} fc WHERE fc.fid = %d AND fc.uid = %d AND fc.content_id = n.nid AND n.tnid = le.nid', $flag->fid, $uid);
     $ids = array();
     while ($obj = db_fetch_object($res)) {
       $ids[] = "$obj->slang-$obj->tlang/$obj->headword($obj->pos)";

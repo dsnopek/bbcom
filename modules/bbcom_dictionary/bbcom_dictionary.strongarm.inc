@@ -83,10 +83,10 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_entry_content_type';
+  $strongarm->name = 'lingwo_entry_content_type';
   $strongarm->value = 'entry';
 
-  $export['lingwo_dictionary_entry_content_type'] = $strongarm;
+  $export['lingwo_entry_content_type'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;

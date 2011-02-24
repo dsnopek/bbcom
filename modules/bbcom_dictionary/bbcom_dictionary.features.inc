@@ -20,8 +20,8 @@ function bbcom_dictionary_context_default_contexts() {
     ),
     'menu' => 'dictionary',
     'block' => array(
-      'lingwo_dictionary_0' => array(
-        'module' => 'lingwo_dictionary',
+      'lingwo_entry_0' => array(
+        'module' => 'lingwo_entry',
         'delta' => '0',
         'weight' => 20,
         'region' => 'header',
