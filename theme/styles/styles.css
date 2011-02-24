@@ -374,7 +374,7 @@ ul.primary li a {
   font-size: 14pt;
   float: left;
 }
-#lingwo-dictionary-search-form .form-submit,
+#lingwo-entry-search-form .form-submit,
 #edit-submit-search-content {
   display: block;
   background: transparent url('../images/search-btn.png') no-repeat;

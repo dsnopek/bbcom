@@ -95,7 +95,7 @@ function bbcom_theme_theme(&$existing, $type, $theme, $path) {
     ),
     'lingwo_entry_search_form' => array(
       'arguments' => array('form' => NULL),
-      'template' => 'lingwo-dictionary-search-form',
+      'template' => 'lingwo-entry-search-form',
       'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
     ),
   );
