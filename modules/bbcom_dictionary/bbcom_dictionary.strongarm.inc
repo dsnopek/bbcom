@@ -97,6 +97,13 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'lingwo_entry_node_title_munging';
+  $strongarm->value = 0;
+
+  $export['lingwo_entry_node_title_munging'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'lingwo_entry_pos_allowed_values';
   $strongarm->value = 'abbreviation|Abbreviation
 adjective|Adjective
