@@ -29,5 +29,5 @@ function populate_lingwo_entry_translation() {
 }
 
 rename_lingwo_entry();
-populate_lingwo_entry_translation();
+//populate_lingwo_entry_translation();
 

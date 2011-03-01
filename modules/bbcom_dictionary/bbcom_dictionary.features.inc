@@ -54,26 +54,6 @@ function bbcom_dictionary_ctools_plugin_api() {
 }
 
 /**
- * Implementation of hook_node_info().
- */
-function bbcom_dictionary_node_info() {
-  $items = array(
-    'entry' => array(
-      'name' => t('Entry'),
-      'module' => 'features',
-      'description' => t('A dictionary entry.'),
-      'has_title' => '1',
-      'title_label' => t('Headword'),
-      'has_body' => '0',
-      'body_label' => '',
-      'min_word_count' => '0',
-      'help' => '',
-    ),
-  );
-  return $items;
-}
-
-/**
  * Implementation of hook_views_api().
  */
 function bbcom_dictionary_views_api() {
