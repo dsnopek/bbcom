@@ -24,10 +24,11 @@ function rename_lingwo_entry() {
   variable_mass_move("lingwo_dictionary", "lingwo_entry");
 }
 
-function populate_lingwo_entry_translation() {
-  db_query("INSERT INTO lingwo_entry_translation (nid, tnid) SELECT nid, tnid FROM node WHERE type = 'entry' AND tnid <> 0 AND tnid <> nid AND tnid IS NOT NULL");
+function install_lingwo_language() {
+  module_load_include('install', 'lingwo_language', 'lingwo_language');
+  lingwo_language_install();
 }
 
 rename_lingwo_entry();
-//populate_lingwo_entry_translation();
+install_lingwo_language();
 
