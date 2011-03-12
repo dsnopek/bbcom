@@ -1,0 +1,878 @@
+array(
+  array(
+    'nid' => '65',
+    'type' => 'language',
+    'language' => 'en',
+    'uid' => '1',
+    'status' => '1',
+    'created' => '1299876784',
+    'changed' => '1299878028',
+    'comment' => '2',
+    'promote' => '1',
+    'moderate' => '0',
+    'sticky' => '0',
+    'tnid' => '0',
+    'translate' => '0',
+    'vid' => '66',
+    'revision_uid' => '1',
+    'title' => 'Polish',
+    'body' => '',
+    'teaser' => '',
+    'log' => '',
+    'revision_timestamp' => '1299878028',
+    'format' => '0',
+    'name' => 'admin',
+    'picture' => '',
+    'data' => 'a:0:{}',
+    'lingwo_language' => array(
+      'lingwo_entry_pos_allowed_values' => 'abbreviation|Abbreviation
+adjective|Adjective
+adverb|Adverb
+article|Article
+auxilary verb|Auxilary Verb
+conjunction|Conjunction
+determiner|Determiner
+exclamation|Exclamation
+noun|Noun
+onomatopoeia|Onomatopoeia
+particle|Particle
+phrase|Phrase
+prefix|Prefix
+preposition|Preposition
+pronoun|Pronoun
+suffix|Suffix
+symbol|Symbol
+title|Title
+verb|Verb',
+      'lingwo_fields_fields' => array(
+        'javascript' => '// must be done for diagraphs, maintaining forms and setting letter classes (ie. vowel).
+lang.alphabet = Language.generateAlphabet(\'aąbcćdeęfghijklłmnńoópqrsśtuvwxyzżź\', [\'ch\',\'dz\',\'dż\',\'dź\',\'sz\',\'rz\',\'sz\'],
+    function (l) {
+        var classes = [];
+        if (l == \'a\' || l == \'ą\' || l == \'e\' || l == \'ę\' || l == \'i\' || l == \'o\' || l == \'ó\' || l == \'u\' || l == \'y\') {
+            classes.push(\'vowel\');
+        } else {
+            classes.push(\'consonant\');
+        }
+        if (l == \'ą\' || l == \'ę\') {
+            classes.push(\'nasal\');
+        }
+        if (l == \'ć\' || l == \'ń\' || l == \'ś\' || l == \'ź\' || l == \'dź\') {
+            classes.push(\'soft\');
+        }
+        return classes;
+    }
+);
+
+/*
+lang.Word.extend({
+    \'thinger\': function () { return \'blarney2\' }
+});
+var word = new lang.Word(\'blah\');
+print(word.thinger());
+*/
+
+function stemChange (word) {
+    return word.ending(\'k\').replace(\'c\') ||
+           word.ending(\'g\').replace(\'dz\') ||
+           word.ending(\'r\').replace(\'rz\') ||
+           word.ending(\'st\').replace(\'ści\') ||
+           word.ending(\'t\').replace(\'ci\') ||
+           word.ending(\'sn\').replace(\'śni\') ||
+           word.ending(\'zn\').replace(\'źni\') ||
+           word.ending(\'sm\').replace(\'śmi\') ||
+           word.ending(\'ch\').replace(\'sz\') ||
+           word.ending(\'zd\').replace(\'ździ\') ||
+           word.ending(\'d\').replace(\'dzi\') ||
+           word.ending(\'sł\').replace(\'śl\') ||
+           word.ending(\'zł\').replace(\'źl\') ||
+           word.ending(\'ł\').replace(\'l\') ||
+           word.ending(\'b\',\'f\',\'p\',\'s\',\'w\',\'z\',\'m\',\'n\').append(\'i\') ||
+           word;
+};
+
+function append_i (word) {
+    if (word.hasEnding(\'j\', \'l\'))
+        return word;
+
+    return word.ending(\'ń\').replace(\'ni\') ||
+           word.ending(\'ć\').replace(\'ci\') ||
+           word.ending(\'ź\').replace(\'zi\') ||
+           word.ending(\'dź\').replace(\'dzi\') ||
+           word.ending(\'ś\').replace(\'si\') ||
+           word.append(\'i\');
+};
+
+// Calls the append_i function if last letter is soft.
+function append_i_on_soft (word) {
+    if (word.hasEnding(Language.cls(\'soft\'))) {
+        return append_i(word);
+    }
+    return word;
+};
+
+// Appends -y to the end of a word, converting to -i if proceded by
+// a \'k\' or \'g\'.
+function append_y (word, soft) {
+    if (soft) {
+        return word.append(\'i\');
+    }
+    return word.ending(\'k\',\'g\').append(\'i\') ||
+           word.append(\'y\');
+};
+
+function append_e (word, soft) {
+    if (soft) {
+        return word.append(\'ie\');
+    }
+    return word.ending(\'k\',\'g\').append(\'ie\') ||
+           word.append(\'e\');
+};
+',
+        'pos' => array(
+          'adjective' => array(
+            'soft' => array(
+              'label' => '',
+              'type' => 'class',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.hasEnding("i") && !word.hasEnding("ki", "gi");
+',
+              'show' => '',
+            ),
+            '*stem' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord().ending(1).drop();
+',
+              'show' => '',
+            ),
+            'nominative.singular.masculine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft"));
+',
+              'show' => '',
+            ),
+            'nominative.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("*stem").append(entry.getField("soft") ? "ia" : "a");
+',
+              'show' => '',
+            ),
+            'nominative.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft"));
+',
+              'show' => '',
+            ),
+            'nominative.plural.non_virile' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nominative.singular.neuter");
+',
+              'show' => '',
+            ),
+            'nominative.plural.virile' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var stem = entry.getWord("*stem"), ending;
+if (entry.getField("soft")) {
+    return stem.append("i");
+}
+if (ending = stem.endingOrFalse("ż")) {
+    return ending.replace("zi");
+} else {
+    if (ending = stem.endingOrFalse("sz")) {
+        return ending.replace("si");
+    } else {
+        if (ending = stem.endingOrFalse("on")) {
+            return ending.replace("eni");
+        } else {
+            stem = stemChange(stem);
+            if (stem.hasEnding("c", "dz", "rz")) {
+                return stem.append("y");
+            } else {
+                if (!stem.hasEnding("i")) {
+                    return stem.append("i");
+                }
+            }
+            return stem;
+        }
+    }
+}
+',
+              'show' => '',
+            ),
+            'accusative.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("*stem").append(entry.getField("soft") ? "ią" : "ą");
+',
+              'show' => '',
+            ),
+            'accusative.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nominative.singular.neuter");
+',
+              'show' => '',
+            ),
+            'accusative.singular.masculine.animate' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("genitive.singular.masculine");
+',
+              'show' => '',
+            ),
+            'accusative.singular.masculine.inanimate' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nominative.singular.masculine");
+',
+              'show' => '',
+            ),
+            'accusative.plural.virile' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("genitive.plural");
+',
+              'show' => '',
+            ),
+            'accusative.plural.non_virile' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nominative.plural.non_virile");
+',
+              'show' => '',
+            ),
+            'genitive.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft")).append("j");
+',
+              'show' => '',
+            ),
+            'genitive.singular.masculine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft")).append("go");
+',
+              'show' => '',
+            ),
+            'genitive.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("genitive.singular.masculine");
+',
+              'show' => '',
+            ),
+            'genitive.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("ch");
+',
+              'show' => '',
+            ),
+            'dative.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft")).append("j");
+',
+              'show' => '',
+            ),
+            'dative.singular.masculine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft")).append("mu");
+',
+              'show' => '',
+            ),
+            'dative.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("dative.singular.masculine");
+',
+              'show' => '',
+            ),
+            'dative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("m");
+',
+              'show' => '',
+            ),
+            'instrumental.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("*stem").append(entry.getField("soft") ? "ią" : "ą");
+',
+              'show' => '',
+            ),
+            'instrumental.singular.masculine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("m");
+',
+              'show' => '',
+            ),
+            'instrumental.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("instrumental.singular.masculine");
+',
+              'show' => '',
+            ),
+            'instrumental.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("mi");
+',
+              'show' => '',
+            ),
+            'locative.singular.masculine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("m");
+',
+              'show' => '',
+            ),
+            'locative.singular.feminine' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_e(entry.getWord("*stem"), entry.getField("soft")).append("j");
+',
+              'show' => '',
+            ),
+            'locative.singular.neuter' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("locative.singular.masculine");
+',
+              'show' => '',
+            ),
+            'locative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_y(entry.getWord("*stem"), entry.getField("soft")).append("ch");
+',
+              'show' => '',
+            ),
+          ),
+          'noun' => array(
+            'animate' => array(
+              'label' => 'Animate',
+              'type' => 'class',
+              'description' => 'Set to True if this noun is a living thing (gramatically).  Only important if the Gender is "masculine".',
+              'options' => '',
+              'automatic' => 'return entry.getField("virile");
+',
+              'show' => 'return entry.getField("gender") == "masculine";
+',
+            ),
+            'virile' => array(
+              'label' => 'Virile',
+              'type' => 'class',
+              'description' => 'Set to True if this noun is a male human.  Only important if the Gender is "masculine".',
+              'options' => '',
+              'automatic' => '',
+              'show' => 'return entry.getField("gender") == "masculine";
+',
+            ),
+            'gender' => array(
+              'label' => 'Gender',
+              'type' => 'option',
+              'description' => '',
+              'options' => 'masculine|Masculine
+feminine|Feminine
+neuter|Neuter',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("o", "e", "ę", "um").result("neuter") || word.ending(Language.cls("vowel")).result("feminine") || "masculine";
+',
+              'show' => '',
+            ),
+            '*stem' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("a", "o", "e", "um").drop() || word;
+',
+              'show' => '',
+            ),
+            '*stem.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("mię").replace("mieni") || word.ending("ę").append("ci") || entry.getWord("*stem");
+',
+              'show' => '',
+            ),
+            '*stem.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("mię").replace("mion") || word.ending("ę").append("t") || entry.getWord("*stem");
+',
+              'show' => '',
+            ),
+            'nominative.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord();
+',
+              'show' => '',
+            ),
+            'nominative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord(), ending;
+if (entry.getField("gender") == "masculine" && entry.getField("virile")) {
+    var stem = entry.getWord("*stem.plural");
+    if (ending = stem.endingOrFalse("rz", "sz", "cz", "l", "j")) {
+        return ending.append("e");
+    } else {
+        if (ending = stem.endingOrFalse("ch")) {
+            return ending.replace("si");
+        } else {
+            stem = stemChange(stem);
+            return stem.ending("c", "dz", "rz").append("y") || stem.ending("l").append("i") || stem;
+        }
+    }
+} else {
+    if (entry.getField("gender") == "feminine" && word.hasEnding("cz", "sz")) {
+        return word.append("y");
+    } else {
+        if ((ending = word.endingOrFalse("ość")) && entry.getField("gender") == "feminine") {
+            return ending.replace("ości");
+        } else {
+            var stem = entry.getWord("*stem.plural");
+            if (entry.getField("gender") == "neuter") {
+                return stem.append("a");
+            }
+            if (stem.hasEnding(Language.cls("soft"))) {
+                return append_i(stem).append("e");
+            }
+            return stem.ending("j", "l", "i", "c", "cz", "rz", "sz", "dz", "ż", "dż").append("e") || append_y(stem);
+        }
+    }
+}
+',
+              'show' => '',
+            ),
+            'accusative.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+if (word.hasEnding("a", "i")) {
+    return entry.getWord("*stem.singular").append("ę");
+} else {
+    if (entry.getField("gender") == "masculine" && entry.getField("animate")) {
+        return entry.getWord("genitive.singular");
+    }
+}
+return word;
+',
+              'show' => '',
+            ),
+            'accusative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("virile")) {
+    return entry.getWord("genitive.plural");
+}
+return entry.getWord("nominative.plural");
+',
+              'show' => '',
+            ),
+            'genitive.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord(), stem = entry.getWord("*stem.singular");
+var gender = entry.getField("gender");
+if (gender == "masculine" && word.hasEnding("a")) {
+    return stem.ending("g", "k").append("i") || stem.append("y");
+} else {
+    if (gender == "feminine") {
+        if (stem.hasEnding("j")) {
+            return stem.ending("cj", "zj", "sj").append("i") || stem.ending(1).replace("i");
+        } else {
+            if (stem.hasEnding("i")) {
+                return stem.ending("di", "chi", "fi", "gi", "ki", "li", "ri", "ti").append("i") || stem;
+            }
+        }
+        return stem.ending("l", "w").append("i") || stem.ending(Language.cls("soft")).result(append_i(stem)) || append_y(stem);
+    } else {
+        if (gender == "masculine") {
+            if (entry.getField("animate")) {
+                if (stem.hasEnding(Language.cls("soft"))) {
+                    return append_i(stem).append("a");
+                }
+                return stem.append("a");
+            }
+            return stem.append("u");
+        } else {
+            if (gender == "neuter") {
+                return stem.append("a");
+            }
+        }
+    }
+}
+',
+              'show' => '',
+            ),
+            'genitive.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord(), stem = entry.getWord("*stem.plural"), ending, endWord;
+var gender = entry.getField("gender");
+if (gender == "masculine") {
+    if (ending = stem.endingOrFalse("ń")) {
+        if (entry.getField("virile")) {
+            return ending.replace("ni\xf3w");
+        }
+        return ending.replace("ni");
+    } else {
+        if (stem.hasEnding("l")) {
+            return stem.append("i");
+        } else {
+            if (ending = stem.endingOrFalse("j")) {
+                return ending.replace("i");
+            } else {
+                if (stem.hasEnding(Language.cls("soft"))) {
+                    return append_i(stem);
+                }
+            }
+        }
+    }
+    return stem.ending("cz", "rz", "sz", "dz", "ż").append("y") || stem.append("\xf3w");
+} else {
+    if (word.hasEnding("um")) {
+        return stem.append("\xf3w");
+    } else {
+        if (word.hasEnding("c", "cz", "sz", "rz", "ż", "nia", "ja", "j")) {
+            return entry.getWord("genitive.singular");
+        } else {
+            if (stem.hasEnding("i")) {
+                stem = stem.ending(1).drop();
+                stem = stem.ending("n").replace("ń") || stem.ending("c").replace("ć") || stem.ending("s").replace("ś") || stem;
+            }
+            if (ending = stem.endingOrFalse("ęt")) {
+                stem = ending.replace("ąt");
+            }
+            if ((stem.hasEnding([Language.cls("consonant"), Language.cls("consonant"), Language.cls("consonant")]) && !stem.hasEnding("r")) || (stem.hasEnding([Language.cls("consonant"), Language.cls("consonant")]) && !stem.hasEnding("r", "ć", "sk", "zd", "rc", "st"))) {
+                ending = stem.ending(Language.cls("consonant"));
+                endWord = ending.toWord();
+                stem = ending.drop();
+                stem = append_e(stem).concat(endWord);
+            }
+            return stem;
+        }
+    }
+}
+',
+              'show' => '',
+            ),
+            'dative.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var gender = entry.getField("gender"), word = entry.getWord(), stem = entry.getWord("*stem.singular");
+if (gender == "feminine" || word.hasEnding("a")) {
+    if (stem.hasEnding("i")) {
+        return entry.getWord("genitive.singular");
+    }
+    return stem.ending("c", "cz").append("y") || stemChange(stem).append("e");
+} else {
+    if (gender == "masculine") {
+        return append_i_on_soft(stem).append("owi");
+    } else {
+        if (gender == "neuter") {
+            if (word.hasEnding("um")) {
+                return word;
+            }
+            return stem.append("u");
+        }
+    }
+}
+',
+              'show' => '',
+            ),
+            'dative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_i_on_soft(entry.getWord("*stem.plural")).append("om");
+',
+              'show' => '',
+            ),
+            'instrumental.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var gender = entry.getField("gender"), word = entry.getWord(), stem = entry.getWord("*stem.singular");
+if (gender == "feminine" || word.hasEnding("a")) {
+    return append_i_on_soft(stem).append("ą");
+}
+return append_e(append_i_on_soft(stem)).append("m");
+',
+              'show' => '',
+            ),
+            'instrumental.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_i_on_soft(entry.getWord("*stem.plural")).append("ami");
+',
+              'show' => '',
+            ),
+            'locative.singular' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord(), stem = entry.getWord("*stem.singular");
+if (entry.getField("gender") == "feminine" || word.hasEnding("a")) {
+    return entry.getWord("dative.singular");
+}
+if (word.hasEnding("um")) {
+    return word;
+}
+if (stem.hasEnding("k", "g", "ch", "j", "l", "c", "cz", "sz", "rz", "ż", "dż", "i", "ń", "ć", "ź", "dź")) {
+    return append_i_on_soft(stem).append("u");
+}
+return stemChange(stem).append("e");
+',
+              'show' => '',
+            ),
+            'locative.plural' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_i_on_soft(entry.getWord("*stem.plural")).append("ach");
+',
+              'show' => '',
+            ),
+          ),
+          'verb' => array(
+            'conjugation' => array(
+              'label' => 'Conjugation',
+              'type' => 'option',
+              'description' => 'first|First
+second|Second
+third|Third',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("ować", "iwać", "awać", "ywać").result("first") || word.ending("ać", "ieć").result("third") || word.ending("ić", "yć", "eć").result("second") || "";
+',
+              'show' => '',
+            ),
+            '*stem' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord(), ending;
+var conj = entry.getField("conjugation");
+if ((ending = word.endingOrFalse("ować", "iwać", "ywać")) && conj != "third") {
+    word = ending.replace("u");
+} else {
+    if (ending = word.endingOrFalse("awać")) {
+        word = ending.replace("a");
+    } else {
+        if (ending = word.endingOrFalse("ć")) {
+            word = ending.drop();
+        }
+    }
+}
+if ((ending = word.endingOrFalse("e")) && conj == "second") {
+    word = ending.replace("y");
+}
+if (word.hasEnding(Language.cls("vowel")) && (conj == "first" || conj == "third")) {
+    word = word.append("j");
+}
+return word;
+',
+              'show' => '',
+            ),
+            'nonpast.singular.1p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord("*stem"), ending;
+if (entry.getField("conjugation") == "third") {
+    return word.ending(1).drop().append("m");
+}
+if (ending = word.endingOrFalse("y")) {
+    word = ending.drop();
+}
+return word.append("ę");
+',
+              'show' => '',
+            ),
+            'nonpast.singular.2p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nonpast.singular.3p").append("sz");
+',
+              'show' => '',
+            ),
+            'nonpast.singular.3p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var stem = entry.getWord("*stem");
+var conj = entry.getField("conjugation");
+if (conj == "first") {
+    return stem.append("e");
+} else {
+    if (conj == "third") {
+        return stem.ending(1).drop();
+    }
+}
+return stem;
+',
+              'show' => '',
+            ),
+            'nonpast.plural.1p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nonpast.singular.3p").append("my");
+',
+              'show' => '',
+            ),
+            'nonpast.plural.2p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("nonpast.singular.3p").append("cie");
+',
+              'show' => '',
+            ),
+            'nonpast.plural.3p' => array(
+              'label' => '',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord("*stem"), ending;
+if (ending = word.endingOrFalse("y")) {
+    word = ending.drop();
+}
+return word.append("ą");
+',
+              'show' => '',
+            ),
+          ),
+        ),
+      ),
+      'language' => 'pl',
+    ),
+    'last_comment_timestamp' => '1299876784',
+    'last_comment_name' => NULL,
+    'comment_count' => '0',
+    'taxonomy' => array(),
+    'menu' => array(
+      'link_title' => '',
+      'mlid' => 0,
+      'plid' => 0,
+      'menu_name' => 'primary-links',
+      'weight' => 0,
+      'options' => array(),
+      'module' => 'menu',
+      'expanded' => 0,
+      'hidden' => 0,
+      'has_children' => 0,
+      'customized' => 0,
+      'parent_depth_limit' => 8,
+    ),
+    '#_export_node_encode_object' => '1',
+  ),
+)

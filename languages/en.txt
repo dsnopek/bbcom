@@ -1,0 +1,393 @@
+array(
+  array(
+    'nid' => '63',
+    'type' => 'language',
+    'language' => 'en',
+    'uid' => '1',
+    'status' => '1',
+    'created' => '1299875238',
+    'changed' => '1299877921',
+    'comment' => '2',
+    'promote' => '1',
+    'moderate' => '0',
+    'sticky' => '0',
+    'tnid' => '0',
+    'translate' => '0',
+    'vid' => '64',
+    'revision_uid' => '1',
+    'title' => 'English',
+    'body' => '',
+    'teaser' => '',
+    'log' => '',
+    'revision_timestamp' => '1299877921',
+    'format' => '0',
+    'name' => 'admin',
+    'picture' => '',
+    'data' => 'a:0:{}',
+    'lingwo_language' => array(
+      'lingwo_entry_pos_allowed_values' => 'abbreviation|Abbreviation
+adjective|Adjective
+adverb|Adverb
+article|Article
+auxilary verb|Auxilary Verb
+conjunction|Conjunction
+determiner|Determiner
+exclamation|Exclamation
+noun|Noun
+onomatopoeia|Onomatopoeia
+particle|Particle
+phrase|Phrase
+prefix|Prefix
+preposition|Preposition
+pronoun|Pronoun
+suffix|Suffix
+symbol|Symbol
+title|Title
+verb|Verb',
+      'lingwo_fields_fields' => array(
+        'javascript' => 'lang.alphabet = Language.generateAlphabet(\'abcdefghijklmnopqrstuvwxyz\', [\'ch\',\'sh\',\'th\'],
+    function (l) {
+        var classes = [];
+        if (l == \'a\' || l == \'e\' || l == \'i\' || l == \'o\' || l == \'u\') {
+            classes.push(\'vowel\');
+        }
+        else {
+            classes.push(\'consonant\');
+        }
+        return classes;
+    }
+);
+
+// some punctuation for the alphabet
+function addPunctuation(v) {
+    lang.alphabet[v] = {
+        \'classes\': [\'punctuation\'],
+        \'default_form\': \'default\',
+        \'forms\': {
+            \'default\': v,
+        }
+    };
+}
+"\'-".split(\'\').forEach(addPunctuation);
+
+function append_s (word) {
+    if (word.hasEnding([Language.cls(\'consonant\'), \'y\'])) {
+        return word.ending(1).replace(\'ies\');
+    }
+    return word.ending(\'sh\',\'ch\',\'s\',\'z\',\'o\').append(\'es\') ||
+           word.append(\'s\');
+}
+
+function double_last_cvc (word) {
+    if (word.letters.length == 3 && word.hasEnding([Language.cls(\'consonant\'), Language.cls(\'vowel\'), Language.cls(\'consonant\')])) {
+        return word.append(word.letters[word.letters.length-1][0]);
+    }
+    return word;
+}
+
+// TODO: in the future base this off the IPA!!
+function syllable_count (word) {
+    var scount = 0, vlast = 0, i;
+    for(i = 0; i < word.letters.length; i++) {
+        if (lang.letterHasClass(word.letters[i][0], \'vowel\')) {
+            // count this as a syllable, if the last letter was a consonant,
+            // or we have already encountered two vowels in a row, and this
+            // is the third...
+            if (vlast == 0 || vlast == 2) {
+                // a special exception, we don\'t count a lone \'e\' on the 
+                // end of a word.
+                if (word.letters[i][0] == \'e\' && vlast == 0 && i == word.letters.length-1) {
+                    break;
+                }
+
+                // otherwise, it was a syllable!
+                scount++;
+            }
+            // mark that we encountered a vowel
+            vlast++;
+        }
+        else {
+            // mark that we encountered a consonant
+            vlast = 0;
+        }
+    }
+
+    return scount;
+}
+',
+        'pos' => array(
+          'adjective' => array(
+            'not_comparable' => array(
+              'label' => 'Not comparable',
+              'type' => 'class',
+              'description' => '',
+              'options' => '',
+              'automatic' => '',
+              'show' => '',
+            ),
+            'more' => array(
+              'label' => 'more Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+var word = entry.getWord();
+if (syllable_count(word) >= 3) {
+    return [lang.parseWord("more"), word];
+}
+word = double_last_cvc(word);
+return word.ending("e").append("r") || word.ending("y").replace("ier") || word.append("er");
+',
+              'show' => '',
+            ),
+            'most' => array(
+              'label' => 'most Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+var word = entry.getWord();
+if (syllable_count(word) >= 3) {
+    return [lang.parseWord("most"), word];
+}
+word = double_last_cvc(word);
+return word.ending("e").append("st") || word.ending("y").replace("iest") || word.append("est");
+',
+              'show' => '',
+            ),
+          ),
+          'adverb' => array(
+            'not_comparable' => array(
+              'label' => 'Not comparable',
+              'type' => 'class',
+              'description' => '',
+              'options' => '',
+              'automatic' => '',
+              'show' => '',
+            ),
+            'more' => array(
+              'label' => 'more Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+return [lang.parseWord("more"), entry.getWord()];
+',
+              'show' => '',
+            ),
+            'most' => array(
+              'label' => 'most Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+return [lang.parseWord("most"), entry.getWord()];
+',
+              'show' => '',
+            ),
+          ),
+          'auxilary verb' => array(
+            '-s' => array(
+              'label' => '-s Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_s(entry.getWord());
+',
+              'show' => '',
+            ),
+            '-ing' => array(
+              'label' => '-ing Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("ee").append("ing") || word.ending("ie").replace("ying") || word.ending("e").replace("ing") || word.append("ing");
+',
+              'show' => '',
+            ),
+            '2nd' => array(
+              'label' => '2nd Form (past)',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("e").append("d") || word.append("ed");
+',
+              'show' => '',
+            ),
+            '3rd' => array(
+              'label' => '3rd Form (past participle)',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("2nd");
+',
+              'show' => '',
+            ),
+            'infinitive' => array(
+              'label' => 'Infinitive',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return [lang.parseWord("to")].concat(entry.getWords());
+',
+              'show' => '',
+            ),
+          ),
+          'determiner' => array(
+            'not_comparable' => array(
+              'label' => 'Not comparable',
+              'type' => 'class',
+              'description' => '',
+              'options' => '',
+              'automatic' => '',
+              'show' => '',
+            ),
+            'more' => array(
+              'label' => 'more Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+var word = entry.getWord();
+if (syllable_count(word) >= 3) {
+    return [lang.parseWord("more"), word];
+}
+word = double_last_cvc(word);
+return word.ending("e").append("r") || word.ending("y").replace("ier") || word.append("er");
+',
+              'show' => '',
+            ),
+            'most' => array(
+              'label' => 'most Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'if (entry.getField("not_comparable")) {
+    return null;
+}
+var word = entry.getWord();
+if (syllable_count(word) >= 3) {
+    return [lang.parseWord("most"), word];
+}
+word = double_last_cvc(word);
+return word.ending("e").append("st") || word.ending("y").replace("iest") || word.append("est");
+',
+              'show' => '',
+            ),
+          ),
+          'noun' => array(
+            'plural_type' => array(
+              'label' => 'Plural Type',
+              'type' => 'option',
+              'description' => '',
+              'options' => 'both|Has singular and plural
+singular|Singular only
+plural|Plural only',
+              'automatic' => 'return "both";
+',
+              'show' => '',
+            ),
+            'plural' => array(
+              'label' => 'Plural',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var type = entry.getField("plural_type");
+switch (type) {
+  case "both":
+    return append_s(entry.getWord());
+  case "singular":
+    return null;
+  case "plural":
+    return entry.getWord();
+}
+',
+              'show' => '',
+            ),
+          ),
+          'verb' => array(
+            '-s' => array(
+              'label' => '-s Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return append_s(entry.getWord());
+',
+              'show' => '',
+            ),
+            '-ing' => array(
+              'label' => '-ing Form',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("ee").append("ing") || word.ending("ie").replace("ying") || word.ending("e").replace("ing") || word.append("ing");
+',
+              'show' => '',
+            ),
+            '2nd' => array(
+              'label' => '2nd Form (past)',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'var word = entry.getWord();
+return word.ending("e").append("d") || word.append("ed");
+',
+              'show' => '',
+            ),
+            '3rd' => array(
+              'label' => '3rd Form (past participle)',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return entry.getWord("2nd");
+',
+              'show' => '',
+            ),
+            'infinitive' => array(
+              'label' => 'Infinitive',
+              'type' => 'form',
+              'description' => '',
+              'options' => '',
+              'automatic' => 'return [lang.parseWord("to")].concat(entry.getWords());
+',
+              'show' => '',
+            ),
+          ),
+        ),
+      ),
+      'language' => 'en',
+    ),
+    'last_comment_timestamp' => '1299875238',
+    'last_comment_name' => NULL,
+    'comment_count' => '0',
+    'taxonomy' => array(),
+    'menu' => array(
+      'link_title' => '',
+      'mlid' => 0,
+      'plid' => 0,
+      'menu_name' => 'primary-links',
+      'weight' => 0,
+      'options' => array(),
+      'module' => 'menu',
+      'expanded' => 0,
+      'hidden' => 0,
+      'has_children' => 0,
+      'customized' => 0,
+      'parent_depth_limit' => 8,
+    ),
+    '#_export_node_encode_object' => '1',
+  ),
+)

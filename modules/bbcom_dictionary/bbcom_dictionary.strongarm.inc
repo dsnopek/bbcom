@@ -192,6 +192,13 @@ verb|Verb';
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'lingwo_language_content_type';
+  $strongarm->value = 'language';
+
+  $export['lingwo_language_content_type'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'lingwo_senses_relationship_allowed_values';
   $strongarm->value = 'imieslow.przy.t.c|present active participle
 imieslow.przy.p.b|past passive participle
