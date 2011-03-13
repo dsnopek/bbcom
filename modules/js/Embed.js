@@ -1,10 +1,10 @@
 
 define(
     ['jquery',
-     'lingwo_dictionary/util/declare',
-     'lingwo_dictionary/annotation/Reader2',
-     'lingwo_dictionary/layout/BottomDock',
-     'lingwo_dictionary/layout/isPositionFixedSupported'
+     'lingwo/util/declare',
+     'lingwo_old/annotation/Reader2',
+     'lingwo_old/layout/BottomDock',
+     'lingwo_old/layout/isPositionFixedSupported'
     ],
     function ($, declare, Reader, BottomDockLayout, isPositionFixedSupported) {
         var BiblioBird = {},

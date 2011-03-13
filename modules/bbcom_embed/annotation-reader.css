@@ -63,6 +63,7 @@ a.external:visited {
   margin:5px 0;
 }
 #lingwo-korpus-entry-view .node p, #lingwo-korpus-entry-view .node dl, #lingwo-korpus-entry-view .node hr, #lingwo-korpus-entry-view .node h1, #lingwo-korpus-entry-view .node h2, #lingwo-korpus-entry-view .node h3, #lingwo-korpus-entry-view .node h4, #lingwo-korpus-entry-view .node h5, #lingwo-korpus-entry-view .node h6, #lingwo-korpus-entry-view .node ol, #lingwo-korpus-entry-view .node ul, #lingwo-korpus-entry-view .node pre, #lingwo-korpus-entry-view .node table, #lingwo-korpus-entry-view .node address, #lingwo-korpus-entry-view .node fieldset { margin-bottom:10px; }
+#lingwo-korpus-entry-view .node .lingwo-sense-example table { margin-bottom:0; }
 #lingwo-korpus-entry-view .node ul.links {
   margin:0;
   padding:0;
@@ -74,7 +75,7 @@ a.external:visited {
   padding:0 0 0 0.5em;
 }
 #lingwo-korpus-entry-view .node ul.links li.first { padding:0; }
-#lingwo-korpus-entry-view .node .lingwo-sense-list li.selected, #lingwo-korpus-entry-view .node .lingwo-sense-list li.selected blockquote {
+#lingwo-korpus-entry-view .node .lingwo-senses li.selected, #lingwo-korpus-entry-view .node .lingwo-senses li.selected blockquote {
   background-color:yellow;
   color:black;
 }
