@@ -20,8 +20,8 @@ function bbcom_dictionary_context_default_contexts() {
     ),
     'menu' => 'dictionary',
     'block' => array(
-      'lingwo_dictionary_0' => array(
-        'module' => 'lingwo_dictionary',
+      'lingwo_entry_0' => array(
+        'module' => 'lingwo_entry',
         'delta' => '0',
         'weight' => 20,
         'region' => 'header',
@@ -51,26 +51,6 @@ function bbcom_dictionary_ctools_plugin_api() {
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
-}
-
-/**
- * Implementation of hook_node_info().
- */
-function bbcom_dictionary_node_info() {
-  $items = array(
-    'entry' => array(
-      'name' => t('Entry'),
-      'module' => 'features',
-      'description' => t('A dictionary entry.'),
-      'has_title' => '1',
-      'title_label' => t('Headword'),
-      'has_body' => '0',
-      'body_label' => '',
-      'min_word_count' => '0',
-      'help' => '',
-    ),
-  );
-  return $items;
 }
 
 /**

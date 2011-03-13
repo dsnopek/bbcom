@@ -8,6 +8,69 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_entry';
+  $strongarm->value = 0;
+
+  $export['comment_anonymous_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_controls_entry';
+  $strongarm->value = '3';
+
+  $export['comment_controls_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_entry';
+  $strongarm->value = '4';
+
+  $export['comment_default_mode_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_order_entry';
+  $strongarm->value = '1';
+
+  $export['comment_default_order_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_entry';
+  $strongarm->value = '50';
+
+  $export['comment_default_per_page_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_entry';
+  $strongarm->value = '2';
+
+  $export['comment_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_entry';
+  $strongarm->value = '0';
+
+  $export['comment_form_location_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_entry';
+  $strongarm->value = '1';
+
+  $export['comment_preview_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_entry';
+  $strongarm->value = '1';
+
+  $export['comment_subject_field_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'content_extra_weights_entry';
   $strongarm->value = array(
     'title' => '2',
@@ -28,14 +91,14 @@ function bbcom_dictionary_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'i18n_node_entry';
-  $strongarm->value = 1;
+  $strongarm->value = '1';
 
   $export['i18n_node_entry'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_entry';
-  $strongarm->value = 2;
+  $strongarm->value = '2';
 
   $export['language_content_type_entry'] = $strongarm;
   $strongarm = new stdClass;
@@ -83,21 +146,28 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_entry_content_type';
+  $strongarm->name = 'lingwo_entry_content_type';
   $strongarm->value = 'entry';
 
-  $export['lingwo_dictionary_entry_content_type'] = $strongarm;
+  $export['lingwo_entry_content_type'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_lookup_path';
+  $strongarm->name = 'lingwo_entry_lookup_path';
   $strongarm->value = 'dictionary/lookup';
 
-  $export['lingwo_dictionary_lookup_path'] = $strongarm;
+  $export['lingwo_entry_lookup_path'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'lingwo_dictionary_pos_allowed_values';
+  $strongarm->name = 'lingwo_entry_node_title_munging';
+  $strongarm->value = 0;
+
+  $export['lingwo_entry_node_title_munging'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'lingwo_entry_pos_allowed_values';
   $strongarm->value = 'abbreviation|Abbreviation
 adjective|Adjective
 adverb|Adverb
@@ -118,7 +188,24 @@ symbol|Symbol
 title|Title
 verb|Verb';
 
-  $export['lingwo_dictionary_pos_allowed_values'] = $strongarm;
+  $export['lingwo_entry_pos_allowed_values'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'lingwo_language_content_type';
+  $strongarm->value = 'language';
+
+  $export['lingwo_language_content_type'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'lingwo_senses_relationship_allowed_values';
+  $strongarm->value = 'imieslow.przy.t.c|present active participle
+imieslow.przy.p.b|past passive participle
+imieslow.przy.p.c|past active participle
+';
+
+  $export['lingwo_senses_relationship_allowed_values'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;

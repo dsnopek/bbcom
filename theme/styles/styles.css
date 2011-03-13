@@ -349,7 +349,7 @@ ul.primary li a {
  * NOTE: This is some of the ugliest CSS ever..  It really needs some
  * oocss love, really.
  */
-#block-lingwo_dictionary-0,
+#block-lingwo_entry-0,
 #block-views--exp-search_content-page {
   margin: 0;
 }
@@ -358,7 +358,7 @@ ul.primary li a {
   padding: 0;
   margin: 0;
 }
-#block-lingwo_dictionary-0 .form-item,
+#block-lingwo_entry-0 .form-item,
 #block-views--exp-search_content-page {
   margin: 0;
 }
@@ -374,7 +374,7 @@ ul.primary li a {
   font-size: 14pt;
   float: left;
 }
-#lingwo-dictionary-search-form .form-submit,
+#lingwo-entry-search-form .form-submit,
 #edit-submit-search-content {
   display: block;
   background: transparent url('../images/search-btn.png') no-repeat;
