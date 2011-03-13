@@ -82,10 +82,13 @@ function bbcom_news_user($op, &$edit, &$account, $category=NULL) {
 function bbcom_news_optin($account) {
   if ($account->status) {
     if (variable_get('bbcom_news_mailchimp_integration', FALSE)) {
-      module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
-      $subinfo = _bbcom_news_mailchimp_subinfo($account);
-      if (!empty($subinfo)) {
-        return $subinfo['status'] == 'subscribed';
+      $validating_id = logintoboggan_validating_id();
+      if (!in_array($validating_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)) && !isset($account->roles[$validating_id])) {
+        module_load_include('inc', 'bbcom_news', 'bbcom_news.mailchimp');
+        $subinfo = _bbcom_news_mailchimp_subinfo($account);
+        if (!empty($subinfo)) {
+          return $subinfo['status'] == 'subscribed';
+        }
       }
     }
 
