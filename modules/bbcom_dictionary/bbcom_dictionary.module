@@ -10,7 +10,7 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   global $user;
 
   if ($op == 'view') {
-    if ($node->type != _lingwo_dictionary_settings('entry_content_type')) {
+    if ($node->type != LingwoEntry::$settings->content_type) {
       return NULL;
     }
 
@@ -69,7 +69,7 @@ function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
  */
 /*
 function bbcom_dictionary_link($type, $node, $teaser=FALSE) {
-  if ($type == 'node' && $node->type == _lingwo_dictionary_settings('entry_content_type') &&
+  if ($type == 'node' && $node->type == LingwoEntry::$settings->content_type &&
       ($source_node = lingwo_dictionary_entry_load_translation_source($node))) {
     
     $languages = language_list();
@@ -129,7 +129,7 @@ function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
   $translation_source = $entry->getTranslationSource();
   $vars['source_node'] = $translation_source ? $translation_source : $node;
   $vars['source_lang'] = $vars['source_node']->language;
-  $vars['is_translation'] = _ld_is_translation($node);
+  $vars['is_translation'] = _lingwo_is_translation($node);
 
   // get the source fields (we always deal with the source fields, so this should be
   // no surprise and we can name it simply $fields).

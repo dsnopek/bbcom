@@ -3,9 +3,10 @@
 REQUIRE=/home/dsnopek/prj/requirejs-0.14.5
 BUILDSH=$REQUIRE/build/build.sh
 CLOSURE=$REQUIRE/build/lib/closure/compiler.jar
-LINGWO_DICTIONARY=/home/dsnopek/prj/lingwo/lingwo_dictionary
-STUBS=$LINGWO_DICTIONARY/js/require/require-stubs.js
-LINGWO_KORPUS=$LINGWO_DICTIONARY/lingwo_korpus
+LINGWO_OLD=/home/dsnopek/prj/lingwo/lingwo_dictionary
+LINGWO=/home/dsnopek/prj/lingwo/lingwo_oss
+STUBS=$LINGWO/js/require-stubs.js
+LINGWO_KORPUS=$LINGWO_OLD/lingwo_korpus
 LESSC=/home/dsnopek/prj/lingwo/drupal/sites/all/modules/less/lessphp/lessc.inc.php
 
 for profile in *.build.js; do

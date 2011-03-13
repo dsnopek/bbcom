@@ -6,34 +6,59 @@
 function bbcom_dictionary_user_default_permissions() {
   $permissions = array();
 
-  // Exported permission: create entry content
-  $permissions['create entry content'] = array(
-    'name' => 'create entry content',
+  // Exported permission: create Lingwo entry content
+  $permissions['create Lingwo entry content'] = array(
+    'name' => 'create Lingwo entry content',
     'roles' => array(
       '0' => 'admin',
       '1' => 'editor',
     ),
   );
 
-  // Exported permission: delete any entry content
-  $permissions['delete any entry content'] = array(
-    'name' => 'delete any entry content',
+  // Exported permission: delete any Lingwo entry source content
+  $permissions['delete any Lingwo entry source content'] = array(
+    'name' => 'delete any Lingwo entry source content',
     'roles' => array(
       '0' => 'admin',
     ),
   );
 
-  // Exported permission: delete own entry content
-  $permissions['delete own entry content'] = array(
-    'name' => 'delete own entry content',
+  // Exported permission: delete any Lingwo entry translation content
+  $permissions['delete any Lingwo entry translation content'] = array(
+    'name' => 'delete any Lingwo entry translation content',
     'roles' => array(
       '0' => 'admin',
     ),
   );
 
-  // Exported permission: edit any entry content
-  $permissions['edit any entry content'] = array(
-    'name' => 'edit any entry content',
+  // Exported permission: delete own Lingwo entry source content
+  $permissions['delete own Lingwo entry source content'] = array(
+    'name' => 'delete own Lingwo entry source content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: delete own Lingwo entry translation content
+  $permissions['delete own Lingwo entry translation content'] = array(
+    'name' => 'delete own Lingwo entry translation content',
+    'roles' => array(
+      '0' => 'admin',
+    ),
+  );
+
+  // Exported permission: edit any Lingwo entry source content
+  $permissions['edit any Lingwo entry source content'] = array(
+    'name' => 'edit any Lingwo entry source content',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'editor',
+    ),
+  );
+
+  // Exported permission: edit any Lingwo entry translation content
+  $permissions['edit any Lingwo entry translation content'] = array(
+    'name' => 'edit any Lingwo entry translation content',
     'roles' => array(
       '0' => 'admin',
       '1' => 'editor',
@@ -41,13 +66,19 @@ function bbcom_dictionary_user_default_permissions() {
     ),
   );
 
-  // Exported permission: edit own entry content
-  $permissions['edit own entry content'] = array(
-    'name' => 'edit own entry content',
+  // Exported permission: edit own Lingwo entry source content
+  $permissions['edit own Lingwo entry source content'] = array(
+    'name' => 'edit own Lingwo entry source content',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'editor',
-      '2' => 'translator',
+    ),
+  );
+
+  // Exported permission: edit own Lingwo entry translation content
+  $permissions['edit own Lingwo entry translation content'] = array(
+    'name' => 'edit own Lingwo entry translation content',
+    'roles' => array(
+      '0' => 'admin',
     ),
   );
 
