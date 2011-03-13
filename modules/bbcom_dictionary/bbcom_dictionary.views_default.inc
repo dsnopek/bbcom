@@ -47,18 +47,18 @@ function bbcom_dictionary_views_default_views() {
       'field' => 'type',
       'relationship' => 'none',
     ),
-    'child_translation' => array(
+    'translation' => array(
       'operator' => '=',
-      'value' => '',
+      'value' => '1',
       'group' => '0',
       'exposed' => FALSE,
       'expose' => array(
         'operator' => FALSE,
         'label' => '',
       ),
-      'id' => 'child_translation',
-      'table' => 'node',
-      'field' => 'child_translation',
+      'id' => 'translation',
+      'table' => 'lingwo_entry_info',
+      'field' => 'translation',
       'relationship' => 'none',
     ),
   ));
