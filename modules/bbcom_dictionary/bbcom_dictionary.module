@@ -118,6 +118,23 @@ function bbcom_dictionary_theme() {
   );
 }
 
+function bbcom_dictionary_preprocess_node(&$vars) {
+  $node = $vars['node'];
+  if ($vars['teaser'] && $node->type == LingwoEntry::$settings->content_type) {
+    // add a convenience link for editors
+    if (node_access('update', $node)) {
+      $links = $node->links;
+      $links['quick-edit'] = array(
+        'title' => 'Edit',
+        'href'  => 'node/'. $node->nid .'/edit',
+      );
+
+      // overwrite existing links
+      $vars['links'] = theme('links', $links, array('class' => 'links inline'));
+    }
+  }
+}
+
 function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
   $node = $vars['node'];
   $entry = LingwoEntry::fromNode($node);
