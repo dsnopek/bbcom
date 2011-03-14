@@ -11,17 +11,18 @@ function bbcom_marketing_content_default_fields() {
     'field_name' => 'field_emvideo',
     'type_name' => 'story',
     'display_settings' => array(
+      'weight' => '21',
+      'parent' => '',
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       'full' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       '4' => array(
         'format' => 'default',

@@ -159,6 +159,7 @@
  * VIEW/BLOCK: all_news
  */
 
+/*
 #block-views-all_news-block_1 {
 	background-color: #eee;
 	border: 4px solid #999;
@@ -167,5 +168,18 @@
 }
 
 .view-all-news {
+}
+*/
+
+#node-4509 .content, #node-4510 .content {
+	background-color: #eee;
+	border: 4px solid #999;
+	margin: 10px;
+	padding: 10px;
+}
+
+#block-views-all_news-block_1 {
+	margin: 0 20px 20px 20px;
+	width: 640px;
 }
 

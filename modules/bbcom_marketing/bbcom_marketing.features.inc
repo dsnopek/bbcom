@@ -15,19 +15,10 @@ function bbcom_marketing_context_default_contexts() {
       'about' => 'about',
     ),
     'block' => array(
-      'views_latest_news-block_1' => array(
-        'module' => 'views',
-        'delta' => 'latest_news-block_1',
-        'weight' => 20,
-        'region' => 'content_top',
-        'status' => '0',
-        'label' => 'Story Slideshow',
-        'type' => 'context_ui',
-      ),
       'views_all_news-block_1' => array(
         'module' => 'views',
         'delta' => 'all_news-block_1',
-        'weight' => 20,
+        'weight' => 18,
         'region' => 'content_bottom',
         'status' => '0',
         'label' => 'All News',

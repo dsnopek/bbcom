@@ -21,7 +21,13 @@
 ?>
 <div class="clear-block">
   <div class="slide-video">
-    <?php print $fields['field_emvideo_embed']->content ?>
+    <?php if (!empty($fields['field_emvideo_embed']->raw)): ?>
+      <?php print $fields['field_emvideo_embed']->content ?>
+    <?php else: ?>
+      <div style="width: 425px; height: 290px; text-align: center; padding-top: 50px; background-color: LightBlue;">
+        <img alt="BiblioBird logo" src="/logoLarge.png" />
+      </div>
+    <?php endif; ?>
   </div>
   <div class="slide-text">
     <div class="slide-text-title"><?php print $fields['title']->content ?></div>

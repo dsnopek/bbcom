@@ -147,11 +147,16 @@ function bbcom_marketing_views_default_views() {
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
-  $handler->override_option('title', 'All News');
+  $handler->override_option('title', 'News');
   $handler->override_option('use_ajax', TRUE);
   $handler->override_option('use_pager', 'mini');
-  $handler->override_option('style_plugin', 'table');
-  $handler->override_option('style_options', NULL);
+  $handler->override_option('row_plugin', 'node');
+  $handler->override_option('row_options', array(
+    'relationship' => 'none',
+    'build_mode' => 'teaser',
+    'links' => 1,
+    'comments' => 0,
+  ));
   $handler = $view->new_display('block', 'Block', 'block_1');
   $handler->override_option('block_description', 'All News');
   $handler->override_option('block_caching', -1);
