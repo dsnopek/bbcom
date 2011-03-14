@@ -224,7 +224,8 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   }
 
   // Remove the right sidebar when on the marketing pages, or in the forum.
-  if ($_GET['q'] == 'about' || context_get('bbcom', 'section') == 'forum') {
+  //if ($_GET['q'] == 'about' || context_get('bbcom', 'section') == 'forum') {
+  if (context_get('bbcom', 'section') == 'forum') {
     $vars['always_right'] = FALSE;
   }
 }
