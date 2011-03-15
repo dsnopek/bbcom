@@ -125,7 +125,7 @@ function bbcom_dictionary_preprocess_node(&$vars) {
     if (node_access('update', $node)) {
       $links = $node->links;
       $links['quick-edit'] = array(
-        'title' => 'Edit',
+        'title' => t('Edit'),
         'href'  => 'node/'. $node->nid .'/edit',
       );
 
