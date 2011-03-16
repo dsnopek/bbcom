@@ -3,6 +3,16 @@
 include_once('bbcom_dictionary.features.inc');
 
 /**
+ * Implementation of hook_perm().
+ */
+function bbcom_dictionary_perm() {
+  return array(
+    'edit verified dictionary entries',
+    'delete verified dictionary entries',
+  );
+}
+
+/**
  * Implementation of hook_nodeapi().
  */
 // Add entry summary information to the node view
