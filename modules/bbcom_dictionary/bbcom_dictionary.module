@@ -41,6 +41,31 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 }
 
 /**
+ * Implementation of hook_lingwo_entry_access().
+ */
+function bbcom_dictionary_lingwo_entry_access($node, $op, $account) {
+  if ($op == 'update' || $op == 'delete') {
+    $results = votingapi_select_results(array(
+      'content_type' => 'node',
+      'content_id'   => $node->nid,
+      'tag'          => 'entry',
+      'function'     => 'sum'
+    ));
+    $total_votes = $results[0]['value'];
+    $verified_threshold = variable_get('bbcom_dictionary_verified_threshold', 2);
+
+    if ($total_votes >= $verified_threshold) {
+      if ($op == 'update' && !user_access('edit verified dictionary entries')) {
+        return 'deny';
+      }
+      elseif ($op == 'delete' && !user_access('delete verified dictionary entries')) {
+        return 'deny';
+      }
+    }
+  }
+}
+
+/**
  * Implementation of hook_block().
  */
 function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
