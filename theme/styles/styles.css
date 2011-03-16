@@ -501,6 +501,35 @@ ul.primary li a {
 }
 
 /*
+ * DRS: Comments
+ */
+.comment {
+  background-color: #ddd;
+  padding: 10px;
+}
+.comment .picture {
+  float: left;
+  margin-right: 10px;
+}
+.comment .picture img {
+  border: 1px solid LightGrey;
+}
+.comment .content {
+}
+.comment .author {
+  font-weight: bold;
+}
+.comment ul.links {
+  text-align: right;
+  border-bottom: 1px dotted black;
+  padding-bottom: 10px;
+}
+.comment .meta {
+}
+.comment .date {
+}
+
+/*
 ** Formatting for administration page
 **
 ** The admin panel styles are a mess. IE has problems with this so this is
