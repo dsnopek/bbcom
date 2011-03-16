@@ -22,13 +22,6 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'advanced_forum_stats_posts';
-  $strongarm->value = '2';
-
-  $export['advanced_forum_stats_posts'] = $strongarm;
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'advanced_forum_style';
   $strongarm->value = 'cloudless_day';
 
