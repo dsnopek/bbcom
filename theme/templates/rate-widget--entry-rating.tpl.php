@@ -17,16 +17,23 @@ if ($rating > 0) {
 }
 elseif ($rating < 0) {
   $class = 'negative';
-}
-print '('. $rating .') ';
+}?>
 
+<div class="bbcom-entry-rating bbcom-entry-rating-<?php print $class ?>">
+<div class="bbcom-entry-rating-count"><?php print $rating; ?></div>
+<!-- <div class="bbcom-entry-rating-label"><?php print t('Rating') ?></div> -->
+</div>
+
+<ul class="bbcom-entry-rating-list">
+<?php
 foreach ($links as $link) {
   if (!empty($results['user_vote']) && $link['value'] == $results['user_vote']) {
-    print '<strong>'. $link['text'] .'</strong>';
+    print '<li><strong>'. $link['text'] .'</strong></li>';
   }
   else {
-    print theme('rate_button', $link['text'], $link['href'], NULL);
+    print '<li>'. theme('rate_button', $link['text'], $link['href'], NULL) .'</li>';
   }
-  print ' ';
 }
+?>
+</ul>
 
