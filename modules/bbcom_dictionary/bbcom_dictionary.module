@@ -48,6 +48,9 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       unset($node->content['lingwo_fields']);
     }
   }
+  elseif ($op == 'delete revision') {
+    rules_invoke_event('node_delete_revision', $node);
+  }
 }
 
 /**
@@ -73,6 +76,21 @@ function bbcom_dictionary_lingwo_entry_access($node, $op, $account) {
       }
     }
   }
+}
+
+/**
+ * Implementation of hook_rules_event_info().
+ */
+function bbcom_dictionary_rules_event_info() {
+  return array(
+    'node_delete_revision' => array(
+      'label' => t('After deleting content revision'),
+      'module' => 'Node',
+      'arguments' => array(
+        'node' => array('type' => 'node', 'label' => t('The deleted revision'))
+      ),
+    )
+  );
 }
 
 /**

@@ -350,6 +350,306 @@ return FALSE;',
         ),
         '#version' => 6003,
       ),
+      'bbcom_dictionary_4' => array(
+        '#type' => 'rule',
+        '#set' => 'event_voting_rules_delete_node',
+        '#label' => 'Retract points when users delete a vote',
+        '#active' => 1,
+        '#weight' => '-1',
+        '#categories' => array(
+          '0' => 'bbcom_dictionary',
+          '1' => 'gamification',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#type' => 'condition',
+            '#settings' => array(
+              'type' => array(
+                'entry' => 'entry',
+              ),
+              '#argument map' => array(
+                'node' => 'node',
+              ),
+            ),
+            '#name' => 'rules_condition_content_is_type',
+            '#info' => array(
+              'label' => 'The node being voted on is Dictionary entry',
+              'arguments' => array(
+                'node' => array(
+                  'type' => 'node',
+                  'label' => 'Content',
+                ),
+              ),
+              'module' => 'Node',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => -10,
+            '#info' => array(
+              'label' => 'Load a user account',
+              'new variables' => array(
+                'user_voting' => array(
+                  'label' => 'voting user',
+                  'label callback' => FALSE,
+                  'type' => 'user',
+                ),
+              ),
+              'module' => 'User',
+              'eval input' => array(
+                '0' => 'userid',
+                '1' => 'username',
+              ),
+            ),
+            '#name' => 'rules_action_load_user',
+            '#settings' => array(
+              'username' => '',
+              'userid' => '[vote:uid]',
+              '#argument map' => array(
+                'user_loaded' => 'user_voting',
+              ),
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'userid' => array(
+                    '0' => 'vote',
+                  ),
+                ),
+              ),
+            ),
+            '#type' => 'action',
+          ),
+          '1' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              'points' => '-1',
+              'description' => 'Retracted vote on dictionary entry',
+              'operation' => 'entry',
+              'entity_type' => 'node',
+              'entity_id' => '[node:nid]',
+              'tid' => '6',
+              '#argument map' => array(
+                'user' => 'user_voting',
+              ),
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'entity_id' => array(
+                    '0' => 'node',
+                  ),
+                ),
+              ),
+            ),
+            '#name' => 'userpoints_action_grant_points',
+            '#info' => array(
+              'label' => 'Retract points from a user',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User',
+                ),
+              ),
+              'module' => 'Userpoints',
+              'eval input' => array(
+                '0' => 'points',
+                '1' => 'entity_id',
+              ),
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#version' => 6003,
+      ),
+      'bbcom_dictionary_5' => array(
+        '#type' => 'rule',
+        '#set' => 'event_comment_delete',
+        '#label' => 'Retract points when comment on dictionary entry is deleted',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'bbcom_dictionary',
+          '1' => 'gamification',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#type' => 'condition',
+            '#settings' => array(
+              'type' => array(
+                'entry' => 'entry',
+              ),
+              '#argument map' => array(
+                'node' => 'node',
+              ),
+            ),
+            '#name' => 'rules_condition_content_is_type',
+            '#info' => array(
+              'label' => 'Commented content is Dictionary entry',
+              'arguments' => array(
+                'node' => array(
+                  'type' => 'node',
+                  'label' => 'Content',
+                ),
+              ),
+              'module' => 'Node',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Grant points to a user',
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User',
+                ),
+              ),
+              'module' => 'Userpoints',
+              'eval input' => array(
+                '0' => 'points',
+                '1' => 'entity_id',
+              ),
+            ),
+            '#name' => 'userpoints_action_grant_points',
+            '#settings' => array(
+              'points' => '-2',
+              'description' => 'Deleted comment on dictionary entry',
+              'operation' => 'delete',
+              'entity_type' => 'comment',
+              'entity_id' => '[comment:comment-cid]',
+              'tid' => '6',
+              '#argument map' => array(
+                'user' => 'comment_author',
+              ),
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'entity_id' => array(
+                    '0' => 'comment',
+                  ),
+                ),
+              ),
+            ),
+            '#type' => 'action',
+          ),
+        ),
+        '#version' => 6003,
+      ),
+      'bbcom_dictionary_6' => array(
+        '#type' => 'rule',
+        '#set' => 'event_node_delete_revision',
+        '#label' => 'Retract points when dictionary entry revision is deleted',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'bbcom_dictionary',
+          '1' => 'gamification',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#type' => 'condition',
+            '#settings' => array(
+              'type' => array(
+                'entry' => 'entry',
+              ),
+              '#argument map' => array(
+                'node' => 'node',
+              ),
+            ),
+            '#name' => 'rules_condition_content_is_type',
+            '#info' => array(
+              'label' => 'The deleted revision is Dictionary entry',
+              'arguments' => array(
+                'node' => array(
+                  'type' => 'node',
+                  'label' => 'Content',
+                ),
+              ),
+              'module' => 'Node',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => -10,
+            '#info' => array(
+              'label' => 'Load a user account',
+              'new variables' => array(
+                'user_revision' => array(
+                  'label' => 'user who created the revision',
+                  'label callback' => FALSE,
+                  'type' => 'user',
+                ),
+              ),
+              'module' => 'User',
+              'eval input' => array(
+                '0' => 'userid',
+                '1' => 'username',
+              ),
+            ),
+            '#name' => 'rules_action_load_user',
+            '#settings' => array(
+              'username' => '',
+              'userid' => '<?php echo $node->revision_uid; ?>',
+              '#argument map' => array(
+                'user_loaded' => 'user_revision',
+              ),
+              '#eval input' => array(
+                'rules_input_evaluator_php' => array(
+                  'userid' => array(
+                    '0' => 'node',
+                  ),
+                ),
+              ),
+            ),
+            '#type' => 'action',
+          ),
+          '1' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              'points' => '-5',
+              'description' => 'Reverted changes to dictionary entry',
+              'operation' => 'entry',
+              'entity_type' => 'node',
+              'entity_id' => '[node:nid]',
+              'tid' => '6',
+              '#argument map' => array(
+                'user' => 'user_revision',
+              ),
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'entity_id' => array(
+                    '0' => 'node',
+                  ),
+                ),
+              ),
+            ),
+            '#name' => 'userpoints_action_grant_points',
+            '#info' => array(
+              'label' => 'Grant points to a user',
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User',
+                ),
+              ),
+              'module' => 'Userpoints',
+              'eval input' => array(
+                '0' => 'points',
+                '1' => 'entity_id',
+              ),
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#version' => 6003,
+      ),
     ),
   );
 }
