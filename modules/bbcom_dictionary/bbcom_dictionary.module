@@ -53,21 +53,24 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   }
 }
 
+function bbcom_dictionary_lingwo_entry_verified($node) {
+  $results = votingapi_select_results(array(
+    'content_type' => 'node',
+    'content_id'   => $node->nid,
+    'tag'          => 'entry',
+    'function'     => 'sum'
+  ));
+  $total_votes = $results[0]['value'];
+  $verified_threshold = variable_get('bbcom_dictionary_verified_threshold', 2);
+  return $total_votes >= $verified_threshold;
+}
+
 /**
  * Implementation of hook_lingwo_entry_access().
  */
 function bbcom_dictionary_lingwo_entry_access($node, $op, $account) {
   if ($op == 'update' || $op == 'delete') {
-    $results = votingapi_select_results(array(
-      'content_type' => 'node',
-      'content_id'   => $node->nid,
-      'tag'          => 'entry',
-      'function'     => 'sum'
-    ));
-    $total_votes = $results[0]['value'];
-    $verified_threshold = variable_get('bbcom_dictionary_verified_threshold', 2);
-
-    if ($total_votes >= $verified_threshold) {
+    if (bbcom_dictionary_lingwo_entry_verified($node)) {
       if ($op == 'update' && !user_access('edit verified dictionary entries')) {
         return 'deny';
       }
