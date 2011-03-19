@@ -59,6 +59,141 @@ function bbcom_dictionary_ctools_plugin_api() {
 function bbcom_dictionary_rules_defaults() {
   return array(
     'rules' => array(
+      'bbcom_dictionary_7' => array(
+        '#type' => 'rule',
+        '#set' => 'event_userpoints_event_points_awarded',
+        '#label' => 'When user gets 50 editor points, upgrade their role',
+        '#active' => 1,
+        '#weight' => '1',
+        '#categories' => array(
+          '0' => 'bbcom_dictionary',
+          '1' => 'gamification',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#type' => 'condition',
+            '#settings' => array(
+              'type' => '6',
+              'amount' => '50',
+              '#argument map' => array(
+                'user' => 'user',
+              ),
+            ),
+            '#name' => 'userpoints_rules_amount',
+            '#info' => array(
+              'label' => 'Points >= 50',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User',
+                ),
+              ),
+              'module' => 'Userpoints',
+              'eval input' => array(
+                '0' => 'amount',
+              ),
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Add \'editor1\' role',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User whos roles should be changed',
+                ),
+              ),
+              'module' => 'User',
+            ),
+            '#name' => 'rules_action_user_addrole',
+            '#settings' => array(
+              'roles' => array(
+                '0' => 10,
+              ),
+              '#argument map' => array(
+                'user' => 'user',
+              ),
+            ),
+            '#type' => 'action',
+          ),
+        ),
+        '#version' => 6003,
+      ),
+      'bbcom_dictionary_8' => array(
+        '#type' => 'rule',
+        '#set' => 'event_userpoints_event_points_awarded',
+        '#label' => 'When user drops below 50 editor points, downgrade their role',
+        '#active' => 1,
+        '#weight' => '1',
+        '#categories' => array(
+          '0' => 'bbcom_dictionary',
+          '1' => 'gamification',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#info' => array(
+              'label' => 'Points < 50',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User',
+                ),
+              ),
+              'module' => 'Userpoints',
+              'eval input' => array(
+                '0' => 'amount',
+              ),
+            ),
+            '#name' => 'userpoints_rules_amount',
+            '#settings' => array(
+              'type' => '6',
+              'amount' => '50',
+              '#argument map' => array(
+                'user' => 'user',
+              ),
+            ),
+            '#type' => 'condition',
+            '#negate' => 1,
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              'roles' => array(
+                '0' => 10,
+              ),
+              '#argument map' => array(
+                'user' => 'user',
+              ),
+            ),
+            '#name' => 'rules_action_user_removerole',
+            '#info' => array(
+              'label' => 'Remove \'editor1\' role',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User whos roles should be changed',
+                ),
+              ),
+              'module' => 'User',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#version' => 6003,
+      ),
       'bbcom_dictionary_1' => array(
         '#type' => 'rule',
         '#set' => 'event_comment_publish',
@@ -646,141 +781,6 @@ return FALSE;',
               ),
             ),
             '#weight' => 0,
-          ),
-        ),
-        '#version' => 6003,
-      ),
-      'bbcom_dictionary_7' => array(
-        '#type' => 'rule',
-        '#set' => 'event_userpoints_event_points_awarded',
-        '#label' => 'When user gets 50 points, upgrade their role',
-        '#active' => 1,
-        '#weight' => '1',
-        '#categories' => array(
-          '0' => 'bbcom_dictionary',
-          '1' => 'gamification',
-        ),
-        '#status' => 'default',
-        '#conditions' => array(
-          '0' => array(
-            '#weight' => 0,
-            '#info' => array(
-              'label' => 'Points >= 50',
-              'label callback' => FALSE,
-              'arguments' => array(
-                'user' => array(
-                  'type' => 'user',
-                  'label' => 'User',
-                ),
-              ),
-              'module' => 'Userpoints',
-              'eval input' => array(
-                '0' => 'amount',
-              ),
-            ),
-            '#name' => 'userpoints_rules_amount',
-            '#settings' => array(
-              'type' => '6',
-              'amount' => '50',
-              '#argument map' => array(
-                'user' => 'user',
-              ),
-            ),
-            '#type' => 'condition',
-          ),
-        ),
-        '#actions' => array(
-          '0' => array(
-            '#type' => 'action',
-            '#settings' => array(
-              'roles' => array(
-                '0' => 10,
-              ),
-              '#argument map' => array(
-                'user' => 'user',
-              ),
-            ),
-            '#name' => 'rules_action_user_addrole',
-            '#info' => array(
-              'label' => 'Add \'editor1\' role',
-              'label callback' => FALSE,
-              'arguments' => array(
-                'user' => array(
-                  'type' => 'user',
-                  'label' => 'User whos roles should be changed',
-                ),
-              ),
-              'module' => 'User',
-            ),
-            '#weight' => 0,
-          ),
-        ),
-        '#version' => 6003,
-      ),
-      'bbcom_dictionary_8' => array(
-        '#type' => 'rule',
-        '#set' => 'event_userpoints_event_points_awarded',
-        '#label' => 'When user drops below 50 points, downgrade their role',
-        '#active' => 1,
-        '#weight' => '1',
-        '#categories' => array(
-          '0' => 'bbcom_dictionary',
-          '1' => 'gamification',
-        ),
-        '#status' => 'default',
-        '#conditions' => array(
-          '0' => array(
-            '#weight' => 0,
-            '#negate' => 1,
-            '#type' => 'condition',
-            '#settings' => array(
-              'type' => '6',
-              'amount' => '50',
-              '#argument map' => array(
-                'user' => 'user',
-              ),
-            ),
-            '#info' => array(
-              'label' => 'Points < 50',
-              'label callback' => FALSE,
-              'arguments' => array(
-                'user' => array(
-                  'type' => 'user',
-                  'label' => 'User',
-                ),
-              ),
-              'module' => 'Userpoints',
-              'eval input' => array(
-                '0' => 'amount',
-              ),
-            ),
-            '#name' => 'userpoints_rules_amount',
-          ),
-        ),
-        '#actions' => array(
-          '0' => array(
-            '#weight' => 0,
-            '#info' => array(
-              'label' => 'Remove \'editor1\' role',
-              'label callback' => FALSE,
-              'arguments' => array(
-                'user' => array(
-                  'type' => 'user',
-                  'label' => 'User whos roles should be changed',
-                ),
-              ),
-              'module' => 'User',
-            ),
-            '#name' => 'rules_action_user_removerole',
-            '#settings' => array(
-              'roles' => array(
-                '0' => 10,
-              ),
-              '#argument map' => array(
-                'user' => 'user',
-              ),
-            ),
-            '#type' => 'action',
           ),
         ),
         '#version' => 6003,
