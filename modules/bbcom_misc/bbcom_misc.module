@@ -13,7 +13,54 @@ function bbcom_misc_menu() {
       'file' => 'system.admin.inc',
       'file path' => drupal_get_path('module', 'system'),
     ),
+    'admin/settings/bbcom/misc' => array(
+      'title' => 'Miscellaneous',
+      'description' => 'Settings for BiblioBird.com miscellaneous module.',
+      'access arguments' => array('administer site configuration'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('bbcom_misc_admin_settings'),
+      'file' => 'bbcom_misc.admin.inc',
+    )
   );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function bbcom_misc_theme() {
+  return array(
+    'bbcom_misc_badges' => array(
+      'arguments' => array('roles' => NULL),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function bbcom_misc_user($op, &$edit, &$account, $category='account') {
+  if ($op == 'view') {
+    $roles = array();
+    $titles = variable_get('bbcom_misc_role_titles', array());
+    foreach ($account->roles as $rid => $role) {
+      if (!empty($titles[$rid])) {
+        $roles[] = array('rid' => $rid, 'role' => $role, 'title' => $titles[$rid]);
+      }
+    }
+
+    if (!empty($roles)) {
+      $account->content['badges'] = array(
+        '#type' => 'user_profile_category',
+        '#title' => t('Badges'),
+        '#weight' => -1,
+      );
+      
+      $account->content['badges']['badges'] = array(
+        '#type' => 'user_profile_item',
+        '#value' => theme('bbcom_misc_badges', $roles),
+      );
+    }
+  }
 }
 
 /*
@@ -44,5 +91,26 @@ function bbcom_misc_link_alter(&$links, $node, $comment=NULL) {
     // TODO: Seems to contradict docs, this should be $links['comment']['comment_forbidden'] ...
     unset($links['comment_forbidden']);
   }
+}
+
+/*
+ * Theming
+ */
+
+function theme_bbcom_misc_badges($roles) {
+  $imgs = array();
+  $text = array();
+  foreach($roles as $role) {
+    $img = str_replace(' ', '-', $role['role']);
+    $img = drupal_get_path('module', 'bbcom_misc') .'/badges/'. $img .'.jpg';
+
+    if (file_exists($img)) {
+      $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
+    }
+    else {
+      $text[] = '<div class="bbcom-badge">'. check_plain($role['title']) .'</div>';
+    }
+  }
+  return implode('', $imgs) . implode('', $text);
 }
 

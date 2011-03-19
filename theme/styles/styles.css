@@ -501,6 +501,65 @@ ul.primary li a {
 }
 
 /*
+ * DRS: Comments
+ */
+.comment {
+  background-color: #ddd;
+  padding: 10px;
+}
+.comment .picture {
+  float: left;
+  margin-right: 10px;
+}
+.comment .picture img {
+  border: 1px solid LightGrey;
+}
+.comment .content {
+}
+.comment .author {
+  font-weight: bold;
+}
+.comment ul.links {
+  text-align: right;
+  border-bottom: 1px dotted black;
+  padding-bottom: 10px;
+}
+.comment .meta {
+}
+.comment .date {
+}
+
+/*
+ * DRS: entry rating
+ */
+.bbcom-entry-rating {
+  border: 1px solid #999;
+  background-color: #DDD;
+  padding: .25em;
+  width: 3em;
+  height: 2.50em;
+  text-align: center;
+  float: left;
+  margin-right: 10px;
+}
+.bbcom-entry-rating-count {
+  font-size: 1.5em;
+}
+.bbcom-entry-rating-positive {
+  color: green;
+}
+.bbcom-entry-rating-negative {
+  color: red;
+}
+.bbcom-entry-rating-label {
+  color: #444;
+  font-size: .75em;
+}
+.bbcom-entry-rating-list, .bbcom-entry-rating-list li {
+  list-style: none;
+}
+
+/*
 ** Formatting for administration page
 **
 ** The admin panel styles are a mess. IE has problems with this so this is

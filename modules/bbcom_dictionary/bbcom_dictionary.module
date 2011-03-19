@@ -3,6 +3,16 @@
 include_once('bbcom_dictionary.features.inc');
 
 /**
+ * Implementation of hook_perm().
+ */
+function bbcom_dictionary_perm() {
+  return array(
+    'edit verified dictionary entries',
+    'delete verified dictionary entries',
+  );
+}
+
+/**
  * Implementation of hook_nodeapi().
  */
 // Add entry summary information to the node view
@@ -38,6 +48,52 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       unset($node->content['lingwo_fields']);
     }
   }
+  elseif ($op == 'delete revision') {
+    rules_invoke_event('node_delete_revision', $node);
+  }
+}
+
+function bbcom_dictionary_lingwo_entry_verified($node) {
+  $results = votingapi_select_results(array(
+    'content_type' => 'node',
+    'content_id'   => $node->nid,
+    'tag'          => 'entry',
+    'function'     => 'sum'
+  ));
+  $total_votes = $results[0]['value'];
+  $verified_threshold = variable_get('bbcom_dictionary_verified_threshold', 2);
+  return $total_votes >= $verified_threshold;
+}
+
+/**
+ * Implementation of hook_lingwo_entry_access().
+ */
+function bbcom_dictionary_lingwo_entry_access($node, $op, $account) {
+  if ($op == 'update' || $op == 'delete') {
+    if (bbcom_dictionary_lingwo_entry_verified($node)) {
+      if ($op == 'update' && !user_access('edit verified dictionary entries')) {
+        return 'deny';
+      }
+      elseif ($op == 'delete' && !user_access('delete verified dictionary entries')) {
+        return 'deny';
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_rules_event_info().
+ */
+function bbcom_dictionary_rules_event_info() {
+  return array(
+    'node_delete_revision' => array(
+      'label' => t('After deleting content revision'),
+      'module' => 'Node',
+      'arguments' => array(
+        'node' => array('type' => 'node', 'label' => t('The deleted revision'))
+      ),
+    )
+  );
 }
 
 /**

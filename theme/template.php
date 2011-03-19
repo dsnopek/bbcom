@@ -309,11 +309,11 @@ function bbcom_theme_preprocess_node_page(&$vars, $hook) {
  * @param $hook
  *   The name of the template being rendered ("comment" in this case.)
  */
-/* -- Delete this line if you want to use this function
 function bbcom_theme_preprocess_comment(&$vars, $hook) {
-  $vars['sample_variable'] = t('Lorem ipsum.');
+  $comment = $vars['comment'];
+  $vars['date'] = format_date($comment->timestamp, 'large');
+  $vars['date'] = l($vars['date'], $_GET['q'], array('fragment' => "comment-$comment->cid"));
 }
-// */
 
 /**
  * Override or insert variables into the block templates.
