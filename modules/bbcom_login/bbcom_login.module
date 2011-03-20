@@ -49,7 +49,7 @@ function bbcom_login_menu() {
   $items['user/edit'] = array(
     'title' => 'Edit my profile',
     'description' => 'Redirect to a user\'s edit page',
-    'access arguments' => array(TRUE),
+    'access callback' => 'user_is_logged_in',
     'page callback' => 'bbcom_login_user_edit_redirect_page',
     'type' => MENU_CALLBACK
   );
