@@ -42,6 +42,26 @@ function bbcom_login_menu_alter(&$items) {
 }
 
 /*
+ * Implementation of hook_menu().
+ */
+function bbcom_login_menu() {
+  $items = array();
+  $items['user/edit'] = array(
+    'title' => 'Edit my profile',
+    'description' => 'Redirect to a user\'s edit page',
+    'access arguments' => array(TRUE),
+    'page callback' => 'bbcom_login_user_edit_redirect_page',
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+function bbcom_login_user_edit_redirect_page() {
+  global $user;
+  drupal_goto('user/'. $user->uid .'/edit');
+}
+
+/*
  * Implementation of hook_form_alter().
  */
 function bbcom_login_form_alter(&$form, &$form_state, $form_id) {
