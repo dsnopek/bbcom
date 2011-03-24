@@ -71,6 +71,22 @@ function bbcom_wiki_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'content_extra_weights_wiki';
+  $strongarm->value = array(
+    'title' => '-5',
+    'body_field' => '0',
+    'revision_information' => '20',
+    'comment_settings' => '30',
+    'language' => '0',
+    'translation' => '30',
+    'menu' => '-2',
+    'path' => '30',
+  );
+
+  $export['content_extra_weights_wiki'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_wiki';
   $strongarm->value = '2';
 

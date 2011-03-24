@@ -6,31 +6,83 @@ include_once('bbcom_wiki.features.inc');
  * Implementation of hook_filter().
  */
 function bbcom_wiki_filter($op, $delta=0, $format=-1, $text='', $cache_id=0) {
+  static $description = NULL;
+
   if ($op == 'list') {
     return array(
-      0 => t('Convert [[title]] into wiki links'),
+      0 => t('Convert [[<em>title</em>]] into wiki links'),
+      1 => t('Convert [[Image:<em>id</em>]] into an image'),
     );
   }
 
-  // we only have one filter presently
-  if ($delta != 0) {
-    return $text;
+  if ($op == 'description') {
+    if (is_null($description)) {
+      $description = array(
+        0 => t('Convert [[<em>title</em>]] into wiki links'),
+        1 => t('Convert [[Image:<em>id</em>]] into an image.  You can include options seperated by the pipe symbol "|" such as: [[Image:17|100x100px]] which will resize the image to be 100x100 pixels.'),
+      );
+    }
+    return $description[$delta];
   }
 
-  switch ($op) {
-    case 'description':
-      return t('Converts [[title]] into wiki links.');
-
-    case 'process':
+  if ($op == 'process') {
+    if ($delta == 0) {
       $text = preg_replace_callback(
         '/\\[\\[([^\\]]+)\\]\\]/',
         create_function('$matches', 'return l($matches[1], wikitools_wikilink_drupal_path($matches[1]));'),
         $text
       );
-      return $text;
+    }
+    elseif ($delta == 1) {
+      $text = preg_replace_callback(
+        '/\\[\\[Image:([^\\]]+)\\]\\]/',
+        create_function('$matches', '$opts = explode("|", $matches[1]); return _bbcom_wiki_image(array_shift($opts), $opts);'),
+        $text
+      );
+    }
+  }
 
-    default:
-      return $text;
+  return $text;
+}
+
+function _bbcom_wiki_image($fid, $opts=array()) {
+  // TODO: In the future I should show some default broken image when the file can't be found
+  if ($file = db_fetch_object(db_query("SELECT * FROM {files} WHERE fid = %d", $fid))) {
+    $filepath = $file->filepath;
+    $attrs = array();
+
+    foreach ($opts as $opt) {
+      if (preg_match('/^(\d+)x(\d+)px$/', $opt, $matches)) {
+        $attrs['width'] = $matches[0];
+        $attrs['height'] = $matches[1];
+      }
+    }
+
+    $getsize = !isset($attrs['width']) && !isset($attrs['height']);
+    return theme('image', $filepath, '', '', $attrs, $getsize);
+  }
+  else {
+    return "[IMAGE: $fid]";
+  }
+}
+
+/*
+ * Implementation of hook_insert_styles().
+ */
+function bbcom_wiki_insert_styles() {
+  return array(
+    'wiki' => array(
+      'label' => t('Wiki syntax'),
+    )
+  );
+}
+
+/*
+ * Implementation of hook_insert_content().
+ */
+function bbcom_wiki_insert_content($item, $style, $widgth) {
+  if ($style['name'] == 'wiki') {
+    return '[[Image:'. $item['fid'] .']]';
   }
 }
 
