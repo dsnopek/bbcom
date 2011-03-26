@@ -196,6 +196,8 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   $vars['always_right'] = TRUE;
   $vars['inner_title'] = FALSE;
 
+  $vars['head'] .= '<meta name="viewport" content="width=960; initial-scale=1.0" />';
+
   if (isset($vars['node'])) {
     $func = 'bbcom_theme_preprocess_node_'. $vars['node']->type;
     if (function_exists($func)) {
