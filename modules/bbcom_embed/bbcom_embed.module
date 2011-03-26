@@ -97,7 +97,7 @@ function bbcom_embed_form_alter(&$form, $form_state, $form_id) {
     if (!empty($field_remote_url) && !empty($_GET['remote_url'])) {
       $remote_url = urldecode($_GET['remote_url']);
 
-      require_once(_ld_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+      require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
       $form[$field_remote_url][0]['#default_value']['value'] = $remote_url;
 
