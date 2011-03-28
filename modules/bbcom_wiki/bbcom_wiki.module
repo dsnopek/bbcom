@@ -11,15 +11,13 @@ function bbcom_wiki_filter($op, $delta=0, $format=-1, $text='', $cache_id=0) {
   if ($op == 'list') {
     return array(
       0 => t('Convert [[<em>title</em>]] into wiki links'),
-      1 => t('Convert [[Image:<em>id</em>]] into an image'),
     );
   }
 
   if ($op == 'description') {
     if (is_null($description)) {
       $description = array(
-        0 => t('Convert [[<em>title</em>]] into wiki links'),
-        1 => t('Convert [[Image:<em>id</em>]] into an image.  You can include options seperated by the pipe symbol "|" such as: [[Image:17|100x100px]] which will resize the image to be 100x100 pixels.'),
+        0 => t('Convert [[<em>title</em>]] into wiki links.  Using the "Image:" prefix embeds images.  Options can be included after the pipe symbol.'),
       );
     }
     return $description[$delta];
@@ -28,15 +26,14 @@ function bbcom_wiki_filter($op, $delta=0, $format=-1, $text='', $cache_id=0) {
   if ($op == 'process') {
     if ($delta == 0) {
       $text = preg_replace_callback(
-        '/\\[\\[([^\\]]+)\\]\\]/',
-        create_function('$matches', 'return l($matches[1], wikitools_wikilink_drupal_path($matches[1]));'),
-        $text
-      );
-    }
-    elseif ($delta == 1) {
-      $text = preg_replace_callback(
         '/\\[\\[Image:([^\\]]+)\\]\\]/',
         create_function('$matches', '$opts = explode("|", $matches[1]); return _bbcom_wiki_image(array_shift($opts), $opts);'),
+        $text
+      );
+
+      $text = preg_replace_callback(
+        '/\\[\\[([^\\]]+)\\]\\]/',
+        create_function('$matches', 'return l($matches[1], wikitools_wikilink_drupal_path($matches[1]));'),
         $text
       );
     }

@@ -97,6 +97,7 @@ function bbcom_wiki_strongarm() {
   $strongarm->name = 'node_options_wiki';
   $strongarm->value = array(
     0 => 'status',
+    1 => 'revision',
   );
 
   $export['node_options_wiki'] = $strongarm;
