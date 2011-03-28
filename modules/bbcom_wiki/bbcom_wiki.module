@@ -33,7 +33,7 @@ function bbcom_wiki_filter($op, $delta=0, $format=-1, $text='', $cache_id=0) {
 
       $text = preg_replace_callback(
         '/\\[\\[([^\\]]+)\\]\\]/',
-        create_function('$matches', 'return l($matches[1], wikitools_wikilink_drupal_path($matches[1]));'),
+        create_function('$matches', '$opts = explode("|", $matches[1]); return l(!empty($opts[1]) ? $opts[1] : $opts[0], wikitools_wikilink_drupal_path($opts[0]));'),
         $text
       );
     }
