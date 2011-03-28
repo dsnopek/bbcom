@@ -50,8 +50,8 @@ function _bbcom_wiki_image($fid, $opts=array()) {
 
     foreach ($opts as $opt) {
       if (preg_match('/^(\d+)x(\d+)px$/', $opt, $matches)) {
-        $attrs['width'] = $matches[0];
-        $attrs['height'] = $matches[1];
+        $attrs['width'] = $matches[1];
+        $attrs['height'] = $matches[2];
       }
     }
 
