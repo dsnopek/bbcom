@@ -3,15 +3,15 @@
 /**
  * Implementation of hook_menu_default_menu_links().
  */
-function bbcom_forum_menu_default_menu_links() {
+function bbcom_wiki_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: primary-links:forum
-  $menu_links['primary-links:forum'] = array(
+  // Exported menu link: primary-links:wiki
+  $menu_links['primary-links:wiki'] = array(
     'menu_name' => 'primary-links',
-    'link_path' => 'forum',
-    'router_path' => 'forum',
-    'link_title' => 'Forum',
+    'link_path' => 'wiki',
+    'router_path' => 'wiki',
+    'link_title' => 'Wiki',
     'options' => array(
       'attributes' => array(
         'title' => '',
@@ -23,11 +23,11 @@ function bbcom_forum_menu_default_menu_links() {
     'external' => '0',
     'has_children' => '0',
     'expanded' => '0',
-    'weight' => '-46',
+    'weight' => '-45',
   );
   // Translatables
   // Included for use with string extractors like potx.
-  t('Forum');
+  t('Wiki');
 
 
   return $menu_links;

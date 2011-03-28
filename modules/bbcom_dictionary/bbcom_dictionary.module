@@ -108,7 +108,7 @@ function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
       return $blocks;
 
     case 'view':
-      if ($delta == 0 && user_access('create entry content')) {
+      if ($delta == 0 && user_access('create Lingwo entry content')) {
         $block['content'] = l(t('Create Dictionary Entry'), 'node/add/entry',
           array('attributes' => array('id' => 'create-content-link')));
         return $block;

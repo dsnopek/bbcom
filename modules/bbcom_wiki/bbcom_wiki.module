@@ -1,0 +1,107 @@
+<?php
+
+include_once('bbcom_wiki.features.inc');
+
+/*
+ * Implementation of hook_filter().
+ */
+function bbcom_wiki_filter($op, $delta=0, $format=-1, $text='', $cache_id=0) {
+  static $description = NULL;
+
+  if ($op == 'list') {
+    return array(
+      0 => t('Convert [[<em>title</em>]] into wiki links'),
+    );
+  }
+
+  if ($op == 'description') {
+    if (is_null($description)) {
+      $description = array(
+        0 => t('Convert [[<em>title</em>]] into wiki links.  Using the "Image:" prefix embeds images.  Options can be included after the pipe symbol.'),
+      );
+    }
+    return $description[$delta];
+  }
+
+  if ($op == 'process') {
+    if ($delta == 0) {
+      $text = preg_replace_callback(
+        '/\\[\\[Image:([^\\]]+)\\]\\]/',
+        create_function('$matches', '$opts = explode("|", $matches[1]); return _bbcom_wiki_image(array_shift($opts), $opts);'),
+        $text
+      );
+
+      $text = preg_replace_callback(
+        '/\\[\\[([^\\]]+)\\]\\]/',
+        create_function('$matches', '$opts = explode("|", $matches[1]); return l(!empty($opts[1]) ? $opts[1] : $opts[0], wikitools_wikilink_drupal_path($opts[0]));'),
+        $text
+      );
+    }
+  }
+
+  return $text;
+}
+
+function _bbcom_wiki_image($fid, $opts=array()) {
+  // TODO: In the future I should show some default broken image when the file can't be found
+  if ($file = db_fetch_object(db_query("SELECT * FROM {files} WHERE fid = %d", $fid))) {
+    $filepath = $file->filepath;
+    $attrs = array();
+
+    foreach ($opts as $opt) {
+      if (preg_match('/^(\d+)x(\d+)px$/', $opt, $matches)) {
+        $attrs['width'] = $matches[0];
+        $attrs['height'] = $matches[1];
+      }
+    }
+
+    $getsize = !isset($attrs['width']) && !isset($attrs['height']);
+    return theme('image', $filepath, '', '', $attrs, $getsize);
+  }
+  else {
+    return "[IMAGE: $fid]";
+  }
+}
+
+/*
+ * Implementation of hook_insert_styles().
+ */
+function bbcom_wiki_insert_styles() {
+  return array(
+    'wiki' => array(
+      'label' => t('Wiki syntax'),
+    )
+  );
+}
+
+/*
+ * Implementation of hook_insert_content().
+ */
+function bbcom_wiki_insert_content($item, $style, $widgth) {
+  if ($style['name'] == 'wiki') {
+    return '[[Image:'. $item['fid'] .']]';
+  }
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function bbcom_wiki_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('BiblioBird.com Wiki: Add Wiki Page'),
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0 && user_access('create wiki content')) {
+        $block['content'] = l(t('Create Wiki Page'), 'node/add/wiki',
+          array('attributes' => array('id' => 'create-content-link')));
+        return $block;
+      }
+      break; 
+  }
+}
+
+
