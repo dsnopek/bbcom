@@ -76,7 +76,7 @@ function bbcom_wiki_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Images',
-      'weight' => '31',
+      'weight' => '-1',
       'description' => '',
       'type' => 'imagefield_widget',
       'module' => 'imagefield',

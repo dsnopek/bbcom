@@ -74,13 +74,13 @@ function bbcom_wiki_strongarm() {
   $strongarm->name = 'content_extra_weights_wiki';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '0',
-    'revision_information' => '20',
-    'comment_settings' => '30',
-    'language' => '0',
-    'translation' => '30',
-    'menu' => '-2',
-    'path' => '30',
+    'body_field' => '-2',
+    'revision_information' => '0',
+    'comment_settings' => '3',
+    'language' => '-3',
+    'translation' => '2',
+    'menu' => '-4',
+    'path' => '1',
   );
 
   $export['content_extra_weights_wiki'] = $strongarm;
