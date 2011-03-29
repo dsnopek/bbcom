@@ -124,7 +124,7 @@
 
     <div id="footer-wrapper">
       <div id="footer" class="container-12 prefix-1 suffix-1">
-        <div id="copyright">Copyright &copy; 2010 Lingwo International S.C.</div>
+        <div id="copyright">Copyright &copy; 2010, 2011 Lingwo International</div>
         <?php if ($footer): ?>
           <div id="footer-region" class="region grid-10 clear-block">
             <?php print $footer; ?>
