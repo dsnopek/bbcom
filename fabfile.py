@@ -254,7 +254,7 @@ def create_bootstrap():
 
     import virtualenv, textwrap
 
-    deps = ['pip', 'virtualenv', 'Fabric']
+    deps = ['pip', 'virtualenv', 'Fabric', 'pycrypto', 'paramiko']
     deps = ', '.join(["'{0}'".format(x) for x in _python_env_requirements(deps)])
 
     output = virtualenv.create_bootstrap_script(textwrap.dedent("""
