@@ -70,7 +70,7 @@ function bbcom_dictionary_views_default_views() {
     'type' => 'none',
   ));
   $handler->override_option('title', 'Dictionary');
-  $handler->override_option('use_pager', 'mini');
+  $handler->override_option('use_pager', '1');
   $handler->override_option('row_plugin', 'node');
   $handler->override_option('row_options', array(
     'relationship' => 'none',
