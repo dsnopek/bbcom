@@ -17,7 +17,6 @@ nltk==2.0b9
 
 # for our bootstrap
 virtualenv==1.5.1
-bzr==2.2.1
 Fabric==0.9.3
 pycrypto==2.3
 paramiko==1.7.6
