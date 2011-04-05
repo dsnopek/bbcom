@@ -51,13 +51,13 @@
         </div>
 
       <?php if ($main_menu_links): ?>
-        <div id="site-menu" class="<?php print ns('grid-8', $linked_logo_img, 1); ?><?php if ($linked_logo_img) print ' prefix-1'; ?>">
+        <div id="site-menu" class="<?php print ns('grid-9', $linked_logo_img, 1); ?><?php if ($linked_logo_img) print ' prefix-1'; ?>">
           <?php print $main_menu_links; ?>
         </div>
       <?php endif; ?>
 
         <!-- Replace language switch with return link -->
-        <div id="language-switcher" class="grid-4 <?php print ns('prefix-8', $main_menu_links, 8); ?>">
+        <div id="language-switcher" class="grid-3 <?php print ns('prefix-9', $main_menu_links, 9); ?>">
           <a href="javascript:window.history.back();"><?php print t('Return to BiblioBird'); ?> &gt;&gt;</a>
         </div>
       </div>
