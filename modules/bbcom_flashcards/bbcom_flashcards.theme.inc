@@ -15,13 +15,9 @@ function theme_bbcom_flashcards_flashcard_front($node) {
 }
 
 function theme_bbcom_flashcards_flashcard_back($node) {
-  $senses = LingwoEntry::fromNode($node)->senses->getTranslations();
-  # we have to remove the examples because they will give it away
-  foreach ($senses as &$sense) {
-    unset($sense['data']['example_translation']);
-    unset($sense['orig_sense']['data']['example']);
-  }
-
-  return theme('lingwo_senses_translation', $node, $senses);
+  // we have to remove the examples because they will give it away
+  // TODO: we should probably make a completely custom generator here, because Anki
+  // has different requirements than the web..
+  return theme('lingwo_senses_translation', $node, array('example' => FALSE, 'contribute' => FALSE));
 }
 

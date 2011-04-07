@@ -5,14 +5,14 @@ import os, datetime
 
 # I'm a little weary of this being here by default, since I don't want to accidently
 # do something on production (with the exception of pulling data down for testing)
-prod_host = 'code.hackyourlife.org'
+prod_host = 'bibliobird.com'
 #env.hosts = [prod_host]
 
 env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
 env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
 env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/lingwo/python-env'
 
-env.repos = ['bbcom','lingwo_dictionary','linguatrek','drupal']
+env.repos = ['bbcom','lingwo_dictionary','drupal']
 
 class _Drush(object):
     def __init__(self, remote=False):
