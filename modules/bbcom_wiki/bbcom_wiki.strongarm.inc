@@ -126,7 +126,6 @@ function bbcom_wiki_strongarm() {
   $strongarm->value = array(
     'wiki' => 'wiki',
     'comment' => 0,
-    'content' => 0,
     'entry' => 0,
     'forum_reply' => 0,
     'forum' => 0,
@@ -134,6 +133,7 @@ function bbcom_wiki_strongarm() {
     'page' => 0,
     'story' => 0,
     'webform' => 0,
+    'content' => 0,
   );
 
   $export['wikitools_node_types'] = $strongarm;

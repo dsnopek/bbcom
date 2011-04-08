@@ -206,7 +206,7 @@ function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
 
   // get the source fields (we always deal with the source fields, so this should be
   // no surprise and we can name it simply $fields).
-  $vars['fields'] = lingwo_fields_map_items($vars['source_node']->lingwo_fields);
+  $vars['fields'] = LingwoFields::mapItems($vars['source_node']->lingwo_fields);
 }
 
 function theme_bbcom_dictionary_entry_summary($node, $teaser=FALSE, $page=FALSE) {
