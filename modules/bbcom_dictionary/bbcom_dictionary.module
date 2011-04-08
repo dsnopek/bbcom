@@ -3,6 +3,23 @@
 include_once('bbcom_dictionary.features.inc');
 
 /**
+ * Implementation of hook_menu().
+ */
+function bbcom_dictionary_menu() {
+  $items = array();
+  $items['admin/settings/bbcom/dictionary'] = array(
+    'title' => 'Dictionary',
+    'description' => 'Settings for BiblioBird.com Dictionary module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_dictionary_admin_settings'),
+    'file' => 'bbcom_dictionary.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
  * Implementation of hook_perm().
  */
 function bbcom_dictionary_perm() {
@@ -50,6 +67,49 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   }
   elseif ($op == 'delete revision') {
     rules_invoke_event('node_delete_revision', $node);
+  }
+}
+
+function _bbcom_dictionary_guidelines() {
+  global $language;
+
+  if ($nid = variable_get('bbcom_dictionary_editorial_guidelines', NULL)) {
+    if ($node = node_load($nid)) {
+      if ($node->tnid) {
+        $translations = translation_node_get_translations($node->tnid);
+        return $translations[$language->language]->nid;
+      }
+      else {
+        return $nid;
+      }
+    }
+  }
+}
+
+/*
+ * Implementation of hook_form_alter().
+ */
+function bbcom_dictionary_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form_id == (LingwoEntry::$settings->content_type .'_node_form')) {
+    $entry = LingwoEntry::fromNode($form['#node']);
+    $gnid = _bbcom_dictionary_guidelines();
+
+    drupal_add_css(drupal_get_path('module', 'bbcom_dictionary') .'/bbcom_dictionary.css');
+
+    if ($gnid) {
+      $form['bbcom_dictionary_guidelines'] = array(
+        '#prefix' => '<div class="bbcom-dictionary-editorial-guidelines">',
+        '#suffix' => '</div>',
+        '#weight' => -20,
+        '#value' => t('Please read the <a href="!url">editorial guidelines</a>!', array('!url' => url('node/'. $gnid))),
+      );
+    }
+
+    if ($entry->isTranslation()) {
+    }
+    else {
+    }
   }
 }
 
