@@ -220,16 +220,15 @@ function bbcom_wiki_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'wikitools_node_types';
   $strongarm->value = array(
+    'rwiki' => 'rwiki',
     'wiki' => 'wiki',
-    'comment' => 0,
+    'content' => 0,
     'entry' => 0,
     'forum_reply' => 0,
     'forum' => 0,
     'language' => 0,
     'page' => 0,
     'story' => 0,
-    'webform' => 0,
-    'content' => 0,
   );
 
   $export['wikitools_node_types'] = $strongarm;
