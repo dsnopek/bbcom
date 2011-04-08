@@ -15,7 +15,7 @@ function bbcom_content_context_default_contexts() {
       '0' => 'content',
     ),
     'path' => array(
-      '<front>' => '<front>',
+      'content' => 'content',
       'node/*/annotate' => 'node/*/annotate',
       'content/search' => 'content/search',
     ),
@@ -33,7 +33,7 @@ function bbcom_content_context_default_contexts() {
       'bbcom_content_0' => array(
         'module' => 'bbcom_content',
         'delta' => '0',
-        'weight' => -21,
+        'weight' => 20,
         'region' => 'right',
         'status' => '0',
         'label' => 'BiblioBird.com Content: Add Content Block',
