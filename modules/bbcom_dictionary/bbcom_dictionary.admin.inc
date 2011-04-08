@@ -11,6 +11,7 @@ function bbcom_dictionary_admin_settings() {
     '#type' => 'textfield',
     '#title' => 'Editorial Guidelines',
     '#description' => 'The <em>nid</em> of the editorial guidelines',
+    '#default_value' => variable_get('bbcom_dictionary_editorial_guidelines', ''),
   );
 
   return system_settings_form($form);
