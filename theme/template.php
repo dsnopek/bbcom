@@ -117,18 +117,24 @@ function bbcom_theme_lt_password_description($form_id) {
   return '';
 }
 
-function bbcom_theme_language_switcher_form(&$form_state) {
+function bbcom_theme_language_switcher_form(&$form_state, $node=NULL) {
   global $language;
+
+  $translations = array();
+  if (!is_null($node) && $node->tnid) {
+    $translations = translation_node_get_translations($node->tnid);
+  }
 
   $path = drupal_is_front_page() ? '<front>' : $_GET['q'];
   $languages = language_list('enabled');
   $options = array();
   foreach ($languages[1] as $lang_item) {
-    if ($language->language == $lang_item->language) {
+    $langcode = $lang_item->language;
+    if ($language->language == $langcode) {
       $url = '';
     }
     else {
-      $url = check_url(url($path, array('language' => $lang_item, 'absolute' => TRUE)));
+      $url = check_url(url(isset($translations[$langcode]) ? 'node/'. $translations[$langcode]->nid : $path, array('language' => $lang_item, 'absolute' => TRUE)));
     }
     $options[$url] = $lang_item->native;
   }
@@ -205,7 +211,7 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
     }
   }
 
-  $vars['language_switcher'] = drupal_get_form('bbcom_theme_language_switcher_form');
+  $vars['language_switcher'] = drupal_get_form('bbcom_theme_language_switcher_form', $vars['node']);
 
   if ($user->uid) {
     $vars['account_links'] = theme('bbcom_account_links', array(
