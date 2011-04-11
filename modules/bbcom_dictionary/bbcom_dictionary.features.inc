@@ -1,54 +1,14 @@
 <?php
 
 /**
- * Implementation of hook_context_default_contexts().
- */
-function bbcom_dictionary_context_default_contexts() {
-  $items = array();
-
-  $items['bbcom-section-dictionary'] = array(
-    'namespace' => 'bbcom',
-    'attribute' => 'section',
-    'value' => 'dictionary',
-    'description' => 'Working in the dictionary',
-    'node' => array(
-      '0' => 'entry',
-    ),
-    'path' => array(
-      'dictionary' => 'dictionary',
-      'dictionary/*' => 'dictionary/*',
-    ),
-    'menu' => 'dictionary',
-    'block' => array(
-      'lingwo_entry_0' => array(
-        'module' => 'lingwo_entry',
-        'delta' => '0',
-        'weight' => 20,
-        'region' => 'header',
-        'status' => '0',
-        'label' => 'Lingwo Dictionary: Search block',
-        'type' => 'context_ui',
-      ),
-      'bbcom_dictionary_0' => array(
-        'module' => 'bbcom_dictionary',
-        'delta' => '0',
-        'weight' => -21,
-        'region' => 'right',
-        'status' => '0',
-        'label' => 'BiblioBird.com Dictionary: Add Content Block',
-        'type' => 'context_ui',
-      ),
-    ),
-  );
-  return $items;
-}
-
-/**
  * Implementation of hook_ctools_plugin_api().
  */
 function bbcom_dictionary_ctools_plugin_api() {
   list($module, $api) = func_get_args();
-  if ($module == "strongarm" && $api == "strongarm") {
+  if ($module == "context" && $api == "context") {
+    return array("version" => 3);
+  }
+  elseif ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
 }

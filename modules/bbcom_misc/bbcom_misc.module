@@ -36,6 +36,25 @@ function bbcom_misc_theme() {
 }
 
 /**
+* Implementation of hook_theme_registry_alter().
+*
+* Make i18nmenu's page preprocess function run *before* everything else's,
+* in case they want to alter the primary links (like context does!).
+*/
+function bbcom_misc_theme_registry_alter(&$theme_registry) {
+  if (isset($theme_registry['page'])) {
+    if (count($theme_registry['page']['preprocess functions']) > 0) {
+      // If i18nmenu's preprocess function is there already, remove it.
+      if ($key = array_search('i18nmenu_preprocess_page', $theme_registry['page']['preprocess functions'])) {
+        unset($theme_registry['page']['preprocess functions'][$key]);
+      }
+    }
+    // Now tack it on at the beginning so it runs before everything else.
+    $theme_registry['page']['preprocess functions'] = array_merge(array('i18nmenu_preprocess_page'), $theme_registry['page']['preprocess functions']);
+  }
+}
+
+/**
  * Implementation of hook_user().
  */
 function bbcom_misc_user($op, &$edit, &$account, $category='account') {

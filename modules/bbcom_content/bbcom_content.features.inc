@@ -1,64 +1,14 @@
 <?php
 
 /**
- * Implementation of hook_context_default_contexts().
- */
-function bbcom_content_context_default_contexts() {
-  $items = array();
-
-  $items['bbcom-section-content'] = array(
-    'namespace' => 'bbcom',
-    'attribute' => 'section',
-    'value' => 'content',
-    'description' => 'Working in the content area.',
-    'node' => array(
-      '0' => 'content',
-    ),
-    'path' => array(
-      'content' => 'content',
-      'node/*/annotate' => 'node/*/annotate',
-      'content/search' => 'content/search',
-    ),
-    'menu' => 'content',
-    'block' => array(
-      'views_-exp-search_content-page' => array(
-        'module' => 'views',
-        'delta' => '-exp-search_content-page',
-        'weight' => 20,
-        'region' => 'header',
-        'status' => '0',
-        'label' => 'Exposed form: search_content-page',
-        'type' => 'context_ui',
-      ),
-      'bbcom_content_0' => array(
-        'module' => 'bbcom_content',
-        'delta' => '0',
-        'weight' => 20,
-        'region' => 'right',
-        'status' => '0',
-        'label' => 'BiblioBird.com Content: Add Content Block',
-        'type' => 'context_ui',
-      ),
-      'lingwo_korpus_0' => array(
-        'module' => 'lingwo_korpus',
-        'delta' => '0',
-        'weight' => 21,
-        'region' => 'right',
-        'status' => '0',
-        'label' => 'Lingwo Korpus: Annotation Reader block',
-        'type' => 'context_ui',
-      ),
-    ),
-  );
-  return $items;
-}
-
-/**
  * Implementation of hook_ctools_plugin_api().
  */
 function bbcom_content_ctools_plugin_api() {
   list($module, $api) = func_get_args();
-  if ($module == "strongarm" && $api == "strongarm") {
+  if ($module == "context" && $api == "context") {
+    return array("version" => 3);
+  }
+  elseif ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
 }

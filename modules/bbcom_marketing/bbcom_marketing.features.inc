@@ -1,40 +1,14 @@
 <?php
 
 /**
- * Implementation of hook_context_default_contexts().
- */
-function bbcom_marketing_context_default_contexts() {
-  $items = array();
-
-  $items['bbcom-section-marketing'] = array(
-    'namespace' => 'bbcom',
-    'attribute' => 'section',
-    'value' => 'marketing',
-    'description' => 'Viewing our marketing materials.',
-    'path' => array(
-      'about' => 'about',
-    ),
-    'block' => array(
-      'views_all_news-block_1' => array(
-        'module' => 'views',
-        'delta' => 'all_news-block_1',
-        'weight' => 18,
-        'region' => 'content_bottom',
-        'status' => '0',
-        'label' => 'All News',
-        'type' => 'context_ui',
-      ),
-    ),
-  );
-  return $items;
-}
-
-/**
  * Implementation of hook_ctools_plugin_api().
  */
 function bbcom_marketing_ctools_plugin_api() {
   list($module, $api) = func_get_args();
-  if ($module == "strongarm" && $api == "strongarm") {
+  if ($module == "context" && $api == "context") {
+    return array("version" => 3);
+  }
+  elseif ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
 }

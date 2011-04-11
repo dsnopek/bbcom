@@ -1,38 +1,14 @@
 <?php
 
 /**
- * Implementation of hook_context_default_contexts().
- */
-function bbcom_forum_context_default_contexts() {
-  $items = array();
-
-  $items['bbcom-section-forum'] = array(
-    'namespace' => 'bbcom',
-    'attribute' => 'section',
-    'value' => 'forum',
-    'description' => 'The forum context.',
-    'node' => array(
-      '0' => 'forum_reply',
-      '1' => 'forum',
-    ),
-    'path' => array(
-      'forum' => 'forum',
-      'forum/*' => 'forum/*',
-    ),
-    'menu_trail' => array(
-      'forum' => 'forum',
-    ),
-    'menu' => 'forum',
-  );
-  return $items;
-}
-
-/**
  * Implementation of hook_ctools_plugin_api().
  */
 function bbcom_forum_ctools_plugin_api() {
   list($module, $api) = func_get_args();
-  if ($module == "strongarm" && $api == "strongarm") {
+  if ($module == "context" && $api == "context") {
+    return array("version" => 3);
+  }
+  elseif ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
 }
