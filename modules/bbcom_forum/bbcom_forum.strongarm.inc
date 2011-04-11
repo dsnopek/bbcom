@@ -15,6 +15,20 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'advanced_forum_collapsible_containers';
+  $strongarm->value = 'none';
+
+  $export['advanced_forum_collapsible_containers'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'advanced_forum_disable_breadcrumbs';
+  $strongarm->value = 0;
+
+  $export['advanced_forum_disable_breadcrumbs'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'advanced_forum_get_new_comments';
   $strongarm->value = 0;
 
