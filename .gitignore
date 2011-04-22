@@ -1,3 +1,4 @@
+*.swp
 drupal/sites/*
 !drupal/sites/all
 !drupal/sites/default

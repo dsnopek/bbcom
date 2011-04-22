@@ -1,5 +1,8 @@
 <?php
 
+// set the include_path to include our PEAR stuff
+ini_set("include_path", 'sites/all/libraries/pear:' . ini_get("include_path"));
+
 /*
  * Implementation of hook_menu().
  */
