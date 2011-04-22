@@ -68,7 +68,8 @@ function addPunctuation(v) {
         }
     };
 }
-"\'-".split(\'\').forEach(addPunctuation);
+addPunctuation("\'");
+addPunctuation("-");
 
 function append_s (word) {
     if (word.hasEnding([Language.cls(\'consonant\'), \'y\'])) {
