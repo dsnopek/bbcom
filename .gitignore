@@ -1,10 +1,8 @@
 *.swp
 drupal/sites/*
 !drupal/sites/all
-!drupal/sites/default
+!drupal/sites/default/default.settings.php
 drupal/sites/all/modules/lingwo
 drupal/sites/all/modules/lingwo_oss
 drupal/sites/all/modules/lingwo_dictionary
 drupal/sites/all/modules/lingwo-old
-drupal/sites/default/settings.php
-drupal/sites/default/files

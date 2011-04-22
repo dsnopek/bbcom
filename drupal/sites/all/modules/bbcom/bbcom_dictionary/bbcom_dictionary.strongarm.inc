@@ -97,6 +97,13 @@ function bbcom_dictionary_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'i18n_node_language';
+  $strongarm->value = 1;
+
+  $export['i18n_node_language'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_entry';
   $strongarm->value = '2';
 
@@ -216,6 +223,15 @@ imieslow.przy.p.c|past active participle
   );
 
   $export['node_options_entry'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_language';
+  $strongarm->value = array(
+    0 => 'status',
+  );
+
+  $export['node_options_language'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;

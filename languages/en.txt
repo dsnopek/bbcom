@@ -8,7 +8,7 @@ array(
     'created' => '1299875238',
     'changed' => '1299877921',
     'comment' => '2',
-    'promote' => '1',
+    'promote' => '0',
     'moderate' => '0',
     'sticky' => '0',
     'tnid' => '0',
