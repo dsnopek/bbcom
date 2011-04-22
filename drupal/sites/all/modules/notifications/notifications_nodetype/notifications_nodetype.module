@@ -1,0 +1,242 @@
+<?php
+/**
+ * @file
+ * Notifications content type extension
+ */
+
+/**
+ * Implementation of hook_help()
+ */
+function notifications_nodetype_help($path, $arg) {
+  switch ($path) {
+    case 'admin/messaging/notifications/events':
+      $output = '<p>' . t('When an event type has subtypes, the parent type and each of the subtypes you want to produce notifications must be enabled.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Check if this type of event is enabled for this content type
+ */
+function notifications_nodetype_enabled($type, $action) {
+  return notifications_content_type_enabled($type) && notifications_event_enabled('node-' . $type . '-' . $action, FALSE);
+}
+/**
+ * Implementation of hook_notifications()
+ */
+function notifications_nodetype_notifications($op, $event = NULL, $arg1 = NULL, $arg2 = NULL) {
+  switch ($op) {
+    case 'event types':
+      // Creates a new one for each content type x node event types
+      // @see notifications_content_notifications()
+      $types = array();
+      foreach (node_get_types() as $type => $info) {
+        // Don't provide more options for content types that are disabled, we don't want to mess up everything
+        if (notifications_content_type_enabled($type, NULL)) {
+          // Node inserts are not grouped by node but all together. The digest will look like:
+          //   New content has been submitted
+          //   - Story Title1 by Author1
+          //   - Event Title2 by Author2
+          $variables = array('@name' => $info->name);
+          $prefix = 'node-' . $type;
+          $template = 'notifications-content-' . $type;
+          $types[$prefix . '-insert'] = array(
+            'type' => 'node',
+            'action' => 'insert',
+            'name' => t('A new @name has been submitted', $variables),
+            'line' => t('@name: [title] by [author-name]', $variables),
+            'digest' => array('node', 'type'),
+            'description' => t('Create @name', $variables),
+            'template' => $template . '-insert',
+            'parent' => 'node-insert',
+          );
+          // These other events are grouped for each node. The digest will look like:
+          //   Story: Title of the story
+          //   - The story has been updated
+          //   - New comment by User: Comment title
+          $types[$prefix . '-update'] = array(
+            'type' => 'node',
+            'action' => 'update',
+            'name' => t('Update for @name: [title]', $variables),
+            'line' => t('The @name has been updated', $variables),
+            'digest' => array('node', 'nid'), 
+            'description' => t('Update @name', $variables),
+            'template' => $template . '-update',
+            'parent' => 'node-update',
+          );      
+          $types[$prefix . '-comment'] = array(
+            'type' => 'node',
+            'action' => 'comment',
+            'name' => t('Comment for @name: [title]', $variables),
+            'line' => t('New comment by [comment-author-name]: [comment-title]'), 
+            'digest' => array('node', 'nid'),
+            'description' => t('New comment for @name', $variables),
+            'template' => $template . '-comment',
+            'parent' => 'node-comment',
+          );
+        }
+      }
+      return $types;
+  }
+}
+
+/**
+ * Implementation of hook notifications_event()
+ * 
+ * Update event key for node events so we can handle the templates for it later.
+ */
+function notifications_nodetype_notifications_event($op, $event = NULL) {
+  if ($op == 'build' && $event->type == 'node' && in_array($event->action, array('insert', 'update', 'comment'))) {
+    $node = $event->get_object('node');
+    // Fix event key and check again whether this is enabled
+    $event->typekey = 'node-' . $node->type . '-' . $event->action;
+    if (!notifications_event_enabled($event->typekey)) {
+      $event->save = $event->queue = FALSE;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_notifications_templates()
+ */
+function notifications_nodetype_notifications_templates($op, $type = 'all', $language = NULL) {
+  switch ($op) {
+    case 'help':
+      if (strpos($type, 'notifications-content') === 0) {
+        $help[] = t('The <em>Header</em> and <em>Footer</em> will be taken from Notifications events.');
+        $help[] = t('The <em>Digest line</em> will be used when composing Short digests on which each event will be just a line.');
+        return $help;
+      }
+      break;
+    case 'info':  
+      $templates = array();
+      if ($type == 'all') {
+        foreach (node_get_types() as $node_type => $type_info) {
+          foreach (array('insert', 'update', 'comment', '') as $action) {
+            $templates += notifications_nodetype_template($type_info, $action);
+          }
+        }
+      }
+      elseif (strpos($type, 'notifications-content-') === 0) {
+        list($module, $content, $node_type, $action) = split('-', $type);
+        $templates = node_get_types($node_type);
+      }
+      return $templates;
+    case 'parts':      
+      if (strpos($type, 'notifications-content') === 0) { 
+          return array(
+            'subject' => t('Subject'),
+            'main' => t('Content'),
+            'digest' => t('Digest line'),
+          );
+      }
+      /*
+       * @todo Think about more digesting options
+      if (strpos($type, 'notifications-digest-content') === 0) {
+        case 'notifications-digest-node-nid':
+        case 'notifications-digest-node-type':
+          $parts['title'] = t('Group title');
+          $parts['closing'] = t('Group footer');
+          return $parts;
+      }
+      */
+      break;
+    case 'defaults':
+      if (strpos($type, 'notifications-content-') === 0) {
+        list($module, $content, $node_type, $action) = split('-', $type);
+        $type_info = node_get_types($node_type);
+        $variables = array('@name' => $type_info->name);
+        // Common parts for all actions
+        $text = array(
+          'main' => array(
+            '[node-teaser]',
+            t('Read more [node-url]'),
+          ),
+          'digest' => array(
+            '[title]',
+            'Read more [node-url]',
+          ),      
+        );
+        switch ($action) {
+          case 'insert':
+            $text['subject'] = t('New @name: [title]', $variables, $language->language);
+            break;           
+          case 'comment': 
+            $text = array(
+              'subject' => t('Comment for @name: [title]', $variables, $language->language),
+              'main' => array(
+                t('Comment by [comment-author-name]: [comment-title]', array(), $language->language),
+                '[comment-body]',
+                t('Read more [comment-url]', array(), $language->language),
+              ),
+              'digest' => array(
+                t('New Comment on [title] by [comment-author-name] titled [comment-title]', array(), $language->language),
+                t('Read more [comment-url]', array(), $language->language),
+              ),
+            );
+            break;
+          case 'update':          
+          default:
+            $text['subject'] = t('Update for @name: [title]', $variables, $language->language);
+            break;    
+        }
+        return $text;
+      }
+      break;
+
+    case 'tokens':
+      if (strpos($type, 'notifications-content-') === 0) {
+        list($module, $content, $node_type, $action) = split('-', $type);
+        $args = explode('-', $type) + array(2 => '', 3 => '');
+        $tokens = array();
+        // These are the token groups that will be used for this module's messages
+        $tokens[] = 'node';
+        if ($action == 'comment') {
+          $tokens[] = 'comment';
+        }
+        return $tokens;
+      }
+      break;
+  }
+}
+
+/**
+ * Build single template
+ */
+function notifications_nodetype_template($type_info, $action) {
+  $variables = array('@name' => $type_info->name);
+  $type = $type_info->type;
+  $key = 'notifications-content-' . $type . ($action ? '-' . $action : '');
+  switch ($action) {
+    case 'insert':
+      $template = array(
+        'name' => t('Notifications for @name creation', $variables),
+        'description' => t('Notifications produced when a @name is created.', $variables), 
+        'fallback' => 'notifications-event-node-insert',
+      );
+      break;
+    case 'update':
+      $template = array(
+        'name' => t('Notifications for @name updates', $variables),
+        'description' => t('Notifications produced when a @name is updated.', $variables), 
+        'fallback' => 'notifications-event-node-update',
+      );
+      break;
+    case 'comment':      
+      $template = array(
+        'name' => t('Notifications for @name comments', $variables),
+        'description' => t('Notifications produced when a comment is posted to a @name.', $variables), 
+        'fallback' => 'notifications-event-node-comment',
+      );
+      break;
+    default:
+      $template = array(
+        'name' => t('Notifications for @name events', $variables),
+        'description' => t('Defaults for all notifications related to content of type @name.', $variables), 
+        'fallback' => 'notifications-event-node',
+      );
+      break;
+  }
+  $template['module'] = 'notifications_nodetype';
+  return array($key => $template);
+}

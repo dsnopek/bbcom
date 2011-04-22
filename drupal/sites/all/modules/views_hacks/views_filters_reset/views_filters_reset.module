@@ -1,0 +1,33 @@
+<?php
+// $Id: views_filters_reset.module,v 1.1.2.2 2010/05/23 12:59:01 kratib Exp $
+
+/**
+ * Implement hook_form_FORMID_alter() for views_exposed_form.
+ */
+function views_filters_reset_form_views_exposed_form_alter(&$form, &$form_state) {
+  $form['reset'] = array(
+    '#type' => 'markup',
+    '#value' => '<input '. drupal_attributes(array('id' => 'edit-reset', 'type' => 'button', 'value' => t('Reset'), 'class' => 'form-submit')) .' />',
+  );
+  static $once = FALSE;
+  if (!$once) {
+    drupal_add_js(drupal_get_path('module', 'views_filters_reset') . '/views_filters_reset.js');
+    drupal_add_js(array('vfr' => array('form_id' => $form['#id'])), 'setting');
+    if (!$form['#parameters'][1]['view']->use_ajax) {
+      drupal_add_js(array('vfr' => array('url' => url($_GET['q']))), 'setting');
+    }
+    drupal_add_js('misc/jquery.form.js');
+  }
+  $once = TRUE;
+}
+
+/**
+ * Implement hook_ajax_data_alter().
+ */
+function views_filters_reset_ajax_data_alter(&$object, $type, $view) {
+  if ($type == 'views' && $view->display_handler->uses_exposed() && $view->display_handler->get_option('exposed_block')) {
+    $object->exposed_form = $view->render_exposed_form(TRUE);
+    $object->__callbacks[] = 'Drupal.vfr.ajaxViewResponse';
+  }
+}
+

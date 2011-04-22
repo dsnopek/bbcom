@@ -1,0 +1,15 @@
+=== added file 'logo.png'
+Binary files logo.png	1970-01-01 00:00:00 +0000 and logo.png	2010-12-03 22:01:10 +0000 differ
+=== modified file 'sites/all/modules/views_bulk_operations/views_bulk_operations.js'
+--- sites/all/modules/views_bulk_operations/views_bulk_operations.js	2010-11-13 00:34:33 +0000
++++ sites/all/modules/views_bulk_operations/views_bulk_operations.js	2010-12-03 23:11:15 +0000
+@@ -88,7 +88,7 @@
+       url: Drupal.settings.basePath+'views-bulk-operations/js/pager',
+       data: 'url='+escape(Drupal.settings.vbo.url)+'&selection='+selection+'&select_all='+select_all+'&page='+page[1],
+       datatype: 'json',
+-      async: false,
++      async: false
+     });
+     return true;
+   });
+

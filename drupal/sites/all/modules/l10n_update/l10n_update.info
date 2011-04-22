@@ -1,0 +1,12 @@
+; $Id: l10n_update.info,v 1.1 2010/01/12 16:21:25 jareyero Exp $
+name = Locale updater
+description = Provides automatic downloads and updates for translations
+dependencies[] = locale
+core = 6.x
+package = Multilanguage
+; Information added by drupal.org packaging script on 2010-09-19
+version = "6.x-1.0-alpha2"
+core = "6.x"
+project = "l10n_update"
+datestamp = "1284913863"
+

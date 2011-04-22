@@ -1,0 +1,82 @@
+<?php
+/**
+ * @file
+ * SMS Messsaging using SMS Framework. Messaging method plug-in
+ */
+
+/**
+ * Implementation of hook_messaging
+ */
+function messaging_sms_messaging($op = 'info') {
+  switch($op) {
+    case 'send methods':
+      $info['sms'] = array(
+        'title' => 'SMS Framework',
+        'name' => t('SMS'),
+        'description' => t('Send SMS using SMS Framework.'),
+        'group' => 'sms', // Class of send method
+        'type' => MESSAGING_TYPE_SEND,
+        'address_type' => 'mobile', // Which kind of address this method uses
+        'glue' => ' ',
+        'render callback' => 'messaging_sms_render',
+        'send callback' => 'messaging_sms_send_msg',
+        'destination callback' => 'messaging_sms_user_destination',
+        'anonymous' => TRUE, // Allow anonymous destinations
+        'filter' => 'messaging_plaintext', // Default filter for this format
+      );
+      return $info;
+    case 'address types':
+      $types['mobile'] = array(
+        'name' => t('Mobile phone number'),
+        'uid2address callback' => 'messaging_sms_user_destination',
+        //'field_name' => 'uid', // Field on which this address is stored
+        //'field_table' => 'users', // Table on which this address is stored
+     
+      );
+  }
+}
+
+/**
+ * Message Render callback
+ */
+function messaging_sms_render($message, $info) {
+  // We need to apply filtering first or run through the render function
+  $message = Messaging_Send_Method::default_render($message, $info);
+  // Now we do some clean up in the body that may contain new lines, replace them with spaces
+  if ($message->body) {
+    $message->body = messaging_text_clean($message->body, ' ');
+  }
+  return $message;
+}
+
+/**
+ * Map user account to SMS destination (phone number)
+ */
+function messaging_sms_user_destination($account) {
+  $account = messaging_user_object($account);
+  // Check for active mobile infomation. Simply return it so that the send
+  // callback has a destination array and access everything.
+  if (!empty($account->sms_user) && $account->sms_user[0]['status'] == 2 && !empty($account->sms_user[0]['number'])) {
+    return $account->sms_user[0]['number'];
+  }
+}
+
+/**
+ * Send SMS message using the default gateway
+ * 
+ * This is just a wrapper for sms_send()
+ * 
+ * @param $destination
+ *   Mobile phone number
+ */
+function messaging_sms_send_msg($destination, $message, $params = array()) {
+  $text = messaging_text_build($message, ' ');
+  return sms_send($destination, $text, $params);
+}
+ 
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_sms_disable() {
+  messaging_method_disable('sms');
+}

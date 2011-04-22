@@ -1,0 +1,13 @@
+; $Id: nodecomment_notify.info,v 1.1.2.1 2009/06/10 19:33:13 merlinofchaos Exp $
+name = Node comment notify
+description = "Node comment follow-up e-mail notification for anonymous as well as registered users."
+dependencies[] = comment_notify
+dependencies[] = nodecomment
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-07-19
+version = "6.x-2.0-beta6"
+core = "6.x"
+project = "nodecomment"
+datestamp = "1279550108"
+

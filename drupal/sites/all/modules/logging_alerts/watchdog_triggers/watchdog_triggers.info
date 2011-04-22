@@ -1,0 +1,11 @@
+; $Id: watchdog_triggers.info,v 1.1.2.2 2010/11/09 19:41:36 bastlynn Exp $
+name = Watchdog Triggers
+description = Provides Trigger and Actions integration to watchdog events.
+core = 6.x
+dependencies[] = trigger
+; Information added by drupal.org packaging script on 2010-11-09
+version = "6.x-1.5"
+core = "6.x"
+project = "logging_alerts"
+datestamp = "1289331942"
+

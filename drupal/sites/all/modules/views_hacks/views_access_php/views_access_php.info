@@ -1,0 +1,13 @@
+; $Id: views_access_php.info,v 1.1.2.1 2010/05/22 13:50:26 kratib Exp $
+name = Views PHP Access Plugin
+description = Provides a programmable Views access plugin for rapid one-off tasks.
+package = Views
+dependencies[] = views
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-06-23
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "views_hacks"
+datestamp = "1277295637"
+

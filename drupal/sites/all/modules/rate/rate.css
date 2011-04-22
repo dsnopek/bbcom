@@ -1,0 +1,10 @@
+.rate-info {
+  clear: left;
+  font-size: 0.8em;
+  color: #666;
+}
+
+.rate-button {
+  /* Required for IE8, see http://drupal.org/node/1042216 */
+  position: relative;
+}

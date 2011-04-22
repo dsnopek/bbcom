@@ -1,0 +1,17 @@
+=== modified file 'sites/all/modules/webformblock/webformblock.module'
+--- sites/all/modules/webformblock/webformblock.module	2010-07-19 12:04:26 +0000
++++ sites/all/modules/webformblock/webformblock.module	2010-07-20 11:18:29 +0000
+@@ -126,6 +126,12 @@
+  * Block content can be themed as if it was a node-webform.tpl.php etc.
+  */
+ function webformblock_view($nid) {
++  global $language;
++  if (module_exists('translation')) {
++    if ($translations = translation_node_get_translations($nid)) {
++      $nid = $translations[$language->language]->nid;
++    }
++  }
+   $node = node_load(array('nid' => $nid));
+       
+   $block_subject = $node->title;
+

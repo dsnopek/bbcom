@@ -1,0 +1,15 @@
+; $Id: views_block.info,v 1.1.2.2 2010/05/22 14:10:17 kratib Exp $
+name = Views Block
+description = Exposes blocks as Views objects.
+dependencies[] = views
+dependencies[] = block
+dependencies[] = views_bulk_operations
+package = Views
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-06-23
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "views_hacks"
+datestamp = "1277295637"
+

@@ -1,0 +1,11 @@
+name = Webform Block
+description = Displays a Webform in a block
+core = 6.x
+package = "webform"
+dependencies[] = webform
+; Information added by drupal.org packaging script on 2009-06-26
+version = "6.x-1.1"
+core = "6.x"
+project = "webformblock"
+datestamp = "1246028556"
+

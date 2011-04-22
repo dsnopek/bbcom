@@ -1,0 +1,157 @@
+<?php
+/**
+ * @file
+ *
+ * Actions defined here interact with Facebook's API.  This makes it
+ * possible to notify facebook of various activities as they happen.
+ *
+ * In the past, facebook offered "profile boxes" and actions were a
+ * resonable way to update their content.  Facebook has deprecated
+ * this feature, leaving thi s module very little to do.  So for the
+ * time being there is little reason to enable this module.
+ */
+
+/**
+ * Implemntation of hook_action_info()
+ */
+function fb_actions_action_info() {
+  return array(
+    'fb_actions_cron_per_user' =>
+    array('type' => 'fb_app',
+          'description' => t('Perform an Action once for each user of a Facebook App'),
+          'configurable' => TRUE,
+          'hooks' => array('cron' => array('run')),
+    ),
+  );
+}
+
+
+
+/**
+ * Implementation of fb_actions_cron_per_user action.
+ *
+ * This is useful only if you have another action which you wish to
+ * trigger, once for each user of an application.  Formerly used to
+ * update profile boxes during cron jobs.  Profile boxes no longer
+ * exist, so there may no longer be a need for this.
+ */
+function fb_actions_cron_per_user_form($values) {
+  include drupal_get_path('module', 'fb') . '/fb.admin.inc';
+  $form['description'] = array('#value' => t('This action will iterate through user\'s of a Facebook Application, attempt to log into the Facebook API as that user, and execute additional actions.  Use this to perform per-user actions during a Facebook cron job.'));
+
+  $options = fb_admin_get_app_options(FALSE);
+  $form['fb_app_labels'] =
+    array('#type' => 'select',
+          '#title' => t('Application'),
+          '#multiple' => TRUE,
+          '#required' => TRUE,
+          '#default_value' => $values['fb_app_labels'],
+          '#options' => $options,
+          '#description' => t('Perform these actions for each user of which applications?'),
+    );
+
+  foreach (actions_get_all_actions() as $aid => $action) {
+    $options[$action['type']][$aid] = $action['description'];
+  }
+  $form['actions'] = array('#type' => 'select',
+                           '#title' => t('Actions'),
+                           '#default_value' => $values['actions'],
+                           '#multiple' => TRUE,
+                           '#required' => TRUE,
+                           '#options' => $options,
+                           '#description' => t('Select one or more actions to perform while logged in as a Facebook Application user.'),
+  );
+  $form['throttle'] = array('#type' => 'textfield',
+                            '#title' => t('Throttle'),
+                            '#default_value' => $values['throttle'],
+                            '#required' => TRUE,
+                            '#description' => t('Number of users to iterate through each time this action is invoked.  Recommended: start with a small number and increase when you are sure things are working.'),
+  );
+  return $form;
+}
+
+function fb_actions_cron_per_user_submit($form_id, $values) {
+  return array('fb_app_labels' => $values['fb_app_labels'],
+               'actions' => $values['actions'],
+               'throttle' => $values['throttle'],
+  );
+}
+
+/**
+ * Trigger an action several times, emulating a different user each
+ * time.  Useful for cron jobs in which we update each users profile
+ * box, for example.
+ */
+function fb_actions_cron_per_user($obj, $values) {
+  //$args = func_get_args();
+  //watchdog('fb_action_debug', "fb_actions_cron_per_user" . dpr($args, 1), WATCHDOG_ERROR);
+
+  foreach ($values['fb_app_labels'] as $label) {
+    $fb_app = fb_get_app(array('label' => $label));
+    // Set paths as if on a canvas page.
+
+    // perform per-user actions by manipulating the global user variable.
+    $save_session = session_save_session();
+    session_save_session(FALSE);
+    // Save current settings
+    $before_fb = $GLOBALS['_fb'];
+    $before_fb_app = $GLOBALS['_fb_app'];
+    $before_user = $GLOBALS['user'];
+
+    // Find some users of the app, for whom cron has not run recently.
+    $result = db_query("SELECT * FROM {fb_user_app} WHERE apikey='%s' AND fbu > 0 AND added > 0 ORDER BY time_cron ASC LIMIT %d",
+              $fb_app->apikey,
+              $values['throttle']);
+    while ($data = db_fetch_object($result)) {
+      // Find a local account for the application user
+      $account = fb_user_get_local_user($data->fbu, $fb_app);
+      if (variable_get('fb_actions_verbose', FALSE))
+        watchdog('fb_action_debug', "fb_actions_cron_per_user fbu is $data->fbu, local user is " . theme('username', $account), array(), WATCHDOG_ERROR);
+
+      if (!$account || !$account->uid) {
+        watchdog('fb cron', 'Facebook user %fbu does not correspond to a local account.',
+          array('%fbu' => $data->fbu));
+        //db_query("DELETE FROM {fb_user_app} WHERE apikey='%s' AND fbu = %d",
+        //         $fb_app->apikey,
+        //         $data->fbu);
+      }
+      else {
+        // If here, local user has been found.
+        // The older facebook API required us to log in as the current user.
+        // In the new API we should not need a user account to perform tasks appropriate for cron jobs.
+        $fb = fb_api_init($fb_app, FB_FBU_CURRENT);
+        if ($fb) {
+          // Set things up as if this were a canvas page.
+          $GLOBALS['user'] = $account;
+          $GLOBALS['_fb'] = $fb;
+          $GLOBALS['_fb_app'] = $fb_app;
+
+          // Invoke any actions that we've been configured to invoke.
+          try {
+            actions_do($values['actions'], $fb_app, array(
+                'fb' => $fb,
+                'fb_app' => $fb_app));
+          } catch (Exception $e) {
+            watchdog('fb cron', "Action per user failed. " . $e->getMessage(), array(),  WATCHDOG_ERROR);
+          }
+
+        } // end if able to log into facebook
+      } // end if local user found.
+
+      // Record how recently cron was run for this user.  We do this even if
+      // we failed to log in, because we don't want persistent problems to
+      // clog the cron queue.  We'll get to this user again, eventually.
+      db_query("UPDATE {fb_user_app} SET time_cron=%d WHERE apikey='%s' AND fbu=%d",
+        time(), $fb_app->apikey, $data->fbu);
+
+    } // end loop per user
+
+    // Restore global variables
+    $GLOBALS['user'] = $before_user;
+    $GLOBALS['_fb'] = $before_fb;
+    $GLOBALS['_fb_app'] = $before_fb_app;
+    session_save_session($save_session);
+
+  }
+}
+

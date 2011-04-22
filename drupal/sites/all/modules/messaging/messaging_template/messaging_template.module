@@ -1,0 +1,404 @@
+<?php
+/**
+ * @file
+ * Drupal Messaging Framework - Messaging template
+ */
+
+// Special string for empty text part
+define('MESSAGING_TEMPLATE_EMPTY', '<none>');
+
+/**
+ * Implementation of hook_help()
+ */
+function messaging_template_help($path, $arg) {
+  switch ($path) {
+    case 'admin/messaging/template':
+      $output = '<p>' . t('Configure the templates for different types of messages. Each message group is defined by other modules using the Messaging Framework. A typical message consists on the following parts:') . '</p>';
+      $output .= '<small><table>';
+      $output .= '<tr><td colspan="2"><em>' . t('Subject') . '</em></td><td>' . t('Single line with a short description') . '</td></tr>';
+      $output .= '<tr><td rowspan="3">' . t('Body') . '</td><td><em>' . t('Header') . '</em></td><td>' . t('Greetings line') . '</td></tr>';
+      $output .= '<tr><td><em>' . t('Content') . '</em></td><td>' . t('Message main content, usually longer with the full description'). '</td></tr>';
+      $output .= '<tr><td><em>' . t('Footer') . '</em></td><td>' .  t('Closing part with site information, unsubscribe links, etc...') . '</td></tr>';
+      $output .= '</table></small>';
+      $output .= '<p>' . t('Here you\'ll be able to configure each of these parts for each sending method. When one of these parts is left blank, there is a fallback system which goes as follows:') . '</p>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('If a message part is left blank for a sending method, the text part from Default sending method will be used.') . '</li>';
+      $output .= '<li>' . t('If the Default part is blank too, the fallback template (the parent in this tree) will be used.') . '</li>';
+      $output .= '</ul>';
+      return $output;
+    default:
+      // Edit template groups
+      if ($arg[0] == 'admin' && $arg[1] == 'messaging' && $arg[2] == 'template' && $arg[3] == 'edit' && ($group = $arg[4])) {
+        $output = messaging_template_admin_info($group);
+        $output .= '<p>' . t('Leave blank to use the default texts or use \'%empty\' for an empty message part, preventing fallback to default message texts.', array('%empty' => MESSAGING_TEMPLATE_EMPTY)) . '</p>';
+        $output .= '<p>' . t('Optionally you can use Input formats for additional formatting after token replacement. <strong>Using Input formats can be unsafe if you use certain filters</strong> like the PHP filter.') . '</p>';
+        return $output;
+      }
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function messaging_template_menu() {
+  $items['admin/messaging/template'] = array(
+    'title' => 'Message templates',
+    'description' => 'Configuration of message templates',
+    'page callback' => 'messaging_template_admin_template',
+    'access callback' => 'messaging_template_access',
+    'file' => 'messaging_template.admin.inc',
+  );
+  $default = language_default();
+  $items['admin/messaging/template/edit/%messaging_template'] = array(
+    'title' => 'Message templates',
+    'page callback' => 'messaging_template_admin_template_edit',
+    'page arguments' => array(4, $default->language),
+    'type' => MENU_CALLBACK,
+    'access callback' => 'messaging_template_access',
+    'file' => 'messaging_template.admin.inc',
+  );
+  foreach (messaging_template_language_list() as $langcode => $name) {
+    $items['admin/messaging/template/edit/%messaging_template/' . $langcode] = array(
+      'title' => check_plain($name),
+      'page callback' => 'messaging_template_admin_template_edit',
+      'page arguments' => array(4, 5),
+      // Default language will be the default tab
+      'type' => $default->language == $langcode ? MENU_DEFAULT_LOCAL_TASK : MENU_LOCAL_TASK,
+      'access callback' => 'messaging_template_access',
+      'file' => 'messaging_template.admin.inc',
+    );
+  }
+  return $items;
+}
+
+/**
+ * Access control to edit templates
+ */
+function messaging_template_access() {
+  return user_access('administer messaging') || user_access('edit message templates');
+}
+/**
+ * Load template data. Menu loading callback
+ */
+function messaging_template_load($key) {
+  $groups = module_invoke_all('messaging', 'message groups');
+  if (isset($groups[$key])) {
+    return $groups[$key] + array('group' => $key);
+  }  
+}
+
+/**
+ * Implementation of hook_perm()
+ */
+function messaging_template_perm() {
+  return array('edit message templates');
+}
+
+/**
+ * Build message from template with token replacement
+ * 
+ * @param $template
+ *   Template name to get text parts from
+ * @param $send_method
+ *   Send method to build the template
+ * @param $language
+ *   Language object
+ * @param $objects
+ *   Objects for token replacement. Global tokens will be added always
+ * @param $options
+ *   Aditional options for token replacement
+ * @param $parts
+ *   Array of template parts. Default will be: subject, header, main, footer
+ *   
+ * @return Messaging_Message object
+ */
+function messaging_template_build($template, $send_method, $language, $objects = array(), $options = array(), $parts = array('subject', 'header', 'main', 'footer')) {
+  $textparts = array();
+  foreach ($parts as $key) {
+    $textparts[$key] = messaging_template_text_part($template, $key, $send_method, $language);
+  }
+  // Run token replacement
+  $text = messaging_template_text_replace($textparts, $objects, $language, $options);
+  // Get subject out of text and build the message array
+  if (isset($text['subject'])) {
+    $subject = $text['subject'];
+    unset($text['subject']);
+  }
+  else {
+    $subject = '';
+  }
+  return new Messaging_Message(array('subject' => $subject, 'body' => $text, 'language' => $language));
+}
+
+/**
+ * Returns parts of messages, that may be formatted for each sending method
+ *
+ * @ TODO Review logic, optimizations, text pre-fetching
+ * @ TODO Glue text in a method-dependent way
+ *
+ * First checks for message, key, method
+ * Then checks for message, key for method 'default'
+ * Finally checks default values from modules and hook_messaging()
+ *
+ * @param $group
+ *   String, specified by the module where the message originates. ie 'subscriptions-event'.
+ * @param $key
+ *   String, key for the desired message part.
+ * @param $language
+ *   Language object
+ * @param $method
+ *   String the mailing method that should be used. OPTIONAL
+ * @param $getdefault
+ *   Boolean, whether to use the default if a specific message isn't available for the used method. OPTIONAL, Defaults to true.
+ *
+ * @return
+ *   Assembled text of a message part.
+ */
+function messaging_template_message_part($group, $key, $method, $language, $getdefault = TRUE) {
+  $cache = &messaging_static(__FUNCTION__);
+  $langcode = $language->language;
+  if (!isset($cache[$langcode][$group][$method])) {
+    $cache[$langcode][$group][$method] = _messaging_template_message_part($group, $method, $language);
+  }
+  if (!$key) {
+    return $cache[$langcode][$group][$method];
+  }
+  if (!isset($cache[$langcode][$group][$method][$key])) {
+    if ($getdefault && ($fallback = messaging_template_method_fallback($method))) {
+      // Go for method fallback
+      $cache[$langcode][$group][$method][$key] = messaging_template_message_part($group, $key, $fallback, $language);
+    }
+    else {
+      // Not found, set a FALSE value in the cache so we don't search again
+      $cache[$langcode][$group][$method][$key] = FALSE;
+    }
+  }
+
+  return $cache[$langcode][$group][$method][$key];
+}
+
+/**
+ * Load message parts from db or get defaults from module
+ */
+function _messaging_template_message_part($group, $method, $language) {
+  $templates = array();
+  $result = db_query("SELECT * FROM {messaging_message_parts} WHERE type = '%s' AND method = '%s' AND language = '%s'", $group, $method, $language->language);
+  while ($part = db_fetch_object($result)) {
+    $templates[$part->msgkey] = $part;
+  }
+  // If not in db and method is default, get values from modules
+  if (empty($templates) && $method == 'default') {
+    foreach (messaging_template_message_defaults($group, $language) as $key => $text) {
+      $part = (object)array('type' => $group, 'msgkey' => $key, 'default' => $text, 'format' => 0, 'message' => is_array($text) ? implode("\n", $text) : $text);
+      $templates[$key] = $part;
+    }
+  }
+  return $templates;
+}
+
+/**
+ * Get text part with group and method fallback
+ * 
+ * @return string
+ *   Or NULL if not found
+ */
+function messaging_template_text_part($group, $key, $method, $language) {
+  $original_group = $group;
+  while ($group) {
+    if ($part = messaging_template_message_part($group, $key, $method, $language)) {
+      // Found template text, check for empty marker and return
+      return $part->message === MESSAGING_TEMPLATE_EMPTY ? '' : $part;
+    }
+    else {
+      $group = messaging_template_group_fallback($group);
+    }
+  }
+  // Try language fallback if language is not default
+  if ($language_fallback = messaging_template_language_fallback($language)) {
+    return messaging_template_text_part($original_group, $key, $method, $language_fallback);
+  }
+}
+
+/**
+ * Get template type information. It will try to retrieve just this type
+ * 
+ * @param $type
+ *   Template type name
+ * @param $property
+ *   Optional property to retrieve
+ * @param $getall
+ *   
+ */
+function messaging_template_type_info($type = NULL, $property = NULL) {
+  $info = &messaging_static(__FUNCTION__);
+  if (!isset($info)) {
+    $info = module_invoke_all('messaging', 'message groups');
+  }
+  return messaging_array_info($info, $type, $property);
+}
+
+/**
+ * Get template fallback
+ */
+function messaging_template_group_fallback($group) {
+  return messaging_template_message_group($group, 'fallback');
+}
+
+/**
+ * Get method fallback
+ * 
+ * @todo To be extended. For now it will just return 'default' for any other method
+ */
+function messaging_template_method_fallback($method) {
+  return $method == 'default' ? NULL : 'default';
+}
+
+/**
+ * Get language fallback, that will be default language if this is not the default
+ */
+function messaging_template_language_fallback($language) {
+  $default = language_default();
+  return $language->language != $default->language ? $default : NULL;
+}
+
+/**
+ * Returns parts of messages, that may be formatted for each sending method
+ *
+ * @param $group
+ *   Message group.
+ * @param $language
+ *   Language to localize defaults
+ */
+function messaging_template_message_defaults($group, $language) {
+  $info = &messaging_static(__FUNCTION__);
+  if (!isset($info[$language->language][$group])) {
+    $info[$language->language][$group] = module_invoke_all('messaging', 'messages', $group, $language);
+  }
+  return $info[$language->language][$group];
+}
+
+/**
+ * Returns information about message groups
+ *
+ * @param $group
+ *   Optional message group. Returns all groups if null.
+ * @param $key
+ *   Optional message key inside the group. Returns all keys if null.
+ * @return array()
+ *   Depending on parameters, may be all message groups and keys or only a specific one.
+ */
+function messaging_template_message_group($group = NULL, $key = NULL) {
+  static $info;
+  
+  if (!isset($info)) {
+    $info = module_invoke_all('messaging', 'message groups');
+  }
+  
+  return messaging_array_info($info, $group, $key);
+}
+
+/**
+ * Extract a group of templates from an array of them (including all fallbacks for selected)
+ * 
+ * @param $filter
+ *   Array of template names
+ */
+function messaging_template_extract_group($filter, $templates) {
+  $filter = is_array($filter) ? $filter : array($filter);
+  $selected = array();
+  foreach ($templates as $key => &$template) {
+    if (in_array($key, $filter)) {
+      $selected[$key] = $template;
+      // Add fallbacks for selected templates too
+      while (!empty($template['fallback']) && ($fallback = $template['fallback']) && !isset($selected[$fallback])) { 
+        $template = $templates[$fallback];
+        $selected[$fallback] = $template;
+      }
+    }    
+  }
+  return $selected;
+}
+/**
+ * Do token replacement. 
+ * 
+ * Uses token_logic if enabled, standard token replacement otherwise
+ * 
+ * @param $text
+ *   String or arry of text parts, that may be strings or template objects
+ * @param $objects
+ *   Array of objects for token replacement
+ * @param $language
+ *   Language object to be used for the token values
+ * @param $options
+ *   Aditional options to get the tokens: language, user
+ */
+function messaging_template_text_replace($text, $objects, $language = NULL, $options = array()) {
+  // Add default options, these will work with this patch http://drupal.org/node/854688
+  $options += array('language' => $language ? $language : $GLOBALS['language']);
+  $options += array('langcode' => $options['language']->language);
+  
+  messaging_include('text.inc');
+  // Add some token types
+  $objects['global'] = NULL;  
+  // Parts may be text or text objects, check them and take out filters to be applied later
+  if (is_object($text)) {
+    $format = !empty($text->format) ? $text->format : NULL;
+    $text = $text->message;
+  }
+  elseif (is_array($text)) {
+    $filters = array();
+    foreach ($text as $key => $part) {
+      if (is_object($part)) {
+        $text[$key] = $part->message;
+        if (!empty($part->format)) {
+          $filters[$key] = $part->format;
+        } 
+      }
+    }
+  }
+
+  // Use token_logic if available, http://code.developmentseed.org/token_logic
+  // Otherwise use standard contrib token module, http://drupal.org/project/token
+  if (module_exists('token_logic')) {
+    $text = token_logic_replace_multiple($text, $objects);
+  }
+  else {
+    $text = token_replace_multiple($text, $objects, '[', ']', $options);
+  }
+  // Run filters if needed and return. We use our extra fast messaging_text_check_markup()
+  if (is_array($text) && !empty($filters)) {
+    foreach ($filters as $key => $format) {
+      $text[$key] = messaging_text_check_markup($text[$key], $format);
+    }
+  }
+  elseif (isset($format)) {
+    // This means it was a single object and we have a filter to run
+    $text = messaging_text_check_markup($text, $format);
+  }
+  return $text;
+}
+
+/**
+ * Get list of available languages
+ */
+function messaging_template_language_list() {
+  if (function_exists('locale_language_list')) {
+    return locale_language_list();
+  }
+  else {
+    $default = language_default();
+    return array($default->language => $default->name);
+  }
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function messaging_template_theme() {
+  return array(
+    'messaging_template_part_text' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'messaging_template.admin.inc',
+    ),
+  );
+}

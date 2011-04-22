@@ -1,0 +1,13 @@
+name = Canvas Pages (fb_canvas.module)
+description = Host <a href=http://developers.facebook.com/docs/guides/canvas/ target=_blank>apps on facebook.com</a> using iframe canvas pages.
+package = Drupal for Facebook
+dependencies[] = fb
+dependencies[] = fb_app
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-11-14
+version = "6.x-3.0-rc1"
+core = "6.x"
+project = "fb"
+datestamp = "1289697375"
+

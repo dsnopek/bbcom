@@ -1,0 +1,48 @@
+<?php
+/**
+ * @file
+ * Mime mail using Drupal API. Messaging method plug-in
+ */
+
+/**
+ * Implementation of hook_messaging
+ */
+function messaging_mime_mail_messaging($op = 'info') {
+  switch($op) {
+    case 'send methods':
+      $info['mimemail'] = array(
+        'title' => 'Mime Mail',
+        'name' => t('Mime Mail'), // Name for display
+        'description' => t('Send e-mails using Mime Mail module.'),
+        'address_type' => 'mail', // Type of address 
+        'group' => 'mail', // Class of send method
+        'glue' => "<br>", // don't use <br/> nor <br /> for maximum HTML email client compatibility
+        'footer' => "-- \n",  // Separator for message footer
+        'send callback' => 'messaging_mime_mail_send_msg',  // Sending callback
+        'class' => 'Messaging_Method_Mail',
+        'filter' => 'messaging_html', // Default filter for this format
+        'anonymous' => TRUE, // This method supports anonymous destinations
+      );
+      return $info;  
+  }
+}
+
+/**
+ * Send mime mail message to user account
+ * 
+ * @param $destination
+ *   Destination email address
+ * @param $message
+ *   Message array
+ */
+function messaging_mime_mail_send_msg($destination, $message, $params) {
+  // mimemail($sender, $recipient, $subject, $body, $plaintext = NULL, $headers = array(), $text = NULL, $attachments = array(), $mailkey = '')  
+  return mimemail($params['from'], $destination, $message->get_subject(), $message->get_body(), NULL, $params['headers'], NULL, $message->get_files(), $params['id']);
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_mime_mail_disable() {
+  messaging_method_disable('mimemail');
+}

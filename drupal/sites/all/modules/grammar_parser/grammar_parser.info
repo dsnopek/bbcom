@@ -1,0 +1,25 @@
+; $Id$
+name = "Grammar Parser"
+
+description = "Grammar Parser -- an API for parsing, editing and rebuilding a code snippet
+               according to the grammar of the programming language."
+
+package = Development
+
+files[] = grammar_parser.install
+files[] = grammar_parser.module
+files[] = engine/grammar_parser.editor.inc
+files[] = engine/grammar_parser.list.inc
+files[] = engine/grammar_parser.object.inc
+files[] = engine/grammar_parser.parser.inc
+files[] = engine/grammar_parser.reader.inc
+files[] = engine/grammar_parser.writer.inc
+
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-12-04
+version = "7.x-1.1"
+core = "6.x"
+project = "grammar_parser"
+datestamp = "1291500673"
+

@@ -1,0 +1,31 @@
+=== modified file 'sites/all/modules/mollom/mollom.module'
+--- sites/all/modules/mollom/mollom.module	2011-02-12 19:01:28 +0000
++++ sites/all/modules/mollom/mollom.module	2011-04-02 19:56:14 +0000
+@@ -1107,7 +1107,7 @@
+   }
+ 
+   // User IP.
+-  $data['author_ip'] = ip_address();
++  //$data['author_ip'] = ip_address();
+ 
+   // Honeypot.
+   // For the Mollom backend, it only matters whether 'honeypot' is non-empty.
+@@ -1626,7 +1626,7 @@
+   $data = array(
+     'session_id' => $form_state['mollom']['response']['session_id'],
+     'captcha_result' => $form_state['values']['mollom']['captcha'],
+-    'author_ip' => $all_data['author_ip'],
++    //'author_ip' => $all_data['author_ip'],
+   );
+   if (isset($all_data['author_id'])) {
+     $data['author_id'] = $all_data['author_id'];
+@@ -2189,7 +2189,7 @@
+  */
+ function mollom_get_captcha($type, $data = array()) {
+   $data += array(
+-    'author_ip' => ip_address(),
++    //'author_ip' => ip_address(),
+     'ssl' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on',
+   );
+ 
+

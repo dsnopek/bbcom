@@ -1,0 +1,117 @@
+<?php
+// $Id: emaillog.module,v 1.3.2.8 2009/07/23 16:28:59 davereid Exp $
+
+// Copyright 2007 Khalid Baheyeldin http://2bits.com
+
+/**
+ * @file
+ * Sends logs and alerts to email addresses.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function emaillog_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#emaillog':
+    case 'admin/settings/logging/emaillog':
+      return '<p>'. t('Sends logs and alerts to email addresses.') .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function emaillog_menu() {
+  $items['admin/settings/logging/emaillog'] = array(
+    'title' => 'Email logging and alerts',
+    'description' => 'Settings for logging and alerts to email addresses.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('emaillog_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'emaillog.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_watchdog().
+ */
+function emaillog_watchdog($log) {
+  global $user;
+
+  $to = variable_get('emaillog_' . $log['severity'], '');
+  if ($to) {
+    // Send email only if there is an email address. Otherwise the message is ignored
+    // by this module.
+    $language = user_preferred_language($user);
+    drupal_mail('emaillog', 'alert', $to, $language, $log);
+  }
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function emaillog_mail($key, &$message, $params) {
+  if ($key == 'alert') {
+    $severity_levels = watchdog_severity_levels();
+    $message['subject'] = t('[@site_name] @severity_desc: Alert from your web site',
+      array(
+        '@site_name'     => variable_get('site_name', 'Drupal'),
+        '@severity_desc' => drupal_ucfirst($severity_levels[$params['severity']]),
+      ));
+    $message['body'] = theme('emaillog_format', $params, $message);
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function emaillog_theme() {
+  return array(
+    'emaillog_format' => array(
+      'arguments' => array('log_msg' => NULL),
+    ),
+  );
+}
+
+function theme_emaillog_format($log_msg = array()) {
+  global $base_url;
+
+  $severity_levels = watchdog_severity_levels();
+
+  $message  = "\nSite:         @base_url";
+  $message .= "\nSeverity:     (@severity) @severity_desc";
+  $message .= "\nTimestamp:    @timestamp";
+  $message .= "\nType:         @type";
+  $message .= "\nIP Address:   @ip";
+  $message .= "\nRequest URI:  @request_uri";
+  $message .= "\nReferrer URI: @referer_uri";
+  $message .= "\nUser:         (@uid) @name";
+  $message .= "\nLink:         @link";
+  $message .= "\nMessage:      \n\n@message";
+
+  if (is_array($log_msg['variables'])) {
+    $vars = $log_msg['variables'];
+    $msg = strtr($log_msg['message'], $vars);
+  }
+  else {
+    $msg = $log_msg['message'];
+  }
+
+  $message = t($message, array(
+    '@base_url'      => $base_url,
+    '@severity'      => $log_msg['severity'],
+    '@severity_desc' => drupal_ucfirst($severity_levels[$log_msg['severity']]),
+    '@timestamp'     => format_date($log_msg['timestamp']),
+    '@type'          => $log_msg['type'],
+    '@ip'            => $log_msg['ip'],
+    '@request_uri'   => $log_msg['request_uri'],
+    '@referer_uri'   => $log_msg['referer'],
+    '@uid'           => $log_msg['user']->uid,
+    '@name'          => $log_msg['user']->name,
+    '@link'          => strip_tags($log_msg['link']),
+    '@message'       => strip_tags($msg),
+  ));
+  return $message;
+}

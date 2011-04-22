@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ *   Notifications for anonymous users
+ */
+
+/**
+ * Implementation of hook_install()
+ */
+function notifications_anonymous_install() {
+  // Set module weight to run after all notifications modules. Notifications content has a weight of 100
+  db_query("UPDATE {system} SET weight = 200 WHERE name = 'notifications_anonymous' AND type = 'module'");
+}

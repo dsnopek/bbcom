@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function spambot_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'spambot_%'");
+}
+
+/**
+ * Migrate settings from previous version of spambot (6.x-2.0)
+ */
+function spambot_update_6300() {
+  $ret = array();
+
+  // In previous versions of spambot, the default message was 'Blacklisted. Now go away!'
+  // If no custom message was configured, then configure it to 'Blacklisted. Now go away!'
+  $message = variable_get('spambot_blocked_message', FALSE);
+  if (!$message) {
+    variable_set('spambot_blocked_message', t('Blacklisted. Now go away!'));
+  }
+
+  // Previous versions of spambot blacklisted on any of the three criteria
+  variable_set('spambot_criteria_email', TRUE);
+  variable_set('spambot_criteria_username', TRUE);
+  variable_set('spambot_criteria_ip', TRUE);
+  return $ret;
+}
+
+function spambot_update_6301() {
+  $ret = array();
+  // Change criteria settings from booleans to numbers
+  if (variable_set('spambot_criteria_email', TRUE)) {
+    variable_set('spambot_criteria_email', 1);
+  }  
+  if (variable_set('spambot_criteria_username', FALSE)) {
+    variable_set('spambot_criteria_username', 1);
+  }
+  if (variable_set('spambot_criteria_ip', FALSE)) {
+    variable_set('spambot_criteria_ip', 1);
+  }
+  return $ret;
+}

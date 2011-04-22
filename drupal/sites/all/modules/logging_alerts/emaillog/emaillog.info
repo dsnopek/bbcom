@@ -1,0 +1,11 @@
+name = Email logging and alerts
+description = Sends logs and alerts to email addresses, with different severity going to different emails.
+package = Logging and alerts
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-11-09
+version = "6.x-1.5"
+core = "6.x"
+project = "logging_alerts"
+datestamp = "1289331942"
+

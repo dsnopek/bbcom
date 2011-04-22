@@ -1,0 +1,11 @@
+name = Content Type extension
+description = Provides different events and templates for each content type
+package = "Notifications"
+dependencies[] = notifications_content
+core = 6.x
+; Information added by drupal.org packaging script on 2011-02-26
+version = "6.x-4.x-dev"
+core = "6.x"
+project = "notifications"
+datestamp = "1298722144"
+

@@ -1,0 +1,37 @@
+<?php
+// $Id: fb_register.install,v 1.5 2010/11/02 18:49:01 yogadex Exp $
+/**
+ * @file
+ * Install file to support fb_register.module.
+ *
+ */
+
+function fb_register_install() {
+  drupal_install_schema('fb_register');
+}
+
+function fb_register_uninstall() {
+  drupal_uninstall_schema('fb_register');
+}
+
+function fb_register_schema() {
+  $schema['fb_register'] = array(
+    'fields' => array(
+      'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'email_hash' => array('type' => 'varchar', 'length' => 255),
+    ),
+    'primary key' => array('uid'),
+    'unique keys' => array(
+      'email_hash' => array('email_hash'),
+    ),
+  );
+
+  return $schema;
+}
+
+
+function fb_register_update_6000() {
+  $ret = array();
+  db_add_primary_key($ret, 'fb_register', array('uid'));
+  return $ret;
+}

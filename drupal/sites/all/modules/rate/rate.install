@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function rate_uninstall() {
+  variable_del('rate_widgets');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function rate_update_6000() {
+  $widgets = variable_get('rate_widgets', array());
+  foreach ($widgets as $widget_id => $widget) {
+    $template = isset($widget->template) ? $widget->template : NULL;
+    // "helpful" template was renamed to "yesno".
+    if ($template == 'helpful') {
+      $widget->template = 'yesno';
+    }
+    $widgets[$widget_id] = $widget;
+  }
+  variable_set('rate_widgets', $widgets);
+  return array();
+}

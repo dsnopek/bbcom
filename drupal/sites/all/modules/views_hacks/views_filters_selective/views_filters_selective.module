@@ -1,0 +1,141 @@
+<?php
+// $Id: views_filters_selective.module,v 1.1.2.2 2010/05/24 15:11:51 kratib Exp $
+
+/**
+ * Implementation of hook_views_api().
+ */
+function views_filters_selective_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
+/**
+ * Implementation of hook_form_FORMID_alter() for views_exposed_form.
+ */
+function views_filters_selective_form_views_exposed_form_alter(&$form, $form_state) {
+  // Go through each filter checking for a 'selective' setting
+  foreach ($form_state['view']->filter as $field => $filter) {
+    if ($filter->options['exposed']) {
+
+      // Form element is designated by the element ID which is user-configurable
+      $field_id = $form['#info']["filter-$field"]['value'];
+      if (!isset($form[$field_id]['#options'])) continue;
+
+      // If using selective filters, filter the value_options based on view results
+      if ($filter->options['expose']['vfs_selective']) {
+        static $results = NULL;
+        static $query_fields = NULL;
+        $resultset = $filter->options['expose']['vfs_active'] ? 'active' : 'full';
+        if (empty($results[$resultset])) {
+          static $guard = FALSE; // We don't want to be back here when we execute the cloned view
+          if (!$guard) {
+            $guard = TRUE;
+            $view = $form_state['view']->clone_view();
+
+            // Add our selective field helper.
+            // This helper adds all selective filters as fields so that we can scan their values.
+            if (isset($view->display[$form_state['view']->current_display]->display_options['fields'])) {
+              $fields =& $view->display[$form_state['view']->current_display]->display_options['fields'];
+            }
+            else {
+              $fields =& $view->display['default']->display_options['fields'];
+            }
+            $fields['selective'] = array(
+              'label' => t('Selective helper'),
+              'link_to_node' => 0,
+              'exclude' => 1,
+              'id' => 'selective',
+              'table' => 'views',
+              'field' => 'selective',
+              'relationship' => 'none',
+              'override' => array('button' => 'Override'),
+              'empty' => '',
+              'empty_zero' => 0,
+              'hide_empty' => 0,
+            );
+
+            $view->set_items_per_page(0);
+            if (!$filter->options['expose']['vfs_active']) {
+              $view->set_exposed_input(array('dummy' => TRUE)); // Force the inputs to be empty even if $_GET is not empty
+            }
+            $view->execute($form_state['view']->current_display);
+            $results[$resultset] = $view->result;
+            $query_fields[$resultset] = $view->query->fields;
+            $view->destroy();
+            $guard = FALSE;
+          }
+        }
+        if (!empty($results[$resultset])) {
+          foreach ($query_fields[$resultset] as $query_field) {
+            if (/*$query_field['table'] == $filter->table && */$query_field['field'] == $filter->real_field) {
+              $field_alias = $query_field['alias'];
+              break;
+            }
+          }
+          if (!isset($field_alias)) {
+            // Do nothing.
+          }
+          else {
+            $options = array();
+            $null_option_exists = FALSE;
+            foreach ($results[$resultset] as $row) {
+              if (isset($row->$field_alias)) {
+                $options[$row->$field_alias] = TRUE;
+              }
+              else if (is_null($row->$field_alias)) {
+                $null_option_exists = TRUE;
+              }
+            }
+            if ($filter->options['expose']['optional']) {
+              $options['All'] = TRUE;
+            }
+            $form[$field_id]['#options'] = array_intersect_key($form[$field_id]['#options'], $options);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_FORMID_alter() for views_ui_config_item_form.
+ */
+function views_filters_selective_form_views_ui_config_item_form_alter(&$form, $form_state) {
+  if (empty($form['options']['expose'])) return;
+
+  // Is this a field we can override?
+  $overrideable = array('select', 'checkboxes', 'radios');
+  if (!in_array($form['options']['value']['#type'], $overrideable)) {
+    return;
+  }
+
+  // Build form elements for the right side of the exposed filter form
+  $right = array();
+
+  $right['vfs_selective'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Limit list to result set'),
+    '#default_value' => @$form_state['handler']->options['expose']['vfs_selective'],
+    '#description' => t(
+      'If checked, the only items presented to the user will be the ones present in the result set.'
+    ),
+  );
+
+  $right['vfs_active'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Further limit list to active filters'),
+    '#default_value' => @$form_state['handler']->options['expose']['vfs_active'],
+    '#description' => t(
+      'If checked, the items presented to the user will be further restricted according to
+       the values of all active exposed filters (i.e., those with selected values). 
+       This option will only kick in if the "!limit" above is checked.', 
+       array('!limit' => t('Limit list to result set'))
+    ),
+  );
+
+  $expose = $form['options']['expose'];
+  $first_chunk = array_splice($expose, 0, array_search('end_checkboxes', array_keys($expose)));
+  $form['options']['expose'] = array_merge($first_chunk, $right, $expose);
+}
+

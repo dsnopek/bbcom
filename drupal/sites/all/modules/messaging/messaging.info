@@ -1,0 +1,11 @@
+name = Messaging
+description = Messaging system. This is the base module for the Messaging Framework
+package = "Messaging"
+dependencies[] = autoload
+core = 6.x
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-4.x-dev"
+core = "6.x"
+project = "messaging"
+datestamp = "1298619642"
+

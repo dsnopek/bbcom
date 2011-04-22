@@ -1,0 +1,14 @@
+; $Id: rate_expiration.info,v 1.2 2010/10/13 22:22:59 mauritsl Exp $
+name = Rate Expiration
+description = Add an expiration time to rate widgets
+core = 6.x
+package = Voting
+dependencies[] = rate
+dependencies[] = date
+
+; Information added by drupal.org packaging script on 2011-02-22
+version = "6.x-1.1"
+core = "6.x"
+project = "rate"
+datestamp = "1298364143"
+

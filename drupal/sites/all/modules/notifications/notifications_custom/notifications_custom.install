@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the notifications_custom module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function notifications_custom_install() {
+  // Create tables.
+  drupal_install_schema('notifications_custom');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function notifications_custom_uninstall() {
+  // Remove tables
+  drupal_uninstall_schema('notifications_custom');
+
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function notifications_custom_schema() {
+  $schema['notifications_custom'] = array(
+    'description' => 'Stores custom subscriptions information.',
+    'fields' => array(
+      'csid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique custom subscription ID.',
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'Type of subscription, machine readable name.',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Name of the subscription type, shown to the end user.',
+      ),
+      'module' => array(
+        'description' => 'Module that defines this custom subscription.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Name of the subscription to display on user forms.',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'Explanation of the subscription to end users, long description.',
+      ),
+      'event_type' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'Type of event that triggers this subscription.',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Weight of subscription for forms.',
+      ),
+      'required' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Whether the user is required to enter a value. (0 = no, 1 = yes)',
+      ),
+      'register' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Whether the subscription is visible in the user registration form. (1 = yes, 0 = no)',
+      ),
+      'visibility' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'The level of visibility for the field. (0 = only admin, 1 = user editable)',
+      ),
+      'default_value' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Whether it is enabled by default. (0 = disabled, 1 = enabled)',
+      ),
+      'fields' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+        'description' => 'Serialized field and other aditional information.',
+      ),
+    ),
+    'primary key' => array('csid'),
+  );
+  return $schema;
+}
+
+/**
+ * Change explanation by description
+ */
+function notifications_custom_update_6000() {
+  $ret = array();
+  db_change_field($ret, 'notifications_custom', 'explanation', 'description', array('type' => 'text', 'not null' => FALSE));
+  return $ret;
+}
+
+/**
+ * Add default to module field
+ */
+function notifications_custom_update_6001() {
+  $ret = array();
+  db_field_set_default($ret, 'notifications_custom', 'module', '');
+  return $ret;
+}

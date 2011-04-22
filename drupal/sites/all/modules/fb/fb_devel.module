@@ -1,0 +1,704 @@
+<?php
+// $Id: fb_devel.module,v 1.63 2010/11/11 19:09:42 yogadex Exp $
+/**
+ * @file
+ * Makes development with Drupal for Facebook much easier.  Keep this
+ * module enabled until you're confident your app works perfectly.
+ *
+ * Produces warning messages and log messages
+ * when it detects something is wrong with
+ * your configuration.
+ *
+ * Runs tests for Drupal's status page.
+ *
+ */
+
+function fb_devel_menu() {
+  $items['fb/devel'] = array(
+    'page callback' => 'fb_devel_page',
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE, /* TODO: restrict access */
+  );
+
+  $items['fb/devel/fbu'] = array(
+    'page callback' => 'fb_devel_fbu_page',
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+  );
+
+  $items['fb/devel/tab'] = array(
+    'page callback' => 'fb_devel_tab',
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE, /* TODO: restrict access */
+  );
+
+  // Return some info for debugging AHAH problems
+  $items['fb/devel/js'] = array(
+    'page callback' => 'fb_devel_js',
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+
+function fb_devel_init() {
+  // fb_settings.inc sanity check.
+  if (isset($GLOBALS['fb_init_no_settings'])) {
+    if (user_access('access administration pages') && module_exists('fb_canvas')) {
+      drupal_set_message(t('!drupal_for_facebook has been enabled, but fb_settings.inc is not included in settings.php.  Please read the !readme.',
+                           array('!drupal_for_facebook' => l(t('Drupal for Facebook'), 'http://drupal.org/project/fb'),
+                                 // This link should work with clean URLs
+                                 // disabled.
+                                 '!readme' => '<a href='. base_path() . drupal_get_path('module', 'fb') .'/README.txt>README.txt</a>')), 'error');
+    }
+  }
+
+
+
+  // $conf['fb_apikey'] sanity check
+  if ($apikey = variable_get('fb_apikey', NULL)) {
+    if ($label = variable_get(FB_CONNECT_VAR_PRIMARY, NULL)) {
+      $fb_app = fb_get_app(array('label' => $label));
+      if ($fb_app && ($fb_app->apikey != $apikey)) {
+        $message = t('Drupal for Facebook has detected a problem.  \'fb_apikey\' (%fb_apikey) is not the same as the primary application %label (%fb_primary_apikey).',
+                     array(
+                       '%fb_apikey' => $apikey,
+                       '%fb_primary_apikey' => $fb_app->apikey,
+                       '%label' => $fb_app->label,
+                     ));
+        if (user_access(FB_PERM_ADMINISTER)) {
+          drupal_set_message($message, 'error');
+        }
+        watchdog('fb_devel', $message, array(), WATCHDOG_WARNING);
+      }
+    }
+  }
+
+  // fb_user table sanity check
+  if (db_result(db_query("SELECT count(*) FROM {authmap} WHERE module='fb_user'"))) {
+    $message = 'fb_user data has not been migrated from authmap table.  Run update.php.';
+    $args = array();
+    if (user_access('access administration pages')) {
+      drupal_set_message(t($message, $args), 'error');
+    }
+    watchdog('fb_devel', $message, $args, WATCHDOG_ERROR);
+  }
+}
+
+/**
+ * Implements hook_fb().
+ */
+function fb_devel_fb($op, $data, &$return) {
+  $fb_app = isset($data['fb_app']) ? $data['fb_app'] : NULL;
+  $fb = isset($data['fb']) ? $data['fb'] : NULL;
+  $errors = 0;
+
+  if ($op == FB_OP_INITIALIZE) {
+
+    if (fb_settings(FB_SETTINGS_APIKEY) &&
+        ($fb_app->apikey != fb_settings(FB_SETTINGS_APIKEY))) {
+      $message = t('Drupal for Facebook has detected a problem.  The initialized app has an apikey (%fb_app_apikey), while the settings indicates a different apikey (%fb_settings_apikey).', array(
+                     '%fb_app_apikey' => $fb_app->apikey,
+                     '%fb_settings_apikey' => fb_settings(FB_SETTINGS_APIKEY),
+                   ));
+      drupal_set_message($message, 'error');
+      watchdog('fb_devel', $message, array(), WATCHDOG_WARNING);
+      $errors++;
+    }
+
+    // This value comes from url rewriting.  Recommended on canvas pages.
+    $apikey = fb_settings(FB_SETTINGS_CB);
+
+    // Sanity check.
+    if ($apikey && $apikey != $fb_app->apikey) {
+      $message = t('fb_app id (%fb_app_id) does not equal fb settings id (%fb_settings_id).  This is usually caused by the wrong callback url on your <a href="!url">facebook application settings form</a>.',
+                   array('%fb_app_id' => $fb_app->apikey,
+                         '%fb_settings_id' => $apikey,
+                         '!url' => "http://www.facebook.com/developers/apps.php",
+                   ));
+      drupal_set_message($message, 'warning');
+      watchdog('fb_devel', $message, array(), WATCHDOG_WARNING);
+      $errors++;
+    }
+
+    // Theme sanity check.  Earlier errors cause this to fail.
+    global $theme; // for debug message
+    if (!$errors && isset($theme) && !variable_get('site_offline', FALSE)) {
+      $message = t('Drupal for Facebook is unable to override the theme settings.  This is usually because some module causes theme_init() to be invoked before fb_init().  See the !readme.',
+                 array(
+                   '!drupal_for_facebook' => l(t('Drupal for Facebook'), 'http://drupal.org/project/fb'),
+                   // This link should work with clean URLs
+                   // disabled.
+                   '!readme' => '<a href='. base_path() . '/' . drupal_get_path('module', 'fb') . '/README.txt>README.txt</a>'));
+      drupal_set_message($message, 'error');
+      watchdog('fb_devel', $message, array(), WATCHDOG_WARNING);
+    }
+
+    // Catch badly formed links ASAP.
+    if ($apikey && !fb_is_canvas() && !fb_is_tab()) {
+      // Skip check on callbacks from facebook.
+      if ((arg(0) != 'fb_app') || (arg(1) != 'event')) {
+        $message = t('URL starts with %prefix.  This should never happen on connect pages.  Did the previous page have a badly formed link?', array(
+                     '%prefix' => FB_SETTINGS_CB . '/' . $apikey,
+                   ));
+        drupal_set_message($message, 'error');
+        $errors++;
+      }
+    }
+
+    // path replacement sanity check
+    global $base_path;
+    if ($base_path == "/{$fb_app->canvas}/") {
+      $message = t('Facebook canvas page matches Drupal base_path (%base_path).  This is currently not supported.',
+                   array('%base_path' => $base_path));
+      drupal_set_message($message, 'error');
+      watchdog('fb_devel', $message);
+    }
+
+    // Old API Sanity check.
+    if (isset($_REQUEST['fb_sig'])) {
+      $message = t('Passed old-style fb_sig parameters.  Go to !url, edit your application.  Under "migrations" enable "new sdks".', array(
+                     '!url' => 'http://www.facebook.com/developers/apps.php',
+                   ));
+      dpm($message);
+      watchdog('fb_devel', $message);
+    }
+
+    // server URL sanity check
+    // This is an expensive test, because it invokes api_client.
+    try {
+      $props = $fb->api(array(
+                 'method' => 'admin.getAppProperties',
+                 'access_token' => fb_access_token($fb),
+                 'properties' => array('connect_url', 'callback_url'),
+               ));
+      $props = json_decode($props, TRUE);
+      if (is_array($props)) {
+        foreach ($props as $prop => $url) {
+          if ($url && (strpos($url, $GLOBALS['base_url']) === FALSE)) {
+            $message = t('The Facebook Application labeled %label has a suspicious %prop.  The value is %value, while something starting with %url was expected.  Consider editing !applink.', array(
+                         '%label' => $fb_app->label,
+                         '%prop' => $prop,
+                         '%value' => $url,
+                         '%url' => $GLOBALS['base_url'],
+                         '!applink' => l($fb_app->label, FB_PATH_ADMIN_APPS . '/' . $fb_app->label),
+                       ));
+
+            if (user_access('access administration pages')) {
+              drupal_set_message($message, 'error');
+            }
+            watchdog('fb_devel', $message);
+          }
+        }
+      }
+    }
+    catch (Exception $e) {
+      dpm($e, __FUNCTION__);
+      if ($e->getCode() == 102) {
+        // Session key invalid or no longer valid 102, which we can ignore.
+      }
+      else {
+        fb_log_exception($e, t('Failed to get app properties for %name.', array('%name' => $fb_app->title)));
+      }
+    }
+
+    // App data sanity checks.
+    $fb_app_data = fb_get_app_data($fb_app);
+
+    // Account mapping format has changed!
+    if (isset($fb_app_data['fb_user']) && !is_array($fb_app_data['fb_user']['map_account'])) {
+      $message = 'The options for mapping facebook account to local accounts has changed.  You must manually <a href=!url>edit your application</a>.  Look for the map accounts options under facebook user settings.';
+      $args = array('!url' => url(FB_PATH_ADMIN_APPS . '/' . $fb_app->label));
+      if (user_access('access administration pages')) {
+        drupal_set_message(t($message, $args), 'error');
+      }
+      watchdog('fb_devel', $message, $args, WATCHDOG_ERROR);
+    }
+
+  }
+
+  elseif ($op == FB_APP_OP_EVENT) {
+    $type = $data['event_type'];
+    // Facebook has notified us of some event.
+    $message = t('Facebook has notified the %label application of a %type event.',
+                 array('%label' => $fb_app->label,
+                       '%type' => $type));
+    $message .= dprint_r($data, 1);
+    $message .= dprint_r($_REQUEST, 1);
+    watchdog('fb_devel', $message);
+  }
+
+  elseif ($op == FB_OP_JS) {
+    // Start debugger
+    //$return[] = "debugger; // added by fb_devel.module";
+  }
+
+  elseif ($op == FB_OP_POST_INIT) {
+    if (isset($_SESSION['fb_devel'])) {
+      // Counter helps track how long session has been around.
+      $_SESSION['fb_devel']['FB_OP_POST_INIT'] = $_SESSION['fb_devel']['FB_OP_POST_INIT'] + 1;
+    }
+    else {
+      $_SESSION['fb_devel']['FB_OP_POST_INIT'] = 1;
+    }
+
+    // Javascript to help us with sanity checks.
+    drupal_add_js(array(
+                    'fb_devel' => array(
+                      'session_id' => session_id(),
+                      'session_name' => session_name(),
+                    ),
+                  ), 'setting');
+  }
+  elseif ($op == FB_OP_AJAX_EVENT) {
+    if (fb_verbose() == 'extreme' && FALSE) { // disabled to prevent console not defined error.
+      $session_id = session_id();
+      $session_name = session_name();
+      $return[] = "console.log('fb_devel.module extreme verbosity: original session_id is ' + Drupal.settings.fb_devel.session_name + ':' + Drupal.settings.fb_devel.session_id + ', session_id during FB_OP_AJAX_EVENT is $session_name:$session_id');";
+      $fbu = fb_facebook_user($data['fb']);
+      $return[] = "console.log('fb_facebook_user() during FB_OP_AJAX_EVENT is $fbu, data[event_data][fbu] is {$data[event_data][fbu]}');";
+      $return[] = "console.log('_COOKIE[fbu_{$fb_app->apikey}] is " . $_COOKIE['fbu_' . $fb_app->apikey] . "');";
+      $return[] = "FB_JS.reload();";
+    }
+  }
+}
+
+/**
+ * Provides a page with useful debug info.
+ *
+ * @TODO - clean this up and rely less on drupal_set_message() and dpm().
+ */
+function fb_devel_page() {
+  global $_fb, $_fb_app;
+  global $user;
+
+  if (isset($_REQUEST['require_login']) && $_REQUEST['require_login'])
+    $_fb->require_login();  // @TODO - find a way to do this with new api.
+
+  if ($_fb) {
+    // TODO: determine whether connect page or canvas.
+
+    drupal_set_message(t("session name: " . session_name()));
+    drupal_set_message(t("cookie domain: " . fb_settings(FB_SETTINGS_COOKIE_DOMAIN)));
+    drupal_set_message(t("session id: " . session_id()));
+    if (isset($_COOKIE['fbs_' . $_fb_app->apikey]))
+      drupal_set_message(t("fbs_" . $_fb_app->apikey . ": " . $_COOKIE["fbs_" . $_fb_app->apikey]));
+    drupal_set_message(t("<a href=\"!url\">processed link</a>, <a href=!url>unprocessed</a>", array('!url' => url('fb/devel'))));
+    drupal_set_message(t("getUser() returns " . $_fb->getUser()));
+
+    drupal_set_message(t("base_url: " . $GLOBALS['base_url']));
+    drupal_set_message(t("base_path: " . $GLOBALS['base_path']));
+    drupal_set_message(t("url() returns: " . url()));
+  }
+
+  if ($fbu = fb_get_fbu($user)) {
+    $path = "fb/devel/fbu/$fbu";
+    drupal_set_message(t("Learn more about the current user at !link",
+                         array('!link' => l($path, $path))));
+  }
+
+  dpm(fb_get_fbu($user), 'Facebook user via fb_get_fbu');
+  //dpm($user, "Local user " . theme('username', $user));
+
+  if (isset($GLOBALS['fb_connect_apikey'])) {
+    drupal_set_message(t("fb_connect_apikey = " . $GLOBALS['fb_connect_apikey']));
+  }
+
+  dpm(fb_settings(), 'fb_settings()');
+  dpm($_COOKIE, 'cookie');
+  dpm($_REQUEST, "Request");
+  //dpm($_fb_app, "fb_app");
+  drupal_set_message(t("session_id returns " . session_id()));
+  dpm($_SESSION, "session:");
+
+  return "This is the facebook debug page.";
+}
+
+
+/**
+ * Provides a profile tab (FBML) with useful debug info.
+ *
+ */
+function fb_devel_tab() {
+  global $_fb, $_fb_app;
+  global $user;
+
+  $info['session_id'] = session_id();
+  $info['session_name'] = session_name();
+  $info['cookie domain'] = fb_settings(FB_SETTINGS_COOKIE_DOMAIN);
+
+  // Tests for links
+  $link_test = url(fb_scrub_urls($_REQUEST['q']), array('absolute' => TRUE));
+  $info['link test'] = "<a href=\"$link_test\">link test (processed)</a>";
+  $info['link test 2'] = "<a href='$link_test'>link test (not processed)</a>";
+
+  //$info['fb_app'] = $_fb_app;
+  //$info['fb'] = $_fb;
+  $info['fb_settings'] = fb_settings();
+  $info['REQUEST'] = $_REQUEST;
+  $info['SESSION'] = $_SESSION;
+  $info['COOKIE'] = $_COOKIE;
+
+  if (isset($_fb)) {
+    $info['fb->getSignedRequest()'] = $_fb->getSignedRequest();
+    $fbu = fb_facebook_user();
+    try {
+      $info["fb->api(/$fbu)"] = $_fb->api('/' . $fbu);
+    }
+    catch (Exception $e) {
+      $info["fb->api(/$fbu)"] = $e->getMessage();
+    }
+
+    if ($app_id = $_REQUEST['fb_sig_app_id']) {
+      try {
+        $info['fb->api(fb_sig_app_id)'] = $_fb->api($_REQUEST['fb_sig_app_id']);
+      }
+      catch (Exception $e) {
+        $info['fb->api(fb_sig_app_id)'] = $e->getMessage();
+      }
+    }
+  }
+
+  print '<p>fb_devel.module tab</p>';
+  foreach ($info as $key => $value) {
+    print "<p>$key:\n";
+    if (is_array($value)) {
+      print '<pre>' . check_plain(print_r($value, 1)) . '</pre>';
+    }
+    elseif (is_object($value)) {
+      print '<pre>' . check_plain(print_r($value, 1)) . '</pre>';
+    }
+    else {
+      print '<pre>' . $value . '</pre>';
+    }
+    print "\n</p>\n\n";
+  }
+
+  exit();
+}
+
+/**
+ * A page which tests function which work with facebook user ids
+ */
+function fb_devel_fbu_page($fbu = NULL) {
+  global $_fb, $_fb_app;
+  if ($fbu) {
+    $info = $_fb->api($fbu, array('metadata' => 1));
+    $output = "<p>Debug info about facebook id $fbu ({$info[name]}):</p>\n";
+    $output .= "<img src=http://graph.facebook.com/$fbu/picture></img>";
+    $output .= "<pre>" . print_r($info, 1) . "</pre>";
+
+    foreach (array('statuses') as $connection) {
+      try {
+        if ($data = $_fb->api($fbu . '/' . $connection)) {
+          $output .= "<p>$connection<pre>";
+          $output .= print_r($data, 1);
+          $output .= "</pre></p>\n\n";
+        }
+      }
+      catch (FacebookApiException $e) {
+        fb_log_exception($e, t('Failed to lookup %connection', array('%connection' => $fbu . '/' . $connection)));
+      }
+    }
+    try {
+      $friends = $_fb->api($fbu . '/friends');
+      //dpm($friends, "$fbu/friends returned");
+      $items = array();
+      foreach ($friends['data'] as $data) {
+        $items[] = l($data['name'], "fb/devel/fbu/{$data[id]}");
+      }
+      if (count($items)) {
+        $output .= "\n<p>Known friends:<ul><li>";
+        $output .= implode("</li>\n  <li>", $items);
+        $output .= "</li></ul></p>\n\n";
+      }
+    }
+    catch (FacebookApiException $e) {
+      fb_log_exception($e, t('Failed to lookup friends of facebook user %fbu', array('%fbu' => $fbu)));
+    }
+
+
+    $local_friends = fb_user_get_local_friends($fbu);
+
+    $items = array();
+    foreach ($local_friends as $uid) {
+      $account = user_load(array('uid' => $uid));
+      $items[] = theme('username', $account);
+    }
+    if (count($items)) {
+      $output .= "\n<p>Local friends:<ul><li>";
+      $output .= implode("</li>\n  <li>", $items);
+      $output .= "</li></ul></p>\n\n";
+    }
+  }
+  else
+    drupal_set_message(t("You have to specify a facebook user id."), 'error');
+  return $output;
+}
+
+
+/**
+ * Provide some information for testing AHAH and AJAX scenarios.
+ */
+function fb_devel_js() {
+  $data = '<pre>';
+
+  $data .= "session_name() = " . session_name() . "\n";
+  $data .= "session_id() = " . session_id() . "\n";
+  $data .= "REQUEST: " . dprint_r($_REQUEST, 1) . "\n";
+  $data .= "SESSION: " . dprint_r($_SESSION, 1) . "\n";
+  $data .= '</pre>';
+
+  print drupal_json(array('status' => TRUE, 'data' => $data));
+  exit();
+}
+
+function fb_devel_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    // Provide two copies of same block, for iframe scenarios.
+    $items[0]['info'] = t('Facebook Devel Page Info');
+    $items[1]['info'] = t('Facebook Devel Page Info 2');
+    return $items;
+  }
+  elseif ($op == 'view') {
+    if (user_access('access devel information')) {
+      return array('subject' => t('Facebook Devel Info'),
+                   'content' => drupal_get_form('fb_devel_info'));
+    }
+  }
+}
+
+function fb_devel_info() {
+  global $_fb, $_fb_app;
+  global $user;
+  global $base_url;
+  global $base_path;
+
+  $info = array();
+
+  if ($_fb) {
+    if (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_CANVAS) {
+      $info['Page Status'] = t('Serving canvas page.');
+    }
+    elseif (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_CONNECT) {
+      $info['Page Status'] = t('Connected via Facebook Connect');
+    }
+    elseif (!fb_settings(FB_SETTINGS_TYPE)) {
+      $info['Page Status'] = t('Facebook SDK iniatilized. User is not logged into facebook or has not authorized application.');
+    }
+    else {
+      $info['Page Status'] = t('Global fb instance is set, but page type unknown (%type).',
+                               array('%type' => fb_settings(FB_SETTINGS_TYPE),
+                               ));
+    }
+    $fbu = fb_facebook_user();
+    $info['fb_facebook_user'] = $fbu;
+
+    if (!$fbu) {
+      $info['login button'] = theme('fb_login_button', 'Connect');
+      $info['login link'] = "<a href=# onclick='FB.login(function(response) {alert(\"FB.login() success.\");}, {perms:Drupal.settings.fb.perms}); return false;'>fb login</a>";
+    }
+
+    // Tests for link on canvas pages (iframe cookie test)
+    //$link_test = url(fb_scrub_urls($_REQUEST['q']), array('absolute' => TRUE));
+    //$info['link test'] = "<a href=\"$link_test\">link test (processed)</a>";
+    //$info['link test 2'] = "<a href='$link_test'>link test (not processed)</a>";
+
+    if ($fbu) {
+      if (!fb_api_check_session($_fb)) {
+        $info['fb_api_check_session()'] = t('Returned FALSE');
+      }
+      else {
+        $info['fb_api_check_session()'] = t('Returned TRUE');
+      }
+    }
+  }
+  else {
+    $info['Page Status'] = t('Not a canvas page.');
+  }
+  // Use theme_username() rather than theme('username') because we want link to local user, even when FBML is enabled
+  $info['local user'] = theme_username($user);
+  $info['fb_get_fbu'] = fb_get_fbu($user->uid);
+  $info['base_url'] = $base_url;
+  $info['base_path'] = $base_path;
+  $info['url() returns'] = url();
+  $info['$_REQUEST[q] is'] = isset($_REQUEST['q']) ? $_REQUEST['q'] : NULL;
+  $info['arg(0) is'] = arg(0);
+  $info['arg(1) is'] = arg(1);
+  $info['session_id'] = session_id();
+  $info['session_name'] = session_name();
+  $info['fbsettings(FB_SETTINGS_COOKIE_DOMAIN)'] = fb_settings(FB_SETTINGS_COOKIE_DOMAIN);
+
+  $info['request'] = $_REQUEST;
+  $info['user'] = $GLOBALS['user'];
+  $info['fb_app'] = $_fb_app;
+  $info['session'] = $_SESSION;
+  $info['cookies'] = $_COOKIE;
+
+
+  if ($_fb) {
+    $info['signed_request'] = $_fb->getSignedRequest();
+    try {
+      // app properties
+      $token = fb_access_token();
+      $props = $_fb->api(array(
+                           'method' => 'admin.getAppProperties',
+                           'properties' => 'about_url', 'application_name',
+                           'access_token' => $token,
+                         ));
+      $info['application properties'] = $props;
+
+    }
+    catch (FacebookApiException $e) {
+      fb_log_exception($e, "failed to get app properties");
+    }
+    $info["fb->getSession()"] = $_fb->getSession();
+    $info["fb->getSignedRequest()"] = $_fb->getSignedRequest();
+    if ($fbu) {
+      try {
+        $info["fb->api($fbu)"] = $_fb->api($fbu, array(
+                                             'access_token' => fb_access_token($_fb),
+                                           ));
+      }
+      catch (FacebookApiException $e) {
+        fb_log_exception($e, "failed to look up _fb->api($fbu)");
+      }
+    }
+  }
+
+  $form = array();
+  foreach ($info as $key => $val) {
+    if (is_string($val) || is_numeric($val) || !$val) {
+      $form[] = array('#value' => t($key) . ' = ' . $val,
+                      '#weight' => count($form),
+                      '#suffix' => '<br/>',
+      );
+
+    }
+    else {
+      $form[] = array(
+        '#type' => 'fieldset',
+        '#title' => t($key),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#weight' => count($form),
+        'value' => array(
+          '#prefix' => '<pre>',
+          '#suffix' => '</pre>',
+          '#type' => 'markup',
+          '#value' => dprint_r($val, 1)),
+      );
+    }
+  }
+  // It's not really a form, but we like collapsible fieldsets
+  return $form;
+}
+
+/**
+ * Implements hook_user().
+ */
+function fb_devel_user($op, &$edit, &$account, $category = NULL) {
+  if ($op == 'view') {
+    if (user_access('administer users') && user_access('access devel information')) {
+      $account->content['fb_devel'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Drupal for Facebook Devel'),
+        '#description' => t('Information from facebook API, visible only to administrators.'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#weight' => 99,
+      );
+      foreach (fb_get_all_apps() as $fb_app) {
+        $account->content['fb_devel'][$fb_app->label] = array(
+          '#type' => 'fieldset',
+          '#title' => $fb_app->title,
+        );
+        if ($fbu = fb_get_fbu($account, $fb_app)) {
+          $fb = fb_api_init($fb_app);
+          try {
+            $info = $fb->api("/$fbu");
+            //$info = fb_users_getInfo(array($fbu), $fb, TRUE);
+            $account->content['fb_devel'][$fb_app->label]['info'] = array(
+              '#type' => 'markup',
+              '#value' => dprint_r($info, 1),
+            );
+          }
+          catch (Exception $e) {
+            $account->content['fb_devel'][$fb_app->label]['#description'] = $e->getMessage();
+            $account->content['fb_devel'][$fb_app->label]['info'] = array(
+              '#type' => 'fieldset',
+              '#title' => t('Failed to get info for !app.',
+                            array('!app' => $fb_app->title)),
+              '#collapsible' => TRUE,
+              '#collapsed' => TRUE,
+              'exception' => array(
+                '#type' => 'markup',
+                '#value' => dprint_r($e, 1),
+              ),
+            );
+          }
+        }
+        else {
+          $account->content['fb_devel'][$fb_app->label]['info'] = array(
+            '#type' => 'markup',
+            '#value' => t('No mapping to a facebook account.'),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_cron().
+ *
+ * Remove obsolete data from {users} table.  Not a serious problem,
+ * just cruft in the database which should never have been saved.
+ * Clean it up.
+ */
+function fb_devel_cron() {
+  $limit = 10;
+  $result = db_query('SELECT * FROM {users} WHERE data LIKE "%\"app_specific\"%" OR data LIKE "%\"is_app_user\"%" OR data LIKE "%\"fbu\"%" LIMIT %d', $limit);
+
+  while ($account = db_fetch_object($result)) {
+    $data = unserialize($account->data);
+    // Clean out the bogus data.
+    foreach (array('app_specific', 'username', 'fbu', 'info') as $key) {
+      unset($data[$key]);
+    }
+    db_query("UPDATE {users} SET data='%s' WHERE uid=%d",
+             serialize($data), $account->uid);
+    if (fb_verbose()) {
+      print(t('Cleaned up data for user %name (%uid), it is now: !data',
+              array('%name' => $account->name,
+                    '%uid' => $account->uid,
+                    '!data' => '<pre>' . print_r($data, 1) . '</pre>',
+              )));
+    }
+  }
+}
+
+
+function fb_devel_fb_tab($op, $data, &$return) {
+  // debug.
+  if (fb_verbose() == 'extreme') {
+    $return['fb_devel'] = array(
+      '#type' => 'markup',
+      '#value' => __FUNCTION__ . ':' . print_r($data, 1),
+      '#prefix' => '<pre>',
+      '#suffix' => '</pre>',
+      '#weight' => 99,
+    );
+    if ($data['profile_id']) {
+      $return['fb_devel']['profile_id'] = array(
+        '#type' => 'markup',
+        '#value' => __FUNCTION__ . ':' . print_r($data['fb']->api($data['profile_id']), 1),
+        '#prefix' => '<pre>',
+        '#suffix' => '</pre>',
+        '#weight' => 99,
+      );
+    }
+  }
+}

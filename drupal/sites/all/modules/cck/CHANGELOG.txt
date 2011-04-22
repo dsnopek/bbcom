@@ -1,0 +1,83 @@
+// $Id: CHANGELOG.txt,v 1.1.6.335.2.72 2009/12/29 16:14:20 markuspetrux Exp $
+
+CCK 6.x-3.x
+===========
+
+Features:
+- #428650 Conditional cache/menu rebuild for content CRUD methods.
+- #334945 Save default values when field is hidden because of access permissions.
+- #196421 Deleting unwanted multiple values / multiple values delta issues.
+- #119102 Combo field - group different fields into one.
+- #505278 Panels 3 and multiple node type fields.
+- #495582 Reviewed Panels 3 integration (prep work for combo / multigroups).
+  Implementation of fieldgroup_view_group() that can be used to render field groups.
+- #417122 by quicksketch: allow drupal_alter on field and widget settings.
+- #514452 Add new argument $node to content_access() to enhance the context for hook_field_access().
+- #523072 by merlinofchaos - Have nodereference relationships limit CCK field availability as well.
+- #519870 by joachim - Add a note to say offset starts from 0 in grouping options for views handler for multiple values fields.
+- #231453 Allow fields index their columns. Implemented for reference value column in node and user reference fields. Needs update.php.
+- #536730 Enhance cells in multiple column tables with CSS classes related to the fields they contain.
+- #521002 by mh86 - Support for optgroups in allowed values for select elements.
+- Render field descriptions as cell titles when multigroup edit mode is configured with multiple column option.
+- #244896 by stella, canaryMason - Add incremental classes for multiple value fields in views.
+- #416154 Preparation for Content Multigroup integration with Views.
+- #416154 by coltrane, skybow - Synchronized deltas Views integration: Filter on equal deltas in multigroups.
+- #227129 by igor.ro - Expose "delta" column in multiple value fields to Views.
+- #531662 by neochief - i18n support. Allow external modules to translate field labels, descriptions and allowed values list as typed in the field settings form.
+- #531662 i18n support for fieldgroups.
+- #558420 Accept trimmed titles in nodereference autocomplete validation to prevent title mismatch errors when title ends with space.
+- #580156 Wrap multigroups with unique CSS classes in node view.
+- #544542 Allow subgroup fieldsets in a multigroup to be collapsible.
+- #596428 by NancyDru - Allow external modules alter the content type list.
+
+Bugfixes:
+- #482774 Update breaks when CCK is disabled.
+- #479994 by quicksketch: fix "add more' button with devel.module's query logging (multigroup).
+- #499696 by DeFr - Noderefernce / Userreference: fix Views mode when the view has exposed filters.
+- #498924 #multiple FAPI attribute is used for a radios and checkboxes in content export forms.
+- #409144 Review extra elements for node edit form provided by core modules.
+- #361473 CCK fieldgroup panels doesn't respect CCK field privacy settings.
+- #515984 Multiple field delta ORDER BY incorrect.
+- #414298 by Michelle, merlinofchaos - Follow up to remove fieldgroup.panels.inc (it was moved to panels/content_types).
+- #522112 by hefox, prevent malformed condition for vid IN () in views handler for multiple values fields.
+- #505278 by Michelle, merlinofchaos - Provide backward compatibility with previous method to build Panels 3 subtype names for fields.
+- #523864 Minor coding style issues in Panels 3 relationships implementations.
+- #83787 Fix PHP warning: array_merge(): Argument #1 is not an array in content_multigroup.node_form.inc on line 432.
+- #481568 by merlinofchaos - Empty property error when attempting to save a user reference in Panels.
+- #510396 by yched - Use field/type definition to render fields in views.
+- #526500 Fix maximum number of deltas in multigroups with explicit number of repeats defined.
+- #393020 by auth - Fieldgroup data is lost when importing to module provided content type with group info for existing fields.
+- #538872 Diff does not respect field permissions.
+- #522558 Date field jumps delta when date field is emptied or fieldset is deleted.
+- #416134 Userreference, impossible to filter allowed values by blocked users. Requires update.php.
+- Minor fix in multigroup. Remove the check for module_exists('fieldgroup'), which is something implicit.
+- Minor fix in multigroup. Remove unused argument $form_id from invocation to worker functions in hook_form_alter().
+- #545942 warning: array_filter() [function.array-filter]: The first argument should be an array in userreference_update_6002().
+- #521002 Fix validation errors when using optgroups in allowed values for select elements.
+- #550252 by GuyPaddock - content_db_index_exists produces SQL errors when creating node reference fields for MySQL 4 (related to #231453).
+- #551280 by xurizaemon - Typo fix for "this field cannot hold more that 3 values" error message.
+- #558744 by chellomere - Fix one of the swedish translation strings to be correct, and much clearer.
+- #562260 by przadka - content_db_index_exists() has wrong syntax for PostgreSQL.
+- #567168 by jcmarco - Checkbox required not defined for on/off widgets.
+- #568430 by Jody Lynn - Bad @see in content-field.tpl.php.
+- #572672 by Jan van Diepen - Remove redundant (and bad) inclusion of node/content_types.inc in content_copy_import_form_submit().
+- #585048 Setting "All users" in "User status that can be referenced" option reverts to "Blocked users".
+- #589306 warning: Invalid argument supplied for foreach() in includes/panels/content_types/content_field.inc on line 166.
+- #551188 "Add another item" for FileField widgets causes Invalid argument supplied for foreach() in content.node_form.inc on line 456.
+- #605152 by pokurek - Missing number formatter fr_2.
+- #618910 Multigroup filter fails when using relationship.
+- #538458 Do not allow to change the widget type for fields in multigroups when the change is not compatible.
+- #604830 by mattyoung - 32 characters limit on field and group identifiers in "Manage fields" screen.
+- #464030 by eojthebrave - Typo in content_copy.module help.
+- #577590 Add a visual indication to the fieldgroup title if the multigroup is required.
+- #577590 Prevent validation errors when multigroup is not required and no subgroup of fields if filled in.
+- #577580 Multigroup fields with empty values loose their ordering when saved via node_save.
+- #614292 by DeFr - Fix CCK Reference fields based on views broken by recent change in views_plugin_style Views 2.7 (#502348).
+- #625768 CCK 6.x-2.6, got fatal error on update.php while running userreference_update_6002().
+- #640488 warning: max() [function.max]: Array must contain at least one element in content.module on line 1044.
+- #649106 by thekevinday: Fix content_copy_form_alter(), where $form_state argument is not passed by reference.
+- #669800 Do not enforce required attribute for multiple value fields the current user is not allowed to edit.
+- Fix validation of required fields and multigroups.
+
+Changes:
+- #421116 Move content.js to js/content.admin.js for consistency with location of new js files.

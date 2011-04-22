@@ -1,0 +1,12 @@
+<?php
+// $Id: views_summary_taxonomy.module,v 1.1.2.1 2010/05/22 13:50:26 kratib Exp $
+
+/**
+ * Implementation of hook_views_api.
+ */ 
+function views_summary_taxonomy_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+

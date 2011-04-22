@@ -1,0 +1,65 @@
+# German translation of cck (6.x-2.5)
+# Copyright (c) 2009 by the German translation team
+# Generated from files:
+#  content-admin-field-overview-form.tpl.php,v 1.1.2.6 2009/06/26 18:02:45 yched
+#  theme.inc,v 1.1.2.13 2009/04/28 23:06:37 yched
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cck (6.x-2.5)\n"
+"POT-Creation-Date: 2009-12-06 15:33+0100\n"
+"PO-Revision-Date: 2009-12-06 23:19+0100\n"
+"Last-Translator: Thomas Zahreddin <tz@it-arts.org>\n"
+"Language-Team: German <tz@it-arts.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: Germany\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: theme/content-admin-field-overview-form.tpl.php:11
+msgid "Weight"
+msgstr "Reihenfolge"
+
+#: theme/content-admin-field-overview-form.tpl.php:54
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: theme/content-admin-field-overview-form.tpl.php:60
+msgid "New field"
+msgstr "Neues Feld"
+
+#: theme/content-admin-field-overview-form.tpl.php:73
+msgid "Existing field"
+msgstr "Vorhandenes Feld"
+
+#: theme/content-admin-field-overview-form.tpl.php:85
+msgid "New group"
+msgstr "Neue Gruppe"
+
+#: theme/theme.inc:11
+msgid "Add fields and groups to the content type, and arrange them on content display and input forms."
+msgstr "Fügt Felder und Gruppen zu dem Inhaltstyp hinzu und ordnet diese auf der Inhaltsansicht und den Eingabeformularen an."
+
+#: theme/theme.inc:13
+msgid "You can add a field to a group by dragging it below and to the right of the group."
+msgstr "Ein Feld kann einer Gruppe hinzugefügt werden, indem es unterhalb der Zeile dieser Gruppe leicht nach rechts gezogen wird."
+
+#: theme/theme.inc:16
+msgid "Note: Installing the <a href=\"!adv_help\">Advanced help</a> module will let you access more and better help."
+msgstr "Hinweis: Die Installation des <a href=\"!adv_help\">Erweiterte Hilfe</a>-Modul ermöglicht den Zugriff auf weitere und bessere Hilfe."
+
+#: theme/theme.inc:111
+msgid "Configure how this content type's fields and field labels should be displayed when it's viewed in teaser and full-page mode."
+msgstr "Die Anzeige von Feldern und Bezeichnungen dieses Inhaltstyps konfigurieren, wenn dieser im Anrisstext und ganzseiten Modus angezeigt wird."
+
+#: theme/theme.inc:114
+msgid "Configure how this content type's fields should be displayed when it's rendered in the following contexts."
+msgstr "Die Anzeige von Feldern dieses Inhaltstyps konfigurieren, wenn dieser im folgenden Kontext angezeigt wird."
+
+#: theme/theme.inc:116
+msgid "Use the 'Exclude' checkbox to exclude an item from the !content value passed to the node template."
+msgstr "Das ‚Ausschließen‘-Ankreuzfeld kann verwendet werden, um einen Eintrag aus dem an die Beitragsvorlage (node.tpl) übergebenen !content-Wert zu entfernen."
+

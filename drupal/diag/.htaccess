@@ -1,0 +1,7 @@
+
+# Hide for now
+AuthType Basic
+AuthName "Restricted Files"
+AuthUserFile /home/dsnopek/http_secrets
+Require user lingdict
+

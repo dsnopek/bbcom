@@ -1,0 +1,49 @@
+<?php
+// $Id: webformblock.install,v 1.1 2009/04/29 14:57:02 budda Exp $
+
+/**
+ * @file
+ * Webform Block module install file.
+ */
+
+
+/**
+ * Define the 'webform_block' table structure.
+ *
+ * @return
+ *   The schema which contains the structure for the webformblock module's table.
+ */
+function webformblock_schema() {
+  $schema['webform_block'] = array(
+      'fields' => array(
+           'nid' => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11')),
+      'primary key' => array('nid'),
+  );
+  
+  return $schema;
+}
+
+
+/**
+ * Implementation of hook_install().
+ *
+ * Inserts the webformblock module's schema in to the SQL database.
+ */
+function webformblock_install() {
+  drupal_install_schema('webformblock');
+}
+
+
+/**
+ * Implementation of hook_uninstall().
+ *
+ * Remove the schema corresponding to the webformblock module.
+ */
+function webformblock_uninstall() {
+  drupal_uninstall_schema('webformblock');
+
+  // Clear the cache tables.
+  cache_clear_all('*', 'cache', TRUE);
+  cache_clear_all('*', 'cache_block', TRUE);
+  cache_clear_all('*', 'cache_page', TRUE);
+}

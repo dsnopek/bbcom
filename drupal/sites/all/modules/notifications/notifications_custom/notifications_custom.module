@@ -1,0 +1,448 @@
+<?php
+
+/**
+ * @file
+ * Custom notifications module
+ *
+ * Create custom predefined notifications and
+ * - Bulk operations to assign them to users
+ * - Force for new users or display on the registration form
+ */
+
+/**
+ * Implementation of hook_autoload_info().
+ */
+function notifications_custom_autoload_info() {
+  return array(
+    'Notifications_Custom_Subscription' => array('file' => 'notifications_custom.class.inc'),
+  );
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function notifications_custom_enable() {
+  // Needed by autoload
+  cache_clear_all();
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function notifications_custom_help($path, $arg) {
+  switch ($path) {
+    case 'admin/messaging/customsubs':
+      $output = '<p>' . t('You can create custom subscription types and make them available in the registration form or enforce them for new users. Once you have created one or more subscription types they can be assigned to one or more users on the <a href="@user-admin">User administration page</a>.', array('@user-admin' => url('admin/user/user/'))) . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function notifications_custom_menu() {
+  $items['admin/messaging/customsubs'] = array(
+    'title' => 'Custom subscriptions',
+    'description' => 'Create and manage custom subscriptions.',
+    'page callback' => 'notifications_custom_admin_page',
+    'access arguments' => array('administer notifications'),
+    'file' => 'notifications_custom.admin.inc',
+  );
+  $items['admin/messaging/customsubs/overview'] = array(
+    'title' => 'Custom subscriptions',
+    //'description' => 'Create and manage custom subscriptions.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/messaging/customsubs/csid/%notifications_custom'] = array(
+    'title' => 'Custom',
+    'description' => 'Create and manage custom subscriptions.',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('notifications_custom_form', 4),
+    'title callback' => 'notifications_custom_subscription_title',
+    'title arguments' => array(4),
+    'access arguments' => array('administer notifications'),
+    'file' => 'notifications_custom.admin.inc',
+  );
+  $items['admin/messaging/customsubs/csid/%notifications_custom/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    //'access arguments' => array('administer notifications'),
+  );
+  $items['admin/messaging/customsubs/csid/%notifications_custom/fields'] = array(
+    'title' => 'Fields',
+    'description' => 'Edit fields for custom subscription.',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('notifications_custom_fields_form', 4),
+    'access arguments' => array('administer notifications'),
+    'file' => 'notifications_custom.admin.inc',
+  );
+  $items['admin/messaging/customsubs/csid/%notifications_custom/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete subscription type and user subscriptions.',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('notifications_custom_delete_confirm', 4),
+    'access arguments' => array('administer notifications'),
+    'file' => 'notifications_custom.admin.inc',
+    'weight' => 100,
+  );
+
+  return $items;
+}
+
+/**
+ * Menu title callback
+ */
+function notifications_custom_subscription_title($subscription) {
+  return $subscription->title;
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function notifications_custom_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'register':
+      return notifications_custom_user_form($account, TRUE);
+
+    case 'update':
+    case 'insert':
+      if (!empty($edit['notifications_custom'])) {
+        notifications_custom_account_update($account, $edit['notifications_custom']);
+        $edit['notifications_custom'] = NULL;        
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_notifications().
+ */
+function notifications_custom_notifications($op) {
+  switch ($op) {
+    case 'subscription types':
+      if ($custom = notifications_custom_list()) {
+        foreach ($custom as $subs) {
+          $type = (array)$subs;
+          $type['custom'] = TRUE;
+          $type['class'] = 'Notifications_Custom_Subscription';
+          $types[$subs->type] = $type;
+        }
+        return $types;
+      }
+      break;
+
+    case 'subscription fields':
+      // To create custom subscriptions to specific event actions
+      $fields['event-action'] = array(
+        'name' => t('Action'),
+        'field' => 'event-action',
+        'type' => 'string',
+        'options callback' => 'notifications_custom_event_actions',
+      );
+      return $fields;
+
+  }
+}
+
+/**
+ * List event actions
+ */
+function notifications_custom_event_actions() {
+  return notifications_info('event actions');
+}
+
+/**
+ * Implementation of hook notifications_event()
+ * 
+ * Retrieve event action so we can create subscriptions to all node/action
+ */
+function notifications_custom_notifications_event($op, $event, $account = NULL) {
+  switch ($op) {
+    case 'query':
+      $query[]['fields'] = array('event-action' => $event->action);
+      return $query;
+  }
+}
+
+/**
+ * Build user account custom subscriptions form
+ */
+function notifications_custom_user_form($account, $register = FALSE) {
+  $form = $params = array();
+  if ($register) {
+    $params['register'] = 1;
+  }
+  if ($custom_list = notifications_custom_build_list($params, $account)) {
+    $visible = FALSE;
+    $form['notifications_custom'] = array(
+      '#tree' => TRUE,
+    );
+    foreach ($custom_list as $subscription) {
+      $visible = $visible || $subscription->is_visible();
+      $form['notifications_custom'][$subscription->type] = $subscription->form_element($register);
+    }
+    // If any of them is visible, add the full fieldset
+    if ($visible) {
+      $form['notifications_custom'] += array(
+        '#type' => 'fieldset', 
+        '#title' => t('Subscriptions')
+      );
+    }
+  }
+  return $form;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function notifications_custom_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'notifications_user_overview') {
+    $conditions = user_access('administer users') ? array() : array('visibility' => 1);
+    if ($custom = notifications_custom_build_list($conditions, $form['account']['#value'])) {
+      $form['custom'] = array('#type' => 'item', '#title' => t('edit subscriptions'), '#weight' => 25);
+      $form['custom']['notifications_custom']['#tree'] = TRUE;
+      foreach ($custom as $subscription) {
+        $form['custom']['notifications_custom'][$subscription->type] = $subscription->form_element();
+      }
+      $form['custom']['button'] = array('#type' => 'submit', '#value' => t('Update'));
+      $form['#submit'][] = 'notifications_custom_user_overview_submit';
+    }
+  }
+}
+
+/**
+ * Form submission with custom notifications
+ */
+function notifications_custom_user_overview_submit($form, $form_state) {
+  if (notifications_custom_account_update($form_state['values']['account'], $form_state['values']['notifications_custom'])) {
+    drupal_set_message(t('Your subscriptions have been updated'));
+  }
+}
+
+/**
+ * Update custom subscriptions for user account
+ *
+ * @param $account
+ *   User account
+ * @param $update
+ *   Array of type => status
+ *
+ * @return int
+ *   The number of updated subscriptions
+ */
+function notifications_custom_account_update($account, $update) {
+  $changed = 0;
+  foreach ($update as $type => $value) {
+    if ($subscription = notifications_custom_get_subscription($type, $account, TRUE)) {
+      if ($value && !$subscription->is_instance()) {
+        // Add new subscription       
+        $subscription->set_account($account);
+        if ($result = notifications_save_subscription($subscription)) {
+          $changed++;
+        }
+        else {
+          $message = !empty($subscription->error_message) ? $subscription->error_message : t('The subscription cannot be saved.');
+          drupal_set_message(t('Cannot create subscription !name. !message', array('!name' => $subscription->get_name(), '!message' => $message)), 'error');
+        }
+      }
+      elseif (!$value && $subscription->is_instance()) {
+        // Disable existing subscription
+        notifications_subscription_delete($subscription->sid);
+        $changed++;
+      }
+    }
+  }
+  return $changed;
+}
+
+/**
+ * Retrieve list of custom subscription types true objects
+ *
+ * @param $filter
+ *   Optional filter conditions. It only works with integer values
+ * @param $account
+ *   User account to get subscriptions for
+ */
+function notifications_custom_build_list($filter = array(), $account = NULL) {
+  $list = notifications_array_filter(notifications_custom_list(), $filter);
+  // Take out disabled types
+  $list = array_intersect_key($list, notifications_subscription_type_enabled());
+  // Now try to match all the parameters against each object in the list
+  foreach ($list as $type => $custom) {
+    $subscription = notifications_custom_build_subscription($custom);
+    $list[$custom->type] = $account ? $subscription->get_instance(array('uid' => $account->uid), TRUE) : $subscription;
+  }
+  return $list;
+}
+
+/**
+ * Get all custom subscriptions by type
+ */
+function notifications_custom_list() {
+  $cache = &messaging_static(__FUNCTION__);
+  if (!isset($cache)) {
+    $cache = array();
+    $result = db_query("SELECT * FROM {notifications_custom} ORDER BY weight");
+    while ($custom = db_fetch_object($result)) {
+      $custom->fields = !empty($custom->fields) ? unserialize($custom->fields) : array();
+      $cache[$custom->type] = $custom;
+    }
+  }
+  return $cache;
+}
+
+/**
+ * Rebuild list of custom subscriptions from modules and the database
+ */
+function notifications_custom_rebuild() {
+  $custom = array();
+  $result = db_query("SELECT * FROM {notifications_custom}");
+  while ($subs = db_fetch_object($result)) {
+    $custom[$subs->type] = $subs;
+  }
+  // Get custom subscriptions defined by modules and merge with the ones in db
+  $modules = notifications_info('custom subscriptions');
+  foreach ($modules as $type => $subs) {
+    if (empty($custom[$type])) {
+      $subs = (object)$subs;
+      $subs->type = $type;
+      drupal_write_record('notifications_custom', $subs);
+      $custom[$type] = $subs;
+    }
+  }
+}
+
+/**
+ * Delete custom subscription and optionally all instances of it
+ *
+ * @param $type
+ *   Custom subscription type to delete
+ * @param $instances
+ *   Delete also subscription instances
+ */
+function notifications_custom_delete($type, $instances = FALSE) {
+  if ($instances) {
+    notifications_delete_subscriptions(array('type' => $type));
+  }
+  db_query("DELETE FROM {notifications_custom} WHERE type = '%s'", $type);
+}
+
+/**
+ * Load custom subscription type. Menu autoloading
+ *
+ * @param $key
+ *   It may be csid (integer) or type (string)
+ */
+function notifications_custom_load($key) {
+  $cache = &messaging_static(__FUNCTION__);
+  if (!isset($cache[$key])) {
+    $where = is_numeric($key) ? 'csid = %d' : "type = '%s'";
+    $template = db_fetch_object(db_query('SELECT * FROM {notifications_custom} WHERE ' . $where , $key));
+    if ($template) {
+      $template->fields = !empty($template->fields) ? unserialize($template->fields) : array();
+      //$subscription = notifications_custom_build_subscription($template);
+      // Cache by type and id
+      $cache[$template->csid] = $template;
+      $cache[$template->type] = $template;
+    }
+    else {
+      $cache[$key] = FALSE;
+    }
+  }
+
+  return $cache[$key];
+}
+
+/**
+ * Get subscription object from custom subscription type
+ *
+ * @param $template
+ *   Custom subscription template (object) or type (string)
+ */
+function notifications_custom_build_subscription($template) {
+  $template = is_object($template) || is_array($template) ? $template : notifications_subscription_types($template);
+  if ($template) {
+    return Notifications_Custom_Subscription::build($template);
+  }
+  else {
+    return NULL;
+  }
+}
+
+/**
+ * Get user subscription for a custom one or subscription type if not available
+ *
+ * @param $type
+ *   Custom subscription type
+ * @param $account
+ *   User account
+ * @param $return_template
+ *   Return subscription template if not found for this user
+ */
+function notifications_custom_get_subscription($type, $account, $return_template = FALSE) {
+  if ($subscription = notifications_custom_build_subscription($type)) {
+    $subscription->set_account($account);
+    return $subscription->get_instance(array('uid' => $account->uid), $return_template);
+  }
+}
+
+/**
+ * Implementation of hook_user_operations().
+ */
+function notifications_custom_user_operations($form_state = array()) {
+  $operations = array();
+  if (user_access('administer notifications') && ($custom_list = notifications_custom_list())) {
+    foreach ($custom_list as $subs) {
+      $subs_options['custom_subscribe-' . $subs->type] = $subs->name;
+    }
+    $operations = array(
+      t('Add subscription for selected users') => array('label' => $subs_options),
+    );
+    // If the form has been posted, we need to insert the proper data for adding subscriptions
+    if (!empty($form_state['submitted'])) {
+      $operation_subs = explode('-', $form_state['values']['operation']);
+      $operation = $operation_subs[0];
+      if ($operation == 'custom_subscribe') {
+        $type = $operation_subs[1];
+        $operations[$form_state['values']['operation']] = array(
+            'callback' => 'notifications_custom_user_multiple_subscribe',
+            'callback arguments' => array($type),
+        ); 
+      }
+    }
+  }
+  return $operations;
+}
+
+/**
+ * User operations callback. Bulk subscribe multiple accounts
+ */
+function notifications_custom_user_multiple_subscribe($accounts, $type) {
+  $custom = notifications_custom_build_subscription($type);
+  $count = 0;
+  foreach ($accounts as $uid) {
+    // Skip subscribing the user if they already are subscribed.
+    if (!notifications_custom_get_subscription($type, $uid)) {
+      $subscription = clone($custom);
+      $subscription->uid = $uid;
+      notifications_save_subscription($subscription);
+      $count ++;
+    }
+  }
+  drupal_set_message(format_plural($count, 'A user has been subscribed.', '@count users have been subscribed.')); 
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function notifications_custom_theme() {
+  return array(
+    'notifications_custom_fields' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'notifications_custom.admin.inc',
+    ),
+  );
+}

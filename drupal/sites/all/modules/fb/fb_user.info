@@ -1,0 +1,13 @@
+name= User Management (fb_user.module)
+description = Maps local user accounts to facebook user ids.  Creates local accounts for app users when configured to do so.
+package = Drupal for Facebook
+dependencies[] = fb
+dependencies[] = fb_app
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-11-14
+version = "6.x-3.0-rc1"
+core = "6.x"
+project = "fb"
+datestamp = "1289697375"
+

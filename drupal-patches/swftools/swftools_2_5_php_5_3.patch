@@ -1,0 +1,53 @@
+? swftools_2_5_php_5_3.patch
+Index: swftools.module
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/swftools/swftools.module,v
+retrieving revision 1.20.2.16
+diff -u -p -r1.20.2.16 swftools.module
+--- swftools.module	18 Apr 2009 23:30:52 -0000	1.20.2.16
++++ swftools.module	6 Jul 2010 12:58:52 -0000
+@@ -497,9 +497,9 @@ function swf($file, $options = array()) 
+   // all existing values by reference to allow optional override at the player.module level.
+   if (module_hook($resolved_methods->player['module'], 'swftools_flashvars')) {
+ 
+-    // Get player flashvars
+-    $player_flashvars = module_invoke($resolved_methods->player['module'], 'swftools_flashvars', $action, $resolved_methods, $vars);
+-    
++  // Get player flashvars - use a custom invoke to allow pass by reference
++  $player_flashvars = swftools_flashvars_invoke($action, $resolved_methods, $vars);
++
+     // Merge player flashvars with existing flashvars
+     if (is_array($player_flashvars)) {
+       $vars->flashvars = array_merge($vars->flashvars, $player_flashvars);
+@@ -1927,3 +1927,31 @@ function theme_swftools_formatter_playli
+   return swf($files);
+   
+ }
++
++/**
++* Invokes hook_swftools_flashvars() in the relevant player module.
++*
++* We cannot use module_invoke() for this, because the arguments need to be passed by reference.
++*
++* @param $action
++*   String defining the action that is to be performed, eg SWFTOOLS_FLV_DISPLAY
++* @param &$methods
++*   Object containing two keys - player and method. Each consists of an array
++*   that defines the details of the resolved player and embedding method that
++*   is being used for this file.
++* @param &$vars
++*   Object containing three keys - othervars, flashvars and params. These are
++*   arrays containing key/value pairs that contain all the data assigned to this
++*   file so far. Refer to swf() for more details about the $vars array.
++* @return
++*   Return an array of flashvars needed to allow the player to work.
++*/
++function swftools_flashvars_invoke($action, &$methods, &$vars) {
++
++  // Build the name of the function we are going to call
++  $function = $methods->player['module'] . '_swftools_flashvars';
++ 
++  // Call the function and return the resulting flashvars to the caller
++  return($function($action, $methods, $vars));
++
++}

@@ -1,0 +1,71 @@
+<?php
+/**
+ * @file
+ * Simple mail using Drupal API. Messaging method plug-in
+ * 
+ * @ TO DO Review filtering
+ */
+
+/**
+ * Implementation of hook_messaging
+ */
+function messaging_privatemsg_messaging($op) {
+  switch($op) {
+    case 'send methods':
+      $info['privatemsg'] = array(
+        'title' => 'Privatemsg',
+        'name' => t('Private message'),
+        'group' => 'web',
+        'type' => MESSAGING_TYPE_SEND,
+        'address_type' => 'user', // Which kind of address this method uses
+        'access' => 'read privatemsg',
+        'glue' => "\n",
+        'description' => t('Send messages through Privatemsg'),
+        'send callback' => 'messaging_privatemsg_send_msg', // Sending callback
+        'filter' => 'messaging_filter', // Default filter for this format
+        'anonymous' => FALSE, // This method is not valid for anonymous users
+      );
+      return $info;  
+  }
+}
+
+/**
+ * Send mail message to user accounts
+ * 
+ * Privatemsg API documentation on http://drupal.org/node/369399
+ * As we cannot use privatemsg_new_thread(), we bypass validation
+ * and send the message with the internal function _privatemsg_send()
+ * 
+ * See http://drupal.org/node/726874
+ * 
+ * @param $destination
+ *   User account or user id
+ */
+function messaging_privatemsg_send_msg($destination, $message) {
+  // Prepare the privatemsg parameters
+  $recipient = messaging_user_object($destination);
+  $author = $message->get_sender();
+
+  $privatemsg = array();
+  $privatemsg['subject'] = $message->get_subject();
+  $privatemsg['body'] = $message->get_body();
+  $privatemsg['recipients'][$recipient->uid] = $recipient;
+
+  // Apply defaults - this will not overwrite existing keys.
+  $privatemsg += array(
+    'author' => $author,
+    'timestamp' => time(),
+    'format' => filter_resolve_format(FILTER_FORMAT_DEFAULT),
+  );
+  
+  // Send
+  $privatemsg = _privatemsg_send($privatemsg);
+  return !empty($privatemsg['mid']);
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_privatemsg_disable() {
+  messaging_method_disable('privatemsg');
+}

@@ -1,0 +1,10 @@
+
+#AddType text/html .html
+AddDefaultCharset utf8
+AddLanguage pl .pl
+AddLanguage en .en
+LanguagePriority en pl
+ForceLanguagePriority Prefer
+MultiViewsMatch Any
+Options +MultiViews
+

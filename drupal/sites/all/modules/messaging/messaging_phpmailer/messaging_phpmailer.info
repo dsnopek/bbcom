@@ -1,0 +1,12 @@
+name = Messaging PHPMailer
+description = Mail Sending Method: Integration with PHPMailer for HTML Mail
+package = "Messaging"
+dependencies[] = messaging_mail
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-4.x-dev"
+core = "6.x"
+project = "messaging"
+datestamp = "1298619642"
+

@@ -1,0 +1,95 @@
+diff -u wikitools-6.x-1.3/wikitools.admin.inc wikitools/wikitools.admin.inc
+--- wikitools-6.x-1.3/wikitools.admin.inc	2011-03-11 15:59:43.000000000 -0600
++++ wikitools/wikitools.admin.inc	2011-03-24 12:41:46.000000000 -0500
+@@ -81,6 +81,12 @@
+       '#description' => t('If you activate this option, the links of the freelinking filter will be processed by the wikitools module rather than the freelinking module. When active, a link to <em>freelinking/Page Name</em> behaves exactly as a link to <em>wikipath/Page Name</em>.'),
+     );
+   }
++  $form['wikitools_redirect_node'] = array(
++    '#type' => 'checkbox',
++    '#title' => t('Redirect node pages to wikilink'),
++    '#default_value' => wikitools_redirect_node(),
++    '#description' => t('If you activate this option, going to a wiki nodes <em>node/nid</em> page, you will be redirected to the same page as <em>wikipath/Page Name</em>.'),
++  );
+   $form['subpages'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Subpages'),
+diff -u wikitools-6.x-1.3/wikitools.module wikitools/wikitools.module
+--- wikitools-6.x-1.3/wikitools.module	2011-03-11 15:59:43.000000000 -0600
++++ wikitools/wikitools.module	2011-04-08 12:41:23.000000000 -0500
+@@ -27,6 +27,37 @@
+  */
+ 
+ /**
++ * Implementation of hook_init
++ *
++ * Early checking of URL requested.
++ * If a wiki node is refered to by "node/$node->nid", the user is
++ * redirected using drupal_goto()
++ *
++ * This code was lifted graciously from the path_redirect module.
++ */
++function wikitools_init() {
++  $languages = language_list('enabled');
++  $languages = $languages[1];
++
++  if (wikitools_redirect_node()) {
++    if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
++      $node = node_load($matches[1]);
++      if (wikitools_type_affected($node->type)) {
++        $redirect = url(wikitools_wikilink_drupal_path($node->title),
++          array('language' => isset($node->language) ? $languages[$node->language] : language_default()));
++      }
++    }
++
++    // do the redirect if we've managed to locate a wikilink
++    if ($redirect) {
++      // if there's a result found, do the redirect
++      unset($_REQUEST['destination']);
++      drupal_goto($redirect);
++    }
++  }
++}
++
++/**
+  * Implementation of hook_menu().
+  */
+ function wikitools_menu() {
+@@ -254,6 +285,16 @@
+   variable_set('wikitools_hijack_freelinking', $value);
+ }
+ 
++/**
++ * Is redirecting from node/$node->nid enabled?
++ */
++function wikitools_redirect_node($value = NULL) {
++  if (is_null($value)) {
++    return variable_get('wikitools_redirect_node', FALSE);
++  }
++  variable_set('wikitools_redirect_node', $value);
++}
++
+ /*
+  * Operations
+  */
+diff -u wikitools-6.x-1.3/wikitools.pages.inc wikitools/wikitools.pages.inc
+--- wikitools-6.x-1.3/wikitools.pages.inc	2011-03-11 15:59:43.000000000 -0600
++++ wikitools/wikitools.pages.inc	2011-03-24 12:38:24.000000000 -0500
+@@ -69,11 +69,15 @@
+       // Single match for title.
+       $node = current($found_nodes);
+       if ($subpage) {
+-        drupal_goto("node/$node->nid/$subpage");
++        $url = "node/$node->nid/$subpage";
+       }
+       else {
+-        drupal_goto("node/$node->nid");
++        $url = "node/$node->nid";
+       }
++      // Set query path so that the tabs from the node get displayed.
++      menu_set_active_item($url);
++      // Generate the node.
++      $output = menu_execute_active_handler($url);
+     }
+     else if (count($found_nodes) > 1) {
+       // Multiple match for title.

@@ -1,0 +1,88 @@
+<?php
+// $Id: less.module,v 1.2.4.4 2010/08/31 23:35:20 coreym29 Exp $
+
+/**
+ * Builds the less cache
+ */
+function _less_build(&$vars, $hook) {
+  
+  $css = $vars['css'];
+  
+  $base_path = $_SERVER['DOCUMENT_ROOT'] . base_path();
+  $file_path = file_directory_path();
+  
+  foreach ($css as $media => $types) {
+    foreach ($types as $type => $files) {
+      
+      $files_keys = array_keys($files);
+      foreach ($files_keys as $key => $input_file) {
+        
+        if (substr($input_file, -5) == '.less') {
+          
+          $css_path = $file_path .'/less/'. dirname($input_file);
+          
+          if (!is_dir($css_path)) {
+            @mkdir($css_path, 0775, TRUE);
+          }
+          
+          $output_file = $css_path .'/'. basename($input_file, '.less') .'.css';
+          
+          if (!file_exists($base_path . $output_file) || filemtime($base_path . $input_file) > filemtime($base_path . $output_file)) {
+            
+            require_once('lessphp/lessc.inc.php');
+            
+            $less = new lessc();
+            
+            $contents = drupal_load_stylesheet($input_file, false);
+            
+            $base = base_path() . dirname($input_file) .'/';
+            _drupal_build_css_path(NULL, $base);
+            // Prefix all paths within this CSS file, ignoring external and absolute paths.
+            $data = preg_replace_callback('/url\([\'"]?(?![a-z]+:|\/+)([^\'")]+)[\'"]?\)/i', '_drupal_build_css_path', $contents);
+
+            file_save_data($less->parse($data), $output_file, FILE_EXISTS_REPLACE);
+            
+          }
+          
+          if (file_exists($base_path . $output_file)) {
+            array_splice($files_keys, $key, 1, $output_file);
+          }
+          
+        }
+        
+      }
+      
+      if (!empty($files)) {
+        $css[$media][$type] = array_combine($files_keys, $files);
+      }
+      
+    }
+  }
+  
+  $vars['messages'] .= theme('status_messages');
+  
+  $vars['css'] = $css;
+  $vars['styles'] = drupal_get_css($vars['css']);
+  
+}
+
+/**
+ * Implements MODULE_preprocess_page().
+ */
+function less_preprocess_page(&$vars, $hook) {
+  _less_build($vars, $hook);
+}
+
+/**
+ * Implements MODULE_preprocess_maintenance_page().
+ */
+function less_preprocess_maintenance_page(&$vars, $hook) {
+  _less_build($vars, $hook);
+}
+
+/**
+ * Implements HOOK_enable().
+ */
+function less_enable() {
+  drupal_rebuild_theme_registry();
+}

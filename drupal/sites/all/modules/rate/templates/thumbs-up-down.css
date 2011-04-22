@@ -1,0 +1,35 @@
+.rate-thumbs-up-down-btn-up {
+  display: block;
+  float: left;
+  background: url(thumbs_up.png);
+  width: 24px;
+  height: 24px;
+  text-indent: 100px;
+  overflow: hidden;
+}
+
+.rate-thumbs-up-down-btn-down {
+  display: block;
+  float: left;
+  background: url(thumbs_down.png);
+  width: 24px;
+  height: 24px;
+  text-indent: 100px;
+  overflow: hidden;
+}
+
+.rate-thumbs-up-down-rating-up {
+  display: block;
+  float: left;
+  width: 45px;
+  text-align: right;
+  padding-top: 3px;
+}
+
+.rate-thumbs-up-down-rating-down {
+  display: block;
+  float: left;
+  width: 45px;
+  text-align: left;
+  padding-top: 3px;
+}

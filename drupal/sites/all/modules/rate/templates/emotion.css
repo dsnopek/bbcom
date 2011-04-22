@@ -1,0 +1,24 @@
+a.rate-emotion-btn {
+  display: block;
+  float: left;
+  background: #eee;
+  border: #ccc;
+  margin-right: 5px;
+  padding: 0 2px;
+  color: #666 !important;
+  border: 1px solid #ccc;
+}
+
+a.rate-emotion-btn:hover {
+  background: #ddd;
+  text-decoration: none;
+}
+
+.rate-emotion-votes {
+  display: block;
+  float: left;
+  margin-right: 5px;
+  padding: 1px 2px;
+  border: 1px;
+  font-size: 0.8em;
+}

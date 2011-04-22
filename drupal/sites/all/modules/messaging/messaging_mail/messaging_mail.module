@@ -1,0 +1,144 @@
+<?php
+/**
+ * @file
+ * Simple mail using Drupal API. Messaging method plug-in
+ * 
+ * This is also the base module for mail sending methods.
+ */
+
+/**
+ * Implementation of hook_autoload_info().
+ */
+function messaging_mail_autoload_info() {
+  return array(
+    'Messaging_Method_Mail' => array('file' => 'messaging_method_mail.class.inc'),
+  ); 
+}
+/**
+ * Implementation of hook_menu()
+ */
+function messaging_mail_menu() {
+  $items['admin/messaging/settings/method/mail'] = array(
+    'title' => 'Mail',
+    'description' => 'Common options for mail methods',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('messaging_mail_admin_settings'),
+    'access arguments' => array('administer messaging'),
+    'file' => 'messaging_mail.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;  
+}
+
+/**
+ * Implementation of hook_messaging()
+ * 
+ * Currently the only operation supported is 'send methods' that will retrieve and array
+ * with information fo the sending methods provided by this module.
+ * 
+ * @param $op
+ *   Type of information to retrieve.
+ * @return mixed
+ *   Depending on $op   
+ */
+function messaging_mail_messaging($op, $type = NULL) {
+  switch($op) {
+    case 'send methods':
+      $info['mail'] = array(
+        'title' => 'Drupal mail',
+        'name' => t('Mail'), // Name for display
+        'description' => t('Send e-mails using the default Drupal mail library.'),
+        'address_type' => 'mail', // Which kind of address this method uses
+        'group' => 'mail', // Class of sending method
+        'type' => MESSAGING_TYPE_SEND,  // Method type: push || pull
+        'glue' => "\n", // Glue for message body lines
+        'footer' => "\n--",  // Separator for message footer
+        'send callback' => 'messaging_mail_send_msg', // Sending callback
+        'class' => 'Messaging_Method_Mail',
+        'filter' => 'messaging_plaintext', // Default filter for this format
+        'anonymous' => TRUE, // This method supports anonymous destinations
+      );
+      return $info;
+
+    case 'address types':
+      // Get some built in address types
+      $types['mail'] = array(
+        'name' => t('E-mail address'), // Name for display
+        'validate callback' => 'valid_email_address', // Validation callback
+        'account_property' => 'mail', // Property on user account
+        'address2uid callback' => 'messaging_address_get_uid',
+        'field_name' => 'mail', // Field on which this address is stored
+        'field_table' => 'users', // Table on which this address is stored
+      );
+      return $types;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ *
+ * Adds fieldset and default sending method setting.
+ */
+function messaging_mail_user($type, $edit, &$user, $category = NULL) {
+  switch ($type) {
+    case 'update':
+      // Claim user mail address if in destinations table
+      messaging_mail_update_user($user);
+  }
+}
+
+/**
+ * Get list of mail methods
+ */
+function messaging_mail_methods() {
+  $mail_methods = array();
+  foreach (messaging_method_info() as $method => $info) {
+    if (!empty($info['group']) && $info['group'] == 'mail') {
+      $mail_methods[] = $method;
+    }
+  }
+  return $mail_methods;
+}
+
+/**
+ * Update destinations when a user account is updated, created
+ * 
+ * The destinations for that mail account will be assigned to the user
+ */
+function messaging_mail_update_user($account) {
+  if ($account->status) {
+    // Update mail for destinations of this user
+    db_query("UPDATE {messaging_destination} SET address = '%s' WHERE uid = %d AND type = 'mail'", $account->mail, $account->uid);
+    // Update uid for destinations with this mail
+    db_query("UPDATE {messaging_destination} SET uid = %d WHERE uid = 0 AND type = 'mail' AND address = '%s'", $account->uid, $account->mail);
+  }
+}
+
+
+/**
+ * Send mail message to user account
+ * 
+ * This is a callback function that will be invoked from messaging delivery methods
+ * 
+ * @see messaging_message_send()
+ * @see drupal_mail()
+ * 
+ * @param $destination
+ *   Single email address
+ * @param $message
+ *   Message array
+ * @param $params
+ *   Optional parameters for this method type
+ */
+function messaging_mail_send_msg($address, $message, $params = array()) {
+  // Build the message in drupal mail format
+  $mail = $message->send_method()->mail_build($address, $message, $params);
+  return drupal_mail_send($mail);
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function messaging_mail_disable() {
+  messaging_method_disable('mail');
+}

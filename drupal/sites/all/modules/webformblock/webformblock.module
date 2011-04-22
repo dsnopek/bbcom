@@ -1,0 +1,152 @@
+<?php
+// $Id: webformblock.module,v 1.1.2.2 2009/06/26 14:18:05 budda Exp $
+
+/**
+ * @file
+ * Expose webform nodes as Drupal blocks.
+ */
+
+/*
+ * Add a checkbox on webform node editing page under 'advanced'.
+ * Allows the activating of a corresponding block
+ *
+ */
+function webformblock_form_alter(&$form, $form_state, $form_id) {
+  $node = $form['#parameters'][2];
+  
+  if ($form_id == 'webform_node_form') {
+  
+    $form['webform']['advanced']['addblock'] = array(
+      '#type' => 'checkbox',
+      '#return_value' => 1,
+      '#default_value' => webformblock_nodestatus($form['nid']['#value']),
+      '#title' => t('Generate a block'),
+      '#description' => t('Allow this form to appear in its own block which can be positioned in any block region.'),
+      '#weight' => -20,
+    );
+  } elseif ($node->webform['addblock'] == 1) { 
+    form_clean_id(null, true);
+    $anchorname = form_clean_id(str_replace('/', '', strtolower( drupal_get_path_alias('node/' . $node->nid) ))); 
+    $form['#action'] = url(drupal_get_path_alias($_GET['q']), array('fragment' => $anchorname)); 
+  }
+}
+
+
+/*
+ * See if a webform node should have a block visible for it
+ * @returns true if the webform node id is listed in the webform_block table
+ */
+function webformblock_nodestatus($nid) {
+  if (!$nid) { return false; }
+  
+  $match = db_result(db_query("SELECT nid FROM {webform_block} WHERE nid = %d", $nid));
+  return $match == $nid ? true : false;
+}
+
+
+function webformblock_nodeapi(&$node, $op, $a3 = NULL, $a4 = NUL) { 
+  switch ($op) {
+    case 'load':
+      $node->webform['addblock'] = webformblock_nodestatus($node->nid);
+      break;
+  
+    case 'update':
+      if ($node->webform['addblock'] == true) {
+        $r = db_query("SELECT nid FROM {webform_block} WHERE nid = %d", $node->nid);
+
+        // If the update fails it must be the first time for this node
+        if (db_result($r) != $node->nid) {
+          db_query("INSERT INTO {webform_block} SET nid = %d", $node->nid);
+        }
+      } else {
+        db_query("DELETE FROM {webform_block} WHERE nid = %d", $node->nid);
+      }
+      break;
+      
+    case 'insert':
+      if ($node->webform['addblock'] == true) {
+         db_query("INSERT INTO {webform_block} SET nid = %d", $node->nid);
+      }
+      break;
+      
+    case 'delete':
+      db_query("DELETE FROM {webform_block} WHERE nid = %d", $node->nid);
+      break;
+  }
+}
+
+
+/*
+ * Exposes blocks to match any webforms which have been activated
+ */
+function webformblock_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $block = webformblock_list();
+      break;
+          
+    case 'configure':
+      return array('editnode' => array(
+        '#type' => 'item',
+        '#value' => l(t('Edit webform'), 'node/'.$delta.'/edit', array('query' => 'destination=admin/build/block/configure/webformblock/' . $delta) ),
+      ));
+      break;
+          
+    case 'view':
+      $block = webformblock_view($delta);
+      break;
+  }
+  
+  return $block;
+}
+
+
+/*
+ * Generate a list of blocks corresponding to webforms which have been ticked
+ * to generate a block
+ */
+function webformblock_list() {
+  $blocks = array();
+  
+  $wfb = db_query('SELECT n.title, n.nid FROM {webform_block} wfb LEFT JOIN {node} n ON wfb.nid = n.nid WHERE n.type = "webform" AND n.status = 1');
+  while($block = db_fetch_object($wfb)) {
+    $blocks[$block->nid] = array(
+      'info' => t('Webform: @title', array('@title' => $block->title)),
+      //'visibility' => '', // mark block not to show on same page as actual webform
+      //'pages' => '', // need to get node path form db
+      'cache' => BLOCK_CACHE_GLOBAL
+    );
+  }
+
+  return $blocks;
+}
+
+/*
+ * Use the block delta to load in the corresponding node and output as a block body
+ * Block content can be themed as if it was a node-webform.tpl.php etc.
+ */
+function webformblock_view($nid) {
+  global $language;
+  if (module_exists('translation')) {
+    if ($translations = translation_node_get_translations($nid)) {
+      $nid = $translations[$language->language]->nid;
+    }
+  }
+  $node = node_load(array('nid' => $nid));
+      
+  $block_subject = $node->title;
+  $node->title = '';
+
+  $anchorname = form_clean_id(str_replace('/', '', strtolower( drupal_get_path_alias('node/' . $node->nid) )));
+  $node = node_view($node, false, false, false);
+  
+  $content = '<a name="'. $anchorname .'"></a>' . $node;
+
+  $block = array(
+    'subject' => $block_subject,
+    'content' => $content,
+  );
+
+  return $block;
+}
+

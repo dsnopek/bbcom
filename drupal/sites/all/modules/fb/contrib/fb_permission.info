@@ -1,0 +1,13 @@
+name= Extended Permissions (fb_permission.module)
+description = <a href=http://developers.facebook.com/docs/authentication/permissions target=_blank>Extended Permissions</a> allow apps to provide additional features, like posting to Streams and sending email.  This module helps you prompt users to grant those permissions.
+package = Drupal for Facebook - contrib
+dependencies[] = fb
+dependencies[] = fb_app
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-11-14
+version = "6.x-3.0-rc1"
+core = "6.x"
+project = "fb"
+datestamp = "1289697375"
+

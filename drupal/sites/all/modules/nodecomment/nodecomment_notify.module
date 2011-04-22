@@ -1,0 +1,353 @@
+<?php
+// $Id: nodecomment_notify.module,v 1.1.2.5 2010/06/05 16:47:52 crea Exp $
+
+/**
+ * @file
+ *
+ * This module relies on the comment_notify module to provide settings, but
+ * duplicates a great deal of its code to handle nodecomments.
+ */
+
+/**
+ * Insert our checkbox, add a submit button, and populate fields.
+ */
+function nodecomment_notify_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+
+  // Only do alter the form if it's a comment form and the user has the permission to subscribe
+  if (!user_access('subscribe to comments')) {
+    return;
+  }
+
+  if (!isset($form['type']) || !isset($form['type']['#value']) || $form['type']['#value'] .'_node_form' != $form_id) {
+    return;
+  }
+
+  $node = &$form['#node'];
+  // Only if this is a comment.
+  if (empty($node->comment_target_nid)) {
+    return;
+  }
+
+  $target = node_load($node->comment_target_nid);
+
+  // Only add the checkbox if this is an enabled content type
+  $enabled_types = variable_get('comment_notify_node_types', array($target->type => TRUE));
+  if (empty($enabled_types[$target->type])) {
+    return;
+  }
+
+  drupal_add_css(drupal_get_path('module', 'comment_notify') .'/comment_notify.css');
+  drupal_add_js(drupal_get_path('module', 'comment_notify') .'/comment_notify.js');
+
+  $available_options = _comment_notify_options();
+
+  // Add the checkbox for anonymous users and set the default based on admin settings.
+  if ($user->uid == 0) {
+    // If anonymous users can't enter their e-mail don't tempt them with the checkbox.
+    $anon_meta_info = variable_get('comment_anonymous_'. $target->type, COMMENT_ANONYMOUS_MAYNOT_CONTACT);
+    if ($anon_meta_info == COMMENT_ANONYMOUS_MAYNOT_CONTACT) {
+      return;
+    }
+    $preference = variable_get('comment_notify_default_anon_mailalert', COMMENT_NOTIFY_DISABLED);
+  }
+  else {
+    $user_preference = db_result(db_query("SELECT comment_notify FROM {comment_notify_user_settings} WHERE uid = %d", $user->uid));
+    $preference = strlen($user_preference) ? $user_preference : variable_get('comment_notify_default_registered_mailalert', COMMENT_NOTIFY_DISABLED);
+  }
+
+  $form['notify_settings'] = array(
+    '#prefix' => '<div class="clear-block">',
+    '#suffix' => '</div>',
+  );
+
+  // If you want to hide this on your site see http://drupal.org/node/322482
+  $form['notify_settings']['notify'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Notify me when new comments are posted'),
+    '#default_value' => $preference,
+  );
+
+  if (count($available_options) > 1) {
+    $form['notify_settings']['notify_type'] = array(
+      '#type' => 'radios',
+      '#options' => $available_options,
+    );
+  }
+  else {
+    $form['notify_settings']['notify_type'] = array(
+      '#type' => 'hidden',
+    );
+  }
+  $form['notify_settings']['notify_type']['#default_value'] = $preference;
+
+  // If this is an existing comment we set the default value based on their selection last time.
+  if (isset($node->nid)) {
+    $notify = db_result(db_query("SELECT notify FROM {nodecomment_notify} WHERE cid = %d", $node->nid));
+    $form['notify_settings']['notify']['#default_value'] = $notify;
+    $form['notify_settings']['notify_type']['#default_value'] = $notify;
+  }
+}
+
+/**
+ * Implementation of hook_comment().
+ */
+function nodecomment_notify_nodeapi(&$node, $op, $arg = 0, $page = 0) {
+  global $user;
+
+  // In theory, the update or insert operations are duplicates with publish which
+  // would lead to duplicate messages.  _nodecomment_notify_mailalert() protects against that.
+  switch ($op) {
+    case 'validate':
+       // We assume that if they are non-anonymous then they have a valid mail.
+       // For anonymous users, though, we verify that they entered a mail and let comment.module validate it is real.
+      if (!$user->uid && $node->notify && empty($node->mail)) {
+        form_set_error('mail', t('If you want to subscribe you must supply a valid e-mail address.'));
+      }
+      break;
+    case 'update':
+      // In case they have changed their status, save it in the database.
+      $sql = 'UPDATE {nodecomment_notify} SET notify = %d WHERE cid = %d';
+      if ($node->notify) {
+        db_query($sql, $node->notify_type, $node->nid);
+      }
+      else {
+        db_query($sql, COMMENT_NOTIFY_DISABLED, $node->nid);
+      }
+      // And send notifications - the real purpose of the module.
+      if ($node->status) {
+        _nodecomment_notify_mailalert($node);
+      }
+      break;
+    case 'insert':
+      // For new comments, we first build up a string to be used as the identifier for the alert
+      $mail = empty($node->mail) ? $user->mail : $node->mail;
+      $notify_hash = drupal_get_token($mail . $node->nid);
+
+      if ($node->notify) {
+        $notify = $node->notify_type;
+        $current = db_result(db_query("SELECT count(1) from {comment_notify_user_settings} WHERE uid = %d", $user->uid));
+        if ($current == 0) {
+          db_query("INSERT INTO {comment_notify_user_settings} (uid, comment_notify) VALUES (%d, %d)", $user->uid, $node->notify_type);
+        }
+      }
+      else {
+        $notify = $node->notify;
+      }
+      // And then save the data.
+      db_query("INSERT INTO {nodecomment_notify} (cid, notify, notify_hash) values (%d, %d, '%s')", $node->nid, $notify, $notify_hash);
+
+      // And send notifications - the real purpose of the module.
+      if ($node->status) {
+        _nodecomment_notify_mailalert($node);
+      }
+      break;
+    case 'delete':
+      db_query("DELETE FROM {nodecomment_notify} WHERE cid = %d", $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function nodecomment_notify_menu_alter(&$items) {
+  $items['comment_notify/disable/%']['page callback'] = 'nodecomment_notify_disable_page';
+}
+
+/**
+ * Override comment_notify's disable to make sure we get disabled too.
+ */
+function nodecomment_notify_disable_page($hash) {
+  db_query("UPDATE {nodecomment_notify} SET notify = 0 WHERE notify_hash = '%s'", $hash);
+  return comment_notify_disable_page($hash);
+}
+
+/**
+ * Private function to send the notifications.
+ *
+ * @param $comment
+ *   The comment node.
+ */
+function _nodecomment_notify_mailalert($comment) {
+  global $language;
+  global $base_url;
+  global $user;
+
+  $nid = $comment->comment_target_nid;
+  $cid = $comment->nid;
+
+  // Check to see if a notification has already been sent for this
+  // comment so that edits to a comment don't trigger an additional
+  // notification.
+  if (db_result(db_query('SELECT cid from {nodecomment_notify} WHERE cid = %d AND notified = %d', $cid, 1))) {
+    return;
+  }
+
+  $initial_language = $language;
+
+  if (function_exists('locale')) {
+    $languages = locale_language_list();
+    $languages = $languages['name'];
+  }
+
+  $node = node_load($nid);
+  if (!isset($comment->mail)) {
+    $comment_account = user_load($comment->uid);
+    $comment_mail = $comment_account->mail;
+  }
+  else {
+    $comment_mail = $comment->mail;
+  }
+  $sent_to = array();
+
+  $query = NULL;
+  $pagenum = nodecomment_page_count($comment, $node);
+  if ($pagenum) {
+    $query = array('page' => $pagenum);
+  }
+  $comment_link = url('node/'. $nid, array('absolute' => TRUE, 'query' => $query, 'fragment' => 'comment-' . $cid));
+
+  // Send to a subscribed author if they are not the current commenter
+  $author = user_load($node->uid);
+  if (!empty($author->node_notify_mailalert) && $author->node_notify_mailalert == 1 && $user->mail != $author->mail) {
+    // Get the author's language.
+    $language = user_preferred_language($author);
+    $message['subject'] = t('!site :: new comment for your post.', array('!site' => variable_get('site_name', 'drupal')));
+    $message['body'] = t(
+      variable_get('node_notify_default_mailtext', AUTHOR_MAILTEXT),
+      array(
+        '!nid' => $node->nid,
+        '!commname' => $comment->name,
+        '!commtext' => $comment->body,
+        '!commsubj' => $comment->title,
+        '!comment_url' => $comment_link,
+        '!node_title' =>  $node->title,
+        '!node_teaser' => $node->teaser,
+        '!mission' => variable_get('site_mission', ''),
+        '!node_body' =>  $node->body,
+        '!name' => $author->name,
+        '!site' => variable_get('site_name', 'drupal'),
+        '!uri' => $base_url,
+        '!uri_brief' => preg_replace('!^https?://!', '', $base_url),
+        '!date' => format_date(time()),
+        '!login_uri' => url('user', array('absolute' => TRUE)),
+        '!edit_uri' => url('user/'. $alert->uid .'/edit', array('absolute' => TRUE))
+      )
+    );
+    drupal_mail('comment_notify', 'comment_notify_mail', $author->mail, $language, $message);
+    $sent_to[] = $author->mail;
+  }
+
+  //Get the list of commenters to notify
+  $result = db_query("SELECT DISTINCT c.cid, c.uid, c.name, c.nid, c.mail AS cmail, u.mail AS umail, u.init AS uinit, cn.notify, cn.notify_hash
+    FROM {node_comments} c INNER JOIN {node} n ON c.cid = n.nid INNER JOIN {nodecomment_notify} cn on c.cid = cn.cid LEFT OUTER JOIN {users} u ON c.uid = u.uid
+    WHERE c.nid = %d AND cn.notify > 0 AND n.status <> 0 AND (u.status = 1 OR u.uid = 0)", $nid
+  );
+  // TODO? the original big query had stuff making sure the mail was populated and contained .+@.+ Perhaps check for that here and set notify = 0 if that is the case for this cid
+
+  while ($alert = db_fetch_object($result)) {
+    $umail = empty($alert->umail) ? $alert->uinit : $alert->umail;
+    $mail = empty($alert->cmail) ? $umail : $alert->cmail;
+
+    if ($alert->notify == COMMENT_NOTIFY_COMMENT && $alert->cid != $comment->comment_target_cid) {
+      continue;
+    }
+    if ($mail != $comment_mail && !in_array($mail, $sent_to) && $alert->uid != $comment->uid) {
+      $message = array();
+      if (!empty($alert->uid)) {
+        $recipient_user = user_load(array('uid' => $alert->uid));
+        $language = user_preferred_language($recipient_user);
+      }
+      else {
+        $language = language_default();
+      }
+
+      $message['subject'] = t('!site :: new comment for your post.', array('!site' => variable_get('site_name', 'drupal')));
+      $message['body'] = t(
+        variable_get('comment_notify_default_mailtext', DEFAULT_MAILTEXT),
+        array(
+          '!nid' => $node->nid,
+          '!commname' => $comment->name,
+          '!commtext' => $comment->body,
+          '!commsubj' => $comment->title,
+          '!comment_url' => $comment_link,
+          '!node_title' =>  $node->title,
+          '!node_teaser' => $node->teaser,
+          '!mission' => variable_get('site_mission', ''),
+          '!node_body' =>  $node->body,
+          '!name' => $alert->name,
+          '!site' => variable_get('site_name', 'drupal'),
+          '!uri' => $base_url,
+          '!uri_brief' => preg_replace('!^https?://!', '', $base_url),
+          '!date' => format_date(time()),
+          '!login_uri' => url('user', array('absolute' => TRUE)),
+          '!edit_uri' => url('user/'. $alert->uid .'/edit', array('absolute' => TRUE)),
+          '!link1' => url('comment_notify/disable/'. $alert->notify_hash, array('absolute' => TRUE))
+        )
+      );
+
+      drupal_mail('comment_notify', 'comment_notify_mail', $mail, $language, $message);
+      $sent_to[] = $mail;
+
+      $link = l(t('source comment'), 'node/'. $nid, array('fragment' => 'comment-'. $alert->cid));
+
+      // Make the mail link to user's /edit, unless it's an anonymous user.
+      if ($alert->uid != 0) {
+        $link .= ', ' . l(t('recipient'), 'user/'. $alert->uid .'/edit');
+      }
+
+      // Add an entry to the watchdog log.
+      watchdog(
+        'comment_notify',
+        'Notified: @user_mail',
+        array('@user_mail' => $mail),
+        WATCHDOG_NOTICE,
+        $link
+      );
+
+      // revert to previous (site default) locale
+      $language = $initial_language;
+    }
+  }
+  // Record that a notification was sent for this comment so that
+  // notifications aren't sent again if the comment is later edited.
+  db_query('UPDATE {nodecomment_notify} SET notified = 1 WHERE cid = %d', $cid);
+}
+
+/**
+ * Take over the submission of the unsubscribe form.
+ */
+function nodecomment_notify_form_comment_notify_unsubscribe_alter(&$form, &$form_state) {
+  $form['comment_notify_unsubscribe']['submit']['#submit'] = 'nodecomment_notify_unsubscribe_submit';
+}
+
+/**
+ * Based on admin submit, do the actual unsubscribe from notifications.
+ */
+function nodecomment_notify_unsubscribe_submit($form, &$form_state) {
+  $email = trim($form_state['values']['email_to_unsubscribe']);
+  // If they have a uid, use that, otherwise update comments directly
+  $result = db_result(db_query_range("SELECT uid FROM {users} WHERE mail = '%s'", $email, 0, 1));
+  if ($result > 0) {
+    $comments = db_result(db_query("SELECT COUNT(1) FROM {comments} c INNER JOIN {comment_notify} cn ON c.cid = cn.cid WHERE c.uid = %d AND cn.notify > 0", $result));
+    db_query("UPDATE {comment_notify} SET notify = 0 WHERE cid IN (SELECT cid FROM  {comments} WHERE uid = %d)", $result);
+    $comments += db_result(db_query("SELECT COUNT(1) FROM {node_comments} c INNER JOIN {nodecomment_notify} cn ON c.cid = cn.cid WHERE c.uid = %d AND cn.notify > 0", $result));
+    db_query("UPDATE {nodecomment_notify} SET notify = 0 WHERE cid IN (SELECT cid FROM  {node_comments} WHERE uid = %d)", $result);
+
+  }
+  else {
+    $comments = db_result(db_query("SELECT COUNT(1) FROM {comments} c INNER JOIN {comment_notify} cn ON c.cid = cn.cid WHERE c.mail = '%s' AND cn.notify > 0", $email));
+    db_query("UPDATE {comment_notify} SET notify = 0 WHERE cid IN (SELECT cid FROM {comments} WHERE mail = '%s')", $email);
+    $comments += db_result(db_query("SELECT COUNT(1) FROM {node_comments} c INNER JOIN {nodecomment_notify} cn ON c.cid = cn.cid WHERE c.mail = '%s' AND cn.notify > 0", $email));
+    db_query("UPDATE {nodecomment_notify} SET notify = 0 WHERE cid IN (SELECT cid FROM {node_comments} WHERE mail = '%s')", $email);
+  }
+  // Update the admin about the state of this comment notification subscription.
+  if ($comments == 0) {
+    drupal_set_message(t("There were no active comment notifications for that email."));
+  }
+  else {
+    drupal_set_message(format_plural($comments, "Email unsubscribed from 1 comment notification.",
+      "Email unsubscribed from @count comment notifications."));
+  }
+}

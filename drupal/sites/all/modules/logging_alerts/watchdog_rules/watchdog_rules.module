@@ -1,0 +1,53 @@
+<?php
+// $Id: watchdog_rules.module,v 1.1.2.2 2010/11/09 19:41:36 bastlynn Exp $
+
+/**
+ * @file
+ * Provides a Rules integration for wachdog events.
+ */
+
+/**
+ * Implementation of hook_watchdog().
+ */
+function watchdog_rules_watchdog($watchdog_message) {
+  rules_invoke_event('watchdog_rules', $watchdog_message['user'], $watchdog_message);
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function watchdog_rules_token_list($type = 'all') {
+  if ($type == 'watchdog' || $type == 'all') {
+    $tokens['watchdog_rules'] = array(
+      'type' => t('The type of the watchdog event.'),
+      'request_uri' => t('The request URI for the page the event happened in.'),
+      'referer' => t('The page that referred the user to the page where the event occurred.'),
+      'ip' => t('The IP address where the request for the page came from.'),
+      'timestamp' => t('The UNIX timetamp of the date/time the event occurred.'),
+      'severity' => t('The degree of severity of the event.'),
+      'link' => t('An informational link provided by the module calling watchdog.'),
+      'message' => t('The text of the message to be logged.'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function watchdog_rules_token_values($type, $object = NULL, $options = array()) {
+  $tokens = array();
+  if ($type == 'watchdog' || $type == 'all') {
+    $tokens = array(
+      'type' => $object['type'],
+      'request_uri' => $object['request_uri'],
+      'referer' => $object['referer'],
+      'ip' => $object['ip'],
+      'timestamp' => $object['timestamp'],
+      'severity' => $object['severity'],
+      'link' => $object['link'],
+      'message' => $object['message'],
+    );
+    return $tokens;
+  }
+}

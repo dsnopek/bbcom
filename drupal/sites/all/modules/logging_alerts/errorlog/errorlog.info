@@ -1,0 +1,11 @@
+name = Web server logging and alerts
+description = Sends logs and alerts to the web server's error log.
+package = Logging and alerts
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-11-09
+version = "6.x-1.5"
+core = "6.x"
+project = "logging_alerts"
+datestamp = "1289331942"
+

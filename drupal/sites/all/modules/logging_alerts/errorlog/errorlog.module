@@ -1,0 +1,74 @@
+<?php
+// $Id: errorlog.module,v 1.1.2.5 2009/07/23 16:29:00 davereid Exp $
+
+// Copyright 2007 Khalid Baheyeldin http://2bits.com
+
+/**
+ * @file
+ * Sends logs and alerts to the web server's log.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function errorlog_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#errorlog':
+    case 'admin/settings/logging/errorlog':
+      return '<p>'. t("Sends logs and alerts to the web server's error log.") .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function errorlog_menu() {
+  $items['admin/settings/logging/errorlog'] = array(
+    'title' => 'Web server logging and alerts',
+    'description' => 'Settings for error log logging and alerts.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('errorlog_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'errorlog.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_watchdog().
+ */
+function errorlog_watchdog($log) {
+  global $user;
+  $language = user_preferred_language($user);
+  $message = theme('errorlog_format', $log);
+  if (variable_get('errorlog_' . $log['severity'], FALSE)) {
+    error_log($message);
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function errorlog_theme() {
+  return array(
+    'errorlog_format' => array(
+      'arguments' => array('log_msg' => NULL),
+    ),
+  );
+}
+
+function theme_errorlog_format($log_msg = array()) {
+  global $base_root;
+
+  $message  = $base_root;
+  $message .= '|type='    . $log_msg['type'];
+  $message .= '|ip='      . $log_msg['ip'];
+  $message .= '|uri='     . $log_msg['request_uri'];
+  $message .= '|referer=' . $log_msg['referer'];
+  $message .= '|uid='     . $log_msg['user']->uid;
+  $message .= '|link='    . strip_tags($log_msg['link']);
+  $message .= '|message=' . strip_tags(is_null($log_msg['variables']) ? $log_msg['message'] : strtr($log_msg['message'], $log_msg['variables']));
+
+  return $message;
+}
+
