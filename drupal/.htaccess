@@ -148,9 +148,13 @@ DirectoryIndex index.php
 # DRS: special magic to try and make sure our embed-reader files don't get cached
 # for too long.
 <FilesMatch "embed-reader(\.js|\.css|-jquery1\.4\.2\.js)$">
-  ExpiresDefault "access plus 1 hour"
-  Header set Cache-Control "public, must-revalidate"
-  #Header unset Expires
+  <IfModule mod_expires.c>
+    ExpiresDefault "access plus 1 hour"
+  </IfModule>
+  <IfModule mod_headers.c>
+    Header set Cache-Control "public, must-revalidate"
+    #Header unset Expires
+  </IfModule>
 </FilesMatch>
 
 # $Id: .htaccess,v 1.90.2.5 2010/02/02 07:25:22 dries Exp $
