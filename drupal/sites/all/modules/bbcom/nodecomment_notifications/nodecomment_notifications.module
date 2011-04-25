@@ -51,10 +51,12 @@ function _nodecomment_notifications($comment, $node) {
       );
 
       // for compatibility, we have to re-arrange some of the data on $comment
+      /*
       $comment->cid = $comment->nid;
       $comment->nid = $parent->nid;
       $comment->comment = $comment->body;
       $comment->subject = $comment->title;
+      */
 
       notifications_event($event, array('node' => $node, 'comment' => $comment));
     }    

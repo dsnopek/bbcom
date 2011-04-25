@@ -86,6 +86,7 @@ def pull_live_db():
         get("{0}/lingwo_backup/manual/{1}".format(env.remote_prj_dir,backup), "/tmp/")
 
     with cd(env.local_drupal_dir):
+        local("drush sqlq 'DROP DATABASE bibliobird; CREATE DATABASE bibliobird;'", capture=False)
         local("zcat /tmp/{0} | drush sql-cli".format(backup))
         local("rm -f /tmp/{0}".format(backup))
 
