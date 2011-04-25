@@ -1,4 +1,160 @@
 <?php
 
-// TODO: write this monkey!
+/**
+ * Implementation of hook_theme().
+ */
+function bbcom_notifications_theme() {
+  return array(
+    'bbcom_notifications_user_subscriptions_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function bbcom_notifications_menu() {
+  $items = array();
+  $items['user/%user/notifications/forum'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => '_bbcom_notifications_user_forum_access',
+    'access arguments' => array(1),
+    'title' => t('Forums'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_notifications_user_forum_form', 1),
+    'weight' => 10,
+  );
+  return $items;
+}
+
+function _bbcom_notifications_user_forum_access($account) {
+  return notifications_access_user($account) && user_access('subscribe to taxonomy terms', $account);
+}
+
+function bbcom_notifications_user_forum_form(&$form_state, $account) {
+  $form = array();
+
+  $account = messaging_user_object($account);
+  $form['account'] = array('#type' => 'value', '#value' => $account);
+
+  $send_methods = notifications_send_methods($account);
+  $send_intervals = notifications_send_intervals($account);
+
+  // lookup existing subscriptions and index by 'tid'
+  $subs = array();
+  foreach (notifications_get_subscriptions(array('type' => 'taxonomy', 'uid' => $account->uid)) as $sub) {
+    $subs[$sub->fields['tid']] = $sub;
+  }
+
+  $form['info'] = array(
+    '#value' => '<p>' . t('Your forum subscriptions:') . '</p>',
+  );
+
+  $form['subscriptions'] = array(
+    //'#type' => 'fieldset',
+    //'#title' => t('Forums'),
+    '#theme' => 'bbcom_notifications_user_subscriptions_form',
+    '#tree' => TRUE,
+  );
+
+  foreach (forum_get_forums() as $forum) {
+    $sub = !empty($subs[$forum->tid]) ? $subs[$forum->tid] : NULL;
+
+    $wrapper = array();
+    $wrapper['subscribe'] = array(
+      '#type' => 'checkbox',
+      '#title' => l($forum->name, "forum/$forum->tid"),
+      '#default_value' => !is_null($sub),
+    );
+    $wrapper['tid'] = array(
+      '#type' => 'value',
+      '#value' => $forum->tid,
+    );
+    if (!is_null($sub)) {
+      $wrapper['sid'] = array(
+        '#type' => 'value',
+        '#value' => $sub->sid,
+      );
+    }
+    $wrapper['description'] = array(
+      '#type' => 'item',
+      '#title' => t('Description'),
+      '#value' => $forum->description,
+    );
+    $wrapper['send_method'] = array(
+      '#type' => 'select',
+      '#title' => t('Send method'),
+      '#options' => $send_methods,
+      '#default_value' => is_null($sub) ? NULL : $sub->send_method,
+    );
+    $wrapper['send_interval'] = array(
+      '#type' => 'select',
+      '#title' => t('Send interval'),
+      '#options' => $send_intervals,
+      '#default_value' => is_null($sub) ? NULL : $sub->send_interval,
+    );
+
+    $form['subscriptions'][] = $wrapper;
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+function bbcom_notifications_user_forum_form_submit($form, &$form_state) {
+  $account = (object)$form_state['values']['account'];
+  foreach ($form_state['values']['subscriptions'] as $value) {
+    if ($value['subscribe']) {
+      $subscription = array(
+        'type' => 'taxonomy',
+        'uid'  => $account->uid,
+        'fields' => array('tid' => $value['tid']),
+        'send_method' => $value['send_method'],
+        'send_interval' => $value['send_interval'],
+        'event_type' => 'node',
+      );
+      if (!empty($value['sid'])) {
+        $subscription['sid'] = $value['sid'];
+      }
+      $subscription = notifications_build_subscription($subscription);
+      $ret = notifications_save_subscription($subscription);
+    }
+    elseif (!empty($value['sid'])) {
+      notifications_subscription_delete($value['sid']);
+    }
+  }
+}
+
+function theme_bbcom_notifications_user_subscriptions_form($form) {
+  $header = array(
+    t('Forum'),
+    /*
+    array(
+      'data' => t('Description'),
+      'width' => '100%',
+    ),
+    */
+    t('Method'),
+    t('Interval'),
+  );
+
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    $element = $form[$key];
+    $row = array();
+    $row[] = drupal_render($element['subscribe']);
+    foreach (array('send_method', 'send_interval') as $name) {
+      unset($element[$name]['#title']);
+      $row[] = drupal_render($element[$name]);
+    }
+    $rows[] = $row;
+  }
+
+  return theme('table', $header, $rows);
+}
 

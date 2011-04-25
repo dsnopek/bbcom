@@ -1,0 +1,158 @@
+<?php
+
+/*
+ * Implementation of hook_nodeapi().
+ *
+ *  - check if node we are inserting/updating is a ndoecomment
+ *  - if it is; check possible approval/pubslished states
+ *  - if its an approved comment add notification "event"
+*/
+function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {   
+  $ctypes = nodecomment_get_comment_types();
+  
+  // if not a nodecomment type; bail
+  if (!in_array($node->type, $ctypes)) return;
+  
+  $parent = node_load($node->comment_target_nid);
+  
+  // if node we are commenting on isn't published; no need to notify
+  if (!$parent->status) return;
+  
+  switch ($op) {
+    case 'insert':
+    case 'update':
+      // if comment node is not published let's not notify on it - this could be useful if we have some sort of approval process which manages 
+      // comment node approval by setting pushlished state
+      if ($node->status) _nodecomment_notifications($node, $parent);
+      
+      // OR if we use modr8 module for approval - i think notifications module will deal with these creating duplicate events
+      if (module_exists('modr8') && $node->moderate) _nodecomment_notifications($node, $parent); 
+      
+      break;  
+  }  
+}
+
+
+/*
+*   - add event into notification queue
+*   - copied from notifications_content_comment() so modelled after how comments are notified on
+* 
+*/
+function _nodecomment_notifications($comment, $node) {
+  if (empty($comment->notifications_content_disable) &&
+    (!isset($comment->notifications_comment_status) || !empty($comment->notifications_comment_status)) ) {
+    if (notifications_content_type_enabled($node->type)) {
+      $event = array(
+        'uid' => $comment->uid, // For this special case the event actor is the user who posts the comment
+        'module' => 'node',
+        'type' => 'node',
+        'action' => 'comment',
+        'node' => $node,
+        'comment' => $comment,
+        'params' => array('nid' => $node->nid, 'cnid' => $comment->nid),        
+      );
+      notifications_event($event);
+    }    
+  }
+}
+
+/**
+ * @file
+ * Implementations of token module hooks for the core comment module.
+ *
+ * The token module requires specific hooks to be added to modules
+ * so that those modules can return data about their objects to the
+ * token API.  Until and unless token becomes a part of core, the
+ * implementations of the token hooks for core modules are provided
+ * in the token module itself.
+ * @ingroup token
+ */
+
+/**
+ * Implementation of hook_token_values().
+ */
+function nodecomment_notifications_token_values($type, $object = NULL, $options = array()) {
+  $values = array();
+  switch ($type) {
+    case 'comment':         
+      // Cast to an object just in case fussy Drupal gave us an array
+      $comment = (object)$object;
+      
+      $ctypes = nodecomment_get_comment_types();
+      // if not a nodecomment type; bail
+      if (!in_array($comment->type, $ctypes)) break;
+      
+      $values['nodecomment-cid']             = $comment->nid;
+      $values['nodecomment-nid']             = $comment->comment_target_nid;
+      $values['nodecomment-title']           = check_plain($comment->title);
+      $values['nodecomment-body']            = check_markup($comment->body, $comment->format, FALSE);
+      $values['nodecomment-author-name']     = check_plain($comment->name);
+      $values['nodecomment-author-uid']      = $comment->uid;
+      $values['nodecomment-author-homepage'] = check_url($comment->homepage);
+
+      // Raw counterparts of user supplied data.
+      $values['nodecomment-title-raw']       = $comment->title;
+      $values['nodecomment-body-raw']        = $comment->body;
+      $values['nodecomment-author-name-raw'] = $comment->name;
+
+      if (!empty($comment->mail)) {
+        $account_mail = $comment->mail;
+      }
+      elseif (!empty($comment->uid)) {
+        $account_mail = db_result(db_query("SELECT mail FROM {users} WHERE uid = %d", $comment->uid));
+      }
+      else {
+        $account_mail = '';
+      }
+      $values['nodecomment-author-mail']     = check_plain($account_mail);
+      $values['nodecomment-author-mail-raw'] = $account_mail;
+
+      // Included in case a consuming module wants to format the body
+      $values['nodecomment-body-format']     = $comment->format;
+
+      $values += token_get_date_token_values($comment->timestamp, 'comment-');
+
+      $values['nodecomment-node-title-raw']  = db_result(db_query("SELECT title FROM {node} WHERE nid = %d", $comment->nid));
+      $values['nodecomment-node-title']      = check_plain($values['nodecomment-node-title-raw']);
+      
+      $values['nodecomment-url'] = url('node/'. $comment->comment_target_nid, array('fragment' =>'comment-'. $comment->nid, 'absolute' => TRUE));
+      $values['nodecomment-reply-url'] = url('comment/reply/'. $comment->comment_target_nid .'/'. $comment->nid, array('absolute' => TRUE));
+      
+      break;
+  }
+
+  return $values;
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function nodecomment_notifications_token_list($type = 'all') {
+  if ($type == 'comment' || $type == 'all') {
+    $tokens['nodecomment']['nodecomment-cid']             = t('The unique ID of the comment.');
+    $tokens['nodecomment']['nodecomment-nid']             = t('The unique ID of the node the comment was posted to.');
+    $tokens['nodecomment']['nodecomment-title']           = t('The title of the comment.');
+    $tokens['nodecomment']['nodecomment-title-raw']       = t('The title of the comment.');
+    $tokens['nodecomment']['nodecomment-body']            = t('The formatted content of the comment itself.');
+    $tokens['nodecomment']['nodecomment-body-raw']        = t('The formatted content of the comment itself.');
+
+    $tokens['nodecomment']['nodecomment-author-uid']      = t('The unique ID of the author of the comment.');
+    $tokens['nodecomment']['nodecomment-author-name']     = t('The name left by the comment author.');
+    $tokens['nodecomment']['nodecomment-author-name-raw'] = t('The name left by the comment author.');
+    $tokens['nodecomment']['nodecomment-author-homepage'] = t('The home page URL left by the comment author.');
+
+    $tokens['nodecomment']['nodecomment-author-mail']     = t('The email address left by the comment author.');
+    $tokens['nodecomment']['nodecomment-author-mail-raw'] = t('The email address left by the comment author.');
+
+    $tokens['nodecomment'] += token_get_date_token_info(t('Comment creation'), 'nodecomment-');
+
+    $tokens['nodecomment']['nodecomment-node-title']      = t('The title of the node the comment was posted to.');
+    $tokens['nodecomment']['nodecomment-node-title-raw']  = t('The title of the node the comment was posted to.');
+    
+    $tokens['nodecomment']['nodecomment-url'] = t('The comment view url.');
+    $tokens['nodecomment']['nodecomment-reply-url'] = t('The comment reply url.');
+
+    return $tokens;
+  }
+}
+
