@@ -39,19 +39,24 @@ function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {
 * 
 */
 function _nodecomment_notifications($comment, $node) {
-  if (empty($comment->notifications_content_disable) &&
+  if (empty($comment->notifications_content_disable) && notifications_event_enabled('node-comment') &&
     (!isset($comment->notifications_comment_status) || !empty($comment->notifications_comment_status)) ) {
     if (notifications_content_type_enabled($node->type)) {
       $event = array(
         'uid' => $comment->uid, // For this special case the event actor is the user who posts the comment
         'module' => 'node',
         'type' => 'node',
+        'oid' => $node->nid,
         'action' => 'comment',
-        'node' => $node,
-        'comment' => $comment,
-        'params' => array('nid' => $node->nid, 'cnid' => $comment->nid),        
       );
-      notifications_event($event);
+
+      // for compatibility, we have to re-arrange some of the data on $comment
+      $comment->cid = $comment->nid;
+      $comment->nid = $parent->nid;
+      $comment->comment = $comment->body;
+      $comment->subject = $comment->title;
+
+      notifications_event($event, array('node' => $node, 'comment' => $comment));
     }    
   }
 }
