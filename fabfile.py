@@ -9,10 +9,11 @@ prod_host = 'bibliobird.com'
 #env.hosts = [prod_host]
 
 env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
-env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
-env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/lingwo/python-env'
+env.local_drupal_dir = env.local_prj_dir+'/bibliobird/bbcom/drupal'
+env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
+env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/bibliobird/python-env'
 
-env.repos = ['bbcom','lingwo_dictionary','drupal']
+env.repos = ['bbcom','lingwo','lingwo-old']
 
 class _Drush(object):
     def __init__(self, remote=False):
@@ -20,14 +21,18 @@ class _Drush(object):
         self.func = run if remote else local
         self.remote = remote
 
-    def run(self, *args):
+    def run(self, *args, **kw):
         # quote the arguments
         def quote(s):
             return '"'+s.replace('"', '\\"')+'"'
         args = [quote(x) for x in args]
-
+        cmd = " ".join(["drush"]+args)
+        res = None
         with cd(self.dir):
-            res = self.func(" ".join(["drush"]+args))
+            if not self.remote and kw.get('capture', True) is False:
+                local(cmd, capture=False)
+            else:
+                res = self.func(cmd)
         return res
 
     def vset(self, **kw):
@@ -90,6 +95,9 @@ def make_testing_safe():
     """Configures drupal such that it is safe to develop with it."""
     drush = _Drush(remote=False)
 
+    # this seems to correct any problems we encounter after putting a foreign db in place
+    drush.run('updatedb', '--yes', capture=False)
+
     drush.cc()
 
     drush.sql_query("UPDATE languages SET domain = 'http://en.localdomain:35637', prefix = '' WHERE language = 'en'")
@@ -124,44 +132,32 @@ def branch(source=None, target=None):
         raise TypeError('Must pass atleast one argument')
     if target is None:
         target = source
-        source = 'mainline'
+        source = 'master'
     if source is None:
-        source = 'mainline'
+        source = 'master'
 
     for repo in env.repos:
-        dest = os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)
-        if os.path.exists(dest):
-            print("Not branching {0}, branch {1} already exists".format(repo, target))
-            continue
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            local('git checkout -b {0} {1}'.format(target, source), capture=False)
+            local('git push origin {0}'.format(target), capture=False)
 
-        with cd(os.path.join(env.local_prj_dir, 'lingwo')):
-            local('bzr branch {repo}.{source} {repo}.{target}'.format(repo=repo, source=source, target=target), capture=False)
-        with cd(dest):
-            remote = 'bzr+ssh://code.hackyourlife.org/home/dsnopek/bzr-lingwo/{repo}/{target}'.format(repo=repo, target=target)
-            local('bzr push {0}'.format(remote), capture=False)
-            local('bzr bind {0}'.format(remote), capture=False)
+            # TODO: can we simply use the --set-upstream argument of 'git push'
+            # setup configuration for this branch
+            fd = open(os.path.join(env.cwd, '.git', 'config'), 'at')
+            fd.write('[branch "{0}"]\n'.format(target))
+            fd.write('\tremote = origin\n')
+            fd.write('\tmerge = refs/heads/{0}\n'.format(target))
+            fd.close()
 
-    # we have to copy our drupal setting from mainline to the new branch
-    with cd(os.path.join(env.local_prj_dir, 'lingwo')):
-        local("cp drupal.mainline/sites/default/settings.php drupal.{0}/sites/default".format(target))
-        local("cp linguatrek.mainline/sites/default/settings.php linguatrek.{0}/sites/default".format(target))
-
-def activate_branch(branch):
+def checkout(branch):
     """Switch all our symlinks to point to the given family of branches."""
 
     for repo in env.repos:
-        with cd(os.path.join(env.local_prj_dir, 'lingwo')):
-            source = repo+'.'+branch
-            if not os.path.exists(os.path.join(env.local_prj_dir, 'lingwo', source)):
-                abort('Branch {0} doesn\'t exist'.format(repo+'.'+target))
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            local('git checkout {0}'.format(branch))
 
-            # also do the 'bbcom' repo if necessary
-            link = repo
-            local('rm -f {0}'.format(link), capture=False)
-            local('ln -s {0} {1}'.format(source, link), capture=False)
-
-def merge(source, target='mainline', message=None):
-    """Merge a family of branches into another family (by default, "mainline")."""
+def merge(source, target='master', message=None):
+    """Merge a family of branches into another family (by default, "master")."""
 
     base_message = 'Merging {0} branch.'.format(source) 
     if message is None:
@@ -172,27 +168,47 @@ def merge(source, target='mainline', message=None):
     # TODO: we need to check for uncommited changes!
     
     for repo in env.repos:
-        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.'+target)):
-            output = local('bzr merge ../{0}'.format(repo+'.'+source), capture=True)
-            if output.stderr != 'Nothing to do.':
-                local('bzr commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            local('git checkout {0}'.format(target), capture=False)
+            output = local('git merge --no-commit --squash {0}'.format(source), capture=True)
+            if 'Already up-to-date' not in output:
+                local('git commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
 
-def up(branch=None):
-    """Update all the code on a given branch."""
+def pull(branch=None):
+    """Pull all the code on a given branch."""
+
+    cmd = 'git pull'
+    if branch is None:
+        cmd += ' --all'
 
     for repo in env.repos:
-        if branch is not None:
-            repo += '.'+branch
-        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo)):
-            local('bzr up', capture=False)
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            if branch is not None:
+                local('git checkout {0}'.format(branch), capture=False)
+            local(cmd, capture=False)
+
+def push(branch=None):
+    """Push all the code on a given branch."""
+
+    cmd = 'git push'
+    if branch is None:
+        cmd += ' --all'
+
+    for repo in env.repos:
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            if branch is not None:
+                local('git checkout {0}'.format(branch), capture=False)
+            local(cmd, capture=False)
 
 def tag_release(name):
     """Tags production for release."""
 
     # tag production with release name
     for repo in env.repos:
-        with cd(os.path.join(env.local_prj_dir, 'lingwo', repo+'.production')):
-            local('bzr tag release--{0}'.format(name))
+        with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
+            local('git checkout production', capture=False)
+            local('git tag release--{0}'.format(name), capture=False)
+            local('git push --tags', capture=False)
 
 def make_release(name):
     """Merges mainline into production and then tags for release."""
@@ -217,7 +233,7 @@ def backup_live_code():
         #   env.repos + ['anki_files']
         #   (remember to swap bbcom in if it hasn't been yet)
         #
-        run('tar -cjvpf lingwo-{0}.tar.bz2 lingwo'.format(today.strftime('%Y-%m-%d')))
+        run('tar -cjvpf bibliobird-{0}.tar.bz2 bibliobird'.format(today.strftime('%Y-%m-%d')))
 
 @hosts(prod_host)
 def unsafe_deploy(release_name):
@@ -225,8 +241,8 @@ def unsafe_deploy(release_name):
 
     # check out the new code
     for repo in env.repos:
-        with cd(os.path.join(env.remote_prj_dir, 'lingwo', repo)):
-            run('bzr up -r tag:release--{0}'.format(release_name))
+        with cd(os.path.join(env.remote_prj_dir, 'bibliobird', repo)):
+            run('git checkout tags/release--{0}'.format(release_name))
 
     # update the database (should also force new dependencies to be enabled)
     drush = _Drush(remote=True)
@@ -246,7 +262,7 @@ def create_bootstrap():
     # TODO: The bootstrap should also add this to bin/activate:
     #
     #  # DRS: make our fabfile always get called
-    #  alias fab='fab -f /home/dsnopek/prj/lingwo/bbcom/fabfile.py'
+    #  alias fab='fab -f /home/dsnopek/prj/bibliobird/bbcom/fabfile.py'
     #
     # TODO: The bootstrap should initialize the top project directory
     # as a Bazaar repository, so that revisiions are shared between branches.
@@ -310,7 +326,7 @@ def setup_python_env():
         'nltk==2.0b9':    'http://nltk.googlecode.com/files/nltk-2.0b9.zip#egg=nltk',
         'html5lib==0.90': 'http://html5lib.googlecode.com/files/html5lib-0.90.zip#egg=html5lib',
     }
-    anki_tarball = 'http://anki.googlecode.com/files/anki-1.2.7.tgz'
+    anki_tarball = 'http://anki.googlecode.com/files/anki-1.2.8.tgz'
     requirements = _python_env_requirements()
 
     for i, r in enumerate(requirements[:]):
