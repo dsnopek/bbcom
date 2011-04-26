@@ -116,7 +116,7 @@ def make_testing_safe():
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
 
     # disable dangerous modules
-    drush.dis('googleanalytics', 'spambot')
+    drush.dis('backup_migrate', 'mollom', 'googleanalytics', 'spambot')
 
     # enable the development module
     drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")

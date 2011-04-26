@@ -17,16 +17,22 @@ function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {
   
   // if node we are commenting on isn't published; no need to notify
   if (!$parent->status) return;
-  
+
   switch ($op) {
+    case 'presave':
+      if (!empty($node->nid)) {
+        $old = node_load($node->nid);
+        $node->old_status = $old->status;
+      }
+      break;
+
     case 'insert':
     case 'update':
-      // if comment node is not published let's not notify on it - this could be useful if we have some sort of approval process which manages 
-      // comment node approval by setting pushlished state
-      if ($node->status) _nodecomment_notifications($node, $parent);
-      
-      // OR if we use modr8 module for approval - i think notifications module will deal with these creating duplicate events
-      if (module_exists('modr8') && $node->moderate) _nodecomment_notifications($node, $parent); 
+      // if comment node is not published let's not notify on it - this could be useful if we have
+      // some sort of approval process which manages comment node approval by setting pushlished state
+      if ($node->status && ($op == 'insert' || !$node->old_status)) {
+        _nodecomment_notifications($node, $parent);
+      }
       
       break;  
   }  

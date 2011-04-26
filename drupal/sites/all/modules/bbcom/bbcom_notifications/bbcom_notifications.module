@@ -1,5 +1,7 @@
 <?php
 
+include_once('bbcom_notifications.features.inc');
+
 /**
  * Implementation of hook_theme().
  */
