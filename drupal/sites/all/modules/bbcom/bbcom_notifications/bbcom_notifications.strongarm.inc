@@ -45,16 +45,29 @@ function bbcom_notifications_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_default_auto';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['notifications_default_auto'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_default_send_interval';
-  $strongarm->value = '0';
+  $strongarm->value = 0;
 
   $export['notifications_default_send_interval'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'notifications_digest_methods';
+  $strongarm->value = array(
+    0 => 'simple',
+    3600 => 'short',
+    43200 => 'short',
+    86400 => 'short',
+    604800 => 'long',
+  );
+
+  $export['notifications_digest_methods'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -138,6 +151,19 @@ function bbcom_notifications_strongarm() {
   $strongarm->value = 0;
 
   $export['notifications_send_immediate'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'notifications_send_intervals';
+  $strongarm->value = array(
+    0 => 'Immediately',
+    3600 => 'Every hour',
+    43200 => 'Twice a day',
+    86400 => 'Daily',
+    604800 => 'Weekly',
+  );
+
+  $export['notifications_send_intervals'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
