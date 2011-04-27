@@ -559,6 +559,11 @@ ul.primary li a {
   list-style: none;
 }
 
+/* Minor forum-list customization */
+.forum-subscribe {
+  margin-top: 5px;
+}
+
 /*
 ** Formatting for administration page
 **

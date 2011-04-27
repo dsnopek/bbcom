@@ -1,3 +1,4 @@
+*.pyc
 *.swp
 drupal/sites/*
 !drupal/sites/all

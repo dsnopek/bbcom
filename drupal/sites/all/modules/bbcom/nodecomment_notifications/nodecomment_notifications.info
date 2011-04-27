@@ -1,0 +1,7 @@
+name = Nodecomment Notifications  
+description = Custom module to make nodecomment module work nicely with notifications
+core = 6.x
+package = "Notifications"
+dependencies[] = nodecomment 
+dependencies[] = notifications
+
