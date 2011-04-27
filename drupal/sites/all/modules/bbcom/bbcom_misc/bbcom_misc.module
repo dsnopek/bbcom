@@ -23,7 +23,14 @@ function bbcom_misc_menu() {
       'page callback' => 'drupal_get_form',
       'page arguments' => array('bbcom_misc_admin_settings'),
       'file' => 'bbcom_misc.admin.inc',
-    )
+    ),
+    'myaccount' => array(
+      'title' => 'My Account',
+      'access callback' => 'user_is_logged_in',
+      'access arguments' => array(),
+      'page callback' => 'bbcom_misc_myaccount_page',
+      'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -113,6 +120,20 @@ function bbcom_misc_link_alter(&$links, $node, $comment=NULL) {
     // TODO: Seems to contradict docs, this should be $links['comment']['comment_forbidden'] ...
     unset($links['comment_forbidden']);
   }
+}
+
+function bbcom_misc_myaccount_page() {
+  global $user;
+
+  $parts = explode('/', $_GET['q']);
+  array_shift($parts);
+
+  $url = 'user/' . $user->uid;
+  if (count($parts) > 0) {
+    $url .= '/' . implode('/', $parts);
+  }
+
+  return drupal_goto($url);
 }
 
 /*

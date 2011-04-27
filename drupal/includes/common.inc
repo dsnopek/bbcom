@@ -1579,6 +1579,13 @@ function drupal_attributes($attributes = array()) {
 function l($text, $path, $options = array()) {
   global $language;
 
+  // DRS: bad hack!  But I can't seem to track down where this problem originates.
+  // It comes from menu_get_active_breadcrumb() passing $parent['localized_options'] where
+  // it doesn't exist.  How is it possible for 'localized_options' to not get set?
+  if (is_null($options)) {
+  	$options = array();
+  }
+
   // Merge in defaults.
   $options += array(
       'attributes' => array(),
