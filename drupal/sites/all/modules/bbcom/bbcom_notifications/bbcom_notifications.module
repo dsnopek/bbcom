@@ -14,6 +14,38 @@ function bbcom_notifications_theme() {
 }
 
 /**
+ * Implementation of hook_link().
+ */
+function bbcom_notifications_link($type, $node = NULL, $teaser = FALSE) {
+  global $user;
+
+  $links = array();
+  // TODO: we should probably do the notifications per-content to remove this stuff from forum_reply
+  if ($type == 'node' && !$teaser && $node->type != 'forum_reply' && notifications_access_subscribe($user)) {
+    notifications_include('object.inc');
+    if ($subscriptions = notifications_object_user_subscriptions($type, $node, $user)) {
+      foreach ($subscriptions as $index => $subscription) {
+        if ($node->type == 'forum') {
+          if ($subscription->type == 'thread') {
+            // rename 'This post' to 'This thread'
+            $subscription->name = t('This thread');
+          }
+          elseif ($subscription->type == 'taxonomy') {
+            // rename from long tag name to just 'This forum'
+            $subscription->name = t('This forum');
+          }
+        }
+
+        if ($link = $subscription->build_link()) {
+          $links['notifications_' . $index] = $link;
+        }
+      }
+    }
+  }
+  return $links;
+}
+
+/**
  * Implementation of hook_menu().
  */
 function bbcom_notifications_menu() {
@@ -88,13 +120,13 @@ function bbcom_notifications_user_forum_form(&$form_state, $account) {
       '#type' => 'select',
       '#title' => t('Send method'),
       '#options' => $send_methods,
-      '#default_value' => is_null($sub) ? NULL : $sub->send_method,
+      '#default_value' => is_null($sub) ? notifications_user_setting('send_method', $account) : $sub->send_method,
     );
     $wrapper['send_interval'] = array(
       '#type' => 'select',
       '#title' => t('Send interval'),
       '#options' => $send_intervals,
-      '#default_value' => is_null($sub) ? NULL : $sub->send_interval,
+      '#default_value' => is_null($sub) ? notifications_user_setting('send_interval', $account) : $sub->send_interval,
     );
 
     $form['subscriptions'][] = $wrapper;
@@ -158,5 +190,37 @@ function theme_bbcom_notifications_user_subscriptions_form($form) {
   }
 
   return theme('table', $header, $rows);
+}
+
+function _bbcom_notifications_toggle_subscription_url($tid) {
+  global $user;
+
+  $original = NULL;
+
+  if ($subscriptions = notifications_get_subscriptions(array('type' => 'taxonomy', 'uid' => $user->uid, 'event_type' => 'node'), array('tid' => $tid), TRUE)) {
+    $original = array_shift($subscriptions);
+  }
+
+  $type = is_null($original) ? 'subscribe' : 'unsubscribe';
+  
+  $url = notifications_build_link($type, array(
+    'type' => 'taxonomy',
+    'uid'  => $user->uid,
+    'fields' => array('tid' => $tid),
+    'event_type' => 'node',
+    'destination' => TRUE,
+  ), 'subscription', $original, 'url');
+
+  return array($type, $url);
+}
+
+function bbcom_notifications_preprocess_forum_list(&$vars) {
+  if (user_access('subscribe to taxonomy terms')) {
+    foreach ($vars['forums'] as $forum_id => &$forum) {
+      list($type, $url) = _bbcom_notifications_toggle_subscription_url($forum_id);
+      $link = t($type == 'subscribe' ? '<a href="!url">Subscribe</a> to this forum' : '<a href="!url">Unsubscribe</a> from this forum', array('!url' => $url));
+      $forum->description .= "<div class='forum-subscribe'>$link</div>";
+    }
+  }
 }
 

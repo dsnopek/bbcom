@@ -35,9 +35,6 @@ function bbcom_notifications_strongarm() {
   $strongarm->value = array(
     'taxonomy' => 'taxonomy',
     'thread' => 'thread',
-    'nodetype' => 'nodetype',
-    'author' => 'author',
-    'typeauthor' => 'typeauthor',
   );
 
   $export['notifications_content_type'] = $strongarm;
