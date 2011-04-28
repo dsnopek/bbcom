@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 AnkiServer/AnkiServer.egg-info
+bootstrap.py
 drupal/sites/*
 !drupal/sites/all
 !drupal/sites/default/default.settings.php
