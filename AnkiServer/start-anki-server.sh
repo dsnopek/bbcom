@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE=$HOME/prj/lingwo/bbcom/AnkiServer
+SOURCE=$HOME/prj/bibliobird/bbcom/AnkiServer
 WEBAPP=$HOME/webapps/anki_server
 
 #LOG_FILE=$HOME/logs/user/anki_server/access_log.%Y%m%d
@@ -8,7 +8,7 @@ LOG_FILE=$WEBAPP/access.log
 PID_FILE=$WEBAPP/paster.pid
 
 #ROTATELOGS="/home/dsnopek/lingwo-phpstack/httpd-2.2.15/bin/rotatelogs $LOG_FILE 86400"
-PASTER=$HOME/prj/lingwo/python-env/bin/paster
+PASTER=$HOME/prj/bibliobird/python-env/bin/paster
 SERVE_ARGS="--daemon --log-file=$LOG_FILE --pid-file=$PID_FILE"
 #SERVE_ARGS=""
 
