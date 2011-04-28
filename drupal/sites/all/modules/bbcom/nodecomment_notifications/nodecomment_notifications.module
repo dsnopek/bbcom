@@ -1,5 +1,54 @@
 <?php
 
+/**
+ * Implementation of hook_notifications().
+ */
+function nodecomment_notifications_notifications($op) {
+  switch ($op) {
+    case 'object types':
+      $types = array();
+      // Just like the 'node' object, except it needs to have a different name so
+      // we can pass it in to the event and generate different tokens.
+      $types['nodecomment'] = array(
+        'name' => t('Nodecomment'),
+        'key_field' => 'nid',
+        'load callback' => 'node_load',
+        'format callback' => '_nodecomment_notifications_nid2title',
+        'value callback' => '_nodecomment_notifications_title2nid',
+        'access callback' => '_nodecomment_notifications_user_access',
+      );
+      return $types;
+  }
+}
+
+function _nodecomment_notifications_nid2title($nid, $html = FALSE) {
+  require_once './' . drupal_get_path('module', 'notifications') . '/includes/node.inc';
+  return notifications_node_nid2title($nid, $html);
+}
+
+function _nodecomment_notifications_title2nid($name, $field = NULL, $types = array()) {
+  require_once './' . drupal_get_path('module', 'notifications') . '/includes/node.inc';
+  return notifications_node_title2nid($name, $field, $types);
+}
+
+function _nodecomment_notifications_user_access($node, $account) {
+  require_once './' . drupal_get_path('module', 'notifications') . '/includes/node.inc';
+  return notifications_node_user_access($node, $account);
+}
+
+/**
+ * Implementation of hook_notifications_templates().
+ */
+function nodecomment_notifications_notifications_templates($op, $type = 'all', $language = NULL) {
+  if ($op == 'tokens') {
+    $parts = explode('-', $type);
+    if ($parts[0] == 'notifications' && $parts[3] == 'comment') {
+      // add the nodecoment tokens to the templates
+      return array('nodecomment');
+    }
+  }
+}
+
 /*
  * Implementation of hook_nodeapi().
  *
@@ -38,7 +87,6 @@ function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {
   }  
 }
 
-
 /*
 *   - add event into notification queue
 *   - copied from notifications_content_comment() so modelled after how comments are notified on
@@ -56,15 +104,7 @@ function _nodecomment_notifications($comment, $node) {
         'action' => 'comment',
       );
 
-      // for compatibility, we have to re-arrange some of the data on $comment
-      /*
-      $comment->cid = $comment->nid;
-      $comment->nid = $parent->nid;
-      $comment->comment = $comment->body;
-      $comment->subject = $comment->title;
-      */
-
-      notifications_event($event, array('node' => $node, 'comment' => $comment));
+      notifications_event($event, array('node' => $node, 'nodecomment' => $comment));
     }    
   }
 }
@@ -87,7 +127,7 @@ function _nodecomment_notifications($comment, $node) {
 function nodecomment_notifications_token_values($type, $object = NULL, $options = array()) {
   $values = array();
   switch ($type) {
-    case 'comment':         
+    case 'nodecomment':
       // Cast to an object just in case fussy Drupal gave us an array
       $comment = (object)$object;
       
@@ -123,7 +163,7 @@ function nodecomment_notifications_token_values($type, $object = NULL, $options 
       // Included in case a consuming module wants to format the body
       $values['nodecomment-body-format']     = $comment->format;
 
-      $values += token_get_date_token_values($comment->timestamp, 'comment-');
+      $values += token_get_date_token_values($comment->timestamp, 'nodecomment-');
 
       $values['nodecomment-node-title-raw']  = db_result(db_query("SELECT title FROM {node} WHERE nid = %d", $comment->nid));
       $values['nodecomment-node-title']      = check_plain($values['nodecomment-node-title-raw']);
@@ -141,7 +181,7 @@ function nodecomment_notifications_token_values($type, $object = NULL, $options 
  * Implementation of hook_token_list().
  */
 function nodecomment_notifications_token_list($type = 'all') {
-  if ($type == 'comment' || $type == 'all') {
+  if ($type == 'nodecomment' || $type == 'all') {
     $tokens['nodecomment']['nodecomment-cid']             = t('The unique ID of the comment.');
     $tokens['nodecomment']['nodecomment-nid']             = t('The unique ID of the node the comment was posted to.');
     $tokens['nodecomment']['nodecomment-title']           = t('The title of the comment.');
