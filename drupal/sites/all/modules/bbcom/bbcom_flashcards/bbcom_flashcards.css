@@ -11,15 +11,28 @@
 }
 
 #bibliobird-flashcards-flashcard-answer {
-  display: none;
+  visibility: hidden;
 }
 
 #bibliobird-flashcards-ease-buttons {
-  display: none;
+  visibility: hidden;
 }
 
 #bibliobird-flashcards-finished {
-  font-size: 14pt;
+  font-size: 20pt;
   margin: 10px 0;
+}
+
+.bibliobird-flashcards-count {
+  color: blue;
+  font-weight: bold;
+}
+
+#edit-learn-more,
+#edit-review-early,
+#edit-finish {
+  display: block;
+  width: 200px;
+  text-align: center;
 }
 

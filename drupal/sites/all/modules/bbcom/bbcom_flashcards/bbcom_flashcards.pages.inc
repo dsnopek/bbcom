@@ -61,27 +61,89 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       # if they want.
       $form['in_quiz']['#value'] = 'no';
       $form['message'] = array(
-        '#value' => '<div id="bibliobird-flashcards-finished">'. t('Review finished!') .'</div>',
+        '#value' => theme('bbcom_flashcards_review_finished', 0, 0),
       );
-      $form['reset_quiz'] = array(
+      $form['learn_more'] = array(
+        '#type' => 'submit',
+        '#value' => t('Learn more'),
+      );
+      $form['review_early'] = array(
+        '#type' => 'submit',
+        '#value' => t('Review early'),
+      );
+      $form['finish'] = array(
         '#type' => 'submit',
         '#value' => t('Finish'),
       );
     }
   }
   else {
-    /*
     $form['study_options'] = array(
-      '#type' => 'radios',
-      '#title' => t('Quiz Type'),
-      '#default_value' => 'normal',
-      '#options' => array(
-        'normal' => t('Quiz all the words that are ready'),
-        'limited' => t('Quiz a maximum of XXX ready cards'),
-        'all' => t('Quiz all cards'),
-      )
+      '#prefix' => '<h2>' . t('Study Options') . '</h2><div class="bbcom-flashcards-study-options"><ul></ul>',
+      '#suffix' => '</div>',
     );
-    */
+
+    // New cards
+    $form['study_options']['new_cards'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('New cards'),
+    );
+    $form['study_options']['new_cards']['cards_per_day'] = array(
+      '#type' => 'textfield',
+      '#title' => t('New cards per day'),
+      '#default_value' => 20,
+    );
+    $form['study_options']['new_cards']['display_order_1'] = array(
+      '#type' => 'select',
+      '#title' => t('Display order'),
+      '#options' => array(
+        t('Show new cards in random order'),
+        t('Show new cards in order added'),
+        t('Show new cards in reverse order added'),
+      ),
+      '#default_value' => t('Show new cards in order added'),
+    );
+    $form['study_options']['new_cards']['display_order_2'] = array(
+      '#type' => 'select',
+      '#options' => array(
+        t('Spread new cards out through reviews'),
+        t('Show new cards after all other cards'),
+        t('Show new cards before reviews'),
+      ),
+      '#default_value' => t('Spread new cards out through reviews'),
+    );
+
+    // Reviews
+    $form['study_options']['reviews'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Reviews'),
+    );
+    $form['study_options']['reviews']['max_failed_cards'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Max failed cards'),
+      '#default_value' => 20,
+    );
+    $form['study_options']['reviews']['display_order_1'] = array(
+      '#type' => 'select',
+      '#title' => t('Display order'),
+      '#options' => array(
+        t('Show new cards in random order'),
+        t('Show new cards in order added'),
+        t('Show new cards in reverse order added'),
+      ),
+      '#default_value' => t('Show new cards in order added'),
+    );
+    $form['study_options']['reviews']['display_order_2'] = array(
+      '#type' => 'select',
+      '#options' => array(
+        t('Review cards from largest interval'),
+        t('Review cards from smallest interval'),
+        t('Review cards in order due'),
+        t('Review cards in random order'),
+      ),
+      '#default_value' => t('Review cards from largest interval'),
+    );
+
     $form['start_quiz'] = array(
       '#type' => 'submit',
       '#value' => t('Review'),

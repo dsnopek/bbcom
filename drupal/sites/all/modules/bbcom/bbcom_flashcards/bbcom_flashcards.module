@@ -49,6 +49,10 @@ function bbcom_flashcards_theme() {
       'arguments' => array('node' => NULL),
       'file' => 'bbcom_flashcards.theme.inc',
     ),
+    'bbcom_flashcards_review_finished' => array(
+      'arguments' => array('reviews_count' => NULL, 'new_count' => NULL),
+      'template' => 'bbcom-flashcards-review-finished',
+    ),
   );
 }
 
