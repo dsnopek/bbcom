@@ -160,7 +160,7 @@ def checkout(branch):
 def merge(source, target='master', message=None):
     """Merge a family of branches into another family (by default, "master")."""
 
-    base_message = 'Merging {0} branch.'.format(source) 
+    base_message = 'Merge branch \'{0}\''.format(source)
     if message is None:
         message = base_message
     else:
