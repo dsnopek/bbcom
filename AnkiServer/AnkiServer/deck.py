@@ -377,7 +377,34 @@ class DeckAppHandler(object):
 
             card = self._output_card(card)
             card['intervals'] = intervals
+            card['finished'] = False
+        else:
+            # copied from Deck.nextDueMsg() in libanki/anki/deck.py
+            newCount = deck.newCardsDueBy(deck.dueCutoff + 86400)
+            newCardsTomorrow = min(newCount, deck.newCardsPerDay)
+            cards = deck.cardsDueBy(deck.dueCutoff + 86400)
+
+            card = {
+                'finished': True,
+                'new_count': newCardsTomorrow,
+                'reviews_count': cards
+            }
+
+            # TODO: clean up a bit, now that we've finished this review
+
         return card
+
+    @opts(waitForReturn=False)
+    def setup_scheduler(self, name):
+        deck = self.wrapper.open()
+        if name == 'standard':
+            deck.setupStandardScheduler()
+        elif name == 'reviewEarly':
+            deck.setupReviewEarlyScheduler()
+        elif name == 'learnMore':
+            deck.setupLearnMoreScheduler()
+        deck.refreshSession()
+        deck.reset()
 
     @opts(waitForReturn=False)
     def answer_card(self, card_id, ease):

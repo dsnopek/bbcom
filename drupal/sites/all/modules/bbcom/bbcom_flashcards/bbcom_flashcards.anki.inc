@@ -56,6 +56,12 @@ class AnkiDeck {
     ));
   }
 
+  function setupScheduler($name) {
+    return $this->server->request($this->path, 'setup_scheduler', array(
+      'name' => $name,
+    ));
+  }
+
   function getCard() {
     return $this->server->request($this->path, 'get_card');
   }

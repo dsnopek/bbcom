@@ -7,22 +7,8 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     $form['#card'] = $card;
   }
 
-  $in_quiz = $form_state['values']['in_quiz'] == 'yes' || FALSE;
-  $form['in_quiz'] = array(
-    '#type'  => 'value',
-    # unless this is the last question, we always want to say we are in the quiz
-    '#value' => 'yes'
-  );
-
-  if (isset($form_state['values']['study_options'])) {
-    // TODO: set our configuration
-  }
-
-  if ($in_quiz) {
-    if ($card) {
-      $form['title'] = array(
-        '#value' => '<h3 id="bibliobird-flashcards-title">'. t('Question') .'</h3>',
-      );
+  if (!empty($card)) {
+    if (!$card->finished) {
       $form['card'] = array(
         '#prefix' => '<div id="bibliobird-flashcards-flashcard"><center>',
         '#suffix' => '</center></div>',
@@ -59,9 +45,8 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     else {
       # If we are out of questions, we tell the user and let them reset the quiz,
       # if they want.
-      $form['in_quiz']['#value'] = 'no';
       $form['message'] = array(
-        '#value' => theme('bbcom_flashcards_review_finished', 0, 0),
+        '#value' => theme('bbcom_flashcards_review_finished', $card->reviews_count, $card->new_count),
       );
       $form['learn_more'] = array(
         '#type' => 'submit',
@@ -156,6 +141,11 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
   return $form;
 }
 
+function _bbcom_flashcards_error($e) {
+  watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
+  drupal_set_message(t('Unable to open flashcard deck.  Sorry for the inconvenience!  Please try again later.'), 'error');
+}
+
 function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
   if ($form_state['clicked_button']['#value'] == t('Finish')) {
     # we don't mark to rebuild which means the form will be regenerated from new
@@ -172,17 +162,32 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
   try {
     $deck = bbcom_flashcards_anki_server_connect()
       ->openWialDeck($form['#user']->uid);
-    if ($form_state['clicked_button']['#value'] == t('Start Quiz')) {
-      # TODO: set the settings we want
+
+    switch ($form_state['clicked_button']['#value']) {
+      case t('Review'):
+        $deck->setupScheduler('standard');
+        # TODO: set the settings we want
+        break;
+
+      case t('Learn more'):
+        $deck->setupScheduler('learnMore');
+        break;
+
+      case t('Review early'):
+        $deck->setupScheduler('reviewEarly');
+        break;
     }
+
+    // answer the last card
     if ($form['#card'] && $ease > 0) {
       $deck->answerCard($form['#card'], $ease);
     }
+
+    // get the next one
     $form_state['card'] = $deck->getCard();
   }
-  catch (AnkiServerError $e) {
-    watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-    drupal_set_message(t('Unable to open flashcard deck.  Sorry for the inconvenience!  Please try again later.', 'error'));
+  catch (AnkiServerException $e) {
+    _bbcom_flashcards_error($e);
   }
 }
 

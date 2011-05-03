@@ -1,21 +1,30 @@
 
 #bibliobird-flashcards-flashcard {
-  margin: 10px;
-  padding: 25px 10px;
-  border: 1px solid black;
-  background: white;
+  padding: 25px 0;
   font-size: 14pt;
 }
 
 #bibliobird-flashcards-flashcard-question {
+  padding: 10px 0 20px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid black;
 }
 
 #bibliobird-flashcards-flashcard-answer {
   visibility: hidden;
+  padding: 10px 0;
 }
 
 #bibliobird-flashcards-ease-buttons {
-  visibility: hidden;
+  display: none;
+  text-align: center;
+}
+
+#bibliobird-flashcards-show-answer {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  background-color: #CCC;
 }
 
 #bibliobird-flashcards-finished {

@@ -1,11 +1,9 @@
 
 Drupal.behaviors.bibliobird_flashcards = function (context) {
-    var link = $('<a href="#"></a>')
+    var link = $('<a id="bibliobird-flashcards-show-answer" href="#"></a>')
         .text(Drupal.t('Show answer'))
         .click(function (evt) {
-            $('#bibliobird-flashcards-title').text(Drupal.t('Answer'));
-            $('#bibliobird-flashcards-flashcard-question').hide();
-            $('#bibliobird-flashcards-flashcard-answer').show();
+            $('#bibliobird-flashcards-flashcard-answer').css('visibility', 'visible');
             $('#bibliobird-flashcards-ease-buttons').show();
             link.remove();
             evt.preventDefault();
