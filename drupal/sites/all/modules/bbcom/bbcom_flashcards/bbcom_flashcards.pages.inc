@@ -63,7 +63,18 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     }
   }
   else {
+    try {
+      $opts = bbcom_flashcards_anki_server_connect()
+        ->openWialDeck($form['#user']->uid)
+        ->getOptions();
+    }
+    catch (AnkiServerException $e) {
+      _bbcom_flashcards_error($e);
+      return $form;
+    }
+
     $form['study_options'] = array(
+      '#tree' => TRUE,
       '#prefix' => '<h2>' . t('Study Options') . '</h2><div class="bbcom-flashcards-study-options"><ul></ul>',
       '#suffix' => '</div>',
     );
@@ -76,26 +87,26 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     $form['study_options']['new_cards']['cards_per_day'] = array(
       '#type' => 'textfield',
       '#title' => t('New cards per day'),
-      '#default_value' => 20,
+      '#default_value' => $opts->new_cards->cards_per_day,
     );
-    $form['study_options']['new_cards']['display_order_1'] = array(
+    $form['study_options']['new_cards']['order'] = array(
       '#type' => 'select',
       '#title' => t('Display order'),
       '#options' => array(
-        t('Show new cards in random order'),
-        t('Show new cards in order added'),
-        t('Show new cards in reverse order added'),
+        0 => t('Show new cards in random order'),
+        1 => t('Show new cards in order added'),
+        2 => t('Show new cards in reverse order added'),
       ),
-      '#default_value' => t('Show new cards in order added'),
+      '#default_value' => $opts->new_cards->order,
     );
-    $form['study_options']['new_cards']['display_order_2'] = array(
+    $form['study_options']['new_cards']['spacing'] = array(
       '#type' => 'select',
       '#options' => array(
-        t('Spread new cards out through reviews'),
-        t('Show new cards after all other cards'),
-        t('Show new cards before reviews'),
+        0 => t('Spread new cards out through reviews'),
+        1 => t('Show new cards after all other cards'),
+        2 => t('Show new cards before reviews'),
       ),
-      '#default_value' => t('Spread new cards out through reviews'),
+      '#default_value' => $opts->new_cards->spacing,
     );
 
     // Reviews
@@ -103,30 +114,32 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       '#type' => 'fieldset',
       '#title' => t('Reviews'),
     );
-    $form['study_options']['reviews']['max_failed_cards'] = array(
+    $form['study_options']['reviews']['failed_card_max'] = array(
       '#type' => 'textfield',
       '#title' => t('Max failed cards'),
-      '#default_value' => 20,
+      '#default_value' => $opts->reviews->failed_card_max,
     );
-    $form['study_options']['reviews']['display_order_1'] = array(
+    $form['study_options']['reviews']['order'] = array(
       '#type' => 'select',
       '#title' => t('Display order'),
       '#options' => array(
-        t('Show new cards in random order'),
-        t('Show new cards in order added'),
-        t('Show new cards in reverse order added'),
+        0 => t('Review cards from largest interval'),
+        1 => t('Review cards from smallest interval'),
+        2 => t('Review cards in order due'),
+        3 => t('Review cards in random order'),
       ),
-      '#default_value' => t('Show new cards in order added'),
+      '#default_value' => $opts->reviews->order,
     );
-    $form['study_options']['reviews']['display_order_2'] = array(
+    $form['study_options']['reviews']['failed_policy'] = array(
       '#type' => 'select',
       '#options' => array(
-        t('Review cards from largest interval'),
-        t('Review cards from smallest interval'),
-        t('Review cards in order due'),
-        t('Review cards in random order'),
+        0 => t('Show failed cards soon'),
+        1 => t('Show failed cards at end'),
+        2 => t('Show failed cards in 10 minutes'),
+        3 => t('Show failed cards in 8 hours'),
+        4 => t('Show failed cards in 3 days'),
       ),
-      '#default_value' => t('Review cards from largest interval'),
+      '#default_value' => $opts->reviews->failed_policy,
     );
 
     $form['start_quiz'] = array(
@@ -165,8 +178,8 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
 
     switch ($form_state['clicked_button']['#value']) {
       case t('Review'):
+        $deck->setOptions($form_state['values']['study_options']);
         $deck->setupScheduler('standard');
-        # TODO: set the settings we want
         break;
 
       case t('Learn more'):

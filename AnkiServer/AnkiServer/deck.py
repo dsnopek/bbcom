@@ -406,6 +406,41 @@ class DeckAppHandler(object):
         deck.refreshSession()
         deck.reset()
 
+    def get_options(self):
+        deck = self.wrapper.open()
+
+        return {
+            'new_cards': {
+                'cards_per_day': deck.newCardsPerDay,
+                'order': deck.newCardOrder,
+                'spacing': deck.newCardSpacing,
+            },
+            'reviews': {
+                'failed_card_max': deck.failedCardMax,
+                'order': deck.revCardOrder,
+                'failed_policy': deck.getFailedCardPolicy(),
+            }
+        }
+
+    @opts(waitForReturn=False)
+    def set_options(self, study_options):
+        deck = self.wrapper.open()
+
+        # new card options
+        deck.newCardsPerDay = int(study_options['new_cards']['cards_per_day'])
+        deck.newCardOrder = int(study_options['new_cards']['order'])
+        if deck.newCardOrder == anki.deck.NEW_CARDS_RANDOM:
+            deck.randomizeNewCards()
+        deck.newCardSpacing = int(study_options['new_cards']['spacing'])
+
+        # reviews options
+        deck.failedCardMax = int(study_options['reviews']['failed_card_max'])
+        deck.revCardOrder = int(study_options['reviews']['order'])
+        deck.setFailedCardPolicy(int(study_options['reviews']['failed_policy']))
+
+        deck.flushMod()
+        deck.reset()
+
     @opts(waitForReturn=False)
     def answer_card(self, card_id, ease):
         ease = int(ease)
