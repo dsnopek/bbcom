@@ -23,32 +23,15 @@ function bbcom_flashcards_menu() {
     'file' => 'bbcom_flashcards.admin.inc',
   );
 
-  // TODO: these pages aren't ready yet!
-  /*
-  $items['wial/%user'] = array(
-    'title' => 'Words I Am Learning',
-    'access callback' => 'bbcom_wial_page_access',
-    'access arguments' => array(1),
-    'page callback' => 'bbcom_flashcards_page_wial_view',
-    'page arguments' => array(1),
-    'file' => 'bbcom_flashcards.pages.inc',
-    'type' => MENU_NORMAL_ITEM
-  );
-  $items['wial/%user/view'] = array(
-    'title' => 'View',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-  $items['wial/%user/quiz'] = array(
-    'title' => 'Quiz',
+  $items['wial/%user/review'] = array(
+    'title' => 'Review',
     'access callback' => 'bbcom_wial_page_access',
     'access arguments' => array(1),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bbcom_flashcards_page_wial_quiz_form', 1),
+    'page arguments' => array('bbcom_flashcards_page_wial_review_form', 1),
     'file' => 'bbcom_flashcards.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  */
 
   return $items;
 }

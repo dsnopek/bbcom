@@ -1,10 +1,6 @@
 <?php
 
-function bbcom_flashcards_page_wial_view($account) {
-  return 'view';
-}
-
-function bbcom_flashcards_page_wial_quiz_form(&$form_state, $account) {
+function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
   $form['#user'] = $account;
   $card = $form_state['card'];
   if ($card) {
@@ -18,7 +14,7 @@ function bbcom_flashcards_page_wial_quiz_form(&$form_state, $account) {
     '#value' => 'yes'
   );
 
-  if (isset($form_state['values']['quiz_options'])) {
+  if (isset($form_state['values']['study_options'])) {
     // TODO: set our configuration
   }
 
@@ -65,16 +61,17 @@ function bbcom_flashcards_page_wial_quiz_form(&$form_state, $account) {
       # if they want.
       $form['in_quiz']['#value'] = 'no';
       $form['message'] = array(
-        '#value' => '<div id="bibliobird-flashcards-finished">'. t('Quiz finished!') .'</div>',
+        '#value' => '<div id="bibliobird-flashcards-finished">'. t('Review finished!') .'</div>',
       );
       $form['reset_quiz'] = array(
         '#type' => 'submit',
-        '#value' => t('Reset Quiz'),
+        '#value' => t('Finish'),
       );
     }
   }
   else {
-    $form['quiz_options'] = array(
+    /*
+    $form['study_options'] = array(
       '#type' => 'radios',
       '#title' => t('Quiz Type'),
       '#default_value' => 'normal',
@@ -84,9 +81,10 @@ function bbcom_flashcards_page_wial_quiz_form(&$form_state, $account) {
         'all' => t('Quiz all cards'),
       )
     );
+    */
     $form['start_quiz'] = array(
       '#type' => 'submit',
-      '#value' => t('Start Quiz'),
+      '#value' => t('Review'),
     );
   }
 
@@ -96,8 +94,8 @@ function bbcom_flashcards_page_wial_quiz_form(&$form_state, $account) {
   return $form;
 }
 
-function bbcom_flashcards_page_wial_quiz_form_submit($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == t('Reset Quiz')) {
+function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
+  if ($form_state['clicked_button']['#value'] == t('Finish')) {
     # we don't mark to rebuild which means the form will be regenerated from new
   	return;
   }

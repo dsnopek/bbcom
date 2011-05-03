@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 AnkiServer/AnkiServer.egg-info
+AnkiServer/server.log
 bootstrap.py
 drupal/sites/*
 !drupal/sites/all
