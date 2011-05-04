@@ -56,6 +56,22 @@ class AnkiDeck {
     ));
   }
 
+  function getOptions() {
+    return $this->server->request($this->path, 'get_options');
+  }
+
+  function setOptions($study_options) {
+    return $this->server->request($this->path, 'set_options', array(
+      'study_options' => $study_options,
+    ));
+  }
+
+  function setupScheduler($name) {
+    return $this->server->request($this->path, 'setup_scheduler', array(
+      'name' => $name,
+    ));
+  }
+
   function getCard() {
     return $this->server->request($this->path, 'get_card');
   }

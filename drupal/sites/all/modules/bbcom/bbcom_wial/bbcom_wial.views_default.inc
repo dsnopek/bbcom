@@ -310,17 +310,17 @@ return bbcom_wial_page_access($parts[1]);
   $handler = $view->new_display('page', 'Page', 'page_1');
   $handler->override_option('path', 'wial/%/edit');
   $handler->override_option('menu', array(
-    'type' => 'tab',
+    'type' => 'default tab',
     'title' => 'Edit',
     'description' => '',
-    'weight' => '0',
+    'weight' => '-1',
     'name' => 'navigation',
   ));
   $handler->override_option('tab_options', array(
-    'type' => 'none',
-    'title' => '',
+    'type' => 'normal',
+    'title' => 'Words I Am Learning',
     'description' => '',
-    'weight' => 0,
+    'weight' => '0',
     'name' => 'navigation',
   ));
 

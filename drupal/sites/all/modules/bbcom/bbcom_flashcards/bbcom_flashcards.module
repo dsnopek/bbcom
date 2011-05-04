@@ -9,6 +9,12 @@ include_once('bbcom_flashcards.anki.inc');
  * Integrate Anki flashcards into BiblioBird.com
  */
 
+function bbcom_flashcards_perm() {
+  return array(
+    'review bibliobird flashcards online'
+  );
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -23,34 +29,21 @@ function bbcom_flashcards_menu() {
     'file' => 'bbcom_flashcards.admin.inc',
   );
 
-  // TODO: these pages aren't ready yet!
-  /*
-  $items['wial/%user'] = array(
-    'title' => 'Words I Am Learning',
-    'access callback' => 'bbcom_wial_page_access',
-    'access arguments' => array(1),
-    'page callback' => 'bbcom_flashcards_page_wial_view',
-    'page arguments' => array(1),
-    'file' => 'bbcom_flashcards.pages.inc',
-    'type' => MENU_NORMAL_ITEM
-  );
-  $items['wial/%user/view'] = array(
-    'title' => 'View',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-  $items['wial/%user/quiz'] = array(
-    'title' => 'Quiz',
-    'access callback' => 'bbcom_wial_page_access',
+  $items['wial/%user/review'] = array(
+    'title' => 'Review',
+    'access callback' => 'bbcom_flashcards_review_access',
     'access arguments' => array(1),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bbcom_flashcards_page_wial_quiz_form', 1),
+    'page arguments' => array('bbcom_flashcards_page_wial_review_form', 1),
     'file' => 'bbcom_flashcards.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  */
 
   return $items;
+}
+
+function bbcom_flashcards_review_access($account) {
+  return bbcom_wial_page_access($account) && user_access('review bibliobird flashcards online');
 }
 
 /**
@@ -65,6 +58,10 @@ function bbcom_flashcards_theme() {
     'bbcom_flashcards_flashcard_back' => array(
       'arguments' => array('node' => NULL),
       'file' => 'bbcom_flashcards.theme.inc',
+    ),
+    'bbcom_flashcards_review_finished' => array(
+      'arguments' => array('reviews_count' => NULL, 'new_count' => NULL),
+      'template' => 'bbcom-flashcards-review-finished',
     ),
   );
 }

@@ -1,25 +1,51 @@
 
+#bibliobird-flashcards-study-options {
+  margin: 20px 0;
+}
+
 #bibliobird-flashcards-flashcard {
-  margin: 10px;
-  padding: 25px 10px;
-  border: 1px solid black;
-  background: white;
+  padding: 25px 0;
   font-size: 14pt;
 }
 
 #bibliobird-flashcards-flashcard-question {
+  padding: 10px 0 20px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid black;
 }
 
 #bibliobird-flashcards-flashcard-answer {
-  display: none;
+  visibility: hidden;
+  padding: 10px 0;
 }
 
 #bibliobird-flashcards-ease-buttons {
   display: none;
+  text-align: center;
+}
+
+#bibliobird-flashcards-show-answer {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  background-color: #CCC;
 }
 
 #bibliobird-flashcards-finished {
-  font-size: 14pt;
+  font-size: 20pt;
   margin: 10px 0;
+}
+
+.bibliobird-flashcards-count {
+  color: blue;
+  font-weight: bold;
+}
+
+#edit-learn-more,
+#edit-review-early,
+#edit-finish {
+  display: block;
+  width: 200px;
+  text-align: center;
 }
 
