@@ -127,7 +127,7 @@ def branch(source=None, target=None):
     """Branch all the repos to create a new family of branches."""
 
     # We do some argument shuffling magic, so that we can specify one argument
-    # to branch from 'mainline', specify both in a sane order...  Not very pythonic
+    # to branch from 'master', specify both in a sane order...  Not very pythonic
     # but it stops me from losing my mind with how this is supposed to work!
     if source is None and target is None:
         raise TypeError('Must pass atleast one argument')
@@ -212,10 +212,10 @@ def tag_release(name):
             local('git push --tags', capture=False)
 
 def make_release(name):
-    """Merges mainline into production and then tags for release."""
+    """Merges master into production and then tags for release."""
 
     # merge mainline into production
-    merge('mainline', 'production', 'Creating release {0}'.format(name))
+    merge('master', 'production', 'Creating release {0}'.format(name))
     
     tag_release(name)
 
