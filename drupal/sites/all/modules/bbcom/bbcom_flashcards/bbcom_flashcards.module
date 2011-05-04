@@ -9,6 +9,12 @@ include_once('bbcom_flashcards.anki.inc');
  * Integrate Anki flashcards into BiblioBird.com
  */
 
+function bbcom_flashcards_perm() {
+  return array(
+    'review bibliobird flashcards online'
+  );
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -25,7 +31,7 @@ function bbcom_flashcards_menu() {
 
   $items['wial/%user/review'] = array(
     'title' => 'Review',
-    'access callback' => 'bbcom_wial_page_access',
+    'access callback' => 'bbcom_flashcards_review_access',
     'access arguments' => array(1),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_flashcards_page_wial_review_form', 1),
@@ -34,6 +40,10 @@ function bbcom_flashcards_menu() {
   );
 
   return $items;
+}
+
+function bbcom_flashcards_review_access($account) {
+  return bbcom_wial_page_access($account) && user_access('review bibliobird flashcards online');
 }
 
 /**
