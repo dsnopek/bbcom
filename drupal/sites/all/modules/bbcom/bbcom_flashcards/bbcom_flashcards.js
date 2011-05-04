@@ -9,5 +9,15 @@ Drupal.behaviors.bibliobird_flashcards = function (context) {
             evt.preventDefault();
         })
         .insertAfter($('#bibliobird-flashcards-flashcard', context));
+
+    // setup our tabs
+    $('#bibliobird-flashcards-study-options-tabs', context).tabs();
+
+    // should use .unwrap() but this is jquery 1.2
+    $('#tab-new-cards fieldset, #tab-reviews fieldset', context).each(function () {
+        var n = $(this);
+        $('legend', n).remove();
+        n.replaceWith(n.contents());
+    });
 };
 

@@ -73,17 +73,36 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       return $form;
     }
 
+    jquery_ui_add('ui.tabs');
+    drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/default/ui.all.css');
+
     $form['study_options'] = array(
       '#tree' => TRUE,
-      '#prefix' => '<h2>' . t('Study Options') . '</h2><div class="bbcom-flashcards-study-options"><ul></ul>',
-      '#suffix' => '</div>',
     );
 
-    // New cards
-    $form['study_options']['new_cards'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('New cards'),
+    // generate some stuff for each tab
+    $tabs_list = array(
+      'new-cards' => t('New cards'),
+      'reviews' => t('Reviews'),
     );
+    $tabs = '<ul>';
+    foreach ($tabs_list as $tab_id => $tab) {
+      $tabs .= '<li><a href="#tab-' . $tab_id . '">' . $tab . '</a></li>';
+      $form['study_options'][str_replace('-', '_', $tab_id)] = array(
+        '#type' => 'fieldset',
+        '#title' => $tabs_list['new-cards'],
+        '#prefix' => '<div id="tab-' . $tab_id . '">',
+        '#suffix' => '</div>',
+      );
+    }
+    $tabs .= '</ul>';
+
+    // setup the tabs html and wrap the whole thing
+    $form['study_options']['#prefix'] = '<h2>' . t('Study Options') . '</h2>' .
+      '<div id="bibliobird-flashcards-study-options"><div id="bibliobird-flashcards-study-options-tabs">' . $tabs . '</div>';
+    $form['study_options']['#suffix'] = '</div>';
+
+    // New cards
     $form['study_options']['new_cards']['cards_per_day'] = array(
       '#type' => 'textfield',
       '#title' => t('New cards per day'),
@@ -110,10 +129,6 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     );
 
     // Reviews
-    $form['study_options']['reviews'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Reviews'),
-    );
     $form['study_options']['reviews']['failed_card_max'] = array(
       '#type' => 'textfield',
       '#title' => t('Max failed cards'),
@@ -162,7 +177,7 @@ function _bbcom_flashcards_error($e) {
 function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
   if ($form_state['clicked_button']['#value'] == t('Finish')) {
     # we don't mark to rebuild which means the form will be regenerated from new
-  	return;
+    return;
   }
 
   # we continue to rebuild the same form

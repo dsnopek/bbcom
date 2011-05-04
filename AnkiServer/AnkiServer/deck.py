@@ -434,12 +434,13 @@ class DeckAppHandler(object):
         deck.newCardSpacing = int(study_options['new_cards']['spacing'])
 
         # reviews options
+        deck.setFailedCardPolicy(int(study_options['reviews']['failed_policy']))
         deck.failedCardMax = int(study_options['reviews']['failed_card_max'])
         deck.revCardOrder = int(study_options['reviews']['order'])
-        deck.setFailedCardPolicy(int(study_options['reviews']['failed_policy']))
 
         deck.flushMod()
         deck.reset()
+        deck.save()
 
     @opts(waitForReturn=False)
     def answer_card(self, card_id, ease):
