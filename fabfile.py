@@ -173,7 +173,9 @@ def merge(source, target='master', message=None):
             local('git checkout {0}'.format(target), capture=False)
             output = local('git merge --no-commit --squash {0}'.format(source), capture=True)
             if 'Already up-to-date' not in output:
-                local('git commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
+                with settings(warn_only=True):
+                    local('git commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
+                local('git push --all', capture=False)
 
 def pull(branch=None):
     """Pull all the code on a given branch."""
