@@ -90,6 +90,24 @@ function bbcom_wial_page_access($account) {
 
 function bbcom_wial_redirect_page() {
   global $user;
-  drupal_goto('wial/'. $user->uid .'/edit');
+  $uid = $user->uid;
+
+  $parts = explode('/', $_GET['q']);
+  array_shift($parts);
+
+  if (count($parts) == 0) {
+    $parts = array('edit');
+  }
+  elseif (count($parts) == 1 && intval($parts[0]) > 0) {
+    $uid = $parts[0];
+    $parts = array('edit');
+  }
+
+  $url = 'wial/' . $uid;
+  if (count($parts) > 0) {
+    $url .= '/' . implode('/', $parts);
+  }
+
+  return drupal_goto($url);
 }
 
