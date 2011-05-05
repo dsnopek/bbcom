@@ -12,17 +12,17 @@ class AnkiDeck {
   }
 
   function setup() {
-    $this->server->request($this->path, 'setup', array());
+    return $this->server->request($this->path, 'setup', array());
   }
 
   function addFact($fields) {
-    $this->server->request($this->path, 'add_fact', array(
+    return $this->server->request($this->path, 'add_fact', array(
       'fields' => $fields
     ));
   }
 
   function addFactForNode($node) {
-    $this->addFact(array(
+    return $this->addFact(array(
       'Front' => theme('bbcom_flashcards_flashcard_front', $node),
       'Back'  => theme('bbcom_flashcards_flashcard_back', $node),
       'External ID' => LingwoEntry::fromNode($node)->getLingwoId(),
@@ -39,13 +39,13 @@ class AnkiDeck {
   }
 
   function deleteFact($fact) {
-    $this->server->request($this->path, 'delete_fact', array(
+    return $this->server->request($this->path, 'delete_fact', array(
       'fact_id' => $fact->id,
     ));
   }
 
   function deleteFactForNode($node) {
-    $this->server->request($this->path, 'delete_fact', array(
+    return $this->server->request($this->path, 'delete_fact', array(
       'external_id' => LingwoEntry::fromNode($node)->getLingwoId(),
     ));
   }
@@ -77,7 +77,7 @@ class AnkiDeck {
   }
 
   function answerCard($card, $ease) {
-    $this->server->request($this->path, 'answer_card', array(
+    return $this->server->request($this->path, 'answer_card', array(
       'card_id' => $card->id,
       'ease' => $ease,
     ));

@@ -208,7 +208,12 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
 
     // answer the last card
     if ($form['#card'] && $ease > 0) {
-      $deck->answerCard($form['#card'], $ease);
+      if (!$deck->answerCard($form['#card'], $ease)) {
+        // return to the options screen and tell user their session has ended
+        $form_state['rebuild'] = FALSE;
+        drupal_set_message(t('Your session has ended.  Please start your review again.'), 'error');
+        return;
+      }
     }
 
     // get the next one

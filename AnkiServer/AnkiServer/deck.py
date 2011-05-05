@@ -201,8 +201,8 @@ class DeckThreadPool(object):
     def __init__(self):
         self.threads = {}
 
-        self.monitor_frequency = 5
-        self.monitor_inactivity = 10
+        self.monitor_frequency = 15
+        self.monitor_inactivity = 90
 
         monitor = Thread(target=self._monitor_run)
         monitor.daemon = True
@@ -442,14 +442,18 @@ class DeckAppHandler(object):
         deck.reset()
         deck.save()
 
-    @opts(waitForReturn=False)
+    #@opts(waitForReturn=False)
     def answer_card(self, card_id, ease):
         ease = int(ease)
         deck = self.wrapper.open()
         card = deck.cardFromId(card_id)
         if card:
-            deck.answerCard(card, ease)
+            try:
+                deck.answerCard(card, ease)
+            except:
+                return False
             deck.save()
+        return True
 
 class DeckApp(object):
     """ Our WSGI app. """
