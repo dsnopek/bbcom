@@ -72,6 +72,25 @@ function bbcom_wial_perm() {
   );
 }
 
+/**
+ * Implementation of hook_user().
+ */
+function bbcom_wial_user($op, &$edit, &$account, $category = NULL) {
+  if ($op == 'form' && $category == 'account') {
+    $form['bbcom_wial'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Words I Am Learning'),
+      '#tree' => TRUE,
+    );
+    $form['bbcom_wial']['auto_add'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Automatically add the words I click on, when reading content.'),
+      '#default_value' => isset($account->bbcom_wial['auto_add']) ? $account->bbcom_wial['auto_add'] : TRUE,
+    );
+    return $form;
+  }
+}
+
 function bbcom_wial_page_access($account) {
   global $user;
 

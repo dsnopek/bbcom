@@ -16,10 +16,41 @@ function bbcom_wial_rules_defaults() {
           'bbcom_wial' => 'bbcom_wial',
         ),
         '#status' => 'default',
-        '#conditions' => array(),
-        '#actions' => array(
+        '#conditions' => array(
           '0' => array(
             '#weight' => 0,
+            '#info' => array(
+              'label' => 'The user wants words to be automatically added',
+              'label callback' => FALSE,
+              'module' => 'PHP',
+              'eval input' => array(
+                '0' => 'code',
+              ),
+            ),
+            '#name' => 'rules_condition_custom_php',
+            '#settings' => array(
+              'code' => '$val = isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_add\'] : TRUE;
+drupal_set_message(\'auto_add: \' . $val);
+return isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_add\'] : TRUE;',
+              'vars' => array(
+                '0' => 'user',
+              ),
+            ),
+            '#type' => 'condition',
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              'flag' => 'wial',
+              'permission_check' => 1,
+              '#argument map' => array(
+                'object' => 'node',
+                'flagging_user' => 'user',
+              ),
+            ),
+            '#name' => 'flag_rules_action_flag_node',
             '#info' => array(
               'label' => 'Flag The node looked up., under "Words I Am Learning"',
               'base' => 'flag_rules_action_flag',
@@ -42,16 +73,7 @@ function bbcom_wial_rules_defaults() {
               ),
               'module' => 'Flag',
             ),
-            '#name' => 'flag_rules_action_flag_node',
-            '#settings' => array(
-              'flag' => 'wial',
-              'permission_check' => 1,
-              '#argument map' => array(
-                'object' => 'node',
-                'flagging_user' => 'user',
-              ),
-            ),
-            '#type' => 'action',
+            '#weight' => 0,
           ),
         ),
         '#version' => 6003,
