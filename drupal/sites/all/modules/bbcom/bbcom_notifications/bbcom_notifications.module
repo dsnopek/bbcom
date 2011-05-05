@@ -62,6 +62,82 @@ function bbcom_notifications_menu() {
   return $items;
 }
 
+// Helper function to subscribe a user to a forum
+function _bbcom_notifications_subscribe_to_forum($account, $tid, $opts) {
+  $subscription = array(
+    'type' => 'taxonomy',
+    'uid'  => $account->uid,
+    'fields' => array('tid' => $tid),
+    'send_method' => $opts['send_method'],
+    'send_interval' => $opts['send_interval'],
+    'event_type' => 'node',
+  );
+  if (!empty($opts['sid'])) {
+    $subscription['sid'] = $opts['sid'];
+  }
+  $subscription = notifications_build_subscription($subscription);
+  $ret = notifications_save_subscription($subscription);
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function bbcom_notifications_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'register':
+      $form['bbcom_notifications'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Notifications'),
+        '#tree' => TRUE,
+      );
+      $forums = array();
+      foreach (forum_get_forums() as $forum) {
+        $forums[$forum->tid] = $forum->name;
+      }
+      $form['bbcom_notifications']['forums'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Forums'),
+        '#options' => $forums,
+        //'#default_value' => array_keys($forums),
+        // By default, they should be subscribed to "General Discussion"
+        '#default_value' => array(2),
+        '#description' => t('The forums you would like to subscribe to.'),
+      );
+      $form['bbcom_notifications']['send_method'] = array(
+        '#parents' => array('messaging_default'),
+        '#type' => 'select',
+        '#title' => t('Default send method'),
+        '#options' => messaging_method_list(),
+        '#default' => messaging_method_default(),
+      );
+      $form['bbcom_notifications']['send_interval'] = array(
+        '#parents' => array('notifications_send_interval'),
+        '#type' => 'select',
+        '#title' => t('Default send interval'),
+        '#options' => notifications_send_intervals(),
+        '#default' => variable_get('notifications_default_send_interval', 0),
+      );
+
+      return $form;
+
+    case 'insert':
+      $forums = $edit['bbcom_notifications']['forums'];
+      unset($edit['bbcom_notifications']);
+
+      // subscribe to the forums
+      foreach ($forums as $tid) {
+        if ($tid > 0) {
+          _bbcom_notifications_subscribe_to_forum($account, $tid, array(
+            'send_method' => $edit['messaging_default'],
+            'send_interval' => $edit['notifications_send_interval'],
+          ));
+        }
+      }
+
+      break;
+  }
+}
+
 function _bbcom_notifications_user_forum_access($account) {
   return notifications_access_user($account) && user_access('subscribe to taxonomy terms', $account);
 }
@@ -86,8 +162,6 @@ function bbcom_notifications_user_forum_form(&$form_state, $account) {
   );
 
   $form['subscriptions'] = array(
-    //'#type' => 'fieldset',
-    //'#title' => t('Forums'),
     '#theme' => 'bbcom_notifications_user_subscriptions_form',
     '#tree' => TRUE,
   );
@@ -144,24 +218,14 @@ function bbcom_notifications_user_forum_form_submit($form, &$form_state) {
   $account = (object)$form_state['values']['account'];
   foreach ($form_state['values']['subscriptions'] as $value) {
     if ($value['subscribe']) {
-      $subscription = array(
-        'type' => 'taxonomy',
-        'uid'  => $account->uid,
-        'fields' => array('tid' => $value['tid']),
-        'send_method' => $value['send_method'],
-        'send_interval' => $value['send_interval'],
-        'event_type' => 'node',
-      );
-      if (!empty($value['sid'])) {
-        $subscription['sid'] = $value['sid'];
-      }
-      $subscription = notifications_build_subscription($subscription);
-      $ret = notifications_save_subscription($subscription);
+      _bbcom_notifications_subscribe_to_forum($account, $value['tid'], $value);
     }
     elseif (!empty($value['sid'])) {
       notifications_subscription_delete($value['sid']);
     }
   }
+
+  drupal_set_message(t('Your forum subscriptions have been updated.'));
 }
 
 function theme_bbcom_notifications_user_subscriptions_form($form) {
