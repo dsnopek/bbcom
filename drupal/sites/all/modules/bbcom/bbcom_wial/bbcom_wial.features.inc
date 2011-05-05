@@ -19,6 +19,14 @@ function bbcom_wial_rules_defaults() {
         '#conditions' => array(
           '0' => array(
             '#weight' => 0,
+            '#type' => 'condition',
+            '#settings' => array(
+              'code' => 'return isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_add\'] : TRUE;',
+              'vars' => array(
+                '0' => 'user',
+              ),
+            ),
+            '#name' => 'rules_condition_custom_php',
             '#info' => array(
               'label' => 'The user wants words to be automatically added',
               'label callback' => FALSE,
@@ -27,30 +35,11 @@ function bbcom_wial_rules_defaults() {
                 '0' => 'code',
               ),
             ),
-            '#name' => 'rules_condition_custom_php',
-            '#settings' => array(
-              'code' => '$val = isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_add\'] : TRUE;
-drupal_set_message(\'auto_add: \' . $val);
-return isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_add\'] : TRUE;',
-              'vars' => array(
-                '0' => 'user',
-              ),
-            ),
-            '#type' => 'condition',
           ),
         ),
         '#actions' => array(
           '0' => array(
-            '#type' => 'action',
-            '#settings' => array(
-              'flag' => 'wial',
-              'permission_check' => 1,
-              '#argument map' => array(
-                'object' => 'node',
-                'flagging_user' => 'user',
-              ),
-            ),
-            '#name' => 'flag_rules_action_flag_node',
+            '#weight' => 0,
             '#info' => array(
               'label' => 'Flag The node looked up., under "Words I Am Learning"',
               'base' => 'flag_rules_action_flag',
@@ -73,7 +62,16 @@ return isset($user->bbcom_wial[\'auto_add\']) ? (bool)$user->bbcom_wial[\'auto_a
               ),
               'module' => 'Flag',
             ),
-            '#weight' => 0,
+            '#name' => 'flag_rules_action_flag_node',
+            '#settings' => array(
+              'flag' => 'wial',
+              'permission_check' => 1,
+              '#argument map' => array(
+                'object' => 'node',
+                'flagging_user' => 'user',
+              ),
+            ),
+            '#type' => 'action',
           ),
         ),
         '#version' => 6003,
