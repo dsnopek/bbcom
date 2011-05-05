@@ -9,8 +9,7 @@ prod_host = 'bibliobird.com'
 #env.hosts = [prod_host]
 
 env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
-env.local_drupal_dir = env.local_prj_dir+'/bibliobird/bbcom/drupal'
-env.remote_drupal_dir = env.remote_prj_dir+'/lingwo/drupal'
+env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/bibliobird/bbcom/drupal'
 env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/bibliobird/python-env'
 
 env.repos = ['bbcom','lingwo','lingwo-old']
