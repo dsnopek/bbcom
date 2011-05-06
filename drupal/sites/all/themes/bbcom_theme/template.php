@@ -69,13 +69,16 @@
 function bbcom_theme_theme(&$existing, $type, $theme, $path) {
   return array(
     'lt_username_title' => array(
-      'arguments' => array('form_id'),
+      'arguments' => array('form_id' => NULL),
     ),
     'lt_username_description' => array(
-      'arguments' => array('form_id'),
+      'arguments' => array('form_id' => NULL),
     ),
     'lt_password_description' => array(
-      'arguments' => array('form_id'),
+      'arguments' => array('form_id' => NULL),
+    ),
+    'breadcrumb' => array(
+      'arguments' => array('breadcrumb' => NULL),
     ),
     'bbcom_join_btn' => array(
       'template' => 'bbcom-join-btn',
@@ -115,6 +118,13 @@ function bbcom_theme_lt_username_description($form_id) {
 
 function bbcom_theme_lt_password_description($form_id) {
   return '';
+}
+
+function bbcom_theme_breadcrumb($breadcrumb) {
+  if (!empty($breadcrumb) && count($breadcrumb) > 1) {
+    array_shift($breadcrumb);
+    return '<div class="breadcrumb">'. implode(' » ', $breadcrumb) .'</div>';
+  }
 }
 
 function bbcom_theme_language_switcher_form(&$form_state, $node=NULL) {
@@ -236,6 +246,9 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   //if (preg_match('/^user\/\d+/', $_GET['q']) || context_isset('context', 'bbcom-section-forum')) {
   if (context_isset('context', 'bbcom-section-forum')) {
     $vars['always_right'] = FALSE;
+  }
+  else {
+    $vars['breadcrumb'] = '';
   }
 }
 
