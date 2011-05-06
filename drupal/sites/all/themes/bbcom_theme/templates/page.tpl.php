@@ -58,6 +58,7 @@
           </div>
         <?php endif; ?>
 
+        <?php print $breadcrumb; ?>
         <?php if ($title && !$inner_title): ?>
           <h1 class="title" id="page-title"><?php print $lang_spec; ?><?php print $title; ?></h1>
         <?php endif; ?>
