@@ -1,0 +1,24 @@
+=== modified file 'notifications_autosubscribe/notifications_autosubscribe.module'
+--- notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:14 +0000
++++ notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:40 +0000
+@@ -13,7 +13,7 @@
+ function notifications_autosubscribe_nodeapi(&$node, $op, $arg = 0) {
+   global $user;
+   
+-  if ($user->uid && $op == 'insert' && $node->uid == $user->uid) {
++  if ($user->uid && $op == 'insert' && $node->uid == $user->uid && notifications_content_type_enabled($node->type, 'thread')) {
+     notifications_autosubscribe($user, 'thread', 'nid', $node->nid);
+   }
+ }
+@@ -26,8 +26,9 @@
+   
+   // $comment can be an object or an array.
+   $comment = (object)$comment;
++  $node = node_load($comment->nid);
+ 
+-  if ($user->uid && $op == 'insert' && $comment->uid == $user->uid) {
++  if ($user->uid && $op == 'insert' && $comment->uid == $user->uid && notifications_content_type_enabled($node->type, 'thread')) {
+     notifications_autosubscribe($user, 'thread', 'nid', $comment->nid); 
+   }
+ }
+

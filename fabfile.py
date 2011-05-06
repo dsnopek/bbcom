@@ -111,8 +111,9 @@ def make_testing_safe():
         bbcom_news_mailchimp_integration="0"
     )
 
-    # disable scheduled backups
-    drush.sql_query("DROP TABLE devel_queries; DROP TABLE devel_times")
+    # disable notifications, so we can still test it, but we won't hit real users with e-mails
+    drush.sql_query("DELETE FROM notifications; DELETE FROM notifications_fields; DELETE FROM notifications_queue;")
+    drush.en('messaging_simple')
 
     # disable dangerous modules
     drush.dis('backup_migrate', 'mollom', 'googleanalytics', 'spambot')

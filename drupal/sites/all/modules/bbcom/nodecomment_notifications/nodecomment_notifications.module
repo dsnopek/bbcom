@@ -57,6 +57,8 @@ function nodecomment_notifications_notifications_templates($op, $type = 'all', $
  *  - if its an approved comment add notification "event"
 */
 function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {   
+  global $user;
+
   $ctypes = nodecomment_get_comment_types();
   
   // if not a nodecomment type; bail
@@ -81,6 +83,13 @@ function nodecomment_notifications_nodeapi(&$node, $op, $arg = 0, $page = 0) {
       // some sort of approval process which manages comment node approval by setting pushlished state
       if ($node->status && ($op == 'insert' || !$node->old_status)) {
         _nodecomment_notifications($node, $parent);
+      }
+
+      // do autosubscribe if notifications_autosubscribe is enabled
+      if (module_exists('notifications_autosubscribe')) {
+        if ($user->uid && $op == 'insert' && $node->uid == $user->uid && notifications_content_type_enabled($parent->type, 'thread')) {
+          notifications_autosubscribe($user, 'thread', 'nid', $parent->nid);
+        }
       }
       
       break;  
