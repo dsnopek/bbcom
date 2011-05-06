@@ -621,7 +621,7 @@ function nodecomment_nodeapi(&$node, $op, $arg = 0, $page = 0) {
     case 'update':
       // if this is a comment, save it as a comment
       if (isset($node->comment_target_nid)) {
-        nodecomment_save($node);
+        nodecomment_save($node, $op);
       }
       break;
 
@@ -681,23 +681,27 @@ function nodecomment_set_breadcrumb($node) {
  *
  * @param $node
  *   The node that is serving as a comment to another node.
+ * @param $is_new
+ *   Boolean flag indicating whether this is a new comment or not.
  *
  * @return
  *   If the comment is successfully saved the node ID of the comment is returned. If the comment
  *   is not saved, FALSE is returned.
  */
-function nodecomment_save($node) {
+function nodecomment_save($node, $op = 'update') {
   global $user;
 
   if (!isset($node->thread)) {
     $node->thread = nodecomment_get_thread($node);
   }
 
-  // Try an update first, do not change the original submitted IP Address.
-  db_query("UPDATE {node_comments} SET nid = %d, pid = %d, thread = '%s', name = '%s', uid = %d, mail = '%s', homepage = '%s' WHERE cid = %d", $node->comment_target_nid, $node->comment_target_cid, $node->thread, $node->name, $node->uid, $node->mail, $node->homepage, $node->nid);
-  // If not updated, insert a new comment.
-  if (db_affected_rows() == 0) {
+  // Insert a node_comments row if this is a new comment else update existing row.
+  if ($op == 'insert') {
     db_query("INSERT INTO {node_comments} (cid, nid, pid, hostname, thread, name, uid, mail, homepage) VALUES (%d, %d, %d, '%s', '%s', '%s', %d, '%s', '%s')", $node->nid, $node->comment_target_nid, $node->comment_target_cid, ip_address(), $node->thread, $node->name, $node->uid, $node->mail, $node->homepage);
+  }
+  else {
+    // Do not change the original submitted IP Address.
+    db_query("UPDATE {node_comments} SET nid = %d, pid = %d, thread = '%s', name = '%s', uid = %d, mail = '%s', homepage = '%s' WHERE cid = %d", $node->comment_target_nid, $node->comment_target_cid, $node->thread, $node->name, $node->uid, $node->mail, $node->homepage, $node->nid);
   }
 
   _nodecomment_update_node_statistics($node->comment_target_nid);
