@@ -1,0 +1,8 @@
+core = "6.x"
+dependencies[] = "bbcom_dictionary"
+dependencies[] = "bbcom_misc"
+dependencies[] = "votingapi"
+description = "Sets up the rating widget on BiblioBird.com"
+name = "BiblioBird.com Rate"
+package = "BiblioBird.com"
+

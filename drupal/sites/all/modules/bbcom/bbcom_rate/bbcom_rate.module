@@ -1,0 +1,112 @@
+<?php
+
+//include_once('bbcom_rate.features.inc');
+
+define('BBCOM_RATE_TAG', 'entry');
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function bbcom_rate_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  global $user;
+
+  if ($op == 'view' && $page) {
+    // TODO: instead of checking uid, it should check for a permission!
+    if (!empty($user->uid) && ($entry = LingwoEntry::fromNode($node)) && $entry->isTranslation()) {
+      $value = _bbcom_rate_widget($entry);
+      if (!empty($value)) {
+        $node->content['bbcom_rate'] = array(
+          '#weight' => 50,
+          '#value' => $value,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function bbcom_rate_theme() {
+  return array(
+    'bbcom_rate_widget' => array(
+      'arguments' => array('results' => NULL, 'links' => NULL),
+      'template' => 'bbcom-rate-widget',
+    ),
+  );
+}
+
+function _bbcom_rate_get_results($nid) {
+  global $user;
+  $ret = array('rating' => 0, 'user_vote' => 0);
+
+  // get the overall results
+  $criteria = array(
+    'content_type' => 'node',
+    'content_id' => $nid,
+    'tag' => BBCOM_RATE_TAG,
+  );
+  $results = votingapi_select_results($criteria);
+  foreach ($results as $result) {
+    if ($result['function'] == 'sum') {
+      $ret['rating'] = $result['value'];
+    }
+  }
+
+  // get the current users vote
+  $criteria += array(
+    'uid' => $user->uid,
+    'value_type' => 'points',
+  );
+  if ($user_vote = votingapi_select_votes($criteria)) {
+    $ret['user_vote'] = $user_vote[0]['value'];
+  }
+
+  return $ret;
+}
+
+function _bbcom_rate_save_vote($nid, $value) {
+  // TODO: check permission
+  $votes = array(
+    'content_type' => 'node',
+    'content_id' => $nid,
+    'value_type' => 'points',
+    'value' => $value,
+    'tag' => BBCOM_RATE_TAG,
+  );
+
+  votingapi_set_votes($votes);
+}
+
+function _bbcom_rate_widget($entry) {
+  $results = _bbcom_rate_get_results($entry->nid);
+
+  $link_labels = array(
+    1  => t('Looks perfect to me!'),
+    -1 => t('Needs more work'),
+  );
+  $links = array();
+  foreach ($link_labels as $value => $text) {
+    $id = "opt-bbcom_rate-node-$entry->nid-$value";
+    $token = drupal_get_token($id);
+
+    // TODO: for some reason this is never called!
+    if (isset($_GET['rate']) && $_GET['rate'] == $token) {
+      _bbcom_rate_save_vote($entry->nid, $value);
+    }
+
+    $query = $_GET;
+    $query['rate'] = $token;
+    unset($query['q']);
+
+    $links[] = array(
+      'value' => $value,
+      'text' => $text,
+      'href' => url($_GET['q'], array('query' => $query)),
+    );
+  }
+  drupal_set_message(print_r($links, TRUE));
+
+  return theme('bbcom_rate_widget', $results, $links);
+}
+
