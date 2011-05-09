@@ -79,8 +79,7 @@ function _bbcom_rate_save_vote($nid, $value) {
 }
 
 function _bbcom_rate_widget($entry) {
-  $results = _bbcom_rate_get_results($entry->nid);
-
+  // build the widget links
   $link_labels = array(
     1  => t('Looks perfect to me!'),
     -1 => t('Needs more work'),
@@ -90,7 +89,6 @@ function _bbcom_rate_widget($entry) {
     $id = "opt-bbcom_rate-node-$entry->nid-$value";
     $token = drupal_get_token($id);
 
-    // TODO: for some reason this is never called!
     if (isset($_GET['rate']) && $_GET['rate'] == $token) {
       _bbcom_rate_save_vote($entry->nid, $value);
     }
@@ -105,8 +103,8 @@ function _bbcom_rate_widget($entry) {
       'href' => url($_GET['q'], array('query' => $query)),
     );
   }
-  drupal_set_message(print_r($links, TRUE));
 
+  $results = _bbcom_rate_get_results($entry->nid);
   return theme('bbcom_rate_widget', $results, $links);
 }
 
