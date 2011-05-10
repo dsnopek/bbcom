@@ -532,6 +532,7 @@ ul.primary li a {
 /*
  * DRS: entry rating
  */
+/*
 .bbcom-entry-rating {
   border: 1px solid #999;
   background-color: #DDD;
@@ -558,6 +559,7 @@ ul.primary li a {
 .bbcom-entry-rating-list, .bbcom-entry-rating-list li {
   list-style: none;
 }
+*/
 
 /* Minor forum-list customization */
 .forum-subscribe {

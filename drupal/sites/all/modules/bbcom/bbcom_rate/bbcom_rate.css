@@ -1,0 +1,38 @@
+
+/*
+ * DRS: entry rating
+ */
+.bbcom-rate {
+  border: 1px solid #999;
+  background-color: #DDD;
+  padding: .25em;
+  width: 3em;
+  height: 2.50em;
+  text-align: center;
+  float: left;
+  margin-right: 10px;
+}
+.bbcom-rate-count {
+  font-size: 1.5em;
+}
+.bbcom-rate-positive {
+  color: green;
+}
+.bbcom-rate-negative {
+  color: red;
+}
+.bbcom-rate-label {
+  color: #444;
+  font-size: .75em;
+}
+.bbcom-rate-list, .bbcom-rate-list li {
+  list-style: none;
+}
+.bbcom-rate-verified {
+  margin-top: -15px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  background: url('verified.png') no-repeat scroll left top;
+  font-weight: bold;
+}
+

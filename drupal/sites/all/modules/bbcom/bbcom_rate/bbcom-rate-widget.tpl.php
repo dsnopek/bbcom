@@ -9,6 +9,8 @@
  * file for information on theming widgets.
  */
 
+drupal_add_css(drupal_get_path('module', 'bbcom_rate') . '/bbcom_rate.css');
+
 $rating = $results['rating'];
 $class = 'neutral';
 if ($rating > 0) {
@@ -19,12 +21,12 @@ elseif ($rating < 0) {
   $class = 'negative';
 }?>
 
-<div class="bbcom-entry-rating bbcom-entry-rating-<?php print $class ?>">
-<div class="bbcom-entry-rating-count"><?php print $rating; ?></div>
+<div class="bbcom-rate bbcom-rate-<?php print $class ?>">
+<div class="bbcom-rate-count"><?php print $rating; ?></div>
 <!-- <div class="bbcom-entry-rating-label"><?php print t('Rating') ?></div> -->
 </div>
 
-<ul class="bbcom-entry-rating-list">
+<ul class="bbcom-rate-list clear-block">
 <?php
 foreach ($links as $link) {
   if (!empty($results['user_vote']) && $link['value'] == $results['user_vote']) {
@@ -36,4 +38,8 @@ foreach ($links as $link) {
 }
 ?>
 </ul>
+
+<?php if ($rating >= variable_get('bbcom_dictionary_verified_threshold', 2)): ?>
+<div class="bbcom-rate-verified"><?php print t('This entry is verified'); ?></div>
+<?php endif; ?>
 
