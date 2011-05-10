@@ -2,6 +2,8 @@
 
 include_once('bbcom_dictionary.features.inc');
 
+define('BBCOM_DICTIONARY_VOTINGAPI_TAG', 'entry');
+
 /**
  * Implementation of hook_menu().
  */
@@ -140,7 +142,7 @@ function bbcom_dictionary_lingwo_entry_verified($node) {
   $results = votingapi_select_results(array(
     'content_type' => 'node',
     'content_id'   => $node->nid,
-    'tag'          => 'entry',
+    'tag'          => BBCOM_DICTIONARY_VOTINGAPI_TAG,
     'function'     => 'sum'
   ));
   $total_votes = $results[0]['value'];

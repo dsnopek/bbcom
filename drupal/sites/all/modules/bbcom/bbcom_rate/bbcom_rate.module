@@ -2,17 +2,19 @@
 
 //include_once('bbcom_rate.features.inc');
 
-define('BBCOM_RATE_TAG', 'entry');
+/**
+ * Implementation of hook_perm().
+ */
+function bbcom_rate_perm() {
+  return array('rate dictionary entries');
+}
 
 /**
  * Implementation of hook_nodeapi().
  */
 function bbcom_rate_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-  global $user;
-
   if ($op == 'view' && $page) {
-    // TODO: instead of checking uid, it should check for a permission!
-    if (!empty($user->uid) && ($entry = LingwoEntry::fromNode($node)) && $entry->isTranslation()) {
+    if (user_access('rate dictionary entries') && ($entry = LingwoEntry::fromNode($node)) && $entry->isTranslation()) {
       $value = _bbcom_rate_widget($entry);
       if (!empty($value)) {
         $node->content['bbcom_rate'] = array(
@@ -44,7 +46,7 @@ function _bbcom_rate_get_results($nid) {
   $criteria = array(
     'content_type' => 'node',
     'content_id' => $nid,
-    'tag' => BBCOM_RATE_TAG,
+    'tag' => BBCOM_DICTIONARY_VOTINGAPI_TAG,
   );
   $results = votingapi_select_results($criteria);
   foreach ($results as $result) {
@@ -66,16 +68,17 @@ function _bbcom_rate_get_results($nid) {
 }
 
 function _bbcom_rate_save_vote($nid, $value) {
-  // TODO: check permission
-  $votes = array(
-    'content_type' => 'node',
-    'content_id' => $nid,
-    'value_type' => 'points',
-    'value' => $value,
-    'tag' => BBCOM_RATE_TAG,
-  );
+  if (user_access('rate dictionary entries')) {
+    $votes = array(
+      'content_type' => 'node',
+      'content_id' => $nid,
+      'value_type' => 'points',
+      'value' => $value,
+      'tag' => BBCOM_DICTIONARY_VOTINGAPI_TAG,
+    );
 
-  votingapi_set_votes($votes);
+    votingapi_set_votes($votes);
+  }
 }
 
 function _bbcom_rate_widget($entry) {
