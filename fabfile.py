@@ -171,7 +171,8 @@ def merge(source, target='master', message=None):
     for repo in env.repos:
         with cd(os.path.join(env.local_prj_dir, 'bibliobird', repo)):
             local('git checkout {0}'.format(target), capture=False)
-            output = local('git merge --no-commit --squash {0}'.format(source), capture=True)
+            #output = local('git merge --no-commit --squash {0}'.format(source), capture=True)
+            output = local('git merge --no-commit {0}'.format(source), capture=True)
             if 'Already up-to-date' not in output:
                 with settings(warn_only=True):
                     local('git commit -m "{0}"'.format(message.replace('"', '\\"')), capture=False)
