@@ -25,7 +25,7 @@ function bbcom_notifications_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_content_per_type';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
 
   $export['notifications_content_per_type'] = $strongarm;
   $strongarm = new stdClass;
@@ -35,9 +35,21 @@ function bbcom_notifications_strongarm() {
   $strongarm->value = array(
     'taxonomy' => 'taxonomy',
     'thread' => 'thread',
+    'nodetype' => 0,
+    'author' => 0,
+    'typeauthor' => 0,
   );
 
   $export['notifications_content_type'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'notifications_content_type_forum_reply';
+  $strongarm->value = array(
+    0 => 'taxonomy',
+  );
+
+  $export['notifications_content_type_forum_reply'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -73,7 +85,6 @@ function bbcom_notifications_strongarm() {
     'node-insert' => 1,
     'node-content-insert' => 1,
     'node-forum_reply-insert' => 0,
-    'node-story-insert' => 1,
     'node-rwiki-insert' => 1,
     'node-wiki-insert' => 1,
     'node-language-insert' => 1,
@@ -81,9 +92,8 @@ function bbcom_notifications_strongarm() {
     'node-entry-insert' => 1,
     'node-page-insert' => 1,
     'node-update' => 1,
-    'node-content-update' => 1,
+    'node-content-update' => 0,
     'node-forum_reply-update' => 0,
-    'node-story-update' => 1,
     'node-rwiki-update' => 1,
     'node-wiki-update' => 1,
     'node-language-update' => 1,
@@ -93,7 +103,6 @@ function bbcom_notifications_strongarm() {
     'node-comment' => 1,
     'node-content-comment' => 1,
     'node-forum_reply-comment' => 1,
-    'node-story-comment' => 1,
     'node-rwiki-comment' => 1,
     'node-wiki-comment' => 1,
     'node-language-comment' => 1,
@@ -111,7 +120,6 @@ function bbcom_notifications_strongarm() {
     'node-insert' => 'notifications-event-node-insert',
     'node-content-insert' => 'notifications-event-node-insert',
     'node-forum_reply-insert' => 'notifications-content-forum_reply-insert',
-    'node-story-insert' => 'notifications-event-node-insert',
     'node-rwiki-insert' => 'notifications-event-node-insert',
     'node-wiki-insert' => 'notifications-event-node-insert',
     'node-language-insert' => 'notifications-event-node-insert',
@@ -121,7 +129,6 @@ function bbcom_notifications_strongarm() {
     'node-update' => 'notifications-event-node-update',
     'node-content-update' => 'notifications-event-node-update',
     'node-forum_reply-update' => 'notifications-event-node-update',
-    'node-story-update' => 'notifications-event-node-update',
     'node-rwiki-update' => 'notifications-event-node-update',
     'node-wiki-update' => 'notifications-event-node-update',
     'node-language-update' => 'notifications-event-node-update',
@@ -131,7 +138,6 @@ function bbcom_notifications_strongarm() {
     'node-comment' => 'notifications-event-node-comment',
     'node-content-comment' => 'notifications-event-node-comment',
     'node-forum_reply-comment' => 'notifications-content-forum-comment',
-    'node-story-comment' => 'notifications-event-node-comment',
     'node-rwiki-comment' => 'notifications-event-node-comment',
     'node-wiki-comment' => 'notifications-event-node-comment',
     'node-language-comment' => 'notifications-event-node-comment',

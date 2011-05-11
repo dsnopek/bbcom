@@ -12,6 +12,7 @@ function bbcom_notifications_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
+      '2' => 'unverified user',
     ),
   );
 
@@ -21,6 +22,7 @@ function bbcom_notifications_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
+      '2' => 'unverified user',
     ),
   );
 
@@ -29,7 +31,6 @@ function bbcom_notifications_user_default_permissions() {
     'name' => 'subscribe to author',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
     ),
   );
 
@@ -39,6 +40,7 @@ function bbcom_notifications_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
+      '2' => 'unverified user',
     ),
   );
 
@@ -47,7 +49,6 @@ function bbcom_notifications_user_default_permissions() {
     'name' => 'subscribe to content type',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
     ),
   );
 
@@ -56,7 +57,6 @@ function bbcom_notifications_user_default_permissions() {
     'name' => 'subscribe to content type and author',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'authenticated user',
     ),
   );
 
@@ -66,6 +66,7 @@ function bbcom_notifications_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'authenticated user',
+      '2' => 'unverified user',
     ),
   );
 
