@@ -67,11 +67,13 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       unset($node->content['lingwo_fields']);
     }
 
-    // add the "See also" section
-    $node->content['bbcom_dictionary_see_also'] = array(
-      '#weight' => 51,
-      '#value' => theme('bbcom_dictionary_see_also', LingwoEntry::fromNode($node)),
-    );
+    // add the "See also" section when viewing as a page
+    if ($a4) {
+      $node->content['bbcom_dictionary_see_also'] = array(
+        '#weight' => 51,
+        '#value' => theme('bbcom_dictionary_see_also', LingwoEntry::fromNode($node)),
+      );
+    }
   }
   elseif ($op == 'delete revision') {
     rules_invoke_event('node_delete_revision', $node);
