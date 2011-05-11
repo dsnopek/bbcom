@@ -168,7 +168,10 @@ function bbcom_dictionary_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'lingwo_entry_node_title_munging';
-  $strongarm->value = 0;
+  $strongarm->value = array(
+    'language' => 0,
+    'pos' => 0,
+  );
 
   $export['lingwo_entry_node_title_munging'] = $strongarm;
   $strongarm = new stdClass;
