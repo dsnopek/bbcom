@@ -12,25 +12,26 @@ function bbcom_forum_context_default_contexts() {
   $context->description = 'The forum context.';
   $context->tag = '';
   $context->conditions = array(
+    'menu' => array(
+      'values' => array(
+        'forum' => 'forum',
+      ),
+    ),
     'node' => array(
       'values' => array(
-        0 => 'forum_reply',
-        1 => 'forum',
+        'forum' => 'forum',
+        'forum_reply' => 'forum_reply',
       ),
-      'options' => array(),
+      'options' => array(
+        'node_form' => '1',
+      ),
     ),
     'path' => array(
       'values' => array(
         'forum' => 'forum',
         'forum/*' => 'forum/*',
+        'node/add/forum-reply/*' => 'node/add/forum-reply/*',
       ),
-      'options' => array(),
-    ),
-    'menu' => array(
-      'values' => array(
-        'forum' => 'forum',
-      ),
-      'options' => array(),
     ),
   );
   $context->reactions = array(
