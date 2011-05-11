@@ -66,6 +66,12 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     else {
       unset($node->content['lingwo_fields']);
     }
+
+    // add the "See also" section
+    $node->content['bbcom_dictionary_see_also'] = array(
+      '#weight' => 51,
+      '#value' => theme('bbcom_dictionary_see_also', LingwoEntry::fromNode($node)),
+    );
   }
   elseif ($op == 'delete revision') {
     rules_invoke_event('node_delete_revision', $node);
@@ -250,6 +256,9 @@ function bbcom_dictionary_theme() {
       'arguments' => array('node' => NULL, 'teaser' => FALSE, 'page' => FALSE),
       'pattern' => 'bbcom_dictionary_entry_summary_',
     ),
+    'bbcom_dictionary_see_also' => array(
+      'arguments' => array('entry' => NULL),
+    ),
     'bbcom_dictionary_formatter_text_link' => array(
       'arguments' => array('element' => NULL),
     ),
@@ -297,6 +306,32 @@ function template_preprocess_bbcom_dictionary_entry_summary(&$vars, $hook) {
 function theme_bbcom_dictionary_entry_summary($node, $teaser=FALSE, $page=FALSE) {
   // TODO: is there some default that makes sense?
   return '';
+}
+
+function theme_bbcom_dictionary_see_also($entry) {
+  // query entries with the same headword but different parts of speech
+  // TODO: is it appropriate to do the actual querying inside the theme function?
+  $results = LingwoEntry::searchHeadword($entry->headword, array('language' => $entry->sourceLanguage));
+  if (count($results) == 1) {
+    // if none, we return the empty string
+    return '';
+  }
+
+  $items = array();
+  foreach ($results as $result) {
+    if ($result->pos == $entry->pos) {
+      continue;
+    }
+
+    $other = LingwoEntry::fromNid($result->nid);
+    if ($entry->isTranslation()) {
+      $other = $other->getTranslation($entry->targetLanguage);
+    }
+
+    $items[] = l($other->headword . ' (' . $other->getPos(TRUE) . ')', $other->getPath());
+  }
+
+  return theme('item_list', $items, t('See also'), 'ul', array('class' => 'lingwo-entry-other-pos'));
 }
 
 function theme_bbcom_dictionary_formatter_text_link($element) {
