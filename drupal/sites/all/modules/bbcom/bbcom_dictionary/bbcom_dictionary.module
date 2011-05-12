@@ -105,7 +105,7 @@ function bbcom_dictionary_form_alter(&$form, &$form_state, $form_id) {
     $entry = LingwoEntry::fromNode($form['#node']);
     $gnid = _bbcom_dictionary_guidelines();
     $gnid_arr = array('!url' => url('node/'. $gnid));
-    $gmoreinfo = $gnid ? ' '. t('For more information, read the <a href="!url">editorial guidlines</a>.', $gnid_arr) : '';
+    $gmoreinfo = $gnid ? ' '. t('For more information, read the <a target="_blank" href="!url">editorial guidlines</a>.', $gnid_arr) : '';
 
     $form['bbcom_dictionary_guidelines'] = array(
       '#prefix' => '<div class="bbcom-dictionary-editorial-guidelines">',
@@ -115,13 +115,13 @@ function bbcom_dictionary_form_alter(&$form, &$form_state, $form_id) {
     );
         
     if ($gnid) {
-      $form['bbcom_dictionary_guidelines']['#value'] .= ' '. t('Please read all the <a href="!url">editorial guidelines</a>!', $gnid_arr);
+      $form['bbcom_dictionary_guidelines']['#value'] .= ' '. t('Please read all the <a target="_blank" href="!url">editorial guidelines</a>!', $gnid_arr);
 
       $form['buttons']['bbcom_dictionary_guidelines_confirm'] = array(
         '#type' => 'checkbox',
         '#weight' => -10,
         '#required' => TRUE,
-        '#title' => t('I have read and understood the <a href="!url">editorial guidelines</a>', $gnid_arr),
+        '#title' => t('I have read and understood the <a target="_blank" href="!url">editorial guidelines</a>', $gnid_arr),
       );
     }
 
