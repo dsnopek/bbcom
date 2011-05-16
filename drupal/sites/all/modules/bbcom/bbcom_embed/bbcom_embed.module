@@ -277,6 +277,17 @@ function bbcom_embed_preprocess_node(&$vars) {
   }
 }
 
+/**
+ * Implementation of hook_link_alter().
+ */
+function bbcom_embed_link_alter(&$links, $node, $comment = NULL) {
+  if (!empty($node)) {
+    if (preg_match('@http://(.*)@', $node->field_remote_url[0]['value'], $matches)) {
+      $links['node_read_more']['href'] = 'embed-reader/l/'. preg_replace('/#.*$/', '', $matches[1]);
+    }
+  }
+}
+
 function bbcom_embed_preprocess_page(&$vars) {
   if ($GLOBALS['bbcom_embed_view_remote_page']) {
     // sneak in a special template when this is remote
