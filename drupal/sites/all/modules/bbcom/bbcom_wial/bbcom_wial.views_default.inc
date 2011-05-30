@@ -242,9 +242,8 @@ return bbcom_wial_page_access($parts[1]);
     'type' => 'none',
   ));
   $handler->override_option('title', 'Words I Am Learning');
-  $handler->override_option('header', 'Review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="http://www.youtube.com/watch?v=juqB3fPFcuM" target="_blank">Watch this video</a> to learn how to install Anki and configure it to communicate with BiblioBird.');
   $handler->override_option('header_format', '2');
-  $handler->override_option('header_empty', 1);
+  $handler->override_option('header_empty', 0);
   $handler->override_option('items_per_page', 20);
   $handler->override_option('use_pager', '1');
   $handler->override_option('style_plugin', 'bulk');

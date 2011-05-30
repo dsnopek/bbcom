@@ -14,9 +14,11 @@ function bbcom_content_context_default_contexts() {
   $context->conditions = array(
     'node' => array(
       'values' => array(
-        0 => 'content',
+        'content' => 'content',
       ),
-      'options' => array(),
+      'options' => array(
+        'node_form' => '1',
+      ),
     ),
     'path' => array(
       'values' => array(
@@ -24,42 +26,38 @@ function bbcom_content_context_default_contexts() {
         'node/*/annotate' => 'node/*/annotate',
         'content/search' => 'content/search',
       ),
-      'options' => array(),
     ),
   );
   $context->reactions = array(
-    'menu' => 'content',
     'block' => array(
       'blocks' => array(
         'views--exp-search_content-page' => array(
           'module' => 'views',
           'delta' => '-exp-search_content-page',
-          'weight' => 20,
           'region' => 'header',
-          'status' => '0',
-          'label' => 'Exposed form: search_content-page',
-          'type' => 'context_ui',
+          'weight' => 0,
         ),
         'bbcom_content-0' => array(
           'module' => 'bbcom_content',
-          'delta' => '0',
-          'weight' => 20,
+          'delta' => 0,
           'region' => 'right',
-          'status' => '0',
-          'label' => 'BiblioBird.com Content: Add Content Block',
-          'type' => 'context_ui',
+          'weight' => 0,
         ),
         'lingwo_korpus-0' => array(
           'module' => 'lingwo_korpus',
-          'delta' => '0',
-          'weight' => 21,
+          'delta' => 0,
           'region' => 'right',
-          'status' => '0',
-          'label' => 'Lingwo Korpus: Annotation Reader block',
-          'type' => 'context_ui',
+          'weight' => 1,
+        ),
+        'views-entries_need_work-block_1' => array(
+          'module' => 'views',
+          'delta' => 'entries_need_work-block_1',
+          'region' => 'right',
+          'weight' => 2,
         ),
       ),
     ),
+    'menu' => 'content',
   );
   $context->condition_mode = 0;
 

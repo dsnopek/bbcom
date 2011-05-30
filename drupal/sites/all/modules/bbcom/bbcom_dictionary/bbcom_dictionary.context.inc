@@ -14,42 +14,43 @@ function bbcom_dictionary_context_default_contexts() {
   $context->conditions = array(
     'node' => array(
       'values' => array(
-        0 => 'entry',
+        'entry' => 'entry',
       ),
-      'options' => array(),
+      'options' => array(
+        'node_form' => '1',
+      ),
     ),
     'path' => array(
       'values' => array(
         'dictionary' => 'dictionary',
         'dictionary/*' => 'dictionary/*',
       ),
-      'options' => array(),
     ),
   );
   $context->reactions = array(
-    'menu' => 'dictionary',
     'block' => array(
       'blocks' => array(
         'lingwo_entry-0' => array(
           'module' => 'lingwo_entry',
-          'delta' => '0',
-          'weight' => 20,
+          'delta' => 0,
           'region' => 'header',
-          'status' => '0',
-          'label' => 'Lingwo Dictionary: Search block',
-          'type' => 'context_ui',
+          'weight' => 0,
         ),
         'bbcom_dictionary-0' => array(
           'module' => 'bbcom_dictionary',
-          'delta' => '0',
-          'weight' => -21,
+          'delta' => 0,
           'region' => 'right',
-          'status' => '0',
-          'label' => 'BiblioBird.com Dictionary: Add Content Block',
-          'type' => 'context_ui',
+          'weight' => 0,
+        ),
+        'views-entries_need_work-block_1' => array(
+          'module' => 'views',
+          'delta' => 'entries_need_work-block_1',
+          'region' => 'right',
+          'weight' => 1,
         ),
       ),
     ),
+    'menu' => 'dictionary',
   );
   $context->condition_mode = 0;
 
