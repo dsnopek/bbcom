@@ -1,5 +1,4 @@
 <?php
-// $Id: form.inc,v 1.265.2.35 2010/11/04 09:55:29 goba Exp $
 
 /**
  * @defgroup forms Form builder functions
@@ -1376,7 +1375,7 @@ function _element_info($type, $refresh = NULL) {
     }
   }
 
-  return (array)$cache[$type];
+  return $cache[$type];
 }
 
 function form_options_flatten($array, $reset = TRUE) {

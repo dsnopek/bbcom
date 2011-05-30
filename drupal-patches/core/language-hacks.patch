@@ -1,0 +1,24 @@
+--- includes/language.inc	2011-05-25 15:43:55.000000000 -0500
++++ includes/language.inc	2011-05-30 10:34:28.000000000 -0500
+@@ -24,7 +24,8 @@
+     case LANGUAGE_NEGOTIATION_DOMAIN:
+       foreach ($languages as $language) {
+         $parts = parse_url($language->domain);
+-        if (!empty($parts['host']) && ($_SERVER['HTTP_HOST'] == $parts['host'])) {
++        $parts_server = parse_url('http://'. $_SERVER['HTTP_HOST']);
++        if (!empty($parts['host']) && ($parts_server['host'] == $parts['host'])) {
+           return $language;
+         }
+       }
+@@ -49,6 +50,11 @@
+         return language_default();
+       }
+       break;
++    case 127:
++      if (isset($languages[$_SESSION['language']])) {
++        return $languages[$_SESSION['language']];
++      }
++      break;
+   }
+ 
+   // User language.
