@@ -440,7 +440,8 @@ ul.primary li a {
 /*
 ** WIAL list
 */
-.view-id-wial_list .view-header {
+.view-id-wial_list .view-header,
+.bbcom-important-message {
   border: 1px solid #c00;
   color: #900;
   background-color: #fee;
@@ -564,6 +565,15 @@ ul.primary li a {
 /* Minor forum-list customization */
 .forum-subscribe {
   margin-top: 5px;
+}
+
+/*
+ * DRS: Our "Entries: Need work" block
+ */
+#block-views-entries_need_work-block_1 {
+  border: 4px solid #aaa;
+  background: white;
+  padding: 10px;
 }
 
 /*

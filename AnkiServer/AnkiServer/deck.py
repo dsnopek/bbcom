@@ -442,15 +442,17 @@ class DeckAppHandler(object):
         deck.reset()
         deck.save()
 
-    #@opts(waitForReturn=False)
     def answer_card(self, card_id, ease):
         ease = int(ease)
         deck = self.wrapper.open()
         card = deck.cardFromId(card_id)
         if card:
+            print card
             try:
                 deck.answerCard(card, ease)
             except:
+                import sys
+                print sys.exc_info()
                 return False
             deck.save()
         return True

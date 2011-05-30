@@ -76,6 +76,10 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     jquery_ui_add('ui.tabs');
     drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/default/ui.all.css');
 
+    $form['message'] = array(
+      '#value' => '<div class="bbcom-important-message">' . t('You can also review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="http://www.youtube.com/watch?v=juqB3fPFcuM" target="_blank">Watch this video</a> to learn how to install Anki and configure it to communicate with BiblioBird.') . '</div>',
+    );
+
     $form['study_options'] = array(
       '#tree' => TRUE,
     );
