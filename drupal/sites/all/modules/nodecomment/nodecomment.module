@@ -889,6 +889,11 @@ function nodecomment_menu_alter(&$items) {
     $items['node/%node']['page callback'] = 'nodecomment_node_view';
   }
 
+  // Disable normal comment reply page
+  if (module_exists('comment')) {
+    $items['comment/reply/%node']['access callback'] = '_nodecomment_comment_reply_access';
+  }
+
   $comment_types = nodecomment_get_comment_types();
   foreach (node_get_types('names') as $type => $blank) {
     $path = "node/add/". str_replace('_', '-', $type);
@@ -955,6 +960,12 @@ function _nodecomment_node_add_access($op, $type) {
   return node_access('create', $type);
 }
 
+function _nodecomment_comment_reply_access($op, $node) {
+  if ($node->comment_type) {
+    return FALSE;
+  }
+  return node_access($op, $node);
+}
 
 /**
  * Menu callback; view a single node.

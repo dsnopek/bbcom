@@ -65,6 +65,7 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     }
     else {
       unset($node->content['lingwo_fields']);
+      unset($node->content['lingwo_pron']);
     }
 
     // add the "See also" section when viewing as a page
