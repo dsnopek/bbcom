@@ -106,7 +106,7 @@ DirectoryIndex index.php
   RewriteCond %{HTTP_HOST} ^lingwo\.biz$ [NC,OR]
   RewriteCond %{HTTP_HOST} ^www.lingwo\.biz$ [NC,OR]
   RewriteCond %{HTTP_HOST} ^bibliobird\.pl$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^bibliobird\.pl$ [NC]
+  RewriteCond %{HTTP_HOST} ^www\.bibliobird\.pl$ [NC]
   RewriteRule ^(.*)$ http://pl.bibliobird.com/$1 [L,R=301]
 
   #RewriteCond %{HTTP_HOST} ^bibliobird\.com$ [NC]
