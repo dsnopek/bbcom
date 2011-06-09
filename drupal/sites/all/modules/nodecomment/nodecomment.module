@@ -891,7 +891,7 @@ function nodecomment_menu_alter(&$items) {
 
   // Disable normal comment reply page
   if (module_exists('comment')) {
-    $items['comment/reply/%node']['access callback'] = '_nodecomment_comment_reply_access';
+    $items['comment/reply/%node']['page callback'] = '_nodecomment_comment_reply';
   }
 
   $comment_types = nodecomment_get_comment_types();
@@ -960,11 +960,13 @@ function _nodecomment_node_add_access($op, $type) {
   return node_access('create', $type);
 }
 
-function _nodecomment_comment_reply_access($op, $node) {
+function _nodecomment_comment_reply($node) {
   if ($node->comment_type) {
-    return FALSE;
+    watchdog('nodecomment', 'User went to Drupal comment page, when this type uses nodecomment', array(), WATCHDOG_ERROR);
+    drupal_goto("node/add/". str_replace('_', '-', $node->comment_type) ."/". $node->nid);
+    exit();
   }
-  return node_access($op, $node);
+  return comment_reply($node);
 }
 
 /**
