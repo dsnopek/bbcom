@@ -252,7 +252,7 @@ function bbcom_dictionary_views_default_views() {
     'value' => array(
       'operator' => '<',
       'value' => array(
-        'value' => '0',
+        'value' => '5',
         'min' => '',
         'max' => '',
       ),
@@ -281,14 +281,396 @@ function bbcom_dictionary_views_default_views() {
   $handler->override_option('header', 'These translations in our dictionary need work.  Leave a comment, vote or edit them!');
   $handler->override_option('header_format', '1');
   $handler->override_option('header_empty', 0);
+  $handler->override_option('items_per_page', 5);
   $handler->override_option('style_plugin', 'list');
   $handler->override_option('style_options', array(
     'grouping' => '',
     'type' => 'ul',
   ));
   $handler = $view->new_display('block', 'Block', 'block_1');
+  $handler->override_option('use_more', 1);
+  $handler->override_option('use_more_always', 0);
+  $handler->override_option('use_more_text', 'more entries');
   $handler->override_option('block_description', 'Entries: Need work');
   $handler->override_option('block_caching', -1);
+  $handler = $view->new_display('page', 'Page', 'page_1');
+  $handler->override_option('items_per_page', 20);
+  $handler->override_option('use_pager', '1');
+  $handler->override_option('style_plugin', 'table');
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+    'override' => 1,
+    'sticky' => 0,
+    'order' => 'asc',
+    'columns' => array(
+      'language' => 'language',
+      'title' => 'title',
+      'nothing' => 'nothing',
+      'value' => 'value',
+    ),
+    'info' => array(
+      'language' => array(
+        'separator' => '',
+      ),
+      'title' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'nothing' => array(
+        'separator' => '',
+      ),
+      'value' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+    ),
+    'default' => '-1',
+  ));
+  $handler->override_option('path', 'dictionary/need_work');
+  $handler->override_option('menu', array(
+    'type' => 'none',
+    'title' => '',
+    'description' => '',
+    'weight' => 0,
+    'name' => 'navigation',
+  ));
+  $handler->override_option('tab_options', array(
+    'type' => 'none',
+    'title' => '',
+    'description' => '',
+    'weight' => 0,
+    'name' => 'navigation',
+  ));
+
+  $views[$view->name] = $view;
+
+  // Exported view: entries_recent_comments
+  $view = new view;
+  $view->name = 'entries_recent_comments';
+  $view->description = 'Recent comments on entries';
+  $view->tag = 'dictionary';
+  $view->view_php = '';
+  $view->base_table = 'comments';
+  $view->is_cacheable = FALSE;
+  $view->api_version = 2;
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+  $handler = $view->new_display('default', 'Defaults', 'default');
+  $handler->override_option('relationships', array(
+    'nid' => array(
+      'label' => 'Node',
+      'required' => 0,
+      'id' => 'nid',
+      'table' => 'comments',
+      'field' => 'nid',
+      'relationship' => 'none',
+    ),
+  ));
+  $handler->override_option('fields', array(
+    'title' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'link_to_node' => 0,
+      'exclude' => 1,
+      'id' => 'title',
+      'table' => 'node',
+      'field' => 'title',
+      'relationship' => 'nid',
+    ),
+    'cid' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 1,
+        'text' => '[title]',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'link_to_comment' => 1,
+      'exclude' => 1,
+      'id' => 'cid',
+      'table' => 'comments',
+      'field' => 'cid',
+      'relationship' => 'none',
+    ),
+    'language' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'exclude' => 1,
+      'id' => 'language',
+      'table' => 'lingwo_entry_info',
+      'field' => 'language',
+      'relationship' => 'nid',
+    ),
+    'nothing' => array(
+      'label' => '',
+      'alter' => array(
+        'text' => '[cid] ([language])',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'exclude' => 0,
+      'id' => 'nothing',
+      'table' => 'views',
+      'field' => 'nothing',
+      'relationship' => 'none',
+    ),
+    'name' => array(
+      'label' => 'Author',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'link_to_user' => 1,
+      'exclude' => 1,
+      'id' => 'name',
+      'table' => 'comments',
+      'field' => 'name',
+      'relationship' => 'none',
+    ),
+    'timestamp' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 1,
+        'text' => 'Submitted by [name] at [timestamp]',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'date_format' => 'small',
+      'custom_date_format' => '',
+      'exclude' => 0,
+      'id' => 'timestamp',
+      'table' => 'comments',
+      'field' => 'timestamp',
+      'relationship' => 'none',
+    ),
+    'comment' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 1,
+        'max_length' => '100',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 1,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'exclude' => 0,
+      'id' => 'comment',
+      'table' => 'comments',
+      'field' => 'comment',
+      'relationship' => 'none',
+    ),
+    'view_comment' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'text' => 'Read more',
+      'exclude' => 0,
+      'id' => 'view_comment',
+      'table' => 'comments',
+      'field' => 'view_comment',
+      'relationship' => 'none',
+    ),
+  ));
+  $handler->override_option('sorts', array(
+    'timestamp' => array(
+      'order' => 'DESC',
+      'granularity' => 'second',
+      'id' => 'timestamp',
+      'table' => 'comments',
+      'field' => 'timestamp',
+      'relationship' => 'none',
+    ),
+  ));
+  $handler->override_option('filters', array(
+    'type' => array(
+      'operator' => 'in',
+      'value' => array(
+        'entry' => 'entry',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'nid',
+    ),
+  ));
+  $handler->override_option('access', array(
+    'type' => 'none',
+  ));
+  $handler->override_option('cache', array(
+    'type' => 'none',
+  ));
+  $handler->override_option('title', 'Recent comments');
+  $handler->override_option('header', '<p>We are currently discussing the following entries:</p>');
+  $handler->override_option('header_format', '1');
+  $handler->override_option('header_empty', 0);
+  $handler->override_option('items_per_page', 5);
+  $handler->override_option('use_more', 1);
+  $handler->override_option('use_more_always', 0);
+  $handler->override_option('use_more_text', 'more comments');
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+  ));
+  $handler = $view->new_display('block', 'Block', 'block_1');
+  $handler->override_option('block_description', 'Entries: Recent comments');
+  $handler->override_option('block_caching', -1);
+  $handler = $view->new_display('page', 'Page', 'page_1');
+  $handler->override_option('title', 'Recent comments in the dictionary');
+  $handler->override_option('items_per_page', 10);
+  $handler->override_option('use_pager', '1');
+  $handler->override_option('path', 'dictionary/recent_comments');
+  $handler->override_option('menu', array(
+    'type' => 'none',
+    'title' => '',
+    'description' => '',
+    'weight' => 0,
+    'name' => 'navigation',
+  ));
+  $handler->override_option('tab_options', array(
+    'type' => 'none',
+    'title' => '',
+    'description' => '',
+    'weight' => 0,
+    'name' => 'navigation',
+  ));
 
   $views[$view->name] = $view;
 

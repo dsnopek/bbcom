@@ -48,6 +48,12 @@ function bbcom_dictionary_context_default_contexts() {
           'region' => 'right',
           'weight' => 1,
         ),
+        'views-entries_recent_comments-block_1' => array(
+          'module' => 'views',
+          'delta' => 'entries_recent_comments-block_1',
+          'region' => 'right',
+          'weight' => 2,
+        ),
       ),
     ),
     'menu' => 'dictionary',
