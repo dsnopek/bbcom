@@ -960,13 +960,13 @@ function _nodecomment_node_add_access($op, $type) {
   return node_access('create', $type);
 }
 
-function _nodecomment_comment_reply($node) {
+function _nodecomment_comment_reply($node, $pid = NULL) {
   if ($node->comment_type) {
     watchdog('nodecomment', 'User went to Drupal comment page, when this type uses nodecomment', array(), WATCHDOG_ERROR);
     drupal_goto("node/add/". str_replace('_', '-', $node->comment_type) ."/". $node->nid);
     exit();
   }
-  return comment_reply($node);
+  return comment_reply($node, $pid);
 }
 
 /**
