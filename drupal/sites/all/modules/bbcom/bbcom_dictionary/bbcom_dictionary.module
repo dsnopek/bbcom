@@ -53,7 +53,7 @@ function bbcom_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 
     // hide the fields and summary for non-admin users
     // TODO: should this be 'editor'?
-    if (array_search('admin', $user->roles) == TRUE) {
+    if (array_search('beta', $user->roles) == TRUE) {
       $node->content['entry_summary'] = array(
         '#weight' => -1,
         '#value'  => theme(array(
