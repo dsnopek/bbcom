@@ -217,22 +217,20 @@ function bbcom_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
  * Adds a link to an entries source entry.
  *
  */
-/*
 function bbcom_dictionary_link($type, $node, $teaser=FALSE) {
-  if ($type == 'node' && $node->type == LingwoEntry::$settings->content_type &&
-      ($source_node = lingwo_dictionary_entry_load_translation_source($node))) {
-    
-    $languages = language_list();
-    $language_name = $languages[$source_node->language]->name;
+  if ($type == 'node' && !$teaser && ($entry = LingwoEntry::fromNode($node)) && $entry->isTranslation()) {
+
+    $language_name = $entry->getSourceLanguage(TRUE);
+    $source = LingwoEntry::fromNode($entry->getTranslationSource());
+
     return array(
       'bbcom_dictionary-source' => array(
         'title' => t('Source entry in @lang', array('@lang' => $language_name)),
-        'href'  => lingwo_dictionary_entry_path($source_node),
+        'href'  => $source->getPath(),
       )
     );
   }
 }
-*/
 
 /**
  * Implementation of hook_field_formatter_info().
