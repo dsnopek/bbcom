@@ -8,7 +8,7 @@ from anki.facts import Fact
 from anki.models import Model, CardModel, FieldModel
 
 from threading import Thread
-from Queue import Queue, PriorityQueue
+from Queue import Queue
 
 try:
     import simplejson as json
@@ -108,7 +108,7 @@ class DeckThread(object):
         self.path = os.path.abspath(path)
         self.wrapper = DeckWrapper(path)
 
-        self._queue = PriorityQueue()
+        self._queue = Queue()
         self._thread = None
         self._running = False
         self.last_timestamp = time.time()
@@ -124,15 +124,12 @@ class DeckThread(object):
         from threading import current_thread
         return current_thread() == self._thread
 
-    def execute(self, func, args=[], kw={}, waitForReturn=True, priority=0):
+    def execute(self, func, args=[], kw={}, waitForReturn=True):
         """ Executes a given function on this thread with the *args and **kw.
 
         If 'waitForReturn' is True, then it will block until the function has
         executed and return its return value.  If False, it will return None
         immediately and the function will be executed sometime later.
-
-        Set 'priority' to a value lower than zero to jump to the front of the
-        queue or higher than zero to stick to the back of the queue.
         """
 
         if waitForReturn:
@@ -140,7 +137,7 @@ class DeckThread(object):
         else:
             return_queue = None
 
-        self._queue.put((priority, func, args, kw, return_queue))
+        self._queue.put((func, args, kw, return_queue))
 
         if return_queue is not None:
             ret = return_queue.get(True)
@@ -153,7 +150,7 @@ class DeckThread(object):
 
         try:
             while self._running:
-                priority, func, args, kw, return_queue = self._queue.get(True)
+                func, args, kw, return_queue = self._queue.get(True)
 
                 logging.info('DeckThread[%s]: Running %s(*%s, **%s)', self.path, func.func_name, repr(args), repr(kw))
                 self.last_timestamp = time.time()
@@ -447,12 +444,13 @@ class DeckAppHandler(object):
         deck = self.wrapper.open()
         card = deck.cardFromId(card_id)
         if card:
-            print card
             try:
                 deck.answerCard(card, ease)
             except:
-                import sys
-                print sys.exc_info()
+                import sys, traceback
+                exc_info = sys.exc_info()
+                print exc_info[1]
+                print traceback.print_tb(exc_info[2])
                 return False
             deck.save()
         return True
