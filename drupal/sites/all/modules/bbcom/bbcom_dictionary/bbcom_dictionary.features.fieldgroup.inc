@@ -50,7 +50,7 @@ function bbcom_dictionary_fieldgroup_default_groups() {
         ),
       ),
     ),
-    'weight' => '8',
+    'weight' => '9',
     'fields' => array(
       '0' => 'field_source_name',
       '1' => 'field_source_url',

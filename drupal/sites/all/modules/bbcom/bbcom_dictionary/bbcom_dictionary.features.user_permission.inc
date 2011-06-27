@@ -53,6 +53,7 @@ function bbcom_dictionary_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'editor',
+      '2' => 'editor2',
     ),
   );
 
@@ -64,7 +65,9 @@ function bbcom_dictionary_user_default_permissions() {
       '1' => 'authenticated user',
       '2' => 'beta',
       '3' => 'editor',
-      '4' => 'translator',
+      '4' => 'editor1',
+      '5' => 'editor2',
+      '6' => 'translator',
     ),
   );
 
