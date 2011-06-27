@@ -123,6 +123,7 @@ function bbcom_dictionary_form_alter(&$form, &$form_state, $form_id) {
         '#weight' => -10,
         '#required' => TRUE,
         '#title' => t('I have read and understood the <a target="_blank" href="!url">editorial guidelines</a>', $gnid_arr),
+        '#default_value' => $form_state['values']['bbcom_dictionary_guidelines_confirm'],
       );
     }
 
