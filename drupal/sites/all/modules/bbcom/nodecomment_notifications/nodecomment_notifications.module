@@ -177,8 +177,9 @@ function nodecomment_notifications_token_values($type, $object = NULL, $options 
       $values['nodecomment-node-title-raw']  = db_result(db_query("SELECT title FROM {node} WHERE nid = %d", $comment->nid));
       $values['nodecomment-node-title']      = check_plain($values['nodecomment-node-title-raw']);
       
-      $values['nodecomment-url'] = url('node/'. $comment->comment_target_nid, array('fragment' =>'comment-'. $comment->nid, 'absolute' => TRUE));
-      $values['nodecomment-reply-url'] = url('comment/reply/'. $comment->comment_target_nid .'/'. $comment->nid, array('absolute' => TRUE));
+      $language = isset($options['language']) ? $options['language'] : $GLOBALS['language'];
+      $values['nodecomment-url'] = url('node/'. $comment->comment_target_nid, array('fragment' =>'comment-'. $comment->nid, 'absolute' => TRUE, 'language' => $language));
+      $values['nodecomment-reply-url'] = url('comment/reply/'. $comment->comment_target_nid .'/'. $comment->nid, array('absolute' => TRUE, 'language' => $language));
       
       break;
   }
