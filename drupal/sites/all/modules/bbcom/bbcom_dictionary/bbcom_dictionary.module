@@ -330,7 +330,9 @@ function theme_bbcom_dictionary_see_also($entry) {
       $other = $other->getTranslation($entry->targetLanguage);
     }
 
-    $items[] = l($other->headword . ' (' . $other->getPos(TRUE) . ')', $other->getPath());
+    if (!empty($other)) {
+      $items[] = l($other->headword . ' (' . $other->getPos(TRUE) . ')', $other->getPath());
+    }
   }
 
   return theme('item_list', $items, t('See also'), 'ul', array('class' => 'lingwo-entry-other-pos'));
