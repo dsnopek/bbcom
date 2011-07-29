@@ -1,7 +1,5 @@
-diff --git a/drupal/sites/all/modules/token/token_node.inc b/drupal/sites/all/modules/token/token_node.inc
-index d7737f8..f16a813 100644
---- a/drupal/sites/all/modules/token/token_node.inc
-+++ b/drupal/sites/all/modules/token/token_node.inc
+--- token_node.inc
++++ token_node.inc
 @@ -37,7 +37,7 @@ function node_token_values($type, $object = NULL, $options = array()) {
        $values['title-raw']          = $node->title;
        $values['node-path-raw']      = drupal_get_path_alias('node/'. $node->nid);

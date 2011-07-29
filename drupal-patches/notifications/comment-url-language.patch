@@ -1,7 +1,5 @@
-diff --git a/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module b/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
-index d8cba8f..8bf2d77 100644
---- a/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
-+++ b/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
+--- notifications_content/notifications_content.module
++++ notifications_content/notifications_content.module
 @@ -938,8 +938,9 @@ function notifications_content_token_values($type, $object = NULL, $options = ar
        break;
      case 'comment':
