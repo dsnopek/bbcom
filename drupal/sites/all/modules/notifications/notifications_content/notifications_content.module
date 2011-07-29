@@ -938,8 +938,9 @@ function notifications_content_token_values($type, $object = NULL, $options = ar
       break;
     case 'comment':
       if ($comment = (object)$object) {
-        $values['comment-url'] = url('node/'. $comment->nid, array('fragment' =>'comment-'. $comment->cid, 'absolute' => TRUE));
-        $values['comment-reply-url'] = url('comment/reply/'. $comment->nid .'/'. $comment->cid, array('absolute' => TRUE));
+        $language = isset($options['language']) ? $options['language'] : $GLOBALS['language'];
+        $values['comment-url'] = url('node/'. $comment->nid, array('fragment' =>'comment-'. $comment->cid, 'absolute' => TRUE, 'language' => $language));
+        $values['comment-reply-url'] = url('comment/reply/'. $comment->nid .'/'. $comment->cid, array('absolute' => TRUE, 'language' => $language));
         return $values;
       }
       break;

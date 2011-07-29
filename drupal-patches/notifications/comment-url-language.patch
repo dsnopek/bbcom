@@ -1,0 +1,23 @@
+diff --git a/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module b/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
+index d8cba8f..8bf2d77 100644
+--- a/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
++++ b/drupal/sites/all/modules/notifications/notifications_content/notifications_content.module
+@@ -938,8 +938,9 @@ function notifications_content_token_values($type, $object = NULL, $options = ar
+       break;
+     case 'comment':
+       if ($comment = (object)$object) {
+-        $values['comment-url'] = url('node/'. $comment->nid, array('fragment' =>'comment-'. $comment->cid, 'absolute' => TRUE));
+-        $values['comment-reply-url'] = url('comment/reply/'. $comment->nid .'/'. $comment->cid, array('absolute' => TRUE));
++        $language = isset($options['language']) ? $options['language'] : $GLOBALS['language'];
++        $values['comment-url'] = url('node/'. $comment->nid, array('fragment' =>'comment-'. $comment->cid, 'absolute' => TRUE, 'language' => $language));
++        $values['comment-reply-url'] = url('comment/reply/'. $comment->nid .'/'. $comment->cid, array('absolute' => TRUE, 'language' => $language));
+         return $values;
+       }
+       break;
+@@ -995,4 +996,4 @@ function notifications_content_comment_access($comment, $account) {
+   )
+   // But all that if and only if the user can access the node too
+   && notifications_object_access('node', $comment->nid, $account);
+-}
+\ No newline at end of file
++}
