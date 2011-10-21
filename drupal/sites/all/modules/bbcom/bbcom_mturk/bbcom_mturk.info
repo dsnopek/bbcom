@@ -1,0 +1,6 @@
+core = "6.x"
+dependencies[] = "bbcom_dictionary"
+description = "Sets up integration with Amazon Mechanical Turk"
+name = "BiblioBird.com Mechanical Turk Integration"
+package = "BiblioBird.com"
+

@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function bbcom_mturk_menu() {
+  $items = array();
+  $items['mturk/dictionary/source-senses/%/%'] = array(
+    'title' => 'Correct dictionary sense',
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_mturk_dictionary_source_senses_form', 3, 4),
+    'file' => 'bbcom_mturk.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function bbcom_mturk_form(&$form) {
+  $form['assignmentId'] = array(
+    '#type' => 'value',
+    '#value' => $_GET['assignmentId'],
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  $form['#submit'][] = 'bbcom_mturk_submit';
+  return $form;
+}
+
+function bbcom_mturk_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  if (!empty($values['assignmentId'])) {
+    unset($values['op'], $values['form_build_id'], $values['form_id'], $values['submit']);
+    //drupal_set_message(print_r($values, TRUE));
+    $form_state['redirect'] = array('http://www.mturk.com/mturk/externalSubmit',
+      array('query' => $values));
+  }
+}
+
+function bbcom_mturk_render_form($form) {
+  $form['assignmentId'] = array(
+    '#type' => 'hidden',
+    '#value' => $_GET['assignmentId'],
+  );
+
+  $html = '<form id="mturk-form-' . $form['#id'] . '" action="http://www.mturk.com/mturk/externalSubmit">';
+  $html .= drupal_render($form);
+  $html .= '</form>';
+
+  return $html;
+}
+
