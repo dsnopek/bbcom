@@ -1,0 +1,79 @@
+array(
+  array(
+    'nid' => '7240',
+    'type' => 'language',
+    'language' => '',
+    'uid' => '1',
+    'status' => '1',
+    'created' => '1325510489',
+    'changed' => '1325510489',
+    'comment' => '2',
+    'promote' => '0',
+    'moderate' => '0',
+    'sticky' => '0',
+    'tnid' => '0',
+    'translate' => '0',
+    'vid' => '14793',
+    'revision_uid' => '1',
+    'title' => 'Swedish',
+    'body' => '',
+    'teaser' => '',
+    'log' => '',
+    'revision_timestamp' => '1325510489',
+    'format' => '0',
+    'name' => 'David Snopek',
+    'picture' => '',
+    'data' => 'a:7:{s:13:"form_build_id";s:37:"form-b36e64565f8a5c1b38d61f7c2f478643";s:11:"remember_me";b:1;s:16:"bbcom_news_optin";i:1;s:10:"bbcom_wial";a:1:{s:8:"auto_add";i:1;}s:17:"messaging_default";s:4:"mail";s:27:"notifications_send_interval";s:1:"0";s:18:"notifications_auto";i:1;}',
+    'lingwo_language' => array(
+      'lingwo_entry_pos_allowed_values' => 'abbreviation|Abbreviation
+adjective|Adjective
+adverb|Adverb
+article|Article
+auxilary verb|Auxilary Verb
+conjunction|Conjunction
+determiner|Determiner
+exclamation|Exclamation
+noun|Noun
+onomatopoeia|Onomatopoeia
+particle|Particle
+phrase|Phrase
+prefix|Prefix
+preposition|Preposition
+pronoun|Pronoun
+suffix|Suffix
+symbol|Symbol
+title|Title
+verb|Verb',
+      'lingwo_fields_fields' => array(
+        'javascript' => '// Generate alphabet for this language
+lang.alphabet = Language.generateAlphabet(\'abcdefghijklmnopqrstuvwxyzåäö\', [], function (l) { return \'aeiouåäö\'.indexOf(l) == -1 ? [\'consonant\'] : [\'vowel\'] });
+
+// Here you can declare some functions for later use!
+',
+      ),
+      'lingwo_senses_relationship_allowed_values' => '',
+      'language' => 'sv',
+    ),
+    'comment_type' => '',
+    'old_status' => '1',
+    'last_comment_timestamp' => '1325510489',
+    'last_comment_name' => NULL,
+    'comment_count' => '0',
+    'taxonomy' => array(),
+    'menu' => array(
+      'link_title' => '',
+      'mlid' => 0,
+      'plid' => 0,
+      'menu_name' => 'navigation',
+      'weight' => 0,
+      'options' => array(),
+      'module' => 'menu',
+      'expanded' => 0,
+      'hidden' => 0,
+      'has_children' => 0,
+      'customized' => 0,
+      'parent_depth_limit' => 8,
+    ),
+    '#_export_node_encode_object' => '1',
+  ),
+)
