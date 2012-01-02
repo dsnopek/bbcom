@@ -2,13 +2,14 @@
 
 /**
  * @file
- * Template file for ImageCache content inserted via the Insert module.
+ * Template file for generic images inserted via the Insert module.
  *
  * Available variables:
  * - $item: The complete item being inserted.
  * - $url: The URL to the image.
  * - $class: A set of classes assigned to this image (if any).
- * - $preset_name: The ImageCache preset being used.
+ * - $width: The width of the image.
+ * - $height: The height of the image.
  *
  * Note that ALT and Title fields should not be filled in here, instead they
  * should use placeholders that will be updated through JavaScript when the
@@ -23,4 +24,7 @@
  *   use the file's name. i.e. __title_or_filename__.
  */
 ?>
-<img src="<?php print $url ?>" alt="__alt__" title="__title__" class="imagecache-<?php print $preset_name ?><?php print $class ? ' ' . $class : '' ?>" />
+<div class="diag" style="float: right; width: <?php print $width ?>px; margin: 10px;"><a href="<?php print $url ?>" rel="lightbox"><img src="<?php print $url ?>" width="<?php print $width ?>" height="<?php print $height ?>" <?php print $class ? 'class="' . $class . '" ' : '' ?>alt="__alt__" /></a>
+<div class="caption">
+Caption goes here!
+</div></div>

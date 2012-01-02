@@ -75,11 +75,13 @@ function bbcom_content_strongarm() {
   $strongarm->value = array(
     'title' => '-5',
     'body_field' => '-2',
-    'revision_information' => '2',
-    'comment_settings' => '3',
+    'revision_information' => '3',
+    'comment_settings' => '4',
     'language' => '-3',
     'menu' => '-4',
-    'lingwo_korpus_settings' => '-1',
+    'path' => '5',
+    'lingwo_korpus_settings' => '0',
+    'notifications' => '6',
   );
 
   $export['content_extra_weights_content'] = $strongarm;
