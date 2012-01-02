@@ -11,7 +11,7 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_audio',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => 0,
+      'weight' => '1',
       'parent' => '',
       '2' => array(
         'format' => 'default',
@@ -53,10 +53,90 @@ function bbcom_content_content_default_fields() {
       'max_filesize_per_file' => '',
       'max_filesize_per_node' => '',
       'label' => 'Audio',
-      'weight' => 0,
+      'weight' => '1',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
+    ),
+  );
+
+  // Exported field: field_content_image
+  $fields['content-field_content_image'] = array(
+    'field_name' => 'field_content_image',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'weight' => '-1',
+      'parent' => '',
+      '2' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      'token' => array(
+        'format' => 'image_plain',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'filefield',
+    'required' => '0',
+    'multiple' => '1',
+    'module' => 'filefield',
+    'active' => '1',
+    'list_field' => '0',
+    'list_default' => 1,
+    'description_field' => '0',
+    'widget' => array(
+      'file_extensions' => 'png gif jpg jpeg',
+      'file_path' => '',
+      'progress_indicator' => 'bar',
+      'max_filesize_per_file' => '',
+      'max_filesize_per_node' => '',
+      'max_resolution' => '0',
+      'min_resolution' => '0',
+      'alt' => '',
+      'custom_alt' => 0,
+      'title' => '',
+      'custom_title' => 0,
+      'title_type' => 'textfield',
+      'default_image' => NULL,
+      'use_default_image' => 0,
+      'insert' => 1,
+      'insert_styles' => array(
+        'imagecache_large' => 'imagecache_large',
+        'imagecache_medium' => 'imagecache_medium',
+        'imagecache_small' => 'imagecache_small',
+        'auto' => 0,
+        'link' => 0,
+        'image' => 0,
+        'wiki' => 0,
+      ),
+      'insert_default' => 'imagecache_small',
+      'insert_class' => '',
+      'insert_width' => '',
+      'label' => 'Images',
+      'weight' => '-1',
+      'description' => '',
+      'type' => 'imagefield_widget',
+      'module' => 'imagefield',
     ),
   );
 
@@ -65,7 +145,7 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_remote_url',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '1',
+      'weight' => '2',
       'parent' => '',
       '2' => array(
         'format' => 'default',
@@ -116,7 +196,7 @@ function bbcom_content_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Remote URL',
-      'weight' => '1',
+      'weight' => '2',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -126,6 +206,7 @@ function bbcom_content_content_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Audio');
+  t('Images');
   t('Remote URL');
 
   return $fields;

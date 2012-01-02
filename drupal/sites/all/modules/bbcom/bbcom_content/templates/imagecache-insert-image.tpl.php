@@ -23,4 +23,7 @@
  *   use the file's name. i.e. __title_or_filename__.
  */
 ?>
-<img src="<?php print $url ?>" alt="__alt__" title="__title__" class="imagecache-<?php print $preset_name ?><?php print $class ? ' ' . $class : '' ?>" />
+<div class="diag" style="<?php print $preset_name == 'large' ? 'margin: 10px auto;' : 'margin: 10px; float: right;'; ?> width: <?php print $width ?>px;"><a href="<?php print $original_url; ?>" rel="lightbox"><img src="<?php print $url ?>" width="<?php print $width ?>" height="<?php print $height ?>" class="imagecache-<?php print $preset_name ?><?php print $class ? $class . ' ' : '' ?>" alt="__alt__" /></a>
+<div class="caption">
+Caption goes here!
+</div></div>

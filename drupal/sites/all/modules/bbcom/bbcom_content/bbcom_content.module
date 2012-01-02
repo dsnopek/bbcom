@@ -2,6 +2,15 @@
 
 include_once('bbcom_content.features.inc');
 
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function bbcom_content_theme_registry_alter(&$registry) {
+  // pretend we are the theme and scan for templates
+  $path = drupal_get_path('module', 'bbcom_content') . '/templates';
+  _theme_process_registry($registry, 'phptemplate', 'theme_engine', 'bbcom_content', $path);
+}
+
 /*
  * Implementation of hook_flag_default_flags().
  */
@@ -71,4 +80,32 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+/////
+// Theme functions
+
+function bbcom_content_preprocess_imagecache_insert_image($vars) {
+  if (empty($vars['width'])) {
+    $filepath = $vars['item']['filepath'];
+
+    // build the small image if it doesn't exist
+    $dst = imagecache_create_path($vars['preset_name'], $filepath);
+    if (!file_exists($dst)) {
+      if ($preset = imagecache_preset_by_name($vars['preset_name'])) {
+        $src = file_create_path($filepath);
+        imagecache_build_derivative($preset['actions'], $src, $dst);
+      }
+    }
+
+    // get the dimensions of the small image
+    if ($image = image_get_info($dst)) {
+      $vars['width'] = $image['width'];
+      $vars['height'] = $image['height'];
+    }
+    else {
+      $vars['width'] = $vars['height'] = NULL;
+    }
+  }
+
+  $vars['original_url'] = file_create_url($vars['item']['filepath']);
+}
 

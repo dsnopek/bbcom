@@ -29,3 +29,14 @@ function bbcom_content_disable() {
   db_query("DELETE FROM {filefield_paths} WHERE field = '%s' AND type = '%s'", 'field_audio', 'content');
 }
 
+//////
+// Updated functions
+
+function bbcom_content_update_6001() {
+  drupal_install_modules(array(
+    'imagecache',
+    'imageapi_gd',
+    'insert',
+  ));
+}
+
