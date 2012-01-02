@@ -1,0 +1,4 @@
+core = "6.x"
+description = "Actionable business metrics for Bibliobird.com"
+name = "BiblioBird.com Metrics"
+package = "BiblioBird.com"
