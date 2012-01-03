@@ -8,7 +8,9 @@ include_once('bbcom_content.features.inc');
 function bbcom_content_theme_registry_alter(&$registry) {
   // pretend we are the theme and scan for templates
   $path = drupal_get_path('module', 'bbcom_content') . '/templates';
-  _theme_process_registry($registry, 'phptemplate', 'theme_engine', 'bbcom_content', $path);
+  foreach (array('insert_image', 'imagecache_insert_image') as $key) {
+    $registry[$key]['template'] = $path . '/' . str_replace('_', '-', $key);
+  }
 }
 
 /*
