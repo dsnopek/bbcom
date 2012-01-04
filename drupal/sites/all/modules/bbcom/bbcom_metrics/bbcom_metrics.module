@@ -39,13 +39,61 @@ function bbcom_metrics_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+// Merge a new command into the list of commands that will be run on page load
+function _bbcom_metrics_mp($func = NULL, $args = array()) {
+  drupal_add_js(array(
+    'bbcom_metrics' => array(
+      'commands' => array(array($func, $args))
+    )
+  ), 'setting');
+}
+
+/**
+ * Tracks an event with the given properties.
+ */
+function bbcom_metrics_track($event, $properties = array()) {
+  _bbcom_metrics_mp('track', array($event, $properties));
+}
+
+/**
+ * Sets some 'super properties' which get applied to all events for this user.
+ */
+function bbcom_metrics_set_user_properties($properties, $once = FALSE) {
+  _bbcom_metrics_mp($once ? 'register_once' : 'register', array($properties));
+}
+
 /**
  * Implementation of hook_init().
  */
 function bbcom_metrics_init() {
+  global $user;
+
   if ($mixpanel_token = variable_get('bbcom_metrics_mixpanel_token', '')) {
-    drupal_add_js(array('bbcom_metrics' => array('mixpanel_token' => $mixpanel_token)), 'setting');
-    drupal_add_js('var mpq=[];mpq.push(["init",Drupal.settings.bbcom_metrics.mixpanel_token]);(function(){var b,a,e,d,c;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=(document.location.protocol==="https:"?"https:":"http:")+"//api.mixpanel.com/site_media/js/api/mixpanel.js";a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a);e=function(f){return function(){mpq.push([f].concat(Array.prototype.slice.call(arguments,0)))}};d=["init","track","track_links","track_forms","register","register_once","identify","name_tag","set_config"];for(c=0;c<d.length;c++){mpq[d[c]]=e(d[c])}})();', 'inline');
+    $info = array(
+      'mixpanel_token' => $mixpanel_token,
+      'commands'       => array(),
+    );
+
+    // make sure the commands identifying the user come first
+    if (!empty($user->uid)) {
+      $info['commands'][] = array('identify', array((string)$user->uid));
+      $info['commands'][] = array('name_tag', array($user->name));
+    }
+
+    drupal_add_js(array('bbcom_metrics' => $info), 'setting');
+    drupal_add_js(drupal_get_path('module', 'bbcom_metrics') . '/bbcom_metrics.js');
+    // make sure this is run as early as possible
+    drupal_add_js('bbcom_metrics_init();', 'inline');
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function bbcom_metrics_user($op, &$edit, &$account, $category = NULL) {
+  if ($op == 'logout') {
+    // clear the old mixpanel properties
+    setcookie('mp_super_properties', '', time() - (86400 * 2));
   }
 }
 
