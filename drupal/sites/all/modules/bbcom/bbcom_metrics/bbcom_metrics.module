@@ -1,5 +1,8 @@
 <?php
 
+define('BBCOM_METRICS_JAVASCRIPT', 0);
+define('BBCOM_METRICS_BACKEND', 1);
+
 /**
  * Implementation of hook_menu().
  */
@@ -39,27 +42,92 @@ function bbcom_metrics_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
-// Merge a new command into the list of commands that will be run on page load
-function _bbcom_metrics_mp($func = NULL, $args = array()) {
-  drupal_add_js(array(
-    'bbcom_metrics' => array(
-      'commands' => array(array($func, $args))
-    )
-  ), 'setting');
+// Merge a new command into the list of commands that will be run by JavaScript on page load
+function _bbcom_metrics_mp_javascript($func = NULL, $args = array()) {
+  if (variable_get('bbcom_metrics_mixpanel_token', FALSE)) {
+    drupal_add_js(array(
+      'bbcom_metrics' => array(
+        'commands' => array(array($func, $args))
+      )
+    ), 'setting');
+  }
+}
+
+// Calls directly to the mixpanel API from the backend
+function _bbcom_metrics_mp_backend($event, $properties = array()) {
+  if ($mixpanel_token = variable_get('bbcom_metrics_mixpanel_token', '')) {
+    $properties['token'] = $mixpanel_token;
+
+    $params = array(
+      'event' => $event,
+      'properties' => $properties,
+    );
+    $url = 'http://api.mixpanel.com/track/?data=' . base64_encode(json_encode($params));
+    $res = drupal_http_request($url);
+    // TODO: do some error handling?
+  }
 }
 
 /**
  * Tracks an event with the given properties.
  */
-function bbcom_metrics_track($event, $properties = array()) {
-  _bbcom_metrics_mp('track', array($event, $properties));
+function bbcom_metrics_track($event, $properties = array(), $type = BBCOM_METRICS_JAVASCRIPT) {
+  global $user;
+
+  switch ($type) {
+    case BBCOM_METRICS_JAVASCRIPT:
+      $args = array($event);
+      if (!empty($properties)) {
+        $args[] = $properties;
+      }
+      _bbcom_metrics_mp_javascript('track', $args);
+      break;
+
+    case BBCOM_METRICS_BACKEND:
+      // add a bunch of properties that would usually come from JavaScript
+      $properties = array_merge(bbcom_metrics_get_user_properties(), $properties);
+      $properties['ip'] = ip_address();
+      if (!empty($user->uid)) {
+        $properties['distinct_id'] = (string)$user->uid;
+        $properties['mp_name_tag'] = $user->name_tag;
+      }
+
+      // so that defered events still happen when they should
+      $properties['time'] = time();
+
+      if (variable_get('bbcom_metrics_defer_backend', TRUE) && module_exists('job_queue')) {
+        job_queue_add('_bbcom_metrics_mp_backend', t('Send %event event to mixpanel', array('%event' => $event)), array($event, $properties));
+      }
+      else {
+        _bbcom_metrics_mp_backend($event, $properties);
+      }
+      break;
+  }
 }
 
 /**
  * Sets some 'super properties' which get applied to all events for this user.
  */
 function bbcom_metrics_set_user_properties($properties, $once = FALSE) {
-  _bbcom_metrics_mp($once ? 'register_once' : 'register', array($properties));
+  static $user_properties = array();
+
+  if (!is_null($properties)) {
+    // store our cached values
+    foreach ($properties as $key => $value) {
+      if (!$once || !isset($user_properties[$key])) {
+        $user_properties = $value;
+      }
+    }
+
+    // Add the JavaScript call
+    _bbcom_metrics_mp_javascript($once ? 'register_once' : 'register', array($properties));
+  }
+
+  return $user_properties;
+}
+
+function bbcom_metrics_get_user_properties() {
+  return bbcom_metrics_set_user_properties(NULL);
 }
 
 /**
@@ -78,12 +146,58 @@ function bbcom_metrics_init() {
     if (!empty($user->uid)) {
       $info['commands'][] = array('identify', array((string)$user->uid));
       $info['commands'][] = array('name_tag', array($user->name));
+      // TODO: need to get this into the the 'backend' metrics
+      $info['commands'][] = array('register_once', array(array(
+        'cohort_week'  => date('Y', $user->created) . 'W' . date('W', $user->created),
+        'cohort_month' => date('Y', $user->created) . '-' . date('m', $user->created),
+        'user_language' => $user->language,
+      )));
     }
 
     drupal_add_js(array('bbcom_metrics' => $info), 'setting');
     drupal_add_js(drupal_get_path('module', 'bbcom_metrics') . '/bbcom_metrics.js');
     // make sure this is run as early as possible
     drupal_add_js('bbcom_metrics_init();', 'inline');
+
+    // do some page specific events!
+    switch ($_GET['q']) {
+      case 'node/4509':
+      case 'node/4510':
+      case 'about':
+        bbcom_metrics_track('View landing page');
+        break;
+
+      case 'user/register':
+        bbcom_metrics_track('View registration page');
+        break;
+    }
+
+    if (preg_match('/wial\/\d\/edit/', $_GET['q'])) {
+      bbcom_metrics_track('View WIAL edit page');
+    }
+    elseif (preg_match('/wial\/\d\/review/', $_GET['q'])) {
+      bbcom_metrics_track('View WIAL review page');
+    }
+  }
+}
+
+/**
+ * Implementation of hook_lingwo_korpus_lookup().
+ */
+function bbcom_metrics_lingwo_korpus_lookup($user, $entry) {
+  bbcom_metrics_track('Lookup word in reader', array(
+    'entry' => $entry->getLingwoId(),
+    'source_language' => $entry->sourceLanguage,
+    'target_language' => $entry->targetLanguage,
+  ), BBCOM_METRICS_BACKEND);
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function bbcom_metrics_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  if ($op == 'view' && $page && $node->type == lingwo_korpus_text_content_type()) {
+    bbcom_metrics_track('View content', array('nid' => $node->nid));
   }
 }
 
@@ -91,7 +205,16 @@ function bbcom_metrics_init() {
  * Implementation of hook_user().
  */
 function bbcom_metrics_user($op, &$edit, &$account, $category = NULL) {
-  if ($op == 'logout') {
+  if ($op == 'register') {
+    bbcom_metrics_track('Register', array(), BBCOM_METRICS_BACKEND);
+  }
+  elseif ($op == 'login') {
+    bbcom_metrics_track('Login', array(), BBCOM_METRICS_BACKEND);
+  }
+  elseif ($op == 'logout') {
+    // the user logged out
+    bbcom_metrics_track('Logout', array(), BBCOM_METRICS_BACKEND);
+
     // clear the old mixpanel properties
     setcookie('mp_super_properties', '', time() - (86400 * 2));
   }
