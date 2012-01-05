@@ -62,23 +62,42 @@ function bbcom_metrics_track($event, $properties = array(), $type = BBCOM_METRIC
 
     case BBCOM_METRICS_BACKEND:
       // add a bunch of properties that would usually come from JavaScript
-      $properties = array_merge(bbcom_metrics_get_user_properties(), $properties);
-      $properties['ip'] = ip_address();
+      $temp = array_merge(bbcom_metrics_get_user_properties(), $properties);
+      $temp['ip'] = ip_address();
       if (!empty($user->uid)) {
-        $properties['distinct_id'] = (string)$user->uid;
-        $properties['mp_name_tag'] = $user->name;
+        $temp['distinct_id'] = (string)$user->uid;
+        $temp['mp_name_tag'] = $user->name;
       }
 
       // so that defered events still happen when they should
-      $properties['time'] = time();
+      $temp['time'] = time();
 
       if (variable_get('bbcom_metrics_defer_backend', TRUE) && module_exists('job_queue')) {
-        job_queue_add('_bbcom_metrics_mp_backend', t('Send %event event to mixpanel', array('%event' => $event)), array($event, $properties));
+        job_queue_add('_bbcom_metrics_mp_backend', t('Send %event event to mixpanel', array('%event' => $event)), array($event, $temp));
       }
       else {
-        _bbcom_metrics_mp_backend($event, $properties);
+        _bbcom_metrics_mp_backend($event, $temp);
       }
       break;
+  }
+
+  if (variable_get('bbcom_metrics_defer_track_locally', TRUE)) {
+    $event_obj = (object)array(
+      'name' => $event,
+      'time' => time(),
+      'session_id' => session_id(),
+      'uid'  => isset($properties['distinct_id']) ? $properties['distinct_id'] : $user->uid,
+    );
+    drupal_write_record('bbcom_metrics_events', $event_obj);
+
+    // we actually want to filter the user properties out, because we already have them on the
+    // user object itself!
+    $exclude = bbcom_metrics_get_user_properties();
+    foreach ($properties as $name => $value) {
+      if (!isset($exclude[$name])) {
+        db_query("INSERT INTO bbcom_metrics_events_properties VALUES (%d, '%s', '%s')", $event_obj->event_id, $name, $value);
+      }
+    }
   }
 }
 
@@ -107,12 +126,14 @@ function bbcom_metrics_get_user_properties() {
   return bbcom_metrics_set_user_properties(NULL);
 }
 
-function _bbcom_metrics_setup_user($account) {
-  bbcom_metrics_set_user_properties(array(
-    'cohort_week'  => date('Y', $account->created) . 'W' . date('W', $account->created),
-    'cohort_month' => date('Y', $account->created) . '-' . date('m', $account->created),
+function _bbcom_metrics_default_user_properties($account) {
+  return array(
+    'cohort_week'   => date('Y', $account->created) . 'W' . date('W', $account->created),
+    'cohort_month'  => date('Y', $account->created) . '-' . date('m', $account->created),
+    'user_id'       => $account->uid,
+    'user_name'     => $account->name,
     'user_language' => $account->language,
-  ), TRUE);
+  );
 }
 
 /**
@@ -125,7 +146,7 @@ function bbcom_metrics_init() {
   _bbcom_metrics_mp_init();
 
   if (!empty($user->uid)) {
-    _bbcom_metrics_setup_user($user);
+    bbcom_metrics_set_user_properties(_bbcom_metrics_default_user_properties($user), TRUE);
   }
 
   // do some page specific events!
@@ -173,13 +194,18 @@ function bbcom_metrics_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
  * Implementation of hook_user().
  */
 function bbcom_metrics_user($op, &$edit, &$account, $category = NULL) {
-  if ($op == 'register') {
-    bbcom_metrics_track('Register', array(), BBCOM_METRICS_BACKEND);
+  if ($op == 'insert') {
+    // a hack to make sure this gets attached to the correct user
+    $properties = _bbcom_metrics_default_user_properties($account);
+    $properties['distinct_id'] = $account->uid;
+    $properties['mp_name_tag'] = $account->name;
+    // this event has a magic mixpanel name...
+    bbcom_metrics_track('$signup', $properties, BBCOM_METRICS_BACKEND);
   }
   elseif ($op == 'login') {
     // because we haven't fully logged in yet and $user is not set, we have
     // to manually set the user properties here
-    _bbcom_metrics_setup_user($account);
+    bbcom_metrics_set_user_properties(_bbcom_metrics_default_user_properties($account), TRUE);
 
     bbcom_metrics_track('Login', array(), BBCOM_METRICS_BACKEND);
   }
