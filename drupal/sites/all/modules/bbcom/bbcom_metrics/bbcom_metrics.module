@@ -3,6 +3,9 @@
 define('BBCOM_METRICS_JAVASCRIPT', 0);
 define('BBCOM_METRICS_BACKEND', 1);
 
+// some functions specific to mix panel
+require_once('includes/mixpanel.inc');
+
 /**
  * Implementation of hook_menu().
  */
@@ -42,32 +45,6 @@ function bbcom_metrics_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
-// Merge a new command into the list of commands that will be run by JavaScript on page load
-function _bbcom_metrics_mp_javascript($func = NULL, $args = array()) {
-  if (variable_get('bbcom_metrics_mixpanel_token', FALSE)) {
-    drupal_add_js(array(
-      'bbcom_metrics' => array(
-        'commands' => array(array($func, $args))
-      )
-    ), 'setting');
-  }
-}
-
-// Calls directly to the mixpanel API from the backend
-function _bbcom_metrics_mp_backend($event, $properties = array()) {
-  if ($mixpanel_token = variable_get('bbcom_metrics_mixpanel_token', '')) {
-    $properties['token'] = $mixpanel_token;
-
-    $params = array(
-      'event' => $event,
-      'properties' => $properties,
-    );
-    $url = 'http://api.mixpanel.com/track/?data=' . base64_encode(json_encode($params));
-    $res = drupal_http_request($url);
-    // TODO: do some error handling?
-  }
-}
-
 /**
  * Tracks an event with the given properties.
  */
@@ -89,7 +66,7 @@ function bbcom_metrics_track($event, $properties = array(), $type = BBCOM_METRIC
       $properties['ip'] = ip_address();
       if (!empty($user->uid)) {
         $properties['distinct_id'] = (string)$user->uid;
-        $properties['mp_name_tag'] = $user->name_tag;
+        $properties['mp_name_tag'] = $user->name;
       }
 
       // so that defered events still happen when they should
@@ -115,7 +92,7 @@ function bbcom_metrics_set_user_properties($properties, $once = FALSE) {
     // store our cached values
     foreach ($properties as $key => $value) {
       if (!$once || !isset($user_properties[$key])) {
-        $user_properties = $value;
+        $user_properties[$key] = $value;
       }
     }
 
@@ -130,54 +107,45 @@ function bbcom_metrics_get_user_properties() {
   return bbcom_metrics_set_user_properties(NULL);
 }
 
+function _bbcom_metrics_setup_user($account) {
+  bbcom_metrics_set_user_properties(array(
+    'cohort_week'  => date('Y', $account->created) . 'W' . date('W', $account->created),
+    'cohort_month' => date('Y', $account->created) . '-' . date('m', $account->created),
+    'user_language' => $account->language,
+  ), TRUE);
+}
+
 /**
  * Implementation of hook_init().
  */
 function bbcom_metrics_init() {
   global $user;
 
-  if ($mixpanel_token = variable_get('bbcom_metrics_mixpanel_token', '')) {
-    $info = array(
-      'mixpanel_token' => $mixpanel_token,
-      'commands'       => array(),
-    );
+  // setup mixpanel
+  _bbcom_metrics_mp_init();
 
-    // make sure the commands identifying the user come first
-    if (!empty($user->uid)) {
-      $info['commands'][] = array('identify', array((string)$user->uid));
-      $info['commands'][] = array('name_tag', array($user->name));
-      // TODO: need to get this into the the 'backend' metrics
-      $info['commands'][] = array('register_once', array(array(
-        'cohort_week'  => date('Y', $user->created) . 'W' . date('W', $user->created),
-        'cohort_month' => date('Y', $user->created) . '-' . date('m', $user->created),
-        'user_language' => $user->language,
-      )));
-    }
+  if (!empty($user->uid)) {
+    _bbcom_metrics_setup_user($user);
+  }
 
-    drupal_add_js(array('bbcom_metrics' => $info), 'setting');
-    drupal_add_js(drupal_get_path('module', 'bbcom_metrics') . '/bbcom_metrics.js');
-    // make sure this is run as early as possible
-    drupal_add_js('bbcom_metrics_init();', 'inline');
+  // do some page specific events!
+  switch ($_GET['q']) {
+    case 'node/4509':
+    case 'node/4510':
+    case 'about':
+      bbcom_metrics_track('View landing page');
+      break;
 
-    // do some page specific events!
-    switch ($_GET['q']) {
-      case 'node/4509':
-      case 'node/4510':
-      case 'about':
-        bbcom_metrics_track('View landing page');
-        break;
+    case 'user/register':
+      bbcom_metrics_track('View registration page');
+      break;
+  }
 
-      case 'user/register':
-        bbcom_metrics_track('View registration page');
-        break;
-    }
-
-    if (preg_match('/wial\/\d\/edit/', $_GET['q'])) {
-      bbcom_metrics_track('View WIAL edit page');
-    }
-    elseif (preg_match('/wial\/\d\/review/', $_GET['q'])) {
-      bbcom_metrics_track('View WIAL review page');
-    }
+  if (preg_match('/wial\/\d\/edit/', $_GET['q'])) {
+    bbcom_metrics_track('View WIAL edit page');
+  }
+  elseif (preg_match('/wial\/\d\/review/', $_GET['q'])) {
+    bbcom_metrics_track('View WIAL review page');
   }
 }
 
@@ -209,6 +177,10 @@ function bbcom_metrics_user($op, &$edit, &$account, $category = NULL) {
     bbcom_metrics_track('Register', array(), BBCOM_METRICS_BACKEND);
   }
   elseif ($op == 'login') {
+    // because we haven't fully logged in yet and $user is not set, we have
+    // to manually set the user properties here
+    _bbcom_metrics_setup_user($account);
+
     bbcom_metrics_track('Login', array(), BBCOM_METRICS_BACKEND);
   }
   elseif ($op == 'logout') {

@@ -7,11 +7,29 @@
  */
 
 function bbcom_metrics_admin_settings() {
-  $form['bbcom_metrics_mixpanel_token'] = array(
+  $form['mixpanel'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Mixpanel'),
+  );
+
+  $form['mixpanel']['bbcom_metrics_mixpanel_token'] = array(
     '#type' => 'textfield',
     '#title' => t('Mixpanel token'),
     '#default_value' => variable_get('bbcom_metrics_mixpanel_token', ''),
   );
+
+  $form['mixpanel']['bbcom_metrics_mixpanel_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mixpanel key'),
+    '#default_value' => variable_get('bbcom_metrics_mixpanel_key', ''),
+  );
+
+  $form['mixpanel']['bbcom_metrics_mixpanel_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mixpanel secret'),
+    '#default_value' => variable_get('bbcom_metrics_mixpanel_secret', ''),
+  );
+
   $form['bbcom_metrics_defer_backend'] = array(
     '#type' => 'checkbox',
     '#title' => 'Defer backend analytics to cron',
