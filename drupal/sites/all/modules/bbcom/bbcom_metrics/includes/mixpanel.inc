@@ -65,7 +65,7 @@ function _bbcom_metrics_mp_export($methods, $params) {
   $api_secret = variable_get('bbcom_metrics_mixpanel_secret', '');
 
   if (empty($api_key) || empty($api_secret)) {
-    throw new Exception("Must set Mixpanel API key and secret");
+    return array('error' => "Must set the Mixpanel API key and secret");
   }
 
   $params['api_key'] = $api_key;
@@ -73,9 +73,7 @@ function _bbcom_metrics_mp_export($methods, $params) {
 
   if (!isset($params['expire'])) {
     // default to 10 minutes from now
-    // TODO: what's the deal with the "- date('Z')" part?
-    $current_utc_time = time() - date('Z');
-    $params['expire'] = $current_utc_time + 600;
+    $params['expire'] = time() + 600;
   }
 
   $param_query = '';
@@ -86,13 +84,10 @@ function _bbcom_metrics_mp_export($methods, $params) {
     $param_query .= '&' . urlencode($param) . '=' . urlencode($value);
   }
 
-  $signature = _bbcom_metrics_mp_signature($params);
-  
-  $uri = '/2.0/' . implode('/', $methods) . '/'; 
-  $request_url = $uri . '?sig=' . $signature . $param_query;
+  $signature = _bbcom_metrics_mp_signature($params, $api_secret);
 
-  $res = drupal_http_request($url);
-  print_r($res);
-  // TODO: decode and return the JSON
+  $request_url = 'http://mixpanel.com/api/2.0/' . implode('/', $methods) . '/?sig=' . $signature . $param_query;
+  $res = drupal_http_request($request_url);
+  return json_decode($res->data);
 }
 
