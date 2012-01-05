@@ -11,6 +11,7 @@ require_once('includes/mixpanel.inc');
  */
 function bbcom_metrics_menu() {
   $items = array();
+
   $items['admin/settings/bbcom/metrics'] = array(
     'title' => 'Metrics',
     'description' => 'Settings for BiblioBird.com Metrics module.',
@@ -18,9 +19,37 @@ function bbcom_metrics_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bbcom_metrics_admin_settings'),
     'file' => 'bbcom_metrics.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/settings/bbcom/metrics/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['admin/settings/bbcom/metrics/funnels'] = array(
+    'title' => 'Funnels',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'bbcom_metrics_admin_funnels',
+    'page arguments' => array(5),
+    'file' => 'bbcom_metrics.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function bbcom_metrics_theme() {
+  return array(
+    'bbcom_metrics_funnel' => array(
+      'arguments' => array('steps' => NULL, 'title' => NULL),
+      'template' => 'bbcom-metrics-funnel',
+    ),
+  );
 }
 
 /**
@@ -130,8 +159,10 @@ function _bbcom_metrics_default_user_properties($account) {
   return array(
     'cohort_week'   => date('Y', $account->created) . 'W' . date('W', $account->created),
     'cohort_month'  => date('Y', $account->created) . '-' . date('m', $account->created),
-    'user_id'       => $account->uid,
-    'user_name'     => $account->name,
+    // The idea is that we could use this to connect back to the user via mixpanel, because
+    // the don't let us segment on distinct_id or mp_name_tag, those are magic!
+    //'user_id'       => $account->uid,
+    //'user_name'     => $account->name,
     'user_language' => $account->language,
   );
 }

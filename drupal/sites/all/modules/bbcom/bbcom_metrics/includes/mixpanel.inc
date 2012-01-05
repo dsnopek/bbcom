@@ -60,7 +60,7 @@ function _bbcom_metrics_mp_signature($params, $api_secret) {
 }
 
 // Access the Mixpanel export API
-function _bbcom_metrics_mp_export($methods, $params) {
+function _bbcom_metrics_mp_export($method, $params) {
   $api_key = variable_get('bbcom_metrics_mixpanel_key', '');
   $api_secret = variable_get('bbcom_metrics_mixpanel_secret', '');
 
@@ -86,8 +86,8 @@ function _bbcom_metrics_mp_export($methods, $params) {
 
   $signature = _bbcom_metrics_mp_signature($params, $api_secret);
 
-  $request_url = 'http://mixpanel.com/api/2.0/' . implode('/', $methods) . '/?sig=' . $signature . $param_query;
+  $request_url = 'http://mixpanel.com/api/2.0/' . $method . '/?sig=' . $signature . $param_query;
   $res = drupal_http_request($request_url);
-  return json_decode($res->data);
+  return json_decode($res->data, TRUE);
 }
 
