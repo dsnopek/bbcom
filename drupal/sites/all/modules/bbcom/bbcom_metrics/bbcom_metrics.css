@@ -1,0 +1,63 @@
+.funnel-header {
+  font-size: 1.4em;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: underline;
+  margin-bottom: 10px;
+}
+
+.funnel {
+  float: left;
+  width: 250px;
+}
+.funnel-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.funnel-steps {
+  margin-top: 10px;
+}
+
+.funnel-step-title {
+  font-weight: bold;
+}
+
+.funnel-step {
+  margin: 10px auto;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid black;
+}
+.funnel-step-0 {
+  background-color: yellow;
+  color: black;
+  width: 90%;
+}
+.funnel-step-1 {
+  background-color: blue;
+  color: white;
+  width: 80%;
+}
+.funnel-step-2 {
+  background-color: green;
+  color: white;
+  width: 70%;
+}
+.funnel-step-3 {
+  background-color: purple;
+  color: white;
+  width: 60%;
+}
+.funnel-step-4 {
+  background-color: red;
+  color: white;
+  width: 50%;
+}
+
+.funnel-step-metrics {
+  display: block;
+}
+
