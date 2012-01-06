@@ -110,7 +110,7 @@ function bbcom_metrics_track($event, $properties = array(), $type = BBCOM_METRIC
       break;
   }
 
-  if (variable_get('bbcom_metrics_defer_track_locally', TRUE)) {
+  if (variable_get('bbcom_metrics_track_locally', TRUE)) {
     $event_obj = (object)array(
       'name' => $event,
       'time' => time(),
