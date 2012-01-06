@@ -47,19 +47,31 @@ function bbcom_metrics_admin_settings() {
   return system_settings_form($form);
 }
 
+function _bbcom_metrics_admin_get_funnel_name($funnel_id) {
+  $result = _bbcom_metrics_mp_export('funnels/list');
+  foreach ($result as $funnel) {
+    if ($funnel['funnel_id'] == $funnel_id) {
+      return $funnel['name'];
+    }
+  }
+}
+
 function bbcom_metrics_admin_funnels($funnel_id = NULL) {
   if (empty($funnel_id)) {
     $items = array();
-    foreach (_bbcom_metrics_mp_export('funnels/list') as $funnel) {
-      $items[] = l($funnel->name, 'admin/settings/bbcom/metrics/funnels/' . $funnel->funnel_id);
+    $result = _bbcom_metrics_mp_export('funnels/list');
+    foreach ($result as $funnel) {
+      $items[] = l($funnel['name'], 'admin/settings/bbcom/metrics/funnels/' . $funnel['funnel_id']);
     }
     return theme('item_list', $items, t('Funnels'));
   }
   else {
-    // find the 4 most recent cohort groups
+    // find the 3 most recent cohort groups
+    $page = isset($_GET['page']) ? $_GET['page'] : 0;
+    $start = $page * 3;
     $current = time();
     $cohorts = array();
-    for ($i = 0; $i < 4; $i++) {
+    for ($i = $start; $i < $start + 3; $i++) {
       $time = $current - (86400 * 7 * $i);
       $cohorts[] = date('Y', $time) . 'W' . date('W', $time);
     }
@@ -67,16 +79,20 @@ function bbcom_metrics_admin_funnels($funnel_id = NULL) {
 
     // find a date range that covers them all
     $from_date = date('Y-m-d', strtotime($cohorts[0]));
+    $to_date = date('Y-m-d', strtotime($cohorts[count($cohorts)-1] . "-7"));
 
     // request the funnel each group using that range
     $funnels = _bbcom_metrics_mp_export('funnels', array(
       'funnel_id' => $funnel_id,
       'interval'  => '30',
       'from_date' => $from_date,
+      'to_date'   => $to_date,
       'on'        => 'properties["cohort_week"]',
     ));
 
-    $output = '<div class="clear-block">';
+    $funnel_name = _bbcom_metrics_admin_get_funnel_name($funnel_id);
+    $output = '<h2 class="funnel-header">' . t('%funnel funnel for %from - %to', array('%funnel' => $funnel_name, '%from' => $from_date, '%to' => $to_date)) . '</h2>';
+    $output .= '<div class="clear-block">';
     foreach ($cohorts as $cohort) {
       $steps = $funnels['data'][$from_date][$cohort];
       if (!empty($steps)) {
@@ -84,6 +100,14 @@ function bbcom_metrics_admin_funnels($funnel_id = NULL) {
       }
     }
     $output .= '</div>';
+
+    // older/newer links
+    $output .= '<p>';
+    $output .= l(t('Older'), $_GET['q'], array('query' => array('page' => $page+1)));
+    if ($page > 0) {
+      $output .= ' ' . l(t('Newer'), $_GET['q'], array('query' => array('page' => $page-1)));
+    }
+    $output .= '</p>';
 
     drupal_add_css(drupal_get_path('module', 'bbcom_metrics') . '/bbcom_metrics.css');
 
