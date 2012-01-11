@@ -5,18 +5,24 @@ import os, datetime
 
 # I'm a little weary of this being here by default, since I don't want to accidently
 # do something on production (with the exception of pulling data down for testing)
-prod_host = 'bibliobird.com'
+prod_host = 'dsnopek@bibliobird.com'
 #env.hosts = [prod_host]
 
-env.local_prj_dir = env.remote_prj_dir = '/home/dsnopek/prj'
-env.local_drupal_dir = env.remote_drupal_dir = env.remote_prj_dir+'/bibliobird/bbcom/drupal'
-env.local_python_env_dir = env.local_python_env_dir = env.remote_prj_dir+'/bibliobird/python-env'
+env.local_prj_dir = '/home/webuser/prj'
+env.local_drupal_dir = env.local_prj_dir+'/bbcom/drupal'
+env.local_python_env_dir = env.local_prj_dir+'/python-env'
+env.local_drush_alias = '@master.bibliobird.vm'
+
+env.remote_prj_dir = '/home/dsnopek/prj';
+env.remote_drupal_dir = env.remote_prj_dir+'/bibliobird/bbcom/drupal'
+env.remote_python_env_dir = env.remote_prj_dir+'/bibliobird/python-env'
+env.remote_drush_alias = '@bibliobird.com'
 
 env.repos = ['bbcom','lingwo','lingwo-old']
 
 class _Drush(object):
     def __init__(self, remote=False):
-        self.dir = env.remote_drupal_dir if remote else env.local_drupal_dir
+        self.alias = env.remote_drush_alias if remote else env.local_drush_alias
         self.func = run if remote else local
         self.remote = remote
 
@@ -25,13 +31,14 @@ class _Drush(object):
         def quote(s):
             return '"'+s.replace('"', '\\"')+'"'
         args = [quote(x) for x in args]
-        cmd = " ".join(["drush"]+args)
+        cmd = " ".join(["drush",self.alias]+args)
         res = None
-        with cd(self.dir):
-            if not self.remote and kw.get('capture', True) is False:
-                local(cmd, capture=False)
-            else:
-                res = self.func(cmd)
+
+        if not self.remote and kw.get('capture', True) is False:
+            local(cmd, capture=False)
+        else:
+            res = self.func(cmd)
+
         return res
 
     def vset(self, **kw):
@@ -85,8 +92,8 @@ def pull_live_db():
         get("{0}/lingwo_backup/manual/{1}".format(env.remote_prj_dir,backup), "/tmp/")
 
     with cd(env.local_drupal_dir):
-        local("drush sqlq 'DROP DATABASE bibliobird; CREATE DATABASE bibliobird;'", capture=False)
-        local("zcat /tmp/{0} | drush sql-cli".format(backup))
+        #local("drush sqlq 'DROP DATABASE bibliobird; CREATE DATABASE bibliobird;'", capture=False)
+        local("zcat /tmp/{0} | drush {1} sql-cli".format(backup, env.local_drush_alias))
         local("rm -f /tmp/{0}".format(backup))
 
     make_testing_safe()
@@ -108,7 +115,10 @@ def make_testing_safe():
         preprocess_css="0",
         preprocess_js="0",
         site_name="TESTING",
-        bbcom_news_mailchimp_integration="0"
+        bbcom_news_mailchimp_integration="0",
+        bbcom_metrics_mixpanel_token="ec4433cb33d091816ce93058686b0ae8",
+        bbcom_metrics_mixpanel_key="d151eb6fe740fe1c3d6392c78df25113",
+        bbcom_metrics_mixpanel_secret="a59ee2473dee43341d97a0b1bc63bd96"
     )
 
     # disable notifications, so we can still test it, but we won't hit real users with e-mails
