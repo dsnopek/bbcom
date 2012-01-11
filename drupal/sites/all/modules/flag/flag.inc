@@ -162,7 +162,7 @@ class flag_flag {
       $flag->$option = $value;
     }
 
-    if (is_array($config['locked'])) {
+    if (isset($config['locked']) && is_array($config['locked'])) {
       $flag->locked = drupal_map_assoc($config['locked']);
     }
 
