@@ -45,6 +45,10 @@ class _Drush(object):
         for k, v in kw.items():
             self.run('vset', '--yes', k, v)
 
+    def vdel(self, *args):
+        for v in args:
+            self.run('vdel', '--yes', v)
+
     def sql_query(self, s):
         self.run('sql-query', s)
 
@@ -107,8 +111,10 @@ def make_testing_safe():
 
     drush.cc()
 
-    drush.sql_query("UPDATE languages SET domain = 'http://en.localdomain:35637', prefix = '' WHERE language = 'en'")
-    drush.sql_query("UPDATE languages SET domain = 'http://pl.localdomain:35637', prefix = '' WHERE language = 'pl'")
+    drush.sql_query("UPDATE languages SET domain = 'http://en.master.bibliobird.vm', prefix = '' WHERE language = 'en'")
+    drush.sql_query("UPDATE languages SET domain = 'http://pl.master.bibliobird.vm', prefix = '' WHERE language = 'pl'")
+
+    drush.vdel('language_default')
 
     drush.vset(
         language_negotiation="3",
