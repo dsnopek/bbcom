@@ -40,7 +40,7 @@ function bbcom_marketing_context_default_contexts() {
   $context = new stdClass;
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
-  $context->name = 'bbcom-sitewide-marketing';
+  $context->name = 'bbcom-marketing-teamspeak';
   $context->description = 'Blocks shown accross the entire site for marketing purposes';
   $context->tag = 'bbcom';
   $context->conditions = array(
@@ -78,6 +78,6 @@ function bbcom_marketing_context_default_contexts() {
   t('Blocks shown accross the entire site for marketing purposes');
   t('bbcom');
 
-  $export['bbcom-sitewide-marketing'] = $context;
+  $export['bbcom-marketing-teamspeak'] = $context;
   return $export;
 }
