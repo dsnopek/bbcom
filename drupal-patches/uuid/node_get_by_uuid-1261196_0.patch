@@ -1,0 +1,57 @@
+diff --git a/uuid.module b/uuid.module
+index 875ba1d..26b08b3 100644
+--- a/uuid.module
++++ b/uuid.module
+@@ -146,27 +146,13 @@ function uuid_views_api() {
+ }
+ 
+ /**
+- * Returns the node associated with a UUID. Uses db_rewrite_sql() to ensure
+- * node_access rules are preserved.
++ * Returns the node associated with a UUID. 
+  *
+  * @return
+  *   Either the $node object, or FALSE on failure.
+  */
+ function node_get_by_uuid($uuid) {
+-  $nid = db_result(db_query(db_rewrite_sql(
+-    "SELECT n.nid
+-     FROM {node} AS n
+-     INNER JOIN {uuid_node} AS un ON n.nid = un.nid
+-     WHERE un.uuid = '%s'"),
+-    $uuid
+-  ));
+-
+-  if ($nid) {
+-    return node_load($nid);
+-  }
+-  else {
+-    return FALSE;
+-  }
++  return node_load(db_result(db_query('SELECT nid FROM {uuid_node} WHERE uuid = "%s"', $uuid)));
+ }
+ 
+ /**
+@@ -179,20 +165,8 @@ function node_get_by_uuid($uuid) {
+  *   Either the $node object, or FALSE on failure.
+  */
+ function node_get_by_revision_uuid($revision_uuid) {
+-  $node = db_fetch_object(db_query(db_rewrite_sql(
+-    "SELECT n.nid, n.vid
+-     FROM {node} AS n
+-     INNER JOIN {uuid_node_revisions} AS unr ON n.vid = unr.vid
+-     WHERE unr.uuid = '%s'"),
+-    $revision_uuid
+-  ));
+-
+-  if ($node->nid && $node->vid) {
+-    return node_load($node->nid, $node->vid);
+-  }
+-  else {
+-    return FALSE;
+-  }
++  $vid = db_result(db_query('SELECT vid FROM {uuid_node_revisions} WHERE uuid = "%s"', $uuid));
++  return node_load(array('vid' => $vid));
+ }
+ 
+ /**

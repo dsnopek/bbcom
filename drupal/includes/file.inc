@@ -76,7 +76,7 @@ function file_create_url($path) {
   else {
     switch (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC)) {
       case FILE_DOWNLOADS_PUBLIC:
-        return base_path() . $path;
+        return $GLOBALS['base_url'] . '/' . $path;
       case FILE_DOWNLOADS_PRIVATE:
         // Strip file_directory_path from $path. Private downloads' URLs are
         // rewritten to be served relatively to system/files (which is a menu
@@ -997,7 +997,7 @@ function file_scan_directory($dir, $mask, $nomask = array('.', '..', 'CVS'), $ca
           // Give priority to files in this folder by merging them in after any subdirectory files.
           $files = array_merge(file_scan_directory("$dir/$file", $mask, $nomask, $callback, $recurse, $key, $min_depth, $depth + 1), $files);
         }
-        elseif ($depth >= $min_depth && ereg($mask, $file)) {
+        elseif ($depth >= $min_depth && @ereg($mask, $file)) {
           // Always use this match over anything already set in $files with the same $$key.
           $filename = "$dir/$file";
           $basename = basename($file);

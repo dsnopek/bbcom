@@ -12,40 +12,43 @@ function bbcom_wiki_context_default_contexts() {
   $context->description = 'Working in the wiki.';
   $context->tag = '';
   $context->conditions = array(
+    'menu' => array(
+      'values' => array(
+        'wiki' => 'wiki',
+      ),
+    ),
     'node' => array(
       'values' => array(
-        0 => 'wiki',
+        'wiki' => 'wiki',
       ),
-      'options' => array(),
+      'options' => array(
+        'node_form' => '1',
+      ),
     ),
     'path' => array(
       'values' => array(
         'wiki' => 'wiki',
       ),
-      'options' => array(),
-    ),
-    'menu' => array(
-      'values' => array(
-        'wiki' => 'wiki',
-      ),
-      'options' => array(),
     ),
   );
   $context->reactions = array(
-    'menu' => 'wiki',
     'block' => array(
       'blocks' => array(
         'bbcom_wiki-0' => array(
           'module' => 'bbcom_wiki',
-          'delta' => '0',
-          'weight' => 23,
+          'delta' => 0,
           'region' => 'right',
-          'status' => '0',
-          'label' => 'BiblioBird.com Wiki: Add Wiki Page',
-          'type' => 'context_ui',
+          'weight' => 0,
+        ),
+        'bbcom_marketing-teamspeak' => array(
+          'module' => 'bbcom_marketing',
+          'delta' => 'teamspeak',
+          'region' => 'right',
+          'weight' => 1,
         ),
       ),
     ),
+    'menu' => 'wiki',
   );
   $context->condition_mode = 0;
 

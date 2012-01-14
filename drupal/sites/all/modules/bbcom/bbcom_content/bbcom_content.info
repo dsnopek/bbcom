@@ -1,5 +1,6 @@
 core = "6.x"
 dependencies[] = "bbcom_dictionary"
+dependencies[] = "bbcom_marketing"
 dependencies[] = "context"
 dependencies[] = "features"
 dependencies[] = "filefield"

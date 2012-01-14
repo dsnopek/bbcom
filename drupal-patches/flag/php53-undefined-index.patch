@@ -1,0 +1,13 @@
+diff --git a/drupal/sites/all/modules/flag/flag.inc b/drupal/sites/all/modules/flag/flag.inc
+index 98b6c72..ed27f21 100644
+--- a/drupal/sites/all/modules/flag/flag.inc
++++ b/drupal/sites/all/modules/flag/flag.inc
+@@ -162,7 +162,7 @@ class flag_flag {
+       $flag->$option = $value;
+     }
+ 
+-    if (is_array($config['locked'])) {
++    if (isset($config['locked']) && is_array($config['locked'])) {
+       $flag->locked = drupal_map_assoc($config['locked']);
+     }
+ 

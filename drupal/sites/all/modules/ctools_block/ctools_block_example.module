@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * Example of an implementation of ctools_block's block plugins.
+ */
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function ctools_block_example_ctools_plugin_directory($module, $plugin) {
+  // This provides the basic integration using ctools_block_block for exposing blocks.
+  if ($module == 'ctools_block' && $plugin == 'block') {
+    return 'plugins/' . $plugin;
+  }
+
+  // This provides our custom blocks. This is actually part of the
+  // implementation below.
+  if ($module == 'ctools_block_example' && $plugin == 'block') {
+    return 'plugins/blocks2';
+  }
+}
+
+/*****************************************************************************
+ * Below are the hooks needed to expose our custom plugin block implementation.
+ *****************************************************************************/
+
+/**
+ * Implementation of hook_block().
+ */
+function ctools_block_example_block($op = 'list', $delta = 0, $edit = array()) {
+  return ctools_block_handle_block($op, $delta, $edit, 'ctools_block_example');
+}
+
+/**
+ * Implementation of hook_ctools_plugin_block().
+ *
+ * This is a ctools plugin definition hook for the ctools_block_example type
+ * used in hook_block(). We don't really need to worry about the
+ * implementation, ctools_block will take care of it in the function
+ * ctools_block_ctools_plugin_block().
+ */
+function ctools_block_example_ctools_plugin_block() {
+  return ctools_block_ctools_plugin_block();
+}
+

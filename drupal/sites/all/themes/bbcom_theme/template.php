@@ -350,6 +350,9 @@ function bbcom_theme_preprocess_block(&$vars, $hook) {
   if ($block->module == 'lingwo_entry' && $block->delta == 0) {
     unset($block->subject);
   }
+  if ($block->module == 'bbcom_marketing' && $block->delta == 'teamspeak') {
+    $vars['class'] = 'block-block';
+  }
 }
 
 /*
