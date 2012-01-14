@@ -44,6 +44,15 @@ function bbcom_marketing_context_default_contexts() {
   $context->description = 'Blocks shown accross the entire site for marketing purposes';
   $context->tag = 'bbcom';
   $context->conditions = array(
+    'node' => array(
+      'values' => array(
+        'page' => 'page',
+        'story' => 'story',
+      ),
+      'options' => array(
+        'node_form' => '0',
+      ),
+    ),
     'path' => array(
       'values' => array(
         '~<front>' => '~<front>',
@@ -62,7 +71,7 @@ function bbcom_marketing_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
 
   // Translatables
   // Included for use with string extractors like potx.
