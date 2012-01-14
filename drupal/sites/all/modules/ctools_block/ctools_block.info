@@ -1,0 +1,12 @@
+name = Chaos Blocks
+description = Provide an easier way to manage blocks using the Chaos Tools Suite.
+core = 6.x
+package = Chaos tool suite
+dependencies[] = ctools
+
+; Information added by drupal.org packaging script on 2011-08-01
+version = "6.x-1.0"
+core = "6.x"
+project = "ctools_block"
+datestamp = "1312222016"
+

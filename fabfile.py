@@ -11,7 +11,7 @@ prod_host = 'dsnopek@bibliobird.com'
 env.local_prj_dir = '/home/webuser/prj'
 env.local_drupal_dir = env.local_prj_dir+'/bbcom/drupal'
 env.local_python_env_dir = env.local_prj_dir+'/python-env'
-env.local_drush_alias = '@master.bibliobird.vm'
+env.local_drush_alias = '@en.master.bibliobird.vm'
 
 env.remote_prj_dir = '/home/dsnopek/prj';
 env.remote_drupal_dir = env.remote_prj_dir+'/bibliobird/bbcom/drupal'
@@ -109,7 +109,8 @@ def make_testing_safe():
     # this seems to correct any problems we encounter after putting a foreign db in place
     drush.run('updatedb', '--yes', capture=False)
 
-    drush.cc()
+    with settings(warn_only=True):
+        drush.cc()
 
     drush.sql_query("UPDATE languages SET domain = 'http://en.master.bibliobird.vm', prefix = '' WHERE language = 'en'")
     drush.sql_query("UPDATE languages SET domain = 'http://pl.master.bibliobird.vm', prefix = '' WHERE language = 'pl'")

@@ -1,0 +1,95 @@
+<?php
+/**
+ * @file
+ * Provide an abstraction of hook_block using ctools plugins.
+ */
+
+/**
+ * Implementation of hook_block().
+ */
+function ctools_block_block($op = 'list', $delta = 0, $edit = array()) {
+  return ctools_block_handle_block($op, $delta, $edit);
+}
+
+/**
+ * Implementation of hook_ctools_plugin_block().
+ */
+function ctools_block_ctools_plugin_block() {
+  return array(
+    'cache' => TRUE,
+    'defaults' => array(
+      // Subject building function.
+      'subject' => NULL,
+      // Subject string is a static string that will be translated and used for
+      // a subject. This replaces the dynamic subject callback.
+      'subject string' => '',
+      // Content building function.
+      'content' => NULL,
+      // Callback function used for building of the block configuration form.
+      'configure' => NULL,
+      // Save function used for saving the results of the configuration form.
+      'save' => NULL,
+      // Informational string used in administration display. Provided seperately for easier translation.
+      'info' => '',
+      // Default options for block definition.
+      'options' => array(),
+    ),
+  );
+}
+
+/**
+ * Helper function to generalize block handling.
+ *
+ * Breaking this out allows other modules to use the logic while providing their own blocks.
+ *
+ * @param string $op
+ * @param string $delta
+ * @param array $edit
+ * @param string $module
+ */
+function ctools_block_handle_block($op, $delta, $edit, $module = 'ctools_block') {
+  ctools_include('plugins');
+  switch ($op) {
+    case 'list':
+      $plugins = ctools_get_plugins($module, 'block');
+      foreach ($plugins as $id => $plugin) {
+        // Allow plugins to set options like 'cache', 'weight', 'status', 'region', 'visibility', and 'pages'
+        $blocks[$id] = $plugin['options'];
+        $blocks[$id]['info'] = t($plugin['info']);
+      }
+      return $blocks;
+
+    case 'view':
+      $plugin = ctools_get_plugins($module, 'block', $delta);
+
+      if (empty($plugin['subject string'])) {
+        $subject_function = ctools_plugin_get_function($plugin, 'subject');
+        if ($subject_function) {
+          $block['subject'] = $subject_function($edit);
+        }
+      }
+      else {
+        $block['subject'] = t($plugin['subject string']);
+      }
+
+      $content_function = ctools_plugin_load_function($module, 'block', $delta, 'content');
+      if ($content_function) {
+        $block['content'] = $content_function($edit);
+      }
+      return $block;
+
+    case 'configure':
+      $configure_function = ctools_plugin_load_function($module, 'block', $delta, 'configure');
+      if ($configure_function) {
+        return $configure_function($edit);
+      }
+      return;
+
+    case 'save':
+      $save_function = ctools_plugin_load_function($module, 'block', $delta, 'save');
+      if ($save_function) {
+        return $save_function($edit);
+      }
+      return;
+  }
+}

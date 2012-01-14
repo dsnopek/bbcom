@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * Update functions:
+ */
+
+/*
+ * Setup our pages and block for TeamSpeak.
+ */
+function bbcom_marketing_update_6001() {
+  drupal_flush_all_caches();
+
+  // Install new dependencies
+  drupal_install_modules(array(
+    'ctools_block',
+    'uuid',
+    'uuid_features',
+  ));
+
+  features_revert(array(
+    'bbcom_marketing' => array('uuid_node')
+  ));
+
+  return array(array('success' => TRUE));
+}
+
