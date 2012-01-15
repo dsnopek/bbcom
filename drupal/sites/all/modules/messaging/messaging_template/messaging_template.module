@@ -359,11 +359,20 @@ function messaging_template_text_replace($text, $objects, $language = NULL, $opt
 
   // Use token_logic if available, http://code.developmentseed.org/token_logic
   // Otherwise use standard contrib token module, http://drupal.org/project/token
+  $function = 'token_replace_multiple';
+  $param_arr = array($text, $objects, '[', ']', $options);
   if (module_exists('token_logic')) {
-    $text = token_logic_replace_multiple($text, $objects);
+    $function = 'token_logic_replace_multiple';
+    $param_array = array($text, $objects);
+  }
+  if (is_array($text)) {
+    foreach ($text as $part => $line) {
+      $param_arr[0] = $line;
+      $text[$part] = call_user_func_array($function, $param_arr);
+    }
   }
   else {
-    $text = token_replace_multiple($text, $objects, '[', ']', $options);
+    $text = call_user_func_array($function, $param_arr);
   }
   // Run filters if needed and return. We use our extra fast messaging_text_check_markup()
   if (is_array($text) && !empty($filters)) {

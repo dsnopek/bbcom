@@ -1,0 +1,39 @@
+From e6012b401e8edbcd4e2457cc437ffaa6a671659f Mon Sep 17 00:00:00 2001
+From: Dane Powell <git@danepowell.com>
+Date: Fri, 11 Nov 2011 11:23:14 -0600
+Subject: [PATCH] Issue #1329024 by Dane Powell: Fixed notice from Token module.
+
+---
+ messaging_template/messaging_template.module |   13 +++++++++++--
+ 1 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/messaging_template/messaging_template.module b/messaging_template/messaging_template.module
+index 1b2e23b..cc1751a 100644
+--- a/messaging_template/messaging_template.module
++++ b/messaging_template/messaging_template.module
+@@ -359,11 +359,20 @@ function messaging_template_text_replace($text, $objects, $language = NULL, $opt
+ 
+   // Use token_logic if available, http://code.developmentseed.org/token_logic
+   // Otherwise use standard contrib token module, http://drupal.org/project/token
++  $function = 'token_replace_multiple';
++  $param_arr = array($text, $objects, '[', ']', $options);
+   if (module_exists('token_logic')) {
+-    $text = token_logic_replace_multiple($text, $objects);
++    $function = 'token_logic_replace_multiple';
++    $param_array = array($text, $objects);
++  }
++  if (is_array($text)) {
++    foreach ($text as $part => $line) {
++      $param_arr[0] = $line;
++      $text[$part] = call_user_func_array($function, $param_arr);
++    }
+   }
+   else {
+-    $text = token_replace_multiple($text, $objects, '[', ']', $options);
++    $text = call_user_func_array($function, $param_arr);
+   }
+   // Run filters if needed and return. We use our extra fast messaging_text_check_markup()
+   if (is_array($text) && !empty($filters)) {
+-- 
+1.7.2.1
+
