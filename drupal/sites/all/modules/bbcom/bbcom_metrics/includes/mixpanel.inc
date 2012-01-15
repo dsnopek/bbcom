@@ -60,7 +60,7 @@ function _bbcom_metrics_mp_signature($params, $api_secret) {
 }
 
 // Access the Mixpanel export API
-function _bbcom_metrics_mp_export($method, $params) {
+function _bbcom_metrics_mp_export($method, $params = array()) {
   $api_key = variable_get('bbcom_metrics_mixpanel_key', '');
   $api_secret = variable_get('bbcom_metrics_mixpanel_secret', '');
 
