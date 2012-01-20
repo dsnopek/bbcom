@@ -1,4 +1,5 @@
 core = "6.x"
+dependencies[] = "bbcom_marketing"
 dependencies[] = "checkbox_validate"
 dependencies[] = "comment"
 dependencies[] = "content"
