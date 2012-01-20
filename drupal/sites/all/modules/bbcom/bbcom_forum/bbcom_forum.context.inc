@@ -12,11 +12,6 @@ function bbcom_forum_context_default_contexts() {
   $context->description = 'The forum context.';
   $context->tag = '';
   $context->conditions = array(
-    'menu' => array(
-      'values' => array(
-        'forum' => 'forum',
-      ),
-    ),
     'node' => array(
       'values' => array(
         'forum' => 'forum',

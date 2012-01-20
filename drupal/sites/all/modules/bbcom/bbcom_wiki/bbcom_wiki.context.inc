@@ -12,11 +12,6 @@ function bbcom_wiki_context_default_contexts() {
   $context->description = 'Working in the wiki.';
   $context->tag = '';
   $context->conditions = array(
-    'menu' => array(
-      'values' => array(
-        'wiki' => 'wiki',
-      ),
-    ),
     'node' => array(
       'values' => array(
         'wiki' => 'wiki',
@@ -28,6 +23,7 @@ function bbcom_wiki_context_default_contexts() {
     'path' => array(
       'values' => array(
         'wiki' => 'wiki',
+        'wiki/*' => 'wiki/*',
       ),
     ),
   );
