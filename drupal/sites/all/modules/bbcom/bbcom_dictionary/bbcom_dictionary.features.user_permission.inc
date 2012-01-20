@@ -52,8 +52,9 @@ function bbcom_dictionary_user_default_permissions() {
     'name' => 'edit any Lingwo entry source content',
     'roles' => array(
       '0' => 'admin',
-      '1' => 'editor',
-      '2' => 'editor2',
+      '1' => 'beta',
+      '2' => 'editor',
+      '3' => 'editor2',
     ),
   );
 

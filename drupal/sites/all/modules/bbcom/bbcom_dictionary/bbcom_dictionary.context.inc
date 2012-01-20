@@ -17,7 +17,7 @@ function bbcom_dictionary_context_default_contexts() {
         'entry' => 'entry',
       ),
       'options' => array(
-        'node_form' => '1',
+        'node_form' => '0',
       ),
     ),
     'path' => array(
