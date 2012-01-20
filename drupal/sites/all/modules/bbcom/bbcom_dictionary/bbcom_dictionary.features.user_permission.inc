@@ -12,6 +12,7 @@ function bbcom_dictionary_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'editor',
+      '2' => 'translator',
     ),
   );
 

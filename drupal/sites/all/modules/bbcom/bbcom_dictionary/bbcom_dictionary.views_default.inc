@@ -11,10 +11,9 @@ function bbcom_dictionary_views_default_views() {
   $view->name = 'entries_need_work';
   $view->description = 'Entries that need work';
   $view->tag = 'dictionary';
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->core = 6;
+  $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->override_option('relationships', array(
@@ -349,10 +348,9 @@ function bbcom_dictionary_views_default_views() {
   $view->name = 'entries_recent_comments';
   $view->description = 'Recent comments on entries';
   $view->tag = 'dictionary';
-  $view->view_php = '';
   $view->base_table = 'comments';
-  $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->core = 6;
+  $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->override_option('relationships', array(
@@ -679,10 +677,9 @@ function bbcom_dictionary_views_default_views() {
   $view->name = 'recent_entries';
   $view->description = '';
   $view->tag = '';
-  $view->view_php = '';
   $view->base_table = 'node';
-  $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->core = 6;
+  $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Recent Entries', 'default');
   $handler->override_option('sorts', array(
