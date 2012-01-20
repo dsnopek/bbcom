@@ -1,0 +1,6 @@
+<?php
+/**
+ * @file
+ * A module to use in tests.
+ */
+// No code here, currently used to create a dependency on schema module.

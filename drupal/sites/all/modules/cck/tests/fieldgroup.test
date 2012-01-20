@@ -1,0 +1,180 @@
+<?php
+
+module_load_include('test', 'content', 'tests/content.crud');
+
+class FieldgroupCRUDTest extends ContentCrudTestCase {
+  var $last_group     = NULL;
+  var $next_group_n   = 1;
+
+  /**
+   * Enable fieldgroup module.
+   */
+  function setUp() {
+    $args = func_get_args();
+    $modules = array_merge(array('fieldgroup'), $args);
+    call_user_func_array(array('parent','setUp'), $modules);
+  }
+
+  /**
+   * Creates a fieldgroup with a predictable name. Also makes all future calls to functions
+   * which take an optional fieldgroup use this one as the default.
+   * @param $settings Array to be passed to fieldgroup_save_group. 
+   * @param $content_type Either a content type object, or the index of an acquired content type
+   * @return The newly created fieldgroup.
+   */
+  function createGroup($settings, $fields = array(), $content_type = 0) {
+    if (is_numeric($content_type) && isset($this->content_types[$content_type])) {
+      $content_type = $this->content_types[$content_type];
+    }
+    $type_name = $content_type->type;
+    $group_name = 'simpletest_g'. $this->next_group_n++;
+
+    $defaults = array(
+      'group_name' => $group_name,
+      'group_type' => 'standard',
+      'parent' => '',
+      'label' => $group_name,
+      'weight' => -3,
+      'settings' => array(
+        'form' => array(
+          'style' => 'fieldset',
+          'description' => '',
+        ),
+        'display' => array(
+          'weight' => -3,
+          'parent' => '',
+          'label' => 'above',
+          'description' => '',
+          'teaser' => array(
+            'format' => 'fieldset',
+            'exclude' => 0,
+          ),
+          'full' => array(
+            'format' => 'fieldset',
+            'exclude' => 0,
+          ),
+        ),
+      ),
+    );
+    $group = $settings + $defaults;
+    fieldgroup_save_group($type_name, $group);
+    $this->last_group = $group_name;
+    
+    foreach ($fields as $field_name) {
+      $form_values = array(
+        'field_name' => $field_name,
+        'group' => $group_name,
+        'type_name' => $type_name,
+      );
+      fieldgroup_update_fields($form_values);
+    }
+    cache_clear_all('fieldgroup_data:', content_cache_tablename(), TRUE);
+    return $this->last_group;
+  }
+
+}
+
+class testFieldgroupFields extends FieldgroupCRUDTest {
+  function getInfo() {
+    return array(
+      'name' => t('Fieldgroups'),
+      'description' => t('Test creating fields in fieldgroups.'),
+      'group' => t('CCK'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp();
+    $this->loginWithPermissions();
+    $this->acquireContentTypes(1);
+  }
+
+  function testFieldgroup() {
+
+    // Create a content type with a multivalue text field.
+    $type = $this->content_types[0];
+    $type_name = $type->type;
+    $type_url = str_replace('_', '-', $type_name);
+    $admin_type_url = 'admin/content/node-type/'. $type_url;
+    $field = $this->createFieldText(array('text_processing' => 0, 'multiple' => 1, 'weight' => -4));
+    $field_name = $field['field_name'];
+    $field2 = $this->createFieldText(array('text_processing' => 0, 'multiple' => 1, 'weight' => -3));
+    $field_name2 = $field2['field_name'];
+    $fields = array($field_name, $field_name2);
+
+    // Create a fieldgroup and nest the fields in it.
+    $settings = array(
+      'type_name' => $type_name,
+      'group_type' => 'standard',
+      'parent' => '',
+    );
+    $group_name = $this->createGroup($settings, $fields);
+
+    // Check that our new group shows up on the administration pages.
+    $this->drupalGet($admin_type_url .'/groups/'. $group_name);
+    $this->drupalGet($admin_type_url .'/fields');
+    $this->assertText($group_name, 'Group name displayed');
+    $this->drupalGet($admin_type_url .'/display');
+    $this->assertText($group_name, 'Group name displayed');
+    
+    // Create a node with 2 values set in each of 2 fields.
+    $value1 = $this->randomName(5);
+    $value2 = $this->randomName(5);
+    $value3 = $this->randomName(5);
+    $value4 = $this->randomName(5);
+    $edit = array(
+      'title' => $this->randomName(20),
+      'body' => $this->randomName(20),
+      'type' => $type_name,
+    );
+    $edit[$field_name][0]['value'] = $value1;
+    $edit[$field_name][1]['value'] = $value2;
+    $edit[$field_name2][0]['value'] = $value3;
+    $edit[$field_name2][1]['value'] = $value4;
+
+    $node = $this->drupalCreateNode($edit);
+
+    $this->drupalGet('node/'. $node->nid);
+    $this->assertText($value1, 'First value displayed');
+    $this->assertText($value2, 'Second value displayed');
+    $this->assertText($value3, 'Third value displayed');
+    $this->assertText($value4, 'Fourth value displayed');
+    $this->assertText($group_name, 'Group name displayed');
+
+    // Create a second fieldgroup and nest the first fieldgroup inside the second one.
+    $settings = array(
+      'type_name' => $type_name,
+      'group_type' => 'standard',
+      'parent' => '',
+    );
+    $group_name2 = $this->createGroup($settings, array());
+
+    // Check that our new group shows up on the administration pages.
+    $this->drupalGet($admin_type_url .'/groups/'. $group_name2);
+    $this->drupalGet($admin_type_url .'/fields');
+    $this->assertText($group_name2, 'Group name 2 displayed');
+    $this->drupalGet($admin_type_url .'/display');
+    $this->assertText($group_name2, 'Group name 2 displayed');
+
+    // Set the first group to use the second group as a parent.
+    $groups = fieldgroup_groups($type->name);
+    $settings = $groups[$group_name];
+    $settings['parent'] = $group_name2;
+    $group_name = $this->createGroup($settings, $fields);
+
+    // Clear the content cache to re-generate the node display.
+    cache_clear_all('content:', content_cache_tablename(), TRUE);
+
+    // Checking that the outside group is displayed is sufficient to tell us they got nested, 
+    // because it has no fields and empty groups are not displayed.
+
+    $this->drupalGet('node/'. $node->nid);
+    $this->assertText($value1, 'First value displayed');
+    $this->assertText($value2, 'Second value displayed');
+    $this->assertText($value3, 'Third value displayed');
+    $this->assertText($value4, 'Fourth value displayed');
+    $this->assertText($group_name, 'Group name displayed');
+    $this->assertText($group_name2, 'Group name 2 displayed');
+
+  }
+}

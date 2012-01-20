@@ -1,5 +1,4 @@
 <?php
-// $Id: content.module,v 1.301.2.106.2.15 2009/12/04 13:33:06 markuspetrux Exp $
 /**
  * @file
  * Allows administrators to associate custom fields to content types.
@@ -333,7 +332,8 @@ function content_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   // Merge fields.
   $additions = _content_field_invoke_default('view', $node, $teaser, $page);
-  $node->content = array_merge((array) $node->content, $additions);
+  $old = isset($node->content) ? (array) $node->content : array();
+  $node->content = array_merge($old, $additions);
 }
 
 /**
@@ -848,22 +848,15 @@ function content_field($op, &$node, $field, &$items, $teaser, $page) {
 
       // The location of the field's rendered output depends on whether the
       // field is in a fieldgroup or not.
-      $wrapper = NULL;
-      if (isset($node->content[$field['field_name']])) {
-        $wrapper = $node->content[$field['field_name']];
-      }
-      elseif (module_exists('fieldgroup') && ($group_name = fieldgroup_get_group($node->type, $field['field_name'])) && isset($node->content[$group_name]['group'][$field['field_name']])) {
-        $wrapper = $node->content[$group_name]['group'][$field['field_name']];
-      }
-
-      if ($wrapper) {
+      $wrappers = content_get_nested_elements($node->content, $field['field_name']);
+      foreach ($wrappers as $wrapper) {
         $element = $wrapper['field'];
         // '#single' is not set if the field is hidden or inaccessible.
         if (isset($element['#single'])) {
           if (!empty($element['#single'])) {
             // Single value formatter.
             foreach (element_children($element['items']) as $delta) {
-              // '#chilren' is not set if the field is empty.
+              // '#children' is not set if the field is empty.
               $items[$delta]['view'] = isset($element['items'][$delta]['#children']) ? $element['items'][$delta]['#children'] : '';
             }
           }
@@ -881,23 +874,15 @@ function content_field($op, &$node, $field, &$items, $teaser, $page) {
 
     case 'preprocess_node':
       // Add $FIELD_NAME_rendered variables.
-      $addition = array();
+      $addition = array($field['field_name'] .'_rendered' => '');
 
       // The location of the field's rendered output depends on whether the
       // field is in a fieldgroup or not.
-      $wrapper = NULL;
-      if (isset($node->content[$field['field_name']])) {
-        $wrapper = $node->content[$field['field_name']];
+      $wrappers = content_get_nested_elements($node->content, $field['field_name']);
+      foreach ($wrappers as $wrapper) {
+        // '#children' is not set if the field is empty.
+        $addition[$field['field_name'] .'_rendered'] .= isset($wrapper['#children']) ? $wrapper['#children'] : '';
       }
-      elseif (module_exists('fieldgroup') && ($group_name = fieldgroup_get_group($node->type, $field['field_name'])) && isset($node->content[$group_name]['group'][$field['field_name']])) {
-        $wrapper = $node->content[$group_name]['group'][$field['field_name']];
-      }
-
-      if ($wrapper) {
-        // '#chilren' is not set if the field is empty.
-        $addition[$field['field_name'] .'_rendered'] = isset($wrapper['#children']) ? $wrapper['#children'] : '';
-      }
-
       return $addition;
 
     case 'prepare translation':
@@ -2316,7 +2301,10 @@ function content_access($op, $field, $account = NULL, $node = NULL) {
   if (is_null($account)) {
     $account = $user;
   }
-
+  // Check for valid field data.
+  if (!isset($field['field_name'])) {
+    return FALSE;
+  }
   $access = module_invoke_all('field_access', $op, $field, $account, $node);
   foreach ($access as $value) {
     if ($value === FALSE) {
@@ -2418,7 +2406,7 @@ function theme_content_exclude($content, $object, $context) {
  * TODO : this should live in theme/theme.inc, but then the preprocessor
  * doesn't get called when the theme overrides the template. Bug in theme layer ?
  */
-function content_preprocess_content_field(&$variables) {
+function template_preprocess_content_field(&$variables) {
   $element = $variables['element'];
   $field = content_fields($element['#field_name'], $element['#node']->type);
 
@@ -2534,13 +2522,23 @@ function content_content_extra_fields($type_name) {
     'description' => t('Node module form.'),
     'weight' => 20
   );
+  $extra['author'] = array(
+    'label' => t('Authoring information'),
+    'description' => t('Node module form.'),
+    'weight' => 20,
+  );
+  $extra['options'] = array(
+    'label' => t('Publishing options'),
+    'description' => t('Node module form.'),
+    'weight' => 25,
+   );
   if (module_exists('comment')) {
     $extra['comment_settings'] = array(
       'label' => t('Comment settings'),
       'description' => t('Comment module form.'),
       'weight' => 30
     );
-  } 
+  }
   if (module_exists('locale') && variable_get("language_content_type_$type_name", 0)) {
     $extra['language'] = array(
       'label' => t('Language'),
@@ -2730,4 +2728,114 @@ function content_inactive_fields($type_name = NULL) {
     return $inactive[$type_name];
   }
   return $inactive;
+}
+
+/**
+ * Helper function to identify inactive instances.
+ * This will be the same results as content_inactive_fields(),
+ * EXCEPT that his function will return inactive instances even 
+ * if the fields have other (shared) instances that are still active.
+ */
+function content_inactive_instances($type_name = NULL) {
+  module_load_include('inc', 'content', 'includes/content.crud');
+  if (!empty($type_name)) {
+    $param = array('type_name' => $type_name);
+    $inactive = array($type_name => array());
+  }
+  else {
+    $param = array();
+    $inactive = array();
+  }
+  $all = content_field_instance_read($param, TRUE);
+  foreach ($all as $field) {
+    $inactive[$field['type_name']][$field['field_name']] = content_field_instance_expand($field);
+  }
+  if (!empty($type_name)) {
+    return $inactive[$type_name];
+  }
+  return $inactive;
+}
+
+/**
+ * Return the nested form elements for a field by name.
+ * This can be used either to retrieve the entire sub-element
+ * for a field by name, no matter how deeply nested it is within
+ * fieldgroups or multigroups, or to find the multiple value
+ * sub-elements within a field element by name (i.e. 'value' or
+ * 'nid'). You can also use this function to see if an item exists 
+ * in a form (the return will be an empty array if it does not exist).
+ *
+ * A field/group will generally only exist once in a form but the 
+ * function can also be used to locate all the 'value' elements 
+ * within a multiple value field if you pass the multiple value field
+ * as the $form argument;
+ *
+ * For example, for a field named field_custom,  the following will 
+ * pluck out the form element for this field from the node form, 
+ * no matter how deeply it is nested within fieldgroups or fieldsets:
+ *
+ * $element = array_shift(content_get_nested_elements($node_form, 'field_custom'));
+ *
+ * You can prefix the function with '&' to retrieve the element by 
+ * reference to alter it directly:
+ *
+ * $elements = &content_get_nested_elements($form, 'field_custom');
+ * foreach ($elements as $element) {
+ *   $element['#after_build'][] = 'my_field_afterbuild';
+ * }
+ *
+ * During the #after_build you could then do something like the
+ * following to alter each individual part of a multiple value field:
+ *
+ * $sub_elements = &content_get_nested_elements($element, 'value', 'all');
+ * foreach ($sub_elements as $sub_element) {
+ *   $sub_element['#element_validate'][] = 'custom_validation';
+ * }
+ *
+ * @param $form
+ *   The form array to search.
+ * @param $field_name
+ *   The name or key of the form elements to return. Can be a field name, a group name, or a sub-field.
+ * @return
+ *   An array of all matching form elements, returned by reference.
+ */
+function &content_get_nested_elements(&$form, $field_name) {
+  $elements = array();
+  foreach (element_children($form) as $key) {
+    if ($key === $field_name) {
+      $elements[] = &$form[$key];
+    }
+    else if (is_array($form[$key])) {
+      $nested_form = &$form[$key];
+      if ($sub_elements = &content_get_nested_elements($nested_form, $field_name)) {
+        $elements = array_merge($elements, $sub_elements);
+      }
+    }
+  }
+  return $elements;
+}
+
+/**
+ * Helper function to set a value in a form element,
+ * no matter how deeply nested it is in the form.
+ *
+ * @param $form
+ *   The form array to search.
+ * @param $field_name
+ *   The name or key of the form elements to return. Can be a field name, a group name, or a sub-field.
+ * @param $value
+ *   The value to set the element to. Should be an array that matches the part of the form that is being altered.
+ * @return
+ *   TRUE or FALSE, depending on whether the element was discovered and set.
+ */
+function content_set_nested_elements(&$form, $field_name, $value) {
+  $success = FALSE;
+  $elements = &content_get_nested_elements($form, $field_name);
+  if (!empty($elements)) {
+    foreach ($elements as &$element) {
+      $element = $value;
+      $success = TRUE;
+    }
+  }
+  return $success;
 }

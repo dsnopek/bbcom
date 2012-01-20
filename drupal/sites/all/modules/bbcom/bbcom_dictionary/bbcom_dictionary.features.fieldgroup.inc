@@ -59,6 +59,10 @@ function bbcom_dictionary_fieldgroup_default_groups() {
       '4' => 'field_source_raw',
       '5' => 'field_source_timestamp',
     ),
+    'depth' => 0,
+    'parents' => array(
+      '0' => NULL,
+    ),
   );
 
   // Translatables

@@ -1,5 +1,4 @@
 <?php
-// $Id: content_multigroup.inc,v 1.1.2.3 2009/11/01 10:44:16 markuspetrux Exp $
 
 /**
  * @file

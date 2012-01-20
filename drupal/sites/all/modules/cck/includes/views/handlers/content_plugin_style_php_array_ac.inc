@@ -1,5 +1,4 @@
 <?php
-// $Id: content_plugin_style_php_array_ac.inc,v 1.1.2.2.2.1 2009/11/04 15:32:47 markuspetrux Exp $
 
 /**
  * @file

@@ -1,5 +1,4 @@
 <?php
-// $Id: content-admin-display-overview-form.tpl.php,v 1.1.2.3 2008/10/09 20:58:26 karens Exp $
 ?>
 <div>
   <?php print $help; ?>

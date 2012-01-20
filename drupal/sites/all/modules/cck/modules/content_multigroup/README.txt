@@ -1,4 +1,3 @@
-; $Id: README.txt,v 1.1.2.4.2.3 2009/08/10 03:53:24 markuspetrux Exp $
 
 CONTENTS OF THIS FILE
 =====================

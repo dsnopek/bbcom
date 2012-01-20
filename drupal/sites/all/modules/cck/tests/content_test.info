@@ -1,8 +1,10 @@
-name = Content Copy
-description = Enables ability to import/export field definitions.
-dependencies[] = content
+name = Content Test
+description = Test module for CCK.
 package = CCK
 core = 6.x
+dependencies[] = schema
+hidden = TRUE
+files[] = content_test.module
 ; Information added by drupal.org packaging script on 2012-01-12
 version = "6.x-3.x-dev"
 core = "6.x"

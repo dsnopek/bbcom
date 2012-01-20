@@ -1,5 +1,4 @@
 <?php
-// $Id: content_multigroup.admin.inc,v 1.1.2.5 2009/11/02 19:22:37 markuspetrux Exp $
 
 /**
  * @file
@@ -22,7 +21,6 @@ function content_multigroup_multiple_values() {
  */
 function content_multigroup_field_overview_form_validate($form, &$form_state) {
   $form_values = $form_state['values'];
-
   $type_name = $form['#type_name'];
   $fields = array();
   $groups = array();
@@ -46,6 +44,7 @@ function content_multigroup_field_overview_form_validate($form, &$form_state) {
   // See if we have fields moving into or out of a Multigroup.
   // Set any fields to use the new name here so they will get processed
   // correctly by the fieldgroup module when saved.
+  $group_rows = array();
   foreach ($form_values as $key => $values) {
     if ($values['parent'] == '_add_new_group') {
       $values['parent'] = $new_group_name;
@@ -56,6 +55,7 @@ function content_multigroup_field_overview_form_validate($form, &$form_state) {
       // Gather up info about all groups.
       $group_name = $form_values[$key]['group']['group_name'];
       $groups[$group_name] = $form_values[$key]['group'];
+      $group_rows[$group_name] = $group_name;
     }
     if (!empty($form[$key]['#row_type']) && $form[$key]['#row_type'] == 'field') {
       if ($values['prev_parent'] != $values['parent']) {
@@ -66,6 +66,25 @@ function content_multigroup_field_overview_form_validate($form, &$form_state) {
   }
 
   $rebuild = FALSE;
+
+  // Test that a group was not moved into a multigroup, an invalid combination.
+  foreach ($groups as $key => $values) {
+    if (in_array($key, $group_rows)) {
+      $parent = $form_values[$key]['parent'];
+      $parent_info = !empty($parent) ? $form_values[$parent] : array();
+      if (!empty($parent) && $parent_info['group']['group_type'] == 'multigroup') {
+        $error_message = t('You cannot place any kind of group inside a multigroup. The group @name was moved back to where it started.', array('@name' => $key));
+        form_set_value($form[$key]['weight'], $form[$key]['weight']['#default_value'], $form_state);
+        form_set_value($form[$key]['parent'], $form[$key]['parent']['#default_value'], $form_state);
+        drupal_set_message($error_message, 'error');
+      }
+    }
+  }
+  
+  // Synchronize the multiple value values for all fields in a group, they must be the same.
+  // Also ensure that fields moved into multigroups are fields that are allowed.
+  // In some cases, it may not be safe to move a field back out of a multigroup because
+  // it will behave differently elsewhere, so check that too.
   foreach ($fields as $field_name => $field) {
     $new_group = $form_values[$field_name]['parent'];
     $old_group = $form_values[$field_name]['prev_parent'];
@@ -285,7 +304,10 @@ function content_multigroup_display_overview_form(&$form, &$form_state) {
     return;
   }
 
+  $groups = array();
+  $groups = fieldgroup_groups($type_name);
   $contexts = content_build_modes($contexts_selector);
+  $all_contexts = content_build_modes();
 
   // Multigroups, extra values.
   $label_options = array(
@@ -300,8 +322,9 @@ function content_multigroup_display_overview_form(&$form, &$form_state) {
     'hr' => t('Horizontal line'),
     'table-single' => t('Table - Single column'),
     'table-multiple' => t('Table - Multiple columns'),
+    'ul' => t('Unordered List'),
   );
-  foreach (fieldgroup_groups($type_name) as $group_name => $group) {
+  foreach ($groups as $group_name => $group) {
     if ($group['group_type'] != 'multigroup') {
       continue;
     }
@@ -322,16 +345,28 @@ function content_multigroup_display_overview_form(&$form, &$form_state) {
         '#default_value' => isset($subgroup_settings['label']) ? $subgroup_settings['label'] : 'above',
       );
     }
-    foreach ($contexts as $key => $title) {
-      $form[$subgroup_name][$key]['format'] = array(
-        '#type' => 'select',
-        '#options' => $options,
-        '#default_value' => isset($subgroup_settings[$key]['format']) ? $subgroup_settings[$key]['format'] : 'fieldset',
-      );
-      $form[$subgroup_name][$key]['exclude'] = array('#type' => 'value', '#value' => 0);
+
+    // Allow a format selection for contexts on the current tab.
+    // Store other contexts as hidden values so they don't get lost.
+    foreach ($all_contexts as $key => $title) {
+      if (array_key_exists($key, $contexts)) {
+        $form[$subgroup_name][$key]['format'] = array(
+          '#type' => 'select',
+          '#options' => $options,
+          '#default_value' => isset($subgroup_settings[$key]['format']) ? $subgroup_settings[$key]['format'] : 'fieldset',
+        );
+        $form[$subgroup_name][$key]['exclude'] = array('#type' => 'value', '#value' => 0);
+      }
+      else {
+        $form[$subgroup_name][$key]['format'] = array(
+          '#type' => 'hidden',
+          '#value' => isset($subgroup_settings[$key]['format']) ? $subgroup_settings[$key]['format'] : 'fieldset',
+        );
+        $form[$subgroup_name][$key]['exclude'] = array('#type' => 'value', '#value' => 0);
+      
+      }
     }
   }
-
   $form['#submit'] = array_merge(array('content_multigroup_display_overview_form_submit'), $form['#submit']);
 }
 
@@ -343,8 +378,7 @@ function content_multigroup_display_overview_form(&$form, &$form_state) {
  */
 function content_multigroup_display_overview_form_submit($form, &$form_state) {
   $groups = fieldgroup_groups($form['#type_name']);
-  $reset_cache = FALSE;
-
+  //$reset_cache = FALSE;
   // Find any subgroups we inserted into the display fields form,
   // save our settings, and remove them from $form_state.
   foreach ($form_state['values'] as $key => $values) {
@@ -355,21 +389,12 @@ function content_multigroup_display_overview_form_submit($form, &$form_state) {
 
       // We have some numeric keys here, so we can't use array_merge.
       foreach ($values as $k => $v) {
-        $group['settings']['multigroup']['subgroup'][$k] = $v;
+        $form_state['values'][$group_name]['settings']['multigroup']['subgroup'][$k] = $v;
       }
-
-      // Update the group information in the database. Note that
-      // 'fieldgroup_data' in cache tables are also cleared here,
-      // but we need to reset static caches of fieldgroup_groups().
-      fieldgroup_save_group($form['#type_name'], $group);
-      $reset_cache = TRUE;
 
       // Remove the subgroup from $form_state.
       unset($form_state['values'][$key]);
     }
-  }
-  if ($reset_cache) {
-    fieldgroup_groups('', FALSE, TRUE);
   }
 }
 
@@ -400,7 +425,6 @@ function content_multigroup_group_edit_form(&$form, &$form_state) {
     '#collapsed' => FALSE,
     '#collapsible' => TRUE,
   );
-
   if (isset($group['settings']['multigroup']['subgroup'])) {
     // Preserve subgroup display settings.
     $form['settings']['multigroup']['subgroup'] = array(
@@ -419,7 +443,7 @@ function content_multigroup_group_edit_form(&$form, &$form_state) {
   $form['settings']['multigroup']['required'] = array(
     '#type' => 'checkbox',
     '#title' => t('Required'),
-    '#default_value' => isset($group['settings']['multigroup']['required']) ? $group['settings']['multigroup']['required'] : 1,
+    '#default_value' => !empty($group['settings']['multigroup']['required']) ? $group['settings']['multigroup']['required'] : 0,
     '#description' => t('Enable this option to require a minimum of one collection of fields in this Multigroup.'),
   );
 

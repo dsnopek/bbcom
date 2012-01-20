@@ -1,5 +1,4 @@
 <?php
-// $Id: content_multigroup.node_view.inc,v 1.1.2.4 2009/11/01 10:44:16 markuspetrux Exp $
 
 /**
  * @file
@@ -54,7 +53,6 @@ function _content_multigroup_fieldgroup_view(&$node, &$element, $group, $context
       $group_deltas = range(0, $group_multiple - 1);
       break;
   }
-
   foreach ($group_deltas as $index => $delta) {
     $element[$delta] = array(
       '#title' => ($show_label == 'above' && !empty($subgroup_labels[$index]) ? check_plain(t($subgroup_labels[$index])) : ''),
@@ -64,15 +62,18 @@ function _content_multigroup_fieldgroup_view(&$node, &$element, $group, $context
 
     // Create a pseudo node that only has the value we want in this group and
     // pass it to the formatter.
-    // Default implementation of content-field.tpl.php uses a different CSS
-    // class for inline labels when delta is zero, but this is not needed in
-    // the context of multigroup, so we place the field into index 1 of the
-    // item list. Note that CSS class "field-label-inline" is overridden in the
-    // multigroup stylesheet because here labels should always be visible.
+
+    // @TODO Watch this change and be sure it doesn't break anything else.
+    // The delta was previously always set to '1' to keep CCK's inline label
+    // from assigning a class of 'first'. But changing it back to the right
+    // delta for the individual item makes the formatters easier to manage
+    // since the delta is always the correct delta and not occasionally
+    // a bogus value. It aslo fixes issues like http://drupal.org/node/766734
+    // by keeping the layout of multigroups the same as other fieldgroups.
     foreach (array_keys($group_fields) as $field_name) {
       if (isset($node->content[$field_name])) {
         $node_copy->content[$field_name]['field']['items'] = array(
-          1 => isset($node->content[$field_name]['field']['items'][$delta]) ? $node->content[$field_name]['field']['items'][$delta] : NULL,
+          $delta => isset($node->content[$field_name]['field']['items'][$delta]) ? $node->content[$field_name]['field']['items'][$delta] : NULL,
         );
         $element[$delta][$field_name] = $node_copy->content[$field_name];
         $element[$delta][$field_name]['#delta'] = $delta;
@@ -107,6 +108,11 @@ function _content_multigroup_fieldgroup_view(&$node, &$element, $group, $context
       case 'table-multiple':
         $element['#theme'] = 'content_multigroup_display_table_multiple';
         $element['#attributes']['class'] = $group_class .' content-multigroup-display-table-multiple-columns';
+        $element['#fields'] = $group_fields;
+        break;
+      case 'ul':
+        $element['#theme'] = 'content_multigroup_display_ul';
+        $element['#attributes']['class'] = $group_class;
         $element['#fields'] = $group_fields;
         break;
     }
@@ -234,4 +240,23 @@ function theme_content_multigroup_display_table_multiple($element) {
     }
   }
   return count($rows) ? theme('table', $headers, $rows, $element['#attributes']) : '';
+}
+
+/**
+ * Theme a subgroup of fields in an unordered list.
+ *
+ * No output is generated if all fields are empty.
+ */
+function theme_content_multigroup_display_ul($element) {
+  $items = array();
+  foreach (element_children($element) as $delta) {
+    foreach ($element['#fields'] as $field_name => $field) {
+      $item = drupal_render($element[$delta][$field_name]);
+      if (!empty($item)) {
+        $items[] = $item;
+      }  
+    }
+  }
+  $element['#attributes']['class'] .= ' content-multigroup';
+  return count($items) ? theme('item_list', $items, $element['#title'], 'ul', $element['#attributes']) : '';
 }

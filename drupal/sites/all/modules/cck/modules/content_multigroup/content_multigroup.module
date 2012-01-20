@@ -1,5 +1,4 @@
 <?php
-// $Id: content_multigroup.module,v 1.1.4.6 2009/11/02 19:22:37 markuspetrux Exp $
 
 /**
  * @file
@@ -60,6 +59,10 @@ function content_multigroup_theme() {
       'arguments' => array('text' => NULL),
       'file' => 'content_multigroup.node_form.inc',
     ),
+    'content_multigroup_add_more_label' => array(
+      'arguments' => array('group_name' => NULL),
+      'file' => 'content_multigroup.node_form.inc',
+    ),
     'content_multigroup_display_simple' => array(
       'arguments' => array('element' => NULL),
       'file' => 'content_multigroup.node_view.inc',
@@ -77,6 +80,10 @@ function content_multigroup_theme() {
       'file' => 'content_multigroup.node_view.inc',
     ),
     'content_multigroup_display_table_multiple' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'content_multigroup.node_view.inc',
+    ),
+    'content_multigroup_display_ul' => array(
       'arguments' => array('element' => NULL),
       'file' => 'content_multigroup.node_view.inc',
     ),

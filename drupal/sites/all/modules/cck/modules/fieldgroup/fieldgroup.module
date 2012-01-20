@@ -1,5 +1,4 @@
 <?php
-// $Id: fieldgroup.module,v 1.79.2.48.2.3 2009/08/14 12:17:58 markuspetrux Exp $
 
 /**
  * @file
@@ -166,6 +165,7 @@ function fieldgroup_group_edit_form(&$form_state, $type_name, $group_name) {
   $form['settings']['display']['label'] = array('#type' => 'value', '#value' => $group['settings']['display']['label']);
   $form['weight'] = array('#type' => 'hidden', '#default_value' => $group['weight']);
   $form['group_name'] = array('#type' => 'hidden', '#default_value' => $group_name);
+  $form['parent'] = array('#type' => 'hidden', '#default_value' => $group['parent']);
 
   $form['#content_type'] = $content_type;
 
@@ -210,6 +210,9 @@ function fieldgroup_remove_group_submit($form, &$form_state) {
   $form_values = $form_state['values'];
   $content_type = $form['#content_type'];
   $group_name = $form['#group_name'];
+  $parent = db_fetch_array(db_query("SELECT parent FROM {". fieldgroup_tablename() ."} WHERE group_name = '%s' AND type_name = '%s'", $group_name, $content_type['type']));
+  $result = db_query("UPDATE {". fieldgroup_tablename() ."} SET parent = '%s' WHERE parent = '%s' AND type_name = '%s'", $parent['parent'], $group_name, $content_type['type']);
+  $result = db_query("UPDATE {". fieldgroup_fields_tablename() ."} SET group_name = '%s' WHERE group_name = '%s' AND type_name = '%s'", $parent['parent'], $group_name, $content_type['type']);
   fieldgroup_delete($content_type['type'], $group_name);
   drupal_set_message(t('The group %group_name has been removed.', array('%group_name' => $group_name)));
   $form_state['redirect'] = 'admin/content/node-type/'. $content_type['url_str'] .'/fields';
@@ -228,43 +231,12 @@ function fieldgroup_groups($content_type = '', $sorted = FALSE, $reset = FALSE) 
       $groups_sorted = $data['groups_sorted'];
     }
     else {
-      $result = db_query("SELECT * FROM {". fieldgroup_tablename() ."} ORDER BY weight, group_name");
+      $result = db_query("SELECT * FROM {". fieldgroup_tablename() ."} ORDER BY type_name, weight");
       $groups = array();
       $groups_sorted = array();
       while ($group = db_fetch_array($result)) {
-        $group['settings'] = unserialize($group['settings']);
-        $group['fields'] = array();
-
-        // Allow external modules to translate field group strings.
-        $group_strings = array(
-          'label' => $group['label'],
-          'form_description' => $group['settings']['form']['description'],
-          'display_description' => $group['settings']['display']['description'],
-        );
-        drupal_alter('content_fieldgroup_strings', $group_strings, $group['type_name'], $group['group_name']);
-        $group['label'] = $group_strings['label'];
-        $group['settings']['form']['description'] = $group_strings['form_description'];
-        $group['settings']['display']['description'] = $group_strings['display_description'];
-
-        $groups[$group['type_name']][$group['group_name']] = $group;
+        $groups[$group['type_name']] = _fieldgroup_get_tree($group['type_name']);
         $groups_sorted[$group['type_name']][] = &$groups[$group['type_name']][$group['group_name']];
-      }
-      //load fields
-      $result = db_query("SELECT nfi.*, ng.group_name FROM {". fieldgroup_tablename() ."} ng ".
- "INNER JOIN {". fieldgroup_fields_tablename() ."} ngf ON ngf.type_name = ng.type_name AND ngf.group_name = ng.group_name ".
- "INNER JOIN {". content_instance_tablename() ."} nfi ON nfi.field_name = ngf.field_name AND nfi.type_name = ngf.type_name ".
- "WHERE nfi.widget_active = 1 ORDER BY nfi.weight");
-      while ($field = db_fetch_array($result)) {
-        // Allow external modules to translate field strings.
-        $field_strings = array(
-          'widget_label' => $field['label'],
-          'widget_description' => $field['description'],
-        );
-        drupal_alter('content_field_strings', $field_strings, $field['type_name'], $field['field_name']);
-        $field['label'] = $field_strings['widget_label'];
-        $field['description'] = $field_strings['widget_description'];
-
-        $groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']] = $field;
       }
       cache_set('fieldgroup_data:'. $language->language, array('groups' => $groups, 'groups_sorted' => $groups_sorted), content_cache_tablename());
     }
@@ -278,6 +250,87 @@ function fieldgroup_groups($content_type = '', $sorted = FALSE, $reset = FALSE) 
   return $sorted ? $groups_sorted[$content_type] : $groups[$content_type];
 }
 
+/**
+ * create a tree of fieldgroups for nesting them
+ */
+function _fieldgroup_get_tree($type_name, $parent = '', $depth = -1, $max_depth = null) {
+  static $children, $parents, $groups;
+
+  $depth++;
+  // We cache trees, so it's not CPU-intensive to call get_tree() on a term
+  // and its children, too.
+  if (!isset($children[$type_name])) {
+    $children[$type_name] = array();
+
+    $result = db_query("SELECT * FROM {". fieldgroup_tablename() ."} WHERE type_name='%s' ORDER BY weight", $type_name);
+    while ($group = db_fetch_array($result)) {
+	    $group['settings'] = unserialize($group['settings']);
+      $group['fields'] = array();
+	
+      // Allow external modules to translate field group strings.
+	    $group_strings = array(
+	      'label' => $group['label'],
+		    'form_description' => $group['settings']['form']['description'],
+		    'display_description' => $group['settings']['display']['description'],
+	    );
+	    $group['label'] = $group_strings['label'];
+	    $group['settings']['form']['description'] = $group_strings['form_description'];
+	    $group['settings']['display']['description'] = $group_strings['display_description'];
+	
+      $children[$type_name][$group['parent']][] = $group['group_name'];
+      $parents[$type_name][$group['group_name']][] = $group['parent'];
+      $groups[$type_name][$group['group_name']] = $group;
+    }
+    //load fields
+    $result = db_query("SELECT nfi.*, ng.group_name FROM {". fieldgroup_tablename() ."} ng ".
+        "INNER JOIN {". fieldgroup_fields_tablename() ."} ngf ON ngf.type_name = ng.type_name AND ngf.group_name = ng.group_name ".
+        "INNER JOIN {". content_instance_tablename() ."} nfi ON nfi.field_name = ngf.field_name AND nfi.type_name = ngf.type_name ".
+        "WHERE nfi.widget_active = 1 ORDER BY nfi.weight");
+    while ($field = db_fetch_array($result)) {
+      $groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']] = $field;
+
+      // Unserialize arrays.
+      foreach (array('widget_settings', 'display_settings', 'global_settings', 'db_columns') as $key) {
+        $groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']] = (!empty($groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']][$key])) ? (array) unserialize($groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']][$key]) : array();
+      }
+
+      // For fields inside of groups, use the weight given by fieldgroup
+      $groups[$field['type_name']][$field['group_name']]['fields'][$field['field_name']]['weight'] = $field['weight'];
+    }
+  }
+
+  $max_depth = (is_null($max_depth)) ? count($children[$type_name]) : $max_depth;
+  if (isset($children[$type_name][$parent])) {
+    foreach ($children[$type_name][$parent] as $child_group_name) {
+      if ($max_depth > $depth) {
+        $group = $groups[$type_name][$child_group_name];
+        $group['depth'] = $depth;
+        $group['parents'] = $parents[$type_name][$child_group_name];
+        $tree[$group['group_name']] = $group;
+        if (!empty($children[$type_name][$child_group_name])) {
+          $tree = array_merge($tree, _fieldgroup_get_tree($type_name, $child_group_name, $depth, $max_depth));
+        }
+      }
+    }
+  }
+  return $tree ? $tree : array();
+}
+
+/**
+ * go through a set of fieldgroups and construct a simple representation of their hierarchy
+ */
+function _fieldgroup_plain_tree($items) {
+  $rows = array();
+  $rows[''] = '<'. t('none') .'>';
+  foreach ($items as $item) {
+    $group_name = $item['group_name'];
+    $label = t($item['label']);
+    if ($group_name) {
+      $rows[$group_name] = str_repeat('--', $item['depth']) . ' ' . $label;
+    }
+  }
+  return $rows;
+}
 
 function _fieldgroup_groups_label($content_type) {
   $groups = fieldgroup_groups($content_type);
@@ -294,50 +347,162 @@ function _fieldgroup_field_get_group($content_type, $field_name) {
 }
 
 /**
+ * Return an array of the parents for a field or group.
+ *
+ * @param $content_type The content type of the field/group.
+ * @param $name The name of a group or field.
+ */
+function fieldgroup_get_parents($content_type, $name) {
+  $is_group = substr($name, 0, 6) == 'group_';
+  $counter = 0;
+  if ($is_group) {
+    $parents[$counter] = $name;
+  }
+  else {
+    if ($result = db_result(db_query("SELECT group_name FROM {". fieldgroup_fields_tablename() ."} WHERE type_name = '%s' AND field_name = '%s'", $content_type, $name))) {
+      $parents[$counter] = $result;
+    }
+  }
+  while ($result = db_result(db_query("SELECT parent FROM {". fieldgroup_tablename() ."} WHERE type_name = '%s' AND group_name = '%s'", $content_type, $parents[$counter]))) {
+    $counter++;
+    $parents[$counter] = $result;
+  }
+  return $parents;
+}
+
+function _fieldgroup_add_group_to_form(&$form, &$form_state, $form_id, $group_name, $group, $groups) {
+  $form[$group_name] = array(
+    '#type' => 'fieldset',
+    '#title' => check_plain(t($group['label'])),
+    '#collapsed' => $group['settings']['form']['style'] == 'fieldset_collapsed',
+    '#collapsible' => in_array($group['settings']['form']['style'], array('fieldset_collapsed', 'fieldset_collapsible')),
+    '#weight' => $group['weight'],
+    '#depth' => $group['depth'],
+    '#group_parent' => $group['parent'],
+    '#description' => content_filter_xss(t($group['settings']['form']['description'])),
+    '#attributes' => array('class' => strtr($group['group_name'], '_', '-')),
+  );
+  $has_accessible_field = FALSE;
+  foreach ($group['fields'] as $field_name => $field) {
+    if (isset($form[$field_name])) {
+      $form[$field_name]['#weight'] = $field['weight'];
+      $form[$group_name][$field_name] = $form[$field_name];
+      //Track whether this group has any accessible fields within it.
+      if (!isset($form[$field_name]['#access']) || $form[$field_name]['#access'] !== FALSE) {
+        $has_accessible_field = TRUE;
+      }
+      unset($form[$field_name]);
+    }
+  }
+  if (!empty($group['fields']) && !element_children($form[$group_name])) {
+    //hide the fieldgroup, because the fields are hidden too
+    unset($form[$group_name]);
+  }
+  
+  if (!$has_accessible_field) {
+    // Hide the fieldgroup, because the fields are inaccessible.
+    $form[$group_name]['#access'] = FALSE;
+  }
+  else {
+    //cascade visibility up
+    $form[$group_name]['#access'] = TRUE;
+  }
+
+  // Allow other modules to alter the form.
+  // Can't use module_invoke_all because we want
+  // to be able to use a reference to $form and $form_state.
+  foreach (module_implements('fieldgroup_form') as $module) {
+    $function = $module .'_fieldgroup_form';
+    $function($form, $form_state, $form_id, $group);
+  }
+}
+
+/**
+ * This is function fieldgroup_order_fields_and_groups
+ *
+ * @param array $group_rows An empty array that we will fill.
+ * @param array $groups All of the info we need about all of the groups for the content type we're working on.
+ * @param array $field_check_off This contains the fields. We will unset them as we process them.
+ *
+ */
+function fieldgroup_order_fields_groups(&$group_rows, &$groups, &$field_check_off) {
+  $max_depth = 0;
+  foreach ($group_rows as $name) {
+    $depth = $groups[$name]['depth'];
+    if ($depth > $max_depth) {
+      $max_depth = $depth;
+    }
+    $parent = $groups[$name]['parent'];
+    
+    //run through the fields and come up with new weights for display purposes
+    if (isset($groups[$name]['fields'])) {
+      foreach ($groups[$name]['fields'] as $name2 => $elements) {
+        $depth2 = $groups[$name]['depth'] + 1;
+        $groups[$name]['fields'][$name2]['depth'] = $depth2;
+        if (in_array($name2, $field_check_off)) {
+          $index = array_search($name2, $field_check_off);
+          unset($field_check_off[$index]);
+        }
+      }
+    }
+  }
+  return $max_depth;
+}
+
+/**
  * Implementation of hook_form_alter()
  */
 function fieldgroup_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['type']) && isset($form['#node']) && $form['type']['#value'] .'_node_form' == $form_id) {
-    foreach (fieldgroup_groups($form['type']['#value']) as $group_name => $group) {
-      $form[$group_name] = array(
-        '#type' => 'fieldset',
-        '#title' => check_plain(t($group['label'])),
-        '#collapsed' => $group['settings']['form']['style'] == 'fieldset_collapsed',
-        '#collapsible' => in_array($group['settings']['form']['style'], array('fieldset_collapsed', 'fieldset_collapsible')),
-        '#weight' => $group['weight'],
-        '#description' => content_filter_xss(t($group['settings']['form']['description'])),
-        '#attributes' => array('class' => strtr($group['group_name'], '_', '-')),
-      );
-
-      $has_accessible_field = FALSE;
-      foreach ($group['fields'] as $field_name => $field) {
-        if (isset($form[$field_name])) {
-          $form[$group_name][$field_name] = $form[$field_name];
-          // Track whether this group has any accessible fields within it.
-          if (!isset($form[$field_name]['#access']) || $form[$field_name]['#access'] !== FALSE) {
-            $has_accessible_field = TRUE;
+    $group_rows = array();
+    $field_rows = array();
+    
+    //prepare data that will make this easier
+    $groups = fieldgroup_groups($form['type']['#value']);
+    if (!empty($groups)) {
+      foreach ($groups as $name => $more) {
+        $group_rows[] = $name;
+      }
+    }
+    
+    $fields = $form['#field_info'];
+    if (!empty($fields)) {
+      foreach ($fields as $name => $more) {
+        $field_rows[] = $name;
+      }
+    }
+    
+    $max_depth = fieldgroup_order_fields_groups($group_rows, $groups, $field_rows);
+    
+    //cover the top level fields that aren't in fieldgroups
+    if (isset($field_rows)) {
+      foreach ($field_rows as $name) {
+        $form[$name]['#depth'] = 0;
+      }
+    }
+    
+    //now that we have the order of things as we want them, let's create the fieldsets for the fieldgroups
+    foreach ($groups as $group_name => $group) {
+      _fieldgroup_add_group_to_form($form, $form_state, $form_id, $group_name, $group, $groups);
+    }
+    
+    //reorder the groups from the inside-out in order to avoid a recursive function
+    while ($max_depth >= 0) {
+      foreach ($group_rows as $name) {
+        if ($form[$name]['#depth'] == $max_depth) {
+          $parent = $form[$name]['#group_parent'];
+          if (isset($parent) && $parent != '') {
+            $form[$parent][$name] = $form[$name];
+            if ($form[$name]['#access']) {
+              $form[$parent]['#access'] = TRUE;
+            }
+            unset($form[$name]);
+            $index = array_search($name, $group_rows);
+            unset($group_rows[$index]);
           }
-          unset($form[$field_name]);
         }
       }
-      if (!empty($group['fields']) && !element_children($form[$group_name])) {
-        //hide the fieldgroup, because the fields are hidden too
-        unset($form[$group_name]);
-      }
-
-      if (!$has_accessible_field) {
-        // Hide the fieldgroup, because the fields are inaccessible.
-        $form[$group_name]['#access'] = FALSE;
-      }
-
-      // Allow other modules to alter the form.
-      // Can't use module_invoke_all because we want
-      // to be able to use a reference to $form and $form_state.
-      foreach (module_implements('fieldgroup_form') as $module) {
-        $function = $module .'_fieldgroup_form';
-        $function($form, $form_state, $form_id, $group);
-      }
-
+      $max_depth--;
     }
 
   }
@@ -451,7 +616,6 @@ function fieldgroup_field_overview_form_validate($form, &$form_state) {
 function fieldgroup_field_overview_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
   $type_name = $form['#type_name'];
-
   // Create new group if needed.
   if (!empty($form_values['_add_new_group']['label'])) {
     $group = $form_values['_add_new_group'];
@@ -463,6 +627,10 @@ function fieldgroup_field_overview_form_submit($form, &$form_state) {
   // Parse incoming rows.
   $add_field_rows = array('_add_new_field', '_add_existing_field');
   $field_rows = array_merge($form['#fields'], $add_field_rows);
+  $add_group_rows = array($new_group_name);
+  $group_rows = array_merge($form['#groups'], $add_group_rows);
+  
+  
   foreach ($form_values as $key => $values) {
     // If 'field' row: update field parenting.
     if (in_array($key, $field_rows)) {
@@ -486,12 +654,15 @@ function fieldgroup_field_overview_form_submit($form, &$form_state) {
       // TODO: check the parent group does exist ?
       fieldgroup_update_fields(array('field_name' => $key, 'group' => $parent, 'type_name' => $type_name));
     }
-
-    // If 'group' row:  update groups weights
+  }
+  
+  foreach ($form_state['values'] as $key => $values) {
+    // If 'group' row:  update groups weights and parent
     // (possible newly created group has already been taken care of).
-    elseif (in_array($key, $form['#groups'])) {
-      db_query("UPDATE {". fieldgroup_tablename() ."} SET weight = %d WHERE type_name = '%s' AND group_name = '%s'",
-        $values['weight'], $type_name, $key);
+    if (in_array($key, $group_rows)) {
+      $parent = ($values['parent'] == '_add_new_group' && isset($new_group_name)) ? $new_group_name : $values['parent'];
+      $weight = $values['weight'];
+      db_query("UPDATE {". fieldgroup_tablename() ."} SET weight = %d, parent = '%s' WHERE type_name = '%s' AND group_name = '%s'", $weight, $parent, $type_name, $key);
     }
   }
 
@@ -519,6 +690,19 @@ function fieldgroup_display_overview_form_submit($form, &$form_state) {
   foreach ($form_values as $key => $values) {
     if (in_array($key, $form['#groups'])) {
       $group = $groups[$key];
+      // Multigroup data (namely, subgroup data) ends up in the settings array as well
+      // Prevent this data from ending up inside of ['settings']['display']
+      if (is_array($values['settings']) && array_key_exists('multigroup', $values['settings'])){
+        if (is_array($group['settings']['multigroup'])){
+          foreach ($values['settings']['multigroup'] as $group_key => $group_values){
+            $group['settings']['multigroup'][$group_key] = $values['settings']['multigroup'][$group_key];
+          }
+        } 
+        else {
+          $group['settings']['multigroup'] = $values['settings']['multigroup'];
+        }
+        unset($values['settings']['multigroup']);
+      }
       // We have some numeric keys here, so we can't use array_merge.
       $group['settings']['display'] = $values + $group['settings']['display'];
       fieldgroup_save_group($form['#type_name'], $group);
@@ -538,14 +722,55 @@ function fieldgroup_field_remove_form_submit($form, &$form_state) {
 /**
  * Implementation of hook_nodeapi().
  */
-function fieldgroup_nodeapi(&$node, $op, $teaser, $page) {
+function fieldgroup_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
   switch ($op) {
     case 'view':
       // Prevent against invalid 'nodes' built by broken 3rd party code.
       if (isset($node->type)) {
+        //prepare data that will make this easier
+        $group_rows = array();
+        $field_rows = array();
+        $groups = fieldgroup_groups($node->type);
+        if (!empty($groups)) {
+          foreach ($groups as $name => $more) {
+            $group_rows[] = $name;
+          }
+        }
+        
+        $fields = $node->content;
+        if (!empty($fields)) {
+          foreach ($fields as $name => $more) {
+            if (is_string($name) && strstr($name, 'field_')) {
+              $field_rows[] = $name;
+            }
+          }
+        }
+        
+        $max_depth = fieldgroup_order_fields_groups($group_rows, $groups, $field_rows);
+        
+        //cover the top level fields that aren't in fieldgroups
+        if (isset($field_rows)) {
+          foreach ($field_rows as $name) {
+            $node->content[$name]['#depth'] = 0;
+          }
+        }
+        
         // Build the node content element needed to render each fieldgroup.
-        foreach (fieldgroup_groups($node->type) as $group) {
+        foreach ($groups as $group) {
           fieldgroup_build_content($group, $node, $teaser, $page);
+        }
+        //reorder the groups from the inside-out in order to avoid writing a recursive function
+        while ($max_depth >= 0) {
+          foreach ($group_rows as $name) {
+            if (!empty($node->content[$name]) && $node->content[$name]['#depth'] == $max_depth) {
+              $parent = $node->content[$name]['#group_parent'];
+              if (isset($parent) && $parent != '') {
+                $node->content[$parent]['group'][$name] = $node->content[$name];
+                unset($node->content[$name]);
+              }
+            }
+          }
+          $max_depth--;
         }
       }
       break;
@@ -586,7 +811,7 @@ function fieldgroup_build_content($group, &$node, $teaser, $page) {
   $label = $group['settings']['display']['label'] == 'above';
   $element = array(
     '#title' => $label ? check_plain(t($group['label'])) : '',
-    '#description' => $label ? content_filter_xss(t($group['settings']['display']['description'])) : '',
+    '#description' => $label && !empty($group['settings']['display']['description']) ? content_filter_xss(t($group['settings']['display']['description'])) : '',
   );
   $format = isset($group['settings']['display'][$context]['format']) ? $group['settings']['display'][$context]['format'] : 'fieldset';
 
@@ -611,6 +836,8 @@ function fieldgroup_build_content($group, &$node, $teaser, $page) {
   foreach ($group['fields'] as $field_name => $field) {
     if (isset($node->content[$field_name])) {
       $element[$field_name] = $node->content[$field_name];
+      $element[$field_name]['#weight'] = $field['weight'];
+      $element[$field_name]['#depth'] = $field['depth'];
     }
   }
 
@@ -636,10 +863,12 @@ function fieldgroup_build_content($group, &$node, $teaser, $page) {
   $wrapper = array(
     'group' => $element,
     '#weight' => $group['weight'],
+    '#depth' => $group['depth'],
     '#post_render' => array('fieldgroup_wrapper_post_render'),
     '#group_name' => $group_name,
     '#type_name' => $node->type,
     '#context' => $context,
+    '#group_parent' => $group['parent'],
   );
 
   $node->content[$group_name] = $wrapper;
@@ -734,7 +963,7 @@ function fieldgroup_wrapper_post_render($content, $element) {
   return $content;
 }
 
-/*
+/**
  * Get the group name for a field.
  * If the field isn't in a group, FALSE will be returned.
  * @return The name of the group, or FALSE.
@@ -792,7 +1021,7 @@ function fieldgroup_fields_tablename($version = NULL) {
  * @todo
  * Make this into more of a real API for groups.
  */
-/*
+/**
  * Saves the given group for this content-type
  */
 function fieldgroup_save_group($type_name, $group) {
@@ -803,18 +1032,19 @@ function fieldgroup_save_group($type_name, $group) {
     $function = $module .'_fieldgroup_save_group';
     $function($group);
   }
-
+  
   if (!isset($groups[$group['group_name']])) {
     // Accept group name from programmed submissions if valid.
-    db_query("INSERT INTO {". fieldgroup_tablename() ."} (group_type, type_name, group_name, label, settings, weight)".
-      " VALUES ('%s', '%s', '%s', '%s', '%s', %d)", $group['group_type'], $type_name, $group['group_name'], $group['label'], serialize($group['settings']), $group['weight']);
+    db_query("INSERT INTO {". fieldgroup_tablename() ."} (parent, group_type, type_name, group_name, label, settings, weight)".
+      " VALUES ('%s','%s', '%s', '%s', '%s', '%s', %d)", 
+      isset($group['parent']) ? $group['parent'] : $group['parent'], $group['group_type'], $type_name, $group['group_name'], $group['label'], serialize($group['settings']), $group['weight']);
     cache_clear_all('fieldgroup_data:', content_cache_tablename(), TRUE);
     return SAVED_NEW;
   }
   else {
-    db_query("UPDATE {". fieldgroup_tablename() ."} SET group_type = '%s', label = '%s', settings = '%s', weight = %d ".
-             "WHERE type_name = '%s' AND group_name = '%s'",
-             $group['group_type'], $group['label'], serialize($group['settings']), $group['weight'], $type_name, $group['group_name']);
+    db_query("UPDATE {". fieldgroup_tablename() ."} SET parent =  '%s', group_type = '%s', label = '%s', settings = '%s', weight = %d ".
+      "WHERE type_name = '%s' AND group_name = '%s'",
+      isset($group['parent']) ? $group['parent'] : $group['parent'], $group['group_type'], $group['label'], serialize($group['settings']), $group['weight'], $type_name, $group['group_name']);
     cache_clear_all('fieldgroup_data:', content_cache_tablename(), TRUE);
     return SAVED_UPDATED;
   }
@@ -881,9 +1111,10 @@ function theme_fieldgroup_fieldset($element) {
  *
  * @see fieldgroup-simple.tpl.php
  */
-function fieldgroup_preprocess_fieldgroup_simple(&$vars) {
+function template_preprocess_fieldgroup_simple(&$vars) {
   $element = $vars['element'];
 
+  $vars['parent'] = isset($element['#parent']) ? $element['#parent'] : NULL;
   $vars['group_name'] = $element['#group_name'];
   $vars['group_name_css'] = strtr($element['#group_name'], '_', '-');
   $vars['label'] = isset($element['#title']) ? $element['#title'] : '';;

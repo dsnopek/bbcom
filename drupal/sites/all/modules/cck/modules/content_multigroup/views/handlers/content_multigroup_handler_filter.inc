@@ -1,5 +1,4 @@
 <?php
-// $Id: content_multigroup_handler_filter.inc,v 1.1.2.2 2009/10/31 20:31:09 markuspetrux Exp $
 
 /**
  * @file

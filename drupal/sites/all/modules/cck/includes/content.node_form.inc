@@ -1,5 +1,4 @@
 <?php
-// $Id: content.node_form.inc,v 1.7.2.19.2.6 2009/12/29 09:03:15 markuspetrux Exp $
 
 /**
  * @file
@@ -265,6 +264,7 @@ function content_multiple_value_form(&$form, &$form_state, $field, $items) {
     $form_element[$field_name .'_add_more']['#prefix'] = '<div class="content-add-more clear-block">';
     $form_element[$field_name .'_add_more']['#suffix'] = '</div>';
   }
+
   return $form_element;
 }
 
@@ -411,6 +411,7 @@ function content_add_more_submit($form, &$form_state) {
  * Menu callback for AHAH addition of new empty widgets.
  */
 function content_add_more_js($type_name_url, $field_name) {
+  $content_type = content_types($type_name_url);
   $type = content_types($type_name_url);
   $field = content_fields($field_name, $type['type']);
 
@@ -465,15 +466,17 @@ function content_add_more_js($type_name_url, $field_name) {
   $form_state['item_count'] = array($field_name => count($_POST[$field_name]) + 1);
   $form_element = content_field_form($form, $form_state, $field);
   // Let other modules alter it.
-  drupal_alter('form', $form_element, array(), 'content_add_more_js');
+  // We pass an empty array as hook_form_alter's usual 'form_state' parameter,
+  // instead of $form_atate (for reasons we may never remember).
+  // However, this argument is still expected to be passed by-reference
+  // (and PHP5.3 will throw an error if it isn't.) This leads to:
+  $data = &$form_element;
+  $empty_form_state = array();
+  $data['__drupal_alter_by_ref'] = array(&$empty_form_state);
+  drupal_alter('form', $data, 'content_add_more_js');
 
   // Add the new element at the right place in the (original, unbuilt) form.
-  if (module_exists('fieldgroup') && ($group_name = _fieldgroup_field_get_group($type['type'], $field_name))) {
-    $form[$group_name][$field_name] = $form_element[$field_name];
-  }
-  else {
-    $form[$field_name] = $form_element[$field_name];
-  }
+  $success = content_set_nested_elements($form, $field_name, $form_element[$field_name]);
 
   // Save the new definition of the form.
   $form_state['values'] = array();
@@ -490,7 +493,8 @@ function content_add_more_js($type_name_url, $field_name) {
   $form = form_builder($_POST['form_id'], $form, $form_state);
 
   // Render the new output.
-  $field_form = (!empty($group_name)) ? $form[$group_name][$field_name] : $form[$field_name];
+  $field_form = array_shift(content_get_nested_elements($form, $field_name));
+
   // We add a div around the new content to receive the ahah effect.
   $field_form[$delta]['#prefix'] = '<div class="ahah-new-content">'. (isset($field_form[$delta]['#prefix']) ? $field_form[$delta]['#prefix'] : '');
   $field_form[$delta]['#suffix'] = (isset($field_form[$delta]['#suffix']) ? $field_form[$delta]['#suffix'] : '') .'</div>';

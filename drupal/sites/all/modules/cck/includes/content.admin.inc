@@ -1,5 +1,4 @@
 <?php
-// $Id: content.admin.inc,v 1.181.2.68.2.7 2009/11/02 21:21:35 markuspetrux Exp $
 
 /**
  * @file
@@ -147,6 +146,7 @@ function content_field_overview_form(&$form_state, $type_name) {
   if (module_exists('fieldgroup')) {
     $groups = fieldgroup_groups($type['type']);
     $group_types = fieldgroup_types();
+    $plain_tree = _fieldgroup_plain_tree($groups);
     $group_options = _fieldgroup_groups_label($type['type']);
     // Add the ability to group under the newly created row.
     $group_options['_add_new_group'] = '_add_new_group';
@@ -194,6 +194,8 @@ function content_field_overview_form(&$form_state, $type_name) {
 
   // Groups.
   foreach ($groups as $name => $group) {
+    $current_group_options = $plain_tree;
+    unset($current_group_options[$name]);
     $weight = $group['weight'];
     $form[$name] = array(
       'label' => array('#value' => check_plain($group['label'])),
@@ -202,17 +204,23 @@ function content_field_overview_form(&$form_state, $type_name) {
       'configure' => array('#value' => l(t('Configure'), 'admin/content/node-type/'. $type['url_str'] .'/groups/'. $group['group_name'])),
       'remove' => array('#value' => l(t('Remove'), 'admin/content/node-type/'. $type['url_str'] .'/groups/'. $group['group_name'] .'/remove')),
       'weight' => array('#type' => 'textfield', '#default_value' => $weight, '#size' => 3),
-      'parent' => array('#type' => 'hidden', '#default_value' => ''),
+      'parent' => array('#type' => 'select', '#options' => $current_group_options, '#default_value' => ''),
+      'prev_parent' => array('#type' => 'hidden', '#value' => ''),
       'hidden_name' => array('#type' => 'hidden', '#default_value' => $group['group_name']),
-      '#root' => TRUE,
       '#row_type' => 'group',
       'group' => array('#type' => 'value', '#value' => $group),
     );
     // Adjust child fields rows.
-    foreach ($group['fields'] as $field_name => $field) {
-      $form[$field_name]['parent']['#default_value'] = $name;
-      $form[$field_name]['prev_parent']['#value'] = $name;
+    if (isset($group['fields'])) {
+      foreach ($group['fields'] as $field_name => $field) {
+        $form[$field_name]['parent']['#default_value'] = $name;
+        $form[$field_name]['prev_parent']['#value'] = $name;
+      }
     }
+    // Adjust child group rows
+    $form[$name]['parent']['#default_value'] = $group['parent'];
+    $form[$name]['prev_parent']['#value'] = $group['parent'];
+    
     $form['#group_rows'][] = $name;
     $weights[] = $weight;
   }
@@ -317,6 +325,9 @@ function content_field_overview_form(&$form_state, $type_name) {
 
   // Additional row : add new group.
   if (!empty($group_types)) {
+    $current_group_options = $group_options;
+    $options = fieldgroup_types();
+    unset($current_group_options['_add_new_group']);
     $weight++;
     $name = '_add_new_group';
     $form[$name] = array(
@@ -346,9 +357,9 @@ function content_field_overview_form(&$form_state, $type_name) {
         '#value' => 'standard',
       ),
       'weight' => array('#type' => 'textfield', '#default_value' => $weight, '#size' => 3),
-      'parent' => array('#type' => 'hidden', '#default_value' => ''),
+      'parent' => array('#type' => 'select', '#options' => $current_group_options, '#default_value' => ''),
+      'prev_parent' => array('#type' => 'hidden', '#value' => ''),
       'hidden_name' => array('#type' => 'hidden', '#default_value' => $name),
-      '#root' => TRUE,
       '#add_new' => TRUE,
       '#row_type' => 'add_new_group',
     );
@@ -662,6 +673,7 @@ function content_display_overview_form(&$form_state, $type_name, $contexts_selec
     $form[$name] = array(
       'human_name' => array('#value' => check_plain($group['label'])),
       'weight' => array('#type' => 'value', '#value' => $weight),
+      'parent' => array('#type' => 'value', '#value' => ''),
     );
     if ($contexts_selector == 'basic') {
       $form[$name]['label'] = array(
@@ -686,6 +698,8 @@ function content_display_overview_form(&$form_state, $type_name, $contexts_selec
     foreach ($group['fields'] as $field_name => $field) {
       $form[$field_name]['parent']['#value'] = $name;
     }
+    $form[$name]['parent']['#value'] = $group['parent'];
+    $form[$name]['group']['#value']['depth'] = $group['depth'];
   }
 
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
@@ -1667,6 +1681,35 @@ function _content_overview_order(&$form, $field_rows, $group_rows) {
       }
     }
   }
+  // Nested fieldgroup
+  if (module_exists('fieldgroup')) {
+    // readjust the depth and parenting of fieldgroup
+    $nested = array();
+    foreach ($group_rows as $name) {
+      if (empty($form[$name]['#depth'])) $form[$name]['#depth'] = 0;
+        
+      // Skip top level groups, only nested groups need adjustment.
+      if ($parent = $form[$name]['parent']['#value']) {
+        $form[$name]['#depth'] = $form[$parent]['#depth'] + 1;
+        if (array_key_exists($parent, $nested)){
+          $nested[$parent][$name] = $dummy[$name];
+          $nested[$name] = & $nested[$parent][$name];
+        }
+        else {
+          $dummy[$parent][$name] = $dummy[$name];
+          $nested[$name] = & $dummy[$parent][$name];
+        }
+        unset($dummy[$name]);
+      }
+    }
+    // readjust the depth
+    foreach ($field_rows as $name) {
+      if ($parent = $form[$name]['parent']['#value']) {
+        $form[$name]['#depth'] = $form[$parent]['#depth'] + 1;
+      }
+    }
+  }
+
   return $dummy ? explode(' ', trim(drupal_render($dummy))) : array();
 }
 

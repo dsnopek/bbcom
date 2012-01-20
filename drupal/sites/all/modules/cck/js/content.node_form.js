@@ -1,4 +1,3 @@
-// $Id: content.node_form.js,v 1.1.2.1 2009/06/06 23:44:56 markuspetrux Exp $
 
 /**
  * Private namespace for local methods.

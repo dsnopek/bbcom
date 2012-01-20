@@ -1,4 +1,3 @@
-// $Id: content.admin.js,v 1.1.2.1 2009/06/07 00:31:35 markuspetrux Exp $
 
 Drupal.behaviors.cckManageFields = function(context) {
   attachUpdateSelects(context);
