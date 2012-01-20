@@ -51,6 +51,7 @@ function bbcom_dictionary_fieldgroup_default_groups() {
       ),
     ),
     'weight' => '9',
+    'parent' => '',
     'fields' => array(
       '0' => 'field_source_name',
       '1' => 'field_source_url',
@@ -61,7 +62,7 @@ function bbcom_dictionary_fieldgroup_default_groups() {
     ),
     'depth' => 0,
     'parents' => array(
-      '0' => NULL,
+      '0' => '',
     ),
   );
 
