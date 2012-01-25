@@ -80,6 +80,9 @@ function bbcom_theme_theme(&$existing, $type, $theme, $path) {
     'breadcrumb' => array(
       'arguments' => array('breadcrumb' => NULL),
     ),
+    'menu_local_tasks' => array(
+      'arguments' => array(),
+    ),
     'bbcom_join_btn' => array(
       'template' => 'bbcom-join-btn',
       'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
@@ -125,6 +128,17 @@ function bbcom_theme_breadcrumb($breadcrumb) {
     array_shift($breadcrumb);
     return '<div class="breadcrumb">'. implode(' » ', $breadcrumb) .'</div>';
   }
+}
+
+function bbcom_theme_menu_local_tasks() {
+  // only include the primary local tasks, we'll include the secondary in a different way
+  $output = '';
+
+  if ($primary = menu_primary_local_tasks()) {
+    $output .= "<ul class=\"tabs primary\">\n". $primary ."</ul>\n";
+  }
+
+  return $output;
 }
 
 function bbcom_theme_language_switcher_form(&$form_state, $node=NULL) {
@@ -241,6 +255,11 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
     ));
   }
 
+  // put the secondary local tasks in the $tab2 variable because we removed them from $tab
+  if ($secondary = menu_secondary_local_tasks()) {
+    $vars['tabs2'] = "<ul class=\"tabs secondary\">\n". $secondary ."</ul>\n";
+  }
+
   // Remove the right sidebar when on the marketing pages, or in the forum.
   //if ($_GET['q'] == 'about' || context_get('bbcom', 'section') == 'forum') {
   //if (preg_match('/^user\/\d+/', $_GET['q']) || context_isset('context', 'bbcom-section-forum')) {
@@ -314,6 +333,10 @@ function bbcom_theme_preprocess_node_content(&$vars, $hook) {
   if (!$vars['teaser']) {
     $vars['inner_title'] = TRUE;
   }
+}
+
+function bbcom_theme_preprocess_node_profile(&$vars, $hook) {
+  unset($vars['submitted']);
 }
 
 function bbcom_theme_preprocess_node_page(&$vars, $hook) {

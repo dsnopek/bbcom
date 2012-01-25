@@ -67,6 +67,10 @@
           <div class="tabs"><?php print $tabs; ?></div>
         <?php endif; ?>
         <div id="content-wrapper" class="<?php print $tabs ? 'with-tabs' : 'without-tabs'?> clear-block">
+            <?php if ($tabs2): ?>
+              <?php print $tabs2; ?>
+            <?php endif; ?>
+
             <?php if ($content_top): ?>
               <div id="content-top" class="region content-region alpha omega <?php print ns('grid-12', $right || $always_right, 4); ?>">
                 <div id="content-top-inner">

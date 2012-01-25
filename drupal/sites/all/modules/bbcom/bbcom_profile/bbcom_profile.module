@@ -1,0 +1,48 @@
+<?php
+
+include_once('bbcom_profile.features.inc');
+
+/**
+ * Implementation of hook_user().
+ */
+function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
+  if ($type == 'view') {
+    // remove the user picture, because we don't use it!  The styling messes up the layout.
+    unset($account->content['user_picture']);
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function bbcom_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($node->type == 'profile' && $op == 'presave') {
+    $node->title = check_plain(user_load($node->uid)->name);
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function bbcom_profile_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'profile_node_form') {
+    unset($form['menu']);
+
+    $form['title']['#type'] = 'value';
+    $form['title']['#required'] = FALSE;
+    $form['#submit'][] = '_bbcom_profile_node_form_submit';
+  }
+}
+
+function _bbcom_profile_node_form_submit($form, &$form_state) {
+  $form_state['value']['title'] = check_plain(user_load($form_state['value']['uid'])->name);
+}
+
+/**
+ * Implementation of hook_profile_alter().
+ */
+function bbcom_profile_profile_alter(&$account) {
+  // move the content profile to the top of the pile
+  $account->content['content_profile']['#weight'] = -2;
+}
+
