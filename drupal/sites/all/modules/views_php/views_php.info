@@ -1,0 +1,12 @@
+name = Views PHP
+description = Allows the usage of PHP to construct a view.
+package = Views
+core = 6.x
+dependencies[] = views
+
+; Information added by drupal.org packaging script on 2011-06-22
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "views_php"
+datestamp = "1308745781"
+

@@ -589,6 +589,19 @@ ul.primary li a {
 }
 
 /*
+ * DRS: User profiles.
+ */
+div.content-profile-display {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.field-field-profile-image {
+  float: right;
+  margin: 0 0 5px 5px;
+}
+
+/*
 ** Formatting for administration page
 **
 ** The admin panel styles are a mess. IE has problems with this so this is

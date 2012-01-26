@@ -6,13 +6,427 @@
 function bbcom_content_views_default_views() {
   $views = array();
 
-  // Exported view: korpus_text_entries
+  // Exported view: content_source_entries
   $view = new view;
-  $view->name = 'korpus_text_entries';
-  $view->description = '';
-  $view->tag = '';
+  $view->name = 'content_source_entries';
+  $view->description = 'Lists source entries which are from a particular text.';
+  $view->tag = 'bbcom_content';
   $view->base_table = 'lingwo_korpus_entry';
-  $view->core = 0;
+  $view->core = 6;
+  $view->api_version = '2';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+  $handler = $view->new_display('default', 'Defaults', 'default');
+  $handler->override_option('relationships', array(
+    'entry_hash' => array(
+      'label' => 'dictionary entry',
+      'required' => 0,
+      'id' => 'entry_hash',
+      'table' => 'lingwo_korpus_entry',
+      'field' => 'entry_hash',
+      'relationship' => 'none',
+    ),
+    'nid' => array(
+      'label' => 'entry node',
+      'required' => 0,
+      'id' => 'nid',
+      'table' => 'lingwo_entry_info',
+      'field' => 'nid',
+      'relationship' => 'entry_hash',
+    ),
+    'flag_content_rel' => array(
+      'label' => 'verified',
+      'required' => 0,
+      'flag' => 'verified',
+      'user_scope' => 'any',
+      'id' => 'flag_content_rel',
+      'table' => 'node',
+      'field' => 'flag_content_rel',
+      'relationship' => 'nid',
+    ),
+  ));
+  $handler->override_option('fields', array(
+    'headword' => array(
+      'label' => 'Headword',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'exclude' => 0,
+      'id' => 'headword',
+      'table' => 'lingwo_korpus_entry',
+      'field' => 'headword',
+      'relationship' => 'none',
+    ),
+    'pos' => array(
+      'id' => 'pos',
+      'table' => 'lingwo_korpus_entry',
+      'field' => 'pos',
+    ),
+    'timestamp' => array(
+      'label' => 'Verified',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => 'True ([timestamp])',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => 'False',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'date_format' => 'small',
+      'custom_date_format' => '',
+      'exclude' => 0,
+      'id' => 'timestamp',
+      'table' => 'flag_content',
+      'field' => 'timestamp',
+      'relationship' => 'flag_content_rel',
+    ),
+    'nid' => array(
+      'label' => 'Nid',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'absolute' => 0,
+        'link_class' => '',
+        'alt' => '',
+        'rel' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'hide_alter_empty' => 1,
+      'link_to_node' => 0,
+      'exclude' => 1,
+      'id' => 'nid',
+      'table' => 'node',
+      'field' => 'nid',
+      'relationship' => 'nid',
+    ),
+    'language' => array(
+      'label' => 'Korpus Language',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'exclude' => 1,
+      'id' => 'language',
+      'table' => 'lingwo_korpus_entry',
+      'field' => 'language',
+      'relationship' => 'none',
+    ),
+    'php' => array(
+      'label' => 'Status',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'absolute' => 0,
+        'link_class' => '',
+        'alt' => '',
+        'rel' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'hide_alter_empty' => 1,
+      'use_php_setup' => 0,
+      'php_setup' => '',
+      'php_value' => '',
+      'php_output' => '<?php
+print empty($row->nid) ? t(\'Missing Source\') : t(\'Full\');
+?>',
+      'use_php_click_sortable' => '0',
+      'php_click_sortable' => '',
+      'exclude' => 0,
+      'id' => 'php',
+      'table' => 'views',
+      'field' => 'php',
+      'relationship' => 'none',
+    ),
+    'php_1' => array(
+      'label' => 'PHP',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'absolute' => 0,
+        'link_class' => '',
+        'alt' => '',
+        'rel' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'hide_alter_empty' => 1,
+      'use_php_setup' => 0,
+      'php_setup' => '',
+      'php_value' => '',
+      'php_output' => '<?php
+print empty($row->nid) ?
+  l(t(\'add source\'), \'node/add/entry\', array(\'query\' => array(
+    \'language\' => $row->language,
+    \'pos\' => $row->pos,
+    \'headword\' => $row->headword
+  ))) :
+  l(t(\'edit source\'), \'node/\' . $row->nid . \'/edit\');
+?>',
+      'use_php_click_sortable' => '0',
+      'php_click_sortable' => '',
+      'exclude' => 0,
+      'id' => 'php_1',
+      'table' => 'views',
+      'field' => 'php',
+      'relationship' => 'none',
+    ),
+  ));
+  $handler->override_option('arguments', array(
+    'nid' => array(
+      'default_action' => 'not found',
+      'style_plugin' => 'default_summary',
+      'style_options' => array(),
+      'wildcard' => '',
+      'wildcard_substitution' => 'All',
+      'title' => '',
+      'breadcrumb' => '',
+      'default_argument_type' => 'fixed',
+      'default_argument' => '',
+      'validate_type' => 'none',
+      'validate_fail' => 'not found',
+      'break_phrase' => 0,
+      'not' => 0,
+      'id' => 'nid',
+      'table' => 'lingwo_korpus_entry',
+      'field' => 'nid',
+      'validate_user_argument_type' => 'uid',
+      'validate_user_roles' => array(
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        6 => 0,
+      ),
+      'relationship' => 'none',
+      'default_options_div_prefix' => '',
+      'default_argument_fixed' => '',
+      'default_argument_user' => 0,
+      'default_argument_php' => '',
+      'validate_argument_node_type' => array(
+        'webform' => 0,
+        'content' => 0,
+        'entry' => 0,
+        'story' => 0,
+        'page' => 0,
+      ),
+      'validate_argument_node_access' => 0,
+      'validate_argument_nid_type' => 'nid',
+      'validate_argument_vocabulary' => array(
+        1 => 0,
+      ),
+      'validate_argument_type' => 'tid',
+      'validate_argument_transform' => 0,
+      'validate_user_restrict_roles' => 0,
+      'validate_argument_node_flag_name' => '*relationship*',
+      'validate_argument_node_flag_test' => 'flaggable',
+      'validate_argument_node_flag_id_type' => 'id',
+      'validate_argument_user_flag_name' => '*relationship*',
+      'validate_argument_user_flag_test' => 'flaggable',
+      'validate_argument_user_flag_id_type' => 'id',
+      'validate_argument_php' => '',
+    ),
+  ));
+  $handler->override_option('filters', array(
+    'flagged' => array(
+      'operator' => '=',
+      'value' => 'All',
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'operator' => '',
+        'identifier' => 'verified',
+        'label' => 'Verified',
+        'optional' => 1,
+        'remember' => 0,
+      ),
+      'id' => 'flagged',
+      'table' => 'flag_content',
+      'field' => 'flagged',
+      'relationship' => 'flag_content_rel',
+    ),
+  ));
+  $handler->override_option('access', array(
+    'type' => 'php',
+    'php_access' => '$parts = explode(\'/\', $_GET[\'q\']);
+$node = node_load($parts[1]);
+// only show on content nodes!!
+return $node->type == \'content\' && user_access(\'translate content\');
+',
+  ));
+  $handler->override_option('cache', array(
+    'type' => 'none',
+  ));
+  $handler->override_option('header', 'There are <?php
+$view = views_get_current_view();
+echo $view->total_rows; ?> entries that match this query.');
+  $handler->override_option('header_format', '3');
+  $handler->override_option('header_empty', 1);
+  $handler->override_option('items_per_page', 20);
+  $handler->override_option('use_pager', '1');
+  $handler->override_option('distinct', 0);
+  $handler->override_option('style_plugin', 'table');
+  $handler->override_option('style_options', array(
+    'grouping' => '',
+    'override' => 1,
+    'sticky' => 0,
+    'order' => 'asc',
+    'columns' => array(
+      'headword' => 'headword',
+      'pos' => 'pos',
+      'timestamp' => 'timestamp',
+      'nothing_1' => 'nothing_1',
+      'nothing' => 'nothing',
+      'nid' => 'nid',
+      'language' => 'language',
+      'nid_1' => 'nid_1',
+    ),
+    'info' => array(
+      'headword' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'pos' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'timestamp' => array(
+        'sortable' => 1,
+        'separator' => '',
+      ),
+      'nothing_1' => array(
+        'separator' => '',
+      ),
+      'nothing' => array(
+        'separator' => '',
+      ),
+      'nid' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'language' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'nid_1' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+    ),
+    'default' => 'headword',
+  ));
+  $handler = $view->new_display('page', 'Page', 'page_1');
+  $handler->override_option('path', 'node/%/entries/source');
+  $handler->override_option('menu', array(
+    'type' => 'default tab',
+    'title' => 'Source',
+    'description' => '',
+    'weight' => '1',
+    'name' => 'navigation',
+  ));
+  $handler->override_option('tab_options', array(
+    'type' => 'tab',
+    'title' => 'Entries',
+    'description' => '',
+    'weight' => '1',
+    'name' => 'navigation',
+  ));
+
+  $views[$view->name] = $view;
+
+  // Exported view: content_translation_entries
+  $view = new view;
+  $view->name = 'content_translation_entries';
+  $view->description = 'Lists translation entries which are from a particular text.';
+  $view->tag = 'bbcom_content';
+  $view->base_table = 'lingwo_korpus_entry';
+  $view->core = 6;
   $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
@@ -119,65 +533,6 @@ function bbcom_content_views_default_views() {
       'field' => 'timestamp',
       'relationship' => 'flag_content_rel',
     ),
-    'nothing_1' => array(
-      'label' => 'Status',
-      'alter' => array(
-        'text' => 'unthemed',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 0,
-      'id' => 'nothing_1',
-      'table' => 'views',
-      'field' => 'nothing',
-      'relationship' => 'none',
-    ),
-    'nothing' => array(
-      'label' => 'Edit',
-      'alter' => array(
-        'text' => 'unthemed',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 0,
-      'id' => 'nothing',
-      'table' => 'views',
-      'field' => 'nothing',
-      'override' => array(
-        'button' => 'Override',
-      ),
-      'relationship' => 'none',
-    ),
     'nid' => array(
       'label' => 'Nid',
       'alter' => array(
@@ -267,6 +622,136 @@ function bbcom_content_views_default_views() {
       'field' => 'nid',
       'relationship' => 'nid',
     ),
+    'php' => array(
+      'label' => 'Status',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'absolute' => 0,
+        'link_class' => '',
+        'alt' => '',
+        'rel' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'hide_alter_empty' => 1,
+      'use_php_setup' => 0,
+      'php_setup' => '',
+      'php_value' => '',
+      'php_output' => '<?php
+global $language;
+
+if (!empty($row->nid)) {
+  // we have everything!
+  print t(\'Full\');
+}
+elseif (!empty($row->nid_1)) {
+  if ($row->language == $language->language) {
+    // we don\'t have everything, but since the korpus language matches the users current
+    // language, from her perspective, there is nothing more we car ask for
+    print t(\'Partial\');
+  }
+  else {
+    print t(\'Missing Translation\');
+  }
+}
+else {
+  print t(\'Missing Source\');
+}
+?>',
+      'use_php_click_sortable' => '0',
+      'php_click_sortable' => '',
+      'exclude' => 0,
+      'id' => 'php',
+      'table' => 'views',
+      'field' => 'php',
+      'relationship' => 'none',
+    ),
+    'php_1' => array(
+      'label' => 'Edit',
+      'alter' => array(
+        'alter_text' => 0,
+        'text' => '',
+        'make_link' => 0,
+        'path' => '',
+        'absolute' => 0,
+        'link_class' => '',
+        'alt' => '',
+        'rel' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'hide_alter_empty' => 1,
+      'use_php_setup' => 0,
+      'php_setup' => '',
+      'php_value' => '',
+      'php_output' => '<?php
+global $language;
+
+if (!empty($row->nid)) {
+  // edit the fully existing node (might be source, might be translation)
+  print l($row->language == $language->language ?
+    t(\'edit source\') : t(\'edit translation\'),
+    \'node/\'. $row->nid .\'/edit\'
+  );
+}
+elseif (!empty($row->nid_1)) {
+  if ($row->language == $language->language) {
+    // edit the source when we are using the language of the korpus (translation is not appropriate)
+    print l(t(\'edit source\'), \'node/\'. $row->nid_1 .\'/edit\');
+  }
+  else {
+    // add the translation when we\'ve got a node, but no translation
+    print l(t(\'add translation\'), \'node/add/entry\', array(\'query\' => array(
+      \'language\'    => $language->language,
+      \'pos\'         => $row->pos,
+      \'headword\'    => $row->headword,
+      \'translation\' => $row->nid_1,
+    )));
+  }
+}
+
+else {
+  // if we\'ve got nothing, then add the source
+  print l(t(\'add source\'), \'node/add/entry\', array(\'query\' => array(
+    \'language\' => $row->language,
+    \'pos\'      => $row->pos,
+    \'headword\' => $row->headword,
+  )));
+}
+?>',
+      'use_php_click_sortable' => '0',
+      'php_click_sortable' => '',
+      'exclude' => 0,
+      'id' => 'php_1',
+      'table' => 'views',
+      'field' => 'php',
+      'relationship' => 'none',
+    ),
   ));
   $handler->override_option('arguments', array(
     'nid' => array(
@@ -343,12 +828,10 @@ function bbcom_content_views_default_views() {
   ));
   $handler->override_option('access', array(
     'type' => 'php',
-    'code' => '<?php
-$parts = explode(\'/\', $_GET[\'q\']);
+    'php_access' => '$parts = explode(\'/\', $_GET[\'q\']);
 $node = node_load($parts[1]);
 // only show on content nodes!!
-return $node->type == \'content\' && user_access(\'translate content\');
-?>',
+return $node->type == \'content\' && user_access(\'translate content\');',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
@@ -412,17 +895,17 @@ echo $view->total_rows; ?> entries that match this query.');
     'default' => 'headword',
   ));
   $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->override_option('path', 'node/%/entries');
+  $handler->override_option('path', 'node/%/entries/translation');
   $handler->override_option('menu', array(
     'type' => 'tab',
-    'title' => 'Entry Translations',
+    'title' => 'Translation',
     'description' => '',
     'weight' => '1',
     'name' => 'navigation',
   ));
   $handler->override_option('tab_options', array(
     'type' => 'tab',
-    'title' => 'Entry Translations',
+    'title' => 'Translation',
     'description' => '',
     'weight' => '1',
     'name' => 'navigation',
