@@ -213,7 +213,7 @@ print empty($row->nid) ? t(\'Missing Source\') : t(\'Full\');
       'relationship' => 'none',
     ),
     'php_1' => array(
-      'label' => 'PHP',
+      'label' => 'Edit',
       'alter' => array(
         'alter_text' => 0,
         'text' => '',
