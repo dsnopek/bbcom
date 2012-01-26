@@ -334,12 +334,11 @@ print empty($row->nid) ?
   ));
   $handler->override_option('access', array(
     'type' => 'php',
-    'code' => '<?php
-$parts = explode(\'/\', $_GET[\'q\']);
+    'php_access' => '$parts = explode(\'/\', $_GET[\'q\']);
 $node = node_load($parts[1]);
 // only show on content nodes!!
 return $node->type == \'content\' && user_access(\'translate content\');
-?>',
+',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
@@ -829,12 +828,10 @@ else {
   ));
   $handler->override_option('access', array(
     'type' => 'php',
-    'code' => '<?php
-$parts = explode(\'/\', $_GET[\'q\']);
+    'php_access' => '$parts = explode(\'/\', $_GET[\'q\']);
 $node = node_load($parts[1]);
 // only show on content nodes!!
-return $node->type == \'content\' && user_access(\'translate content\');
-?>',
+return $node->type == \'content\' && user_access(\'translate content\');',
   ));
   $handler->override_option('cache', array(
     'type' => 'none',
