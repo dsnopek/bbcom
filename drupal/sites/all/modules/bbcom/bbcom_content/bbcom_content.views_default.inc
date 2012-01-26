@@ -413,7 +413,7 @@ echo $view->total_rows; ?> entries that match this query.');
   ));
   $handler->override_option('tab_options', array(
     'type' => 'tab',
-    'title' => 'Entry',
+    'title' => 'Entries',
     'description' => '',
     'weight' => '1',
     'name' => 'navigation',
@@ -908,7 +908,7 @@ echo $view->total_rows; ?> entries that match this query.');
   ));
   $handler->override_option('tab_options', array(
     'type' => 'tab',
-    'title' => 'Entry Translations',
+    'title' => 'Translation',
     'description' => '',
     'weight' => '1',
     'name' => 'navigation',
