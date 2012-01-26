@@ -1,0 +1,238 @@
+<?php
+
+/**
+ * @file
+ * Allows to use PHP in views.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_php_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
+/**
+ * Menu access callback function; use PHP code to determine whether a user as
+ * access.
+ */
+function views_php_check_access($php_access, $view_name, $display_id, $account = NULL) {
+  global $user;
+  static $function = array();
+
+  if (!isset($account)) {
+    $account = $user;
+  }
+
+  if (!isset($function[$view_name . ':' . $display_id])) {
+    $function[$view_name . ':' . $display_id] = create_function('$view_name, $display_id, $account', $php_access . ';');
+  }
+
+  ob_start();
+  $access = (bool) $function[$view_name . ':' . $display_id]($view_name, $display_id, $account);
+  ob_end_clean();
+  return $access;
+}
+
+/**
+ * Helper function; builds form for PHP code options of views handlers/plugins.
+ */
+function views_php_form_element($handler, $checkbox = FALSE, $input, $variables = array(), $parents = array('options')) {
+  static $default_variables;
+  if (!isset($default_variables)) {
+    $default_variables = array(
+      '$view'    => t('The view object.'),
+      '$handler' => t('The handler object.'),
+      '$plugin'  => t('The plugin object.'),
+      '$static'  => t('A variable that can be used to store reusable data per row.'),
+      '$row'     => t('Contains the normalized record with consistent field name (e.g. $row->title).'),
+      '$data'    => t('Contains the raw record as created by Views (e.g. $data->nid).'),
+      '$results' => t('Array containing the view\'s result.'),
+      '$cache'   => t('The cache object.'),
+    );
+  }
+
+  list($name, $title, $description, $use_delimiters) = $input;
+  $container = array(
+    '#parents' => $parents,
+  );
+
+  if (!empty($checkbox)) {
+    list($checkbox_name, $checkbox_title, $checkbox_description) = $checkbox;
+    $checkbox = array(
+      '#type' => 'checkbox',
+      '#title' => $checkbox_title,
+      '#description' => $checkbox_description,
+      '#default_value' => $handler->options[$checkbox_name] && !empty($handler->options[$name]),
+    );
+  }
+  $container[$name] = array(
+    '#type' => 'textarea',
+    '#id' => str_replace('_', '-', 'edit-options-' . $name),
+    '#title' => $title,
+    '#default_value' => $handler->options[$name],
+    '#rows' => 5,
+    '#description' => $description . ' <strong>' . ($use_delimiters
+      ? t('Use &lt;?php ?&gt; delimiters to enclose PHP code.')
+      : t('Do not use &lt;?php ?&gt; delimiters.'))
+      . '</strong>',
+  );
+
+  // Only users with use PHP permission can set/modify input.
+  if (!user_access('Use PHP input for field settings (dangerous - grant with care)')) {
+    $container[$name]['#disabled'] = TRUE;
+    $container[$name]['#value'] = $container[$name]['#default_value'];
+    $container[$name]['#description'] .= ' <strong>' . t('You do not have permission to modify this.') . '</strong>';
+  }
+
+  $items = array();
+  foreach ($variables as $variable_name => $description) {
+    if (is_int($variable_name)) {
+      $variable_name = $description;
+      $description = isset($default_variables[$description]) ? $default_variables[$description] : '';
+    }
+    $items[] = l($variable_name, '', array('fragment' => $container[$name]['#id'], 'external' => TRUE)) . ': ' . $description;
+
+    if (strpos($variable_name, '$row') === 0) {
+      foreach ($handler->view->display_handler->get_handlers('field') as $field => $field_handler) {
+        $title = $field_handler->label();
+        if (empty($title)) {
+          $title = $field_handler->ui_name();
+        }
+        $items[] = l($variable_name . '->' . $field, '', array('fragment' => $container[$name]['#id'], 'external' => TRUE)) . ': ' . $title;
+      }
+    }
+  }
+  drupal_add_js(drupal_get_path('module', 'views_php') . '/views_php.js');
+  $container[$name . '_variables'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Available variables'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#attributes' => array('class' => array('views-php-variables')),
+  );
+  $container[$name . '_variables']['variables'] = array(
+    '#value' => theme('item_list', $items), 
+  );
+
+  if (!empty($checkbox)) {
+    return array($checkbox_name => $checkbox, $name => $container);
+  }
+  return array($name => $container);
+}
+
+/**
+ * Implements hook_views_pre_execute().
+ */
+function views_php_views_pre_execute($view) {
+  foreach (array(/*'argument',*/ 'field', 'filter', 'sort', /*'relationship'*/) as $type) {
+    foreach ($view->$type as $id => $handler) {
+      if (is_callable(array($handler, 'php_pre_execute'))) {
+        $handler->php_pre_execute();
+      }
+    }
+  }
+  if (!empty($view->use_php_pager)) {
+    $view->php_pager = new views_php_pager_helper($view);
+  }
+}
+
+/**
+ * Implements hook_views_post_execute().
+ */
+function views_php_views_post_execute($view) {
+  foreach (array(/*'argument',*/ 'field', 'filter', 'sort', /*'relationship'*/) as $type) {
+    foreach ($view->$type as $id => $handler) {
+      if (is_callable(array($handler, 'php_post_execute'))) {
+        $handler->php_post_execute();
+      }
+    }
+  }
+  if (!empty($view->php_pager)) {
+    $view->php_pager->slice();
+  }
+  $view->php_post_executed = TRUE;
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function views_php_views_pre_render($view) {
+  if (empty($view->php_post_executed)) {
+    views_php_views_post_execute($view);
+  }
+}
+
+/**
+ * Helper class to deal with pager differences between Views 2 and 3.
+ */
+class views_php_pager_helper {
+  function __construct($view) {
+    $this->view = $view;
+    if (version_compare(views_api_version(), '3', '<')) { // Views 2
+      $this->pager = $this->view->pager;
+      $this->view->set_items_per_page(0);
+    }
+    else { // Views 3
+      $this->pager = array(
+        'limit' => $this->view->query->limit,
+        'offset' => $this->view->query->offset,
+        'use_pager' => $this->view->query->pager->use_pager(),
+      );
+      $this->view->query->set_limit(0);
+      $this->view->query->set_offset(0);
+    }
+  }
+
+  function slice() {
+    if (isset($this->pager) && $this->pager['use_pager']) {
+      if (version_compare(views_api_version(), '3', '<')) { // Views 2
+        $this->view->pager = $this->pager;
+        if (method_exists($this->view, 'synchronize_pager')) {
+          $this->view->synchronize_pager();
+        }
+        else {
+          $this->synchronize();
+        }
+        $offset = $this->view->pager['current_page'] * $this->view->pager['items_per_page'] + $this->view->pager['offset'];
+        $limit = $this->view->pager['items_per_page'];
+      }
+      else { // Views 3
+        $this->view->query->pager->total_items = $this->view->total_rows;
+        $this->view->query->pager->update_page_info();
+        $this->view->query->pager->query();
+        $offset = $this->view->query->offset;
+        $limit = $this->view->query->limit;
+      }
+      $results = array_slice($this->view->result, $offset, $limit);
+      $this->view->result = $results;
+    }
+  }
+
+  function synchronize() {
+    if (!empty($this->view->pager['use_pager'])) {
+    // dump information about what we already know into the globals
+      global $pager_page_array, $pager_total, $pager_total_items;
+      // total rows in query
+      $pager_total_items[$this->view->pager['element']] = $this->view->total_rows;
+      // total pages
+      $pager_total[$this->view->pager['element']] = ceil($pager_total_items[$this->view->pager['element']] / $this->view->pager['items_per_page']);
+
+      // What page was requested:
+      $pager_page_array = isset($_GET['page']) ? explode(',', $_GET['page']) : array();
+
+      // If the requested page was within range. $this->pager['current_page']
+      // defaults to 0 so we don't need to set it in an out-of-range condition.
+      if (!empty($pager_page_array[$this->view->pager['element']])) {
+        $page = intval($pager_page_array[$this->view->pager['element']]);
+        if ($page > 0 && $page < $pager_total[$this->view->pager['element']]) {
+          $this->view->pager['current_page'] = $page;
+        }
+      }
+      $pager_page_array[$this->view->pager['element']] = $this->view->pager['current_page'];
+    }
+  }
+}
+
