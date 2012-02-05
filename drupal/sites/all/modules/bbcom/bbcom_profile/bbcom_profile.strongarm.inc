@@ -9,6 +9,25 @@ function bbcom_profile_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'bbcom_profile_role_titles';
+  $strongarm->value = array(
+    1 => '',
+    2 => '',
+    3 => 'Administrator',
+    9 => 'Beta team member',
+    7 => '',
+    4 => '',
+    10 => 'Verified editor',
+    12 => 'Source editor',
+    11 => '',
+    6 => '',
+    8 => '',
+  );
+  $export['bbcom_profile_role_titles'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_anonymous_profile';
   $strongarm->value = '[author-name]';
   $export['comment_anonymous_profile'] = $strongarm;
@@ -108,6 +127,13 @@ function bbcom_profile_strongarm() {
     1 => 'promote',
   );
   $export['node_options_profile'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'user_pictures';
+  $strongarm->value = '1';
+  $export['user_pictures'] = $strongarm;
 
   return $export;
 }

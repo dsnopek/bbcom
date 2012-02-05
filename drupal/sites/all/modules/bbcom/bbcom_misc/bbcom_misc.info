@@ -1,6 +1,11 @@
 core = "6.x"
-// This is required by the theme (but themes can't have dependencies)
+dependencies[] = "features"
 dependencies[] = "jquery_ui"
+dependencies[] = "lightbox2"
 description = "Miscellaneous customizations for BiblioBird.com"
+features[imagecache][] = "large"
+features[imagecache][] = "medium"
+features[imagecache][] = "small"
+features[imagecache][] = "tiny"
 name = "BiblioBird.com Misc"
 package = "BiblioBird.com"

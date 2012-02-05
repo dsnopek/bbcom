@@ -3,12 +3,70 @@
 include_once('bbcom_profile.features.inc');
 
 /**
+ * Implementation of hook_menu().
+ */
+function bbcom_profile_menu() {
+  $items = array();
+  $items['admin/settings/bbcom/profile'] = array(
+    'title' => 'Profile',
+    'description' => 'Settings for BiblioBird.com Profile module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_profile_admin_settings'),
+    'file' => 'bbcom_profile.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function bbcom_profile_theme() {
+  return array(
+    'bbcom_profile_badges' => array(
+      'arguments' => array('roles' => NULL),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function bbcom_profile_theme_registry_alter(&$registry) {
+  if (isset($registry['author_pane_user_picture'])) {
+    // we need our preprocess function to run before author_pane's
+    array_unshift($registry['author_pane_user_picture']['preprocess functions'], 'bbcom_profile_pre_preprocess_author_pane_user_picture');
+  }
+}
+
+/**
  * Implementation of hook_user().
  */
 function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
   if ($type == 'view') {
     // remove the user picture, because we don't use it!  The styling messes up the layout.
     unset($account->content['user_picture']);
+
+    // integrate the titles and badges
+    $roles = array();
+    $titles = variable_get('bbcom_profile_role_titles', array());
+    foreach ($account->roles as $rid => $role) {
+      if (!empty($titles[$rid])) {
+        $roles[] = array('rid' => $rid, 'role' => $role, 'title' => $titles[$rid]);
+      }
+    }
+    if (!empty($roles)) {
+      $account->content['badges'] = array(
+        '#type' => 'user_profile_category',
+        '#title' => t('Badges'),
+        '#weight' => -1,
+      );
+      
+      $account->content['badges']['badges'] = array(
+        '#type' => 'user_profile_item',
+        '#value' => theme('bbcom_profile_badges', $roles),
+      );
+    }
   }
 }
 
@@ -16,8 +74,17 @@ function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
  * Implementation of hook_nodeapi().
  */
 function bbcom_profile_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  if ($node->type == 'profile' && $op == 'presave') {
-    $node->title = check_plain(user_load($node->uid)->name);
+  if ($node->type == 'profile') {
+    if ($op == 'presave') {
+      $node->title = check_plain(user_load($node->uid)->name);
+    }
+    elseif (in_array($op, array('update', 'insert'))) {
+      $field = $node->field_profile_image;
+      $path = !empty($field[0]['filepath']) ? $field[0]['filepath'] : '';
+      
+      // Update the user's account picture.
+      db_query("UPDATE {users} SET picture = '%s' WHERE uid = %d", $path, $node->uid);
+    }
   }
 }
 
@@ -32,6 +99,15 @@ function bbcom_profile_form_alter(&$form, &$form_state, $form_id) {
     $form['title']['#required'] = FALSE;
     $form['#submit'][] = '_bbcom_profile_node_form_submit';
   }
+  elseif ($form_id == 'user_profile_form') {
+    unset($form['picture']);
+  }
+  elseif ($form_id == 'user_admin_settings') {
+    // remove extra settings about the user picture that don't apply
+    foreach (array('path', 'default', 'dimensions', 'file_size', 'guidelines') as $key) {
+      $form['pictures']['settings']['user_picture_' . $key]['#type'] = 'value';
+    }
+  }
 }
 
 function _bbcom_profile_node_form_submit($form, &$form_state) {
@@ -44,5 +120,47 @@ function _bbcom_profile_node_form_submit($form, &$form_state) {
 function bbcom_profile_profile_alter(&$account) {
   // move the content profile to the top of the pile
   $account->content['content_profile']['#weight'] = -2;
+}
+
+//////
+// Theming
+
+function theme_bbcom_profile_badges($roles) {
+  $imgs = array();
+  $text = array();
+  foreach($roles as $role) {
+    $img = str_replace(' ', '-', $role['role']);
+    $img = drupal_get_path('module', 'bbcom_profile') .'/badges/'. $img .'.jpg';
+
+    if (file_exists($img)) {
+      $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
+    }
+    else {
+      $text[] = '<div class="bbcom-badge">'. check_plain($role['title']) .'</div>';
+    }
+  }
+  return implode('', $imgs) . implode('', $text);
+}
+
+function bbcom_profile_pre_preprocess_author_pane_user_picture(&$vars) {
+  // tell author_pane to use the 'tiny' imagecache preset
+  $vars['picture_preset'] = 'tiny';
+}
+
+function bbcom_profile_preprocess_node($vars) {
+  $node = $vars['node'];
+  if ($node->type == 'profile') {
+    // remove links from the profile (this is useless 'Subscribe' etc, when viewing the user)
+    unset($vars['links']);
+    unset($vars['submitted']);
+  }
+}
+
+function bbcom_profile_preprocess_content_profile_display_view(&$vars) {
+  $node = $vars['node'];
+  if ($node->type == 'profile') {
+    // Remove the heading 'Profile' from the profile page, since it's redundant
+    $vars['title'] = NULL;
+  }
 }
 

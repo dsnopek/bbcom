@@ -1,5 +1,7 @@
 <?php
 
+include_once('bbcom_misc.features.inc');
+
 // set the include_path to include our PEAR stuff
 ini_set("include_path", 'sites/all/libraries/pear:' . (strtoupper(substr(PHP_OS, 0, 3)) ? ';' : ':') . ini_get("include_path"));
 
@@ -16,14 +18,6 @@ function bbcom_misc_menu() {
       'file' => 'system.admin.inc',
       'file path' => drupal_get_path('module', 'system'),
     ),
-    'admin/settings/bbcom/misc' => array(
-      'title' => 'Miscellaneous',
-      'description' => 'Settings for BiblioBird.com miscellaneous module.',
-      'access arguments' => array('administer site configuration'),
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('bbcom_misc_admin_settings'),
-      'file' => 'bbcom_misc.admin.inc',
-    ),
     'myaccount' => array(
       'title' => 'My Account',
       'access callback' => 'user_is_logged_in',
@@ -31,17 +25,6 @@ function bbcom_misc_menu() {
       'page callback' => 'bbcom_misc_myaccount_page',
       'type' => MENU_CALLBACK,
     ),
-  );
-}
-
-/**
- * Implementation of hook_theme().
- */
-function bbcom_misc_theme() {
-  return array(
-    'bbcom_misc_badges' => array(
-      'arguments' => array('roles' => NULL),
-    )
   );
 }
 
@@ -61,34 +44,6 @@ function bbcom_misc_theme_registry_alter(&$theme_registry) {
     }
     // Now tack it on at the beginning so it runs before everything else.
     $theme_registry['page']['preprocess functions'] = array_merge(array('i18nmenu_preprocess_page'), $theme_registry['page']['preprocess functions']);
-  }
-}
-
-/**
- * Implementation of hook_user().
- */
-function bbcom_misc_user($op, &$edit, &$account, $category='account') {
-  if ($op == 'view') {
-    $roles = array();
-    $titles = variable_get('bbcom_misc_role_titles', array());
-    foreach ($account->roles as $rid => $role) {
-      if (!empty($titles[$rid])) {
-        $roles[] = array('rid' => $rid, 'role' => $role, 'title' => $titles[$rid]);
-      }
-    }
-
-    if (!empty($roles)) {
-      $account->content['badges'] = array(
-        '#type' => 'user_profile_category',
-        '#title' => t('Badges'),
-        '#weight' => -1,
-      );
-      
-      $account->content['badges']['badges'] = array(
-        '#type' => 'user_profile_item',
-        '#value' => theme('bbcom_misc_badges', $roles),
-      );
-    }
   }
 }
 
@@ -134,26 +89,5 @@ function bbcom_misc_myaccount_page() {
   }
 
   return drupal_goto($url);
-}
-
-/*
- * Theming
- */
-
-function theme_bbcom_misc_badges($roles) {
-  $imgs = array();
-  $text = array();
-  foreach($roles as $role) {
-    $img = str_replace(' ', '-', $role['role']);
-    $img = drupal_get_path('module', 'bbcom_misc') .'/badges/'. $img .'.jpg';
-
-    if (file_exists($img)) {
-      $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
-    }
-    else {
-      $text[] = '<div class="bbcom-badge">'. check_plain($role['title']) .'</div>';
-    }
-  }
-  return implode('', $imgs) . implode('', $text);
 }
 

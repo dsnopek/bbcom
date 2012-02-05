@@ -1,0 +1,12 @@
+<?php
+
+//////
+// Update functions
+
+// Rename variables because the badges moved to the bbcom_profile module.
+function bbcom_misc_update_6001() {
+  // the role titles moved to bbcom_profile
+  variable_set('bbcom_profile_role_titles', variable_get('bbcom_misc_role_titles', array()));
+  variable_del('bbcom_misc_role_titles');
+}
+
