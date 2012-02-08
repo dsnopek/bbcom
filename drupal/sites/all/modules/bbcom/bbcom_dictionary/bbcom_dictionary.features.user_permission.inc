@@ -56,6 +56,7 @@ function bbcom_dictionary_user_default_permissions() {
       '1' => 'beta',
       '2' => 'editor',
       '3' => 'editor2',
+      '4' => 'translator',
     ),
   );
 

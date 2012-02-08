@@ -36,12 +36,6 @@ function bbcom_wiki_context_default_contexts() {
           'region' => 'right',
           'weight' => 0,
         ),
-        'bbcom_marketing-teamspeak' => array(
-          'module' => 'bbcom_marketing',
-          'delta' => 'teamspeak',
-          'region' => 'right',
-          'weight' => 1,
-        ),
       ),
     ),
     'menu' => 'wiki',

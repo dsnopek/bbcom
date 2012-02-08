@@ -55,12 +55,6 @@ function bbcom_content_context_default_contexts() {
           'region' => 'right',
           'weight' => 2,
         ),
-        'bbcom_marketing-teamspeak' => array(
-          'module' => 'bbcom_marketing',
-          'delta' => 'teamspeak',
-          'region' => 'right',
-          'weight' => 3,
-        ),
       ),
     ),
     'menu' => 'content',
