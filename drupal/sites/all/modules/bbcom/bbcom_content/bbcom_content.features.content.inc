@@ -13,6 +13,17 @@ function bbcom_content_content_default_fields() {
     'display_settings' => array(
       'weight' => '1',
       'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'swftools_no_file',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'swftools',
+        'exclude' => 0,
+      ),
       '2' => array(
         'format' => 'default',
         'exclude' => 0,
@@ -24,17 +35,6 @@ function bbcom_content_content_default_fields() {
       '4' => array(
         'format' => 'default',
         'exclude' => 1,
-      ),
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'swftools_no_file',
-        'exclude' => 1,
-      ),
-      'full' => array(
-        'format' => 'swftools',
-        'exclude' => 0,
       ),
     ),
     'widget_active' => '1',
@@ -65,8 +65,108 @@ function bbcom_content_content_default_fields() {
       'insert_default' => 'auto',
       'insert_class' => '',
       'insert_width' => '',
-      'label' => 'Audio',
+      'label' => 'Audio (natural speed)',
       'weight' => '1',
+      'description' => '',
+      'type' => 'filefield_widget',
+      'module' => 'filefield',
+    ),
+  );
+
+  // Exported field: field_audio_slower
+  $fields['content-field_audio_slower'] = array(
+    'field_name' => 'field_audio_slower',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'weight' => '2',
+      'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'swftools_no_file',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'swftools',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'filefield',
+    'required' => '0',
+    'multiple' => '0',
+    'module' => 'filefield',
+    'active' => '1',
+    'list_field' => '0',
+    'list_default' => 1,
+    'description_field' => '0',
+    'widget' => array(
+      'file_extensions' => 'mp3',
+      'file_path' => '',
+      'progress_indicator' => 'bar',
+      'max_filesize_per_file' => '10M',
+      'max_filesize_per_node' => '',
+      'insert' => 0,
+      'insert_styles' => array(
+        'auto' => 0,
+        'link' => 0,
+        'image' => 0,
+        'imagecache_large' => 0,
+        'lightbox2--large--large' => 0,
+        'lightbox2--large--medium' => 0,
+        'lightbox2--large--original' => 0,
+        'lightbox2--large--small' => 0,
+        'lightbox2--large--tiny' => 0,
+        'lightbox2--link--large' => 0,
+        'lightbox2--link--medium' => 0,
+        'lightbox2--link--small' => 0,
+        'lightbox2--link--tiny' => 0,
+        'lightbox2--medium--large' => 0,
+        'lightbox2--medium--medium' => 0,
+        'lightbox2--medium--original' => 0,
+        'lightbox2--medium--small' => 0,
+        'lightbox2--medium--tiny' => 0,
+        'lightbox2--original--large' => 0,
+        'lightbox2--original--medium' => 0,
+        'lightbox2--original--small' => 0,
+        'lightbox2--original--tiny' => 0,
+        'lightbox2--small--large' => 0,
+        'lightbox2--small--medium' => 0,
+        'lightbox2--small--original' => 0,
+        'lightbox2--small--small' => 0,
+        'lightbox2--small--tiny' => 0,
+        'lightbox2--tiny--large' => 0,
+        'lightbox2--tiny--medium' => 0,
+        'lightbox2--tiny--original' => 0,
+        'lightbox2--tiny--small' => 0,
+        'lightbox2--tiny--tiny' => 0,
+        'imagecache_medium' => 0,
+        'imagecache_small' => 0,
+        'imagecache_tiny' => 0,
+        'wiki' => 0,
+      ),
+      'insert_default' => 'auto',
+      'insert_class' => '',
+      'insert_width' => '',
+      'label' => 'Audio (slower)',
+      'weight' => '2',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -80,6 +180,17 @@ function bbcom_content_content_default_fields() {
     'display_settings' => array(
       'weight' => '-1',
       'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
       '2' => array(
         'format' => 'image_plain',
         'exclude' => 1,
@@ -89,17 +200,6 @@ function bbcom_content_content_default_fields() {
         'exclude' => 1,
       ),
       '4' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
-      ),
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
-      ),
-      'full' => array(
         'format' => 'image_plain',
         'exclude' => 1,
       ),
@@ -158,8 +258,19 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_remote_url',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '2',
+      'weight' => '3',
       'parent' => '',
+      'label' => array(
+        'format' => 'above',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
       '2' => array(
         'format' => 'default',
         'exclude' => 0,
@@ -171,17 +282,6 @@ function bbcom_content_content_default_fields() {
       '4' => array(
         'format' => 'default',
         'exclude' => 1,
-      ),
-      'label' => array(
-        'format' => 'above',
-      ),
-      'teaser' => array(
-        'format' => 'default',
-        'exclude' => 1,
-      ),
-      'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
       ),
       'token' => array(
         'format' => 'default',
@@ -209,7 +309,7 @@ function bbcom_content_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Remote URL',
-      'weight' => '2',
+      'weight' => '3',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -218,7 +318,8 @@ function bbcom_content_content_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Audio');
+  t('Audio (natural speed)');
+  t('Audio (slower)');
   t('Images');
   t('Remote URL');
 
