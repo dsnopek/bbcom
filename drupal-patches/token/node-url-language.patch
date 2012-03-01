@@ -1,11 +1,11 @@
---- token_node.inc
-+++ token_node.inc
-@@ -37,7 +37,7 @@ function node_token_values($type, $object = NULL, $options = array()) {
-       $values['title-raw']          = $node->title;
-       $values['node-path-raw']      = drupal_get_path_alias('node/'. $node->nid);
-       $values['node-path']          = check_plain($values['node-path-raw']);
--      $values['node-url']           = url('node/' . $node->nid, array('absolute' => TRUE));
-+      $values['node-url']           = url('node/' . $node->nid, array('absolute' => TRUE, 'language' => isset($options['language']) ? $options['language'] : $GLOBALS['language']));
-       $values['author-uid']         = $node->uid;
-       $values['author-name']        = check_plain($account->name);
-       $values['author-name-raw']    = $account->name;
+--- a/token_node.inc.orig	2012-03-01 15:38:57.000000000 +0000
++++ b/token_node.inc	2012-03-01 16:02:13.000000000 +0000
+@@ -36,7 +36,7 @@
+     $values['title-raw']          = $node->title;
+     $values['node-path-raw']      = drupal_get_path_alias('node/'. $node->nid);
+     $values['node-path']          = check_plain($values['node-path-raw']);
+-    $values['node-url']           = url('node/' . $node->nid, array('absolute' => TRUE));
++    $values['node-url']           = url('node/' . $node->nid, array('absolute' => TRUE, 'language' => isset($options['language']) ? $options['language'] : $GLOBALS['language']));
+     $values['author-uid']         = $node->uid;
+     $values['author-name']        = check_plain($account->name);
+     $values['author-name-raw']    = $account->name;

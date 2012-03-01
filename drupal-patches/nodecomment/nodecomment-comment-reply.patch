@@ -1,6 +1,5 @@
-=== modified file 'nodecomment.module'
---- nodecomment.module	2011-05-06 14:36:02 +0000
-+++ nodecomment.module	2011-05-31 11:17:01 +0000
+--- a/nodecomment.module	2011-05-06 14:36:02 +0000
++++ b/nodecomment.module	2011-05-31 11:17:01 +0000
 @@ -885,6 +885,11 @@
      $items['node/%node']['page callback'] = 'nodecomment_node_view';
    }

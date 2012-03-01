@@ -1,6 +1,5 @@
-=== modified file 'sites/all/modules/logintoboggan/logintoboggan.module'
---- sites/all/modules/logintoboggan/logintoboggan.module	2010-11-17 18:33:35 +0000
-+++ sites/all/modules/logintoboggan/logintoboggan.module	2010-12-28 20:54:37 +0000
+--- a/logintoboggan.module	2010-11-17 18:33:35 +0000
++++ b/logintoboggan/logintoboggan.module	2010-12-28 20:54:37 +0000
 @@ -1015,6 +1015,7 @@
      $edit = array();
      $account->logintoboggan_email_validated = TRUE;

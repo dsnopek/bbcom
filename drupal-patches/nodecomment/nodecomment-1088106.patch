@@ -1,6 +1,5 @@
-=== modified file 'nodecomment.module'
---- nodecomment.module	2011-05-06 14:36:02 +0000
-+++ nodecomment.module	2011-05-06 14:38:43 +0000
+--- a/nodecomment.module	2011-05-06 14:36:02 +0000
++++ b/nodecomment.module	2011-05-06 14:38:43 +0000
 @@ -621,7 +621,7 @@
      case 'update':
        // if this is a comment, save it as a comment

@@ -1,6 +1,5 @@
-=== modified file 'notifications_autosubscribe/notifications_autosubscribe.module'
---- notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:14 +0000
-+++ notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:40 +0000
+--- a/notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:14 +0000
++++ b/notifications_autosubscribe/notifications_autosubscribe.module	2011-05-06 14:03:40 +0000
 @@ -13,7 +13,7 @@
  function notifications_autosubscribe_nodeapi(&$node, $op, $arg = 0) {
    global $user;
