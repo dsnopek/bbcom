@@ -42,6 +42,7 @@ projects[checkbox_validate][version] = "2.1"
 
 projects[services][subdir] = contrib
 projects[services][version] = "2.4"
+projects[services][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/services/services_pressflow.patch"
 
 ; We use a particular version on the 3.x-dev stream
 projects[cck][subdir] = contrib
@@ -76,9 +77,12 @@ projects[filefield_paths][version] = "1.4"
 
 projects[flag][subdir] = contrib
 projects[flag][version] = "1.2"
+projects[flag][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/flag/php53-undefined-index.patch"
+projects[flag][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/flag/views-not-flagged.patch"
 
 projects[swftools][subdir] = contrib
 projects[swftools][version] = "2.5"
+projects[swftools][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/swftools/swftools_2_5_php_5_3.patch"
 
 projects[i18n][subdir] = contrib
 projects[i18n][version] = "1.7"
@@ -112,6 +116,7 @@ projects[lightbox2][version] = "1.11"
 
 projects[logintoboggan][subdir] = contrib
 projects[logintoboggan][version] = "1.7"
+projects[logintoboggan][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/logintoboggan/logintoboggan-after_update.patch"
 
 projects[masquerade][subdir] = contrib
 projects[masquerade][version] = "1.5"
@@ -122,12 +127,15 @@ projects[messaging][type] = module
 projects[messaging][download][type] = git
 projects[messaging][download][url] = http://git.drupal.org/project/messaging.git
 projects[messaging][download][revision] = "bd5b16bb7c228cad76e9701d5118b03dfa77ced5"
+projects[messaging][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/messaging/e6012b4.txt"
 
 projects[node_export][subdir] = contrib
 projects[node_export][version] = "2.24"
 
 projects[nodecomment][subdir] = contrib
 projects[nodecomment][version] = "2.0-beta6"
+projects[nodecomment][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/nodecomment/nodecomment-1088106.patch"
+projects[nodecomment][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/nodecomment/nodecomment-comment-reply.patch"
 
 ; We use a specific version in the 4.x-dev stream
 projects[notifications][subdir] = contrib
@@ -148,15 +156,12 @@ projects[rules][version] = "1.3"
 projects[scheduler][subdir] = contrib
 projects[scheduler][version] = "1.8"
 
-; TODO: does this really belong in the install profile?
-projects[smtp][subdir] = contrib
-projects[smtp][version] = "1.0-beta4"
-
 projects[strongarm][subdir] = contrib
 projects[strongarm][version] = "2.1"
 
 projects[token][subdir] = contrib
 projects[token][version] = "1.18"
+projects[token][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/token/node-url-language.patch"
 
 projects[translation_helpers][subdir] = contrib
 projects[translation_helpers][version] = "1.0"
@@ -166,12 +171,17 @@ projects[userpoints][version] = "1.2"
 
 projects[uuid][subdir] = contrib
 projects[uuid][version] = "1.0-beta2"
+projects[uuid][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/uuid/node_get_by_uuid-1261196_0.patch"
 
 projects[uuid_features][subdir] = contrib
 projects[uuid_features][version] = "1.0-alpha1"
 
 projects[views][subdir] = contrib
 projects[views][version] = "2.16"
+
+projects[views_bulk_operations][subdir] = contrib
+projects[views_bulk_operations][version] = "1.10"
+projects[views_bulk_operations][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/views_bulk_operations/ie6.patch"
 
 projects[views_hacks][subdir] = contrib
 projects[views_hacks][version] = "1.x-dev"
@@ -187,9 +197,27 @@ projects[votingapi][version] = "2.3"
 
 projects[wikitools][subdir] = contrib
 projects[wikitools][version] = "1.3"
+projects[wikitools][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/wikitools/wikitools-inline.diff"
 
-projects[views_bulk_operations][subdir] = contrib
-projects[views_bulk_operations][version] = "1.10"
+; TODO: maybe I need a site.make file for the site specific stuff?
+
+; TODO: does this really belong in the install profile?
+projects[smtp][subdir] = contrib
+projects[smtp][version] = "1.0-beta4"
+
+; TODO: does this really belong in the install profile?
+projects[mollom][subdir] = contrib
+projects[mollom][version] = "1.15"
+projects[mollom][patch][] = "https://raw.github.com/dsnopek/bbcom/master/drupal-patches/mollom/disable-author-ip.patch"
+
+; TODO: does this really belong in the install profile?
+projects[backup_migrate][subdir] = contrib
+projects[backup_migrate][version] = "2.4"
+
+; TODO: does this really belong in the install profile?
+; TODO: this actually requires a very specific version!
+projects[backup_migrate_files][subdir] = contrib
+projects[backup_migrate_files][version] = "1.x-dev"
 
 ; Themes
 
