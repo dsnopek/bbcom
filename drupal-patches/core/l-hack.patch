@@ -1,7 +1,7 @@
-diff --git a/drupal/includes/common.inc b/drupal/includes/common.inc
+diff --git a/includes/common.inc b/drupal/includes/common.inc
 index a100f8a..7c8ebd0 100644
---- a/drupal/includes/common.inc
-+++ b/drupal/includes/common.inc
+--- a/includes/common.inc
++++ b/includes/common.inc
 @@ -1579,6 +1579,13 @@ function drupal_attributes($attributes = array()) {
  function l($text, $path, $options = array()) {
    global $language;
