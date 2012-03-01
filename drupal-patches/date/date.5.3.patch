@@ -1,7 +1,5 @@
-diff --git includes/date_plugin_display_attachment.inc includes/date_plugin_display_attachment.inc
-index 9ea8f75..7a9c153 100644
---- includes/date_plugin_display_attachment.inc
-+++ includes/date_plugin_display_attachment.inc
+--- a/includes/date_plugin_display_attachment.inc
++++ b/includes/date_plugin_display_attachment.inc
 @@ -21,14 +21,14 @@ class date_plugin_display_attachment extends views_plugin_display_attachment {
  
    function options(&$display) {
