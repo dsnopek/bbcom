@@ -3,6 +3,10 @@
 AnkiServer/AnkiServer.egg-info
 AnkiServer/server.log
 bootstrap.py
+modules/contrib
+themes/rubik
+themes/tao
+themes/ninesixty
 drupal/sites/*
 !drupal/sites/all
 !drupal/sites/default/default.settings.php
