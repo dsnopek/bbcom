@@ -43,9 +43,12 @@ projects[checkbox_validate][version] = "2.1"
 projects[services][subdir] = contrib
 projects[services][version] = "2.4"
 
-; TODO: get a concrete version or git checkout
+; We use a particular version on the 3.x-dev stream
 projects[cck][subdir] = contrib
-projects[cck][version] = "3.x-dev"
+projects[cck][type] = module
+projects[cck][download][type] = git
+projects[cck][download][url] = http://git.drupal.org/project/cck.git
+projects[cck][download][revision] = "288c628723c5461c4c692cecad61556e3b395902"
 
 projects[context][subdir] = contrib
 projects[context][version] = "3.0"
@@ -113,9 +116,12 @@ projects[logintoboggan][version] = "1.7"
 projects[masquerade][subdir] = contrib
 projects[masquerade][version] = "1.5"
 
-; TODO: find a concrete version or git id
+; We use a specific version in the 4.x-dev stream
 projects[messaging][subdir] = contrib
-projects[messaging][version] = "4.x-dev"
+projects[messaging][type] = module
+projects[messaging][download][type] = git
+projects[messaging][download][url] = http://git.drupal.org/project/messaging.git
+projects[messaging][download][revision] = "bd5b16bb7c228cad76e9701d5118b03dfa77ced5"
 
 projects[node_export][subdir] = contrib
 projects[node_export][version] = "2.24"
@@ -123,9 +129,12 @@ projects[node_export][version] = "2.24"
 projects[nodecomment][subdir] = contrib
 projects[nodecomment][version] = "2.0-beta6"
 
-; TODO: find a concrete version or git id
+; We use a specific version in the 4.x-dev stream
 projects[notifications][subdir] = contrib
-projects[notifications][version] = "4.x-dev"
+projects[notifications][type] = module
+projects[notifications][download][type] = git
+projects[notifications][download][url] = http://git.drupal.org/project/notifications.git
+projects[notifications][download][revision] = "bf2889b4a23117151b77189a9c8b4ec2cf8f5a32"
 
 projects[onbeforeunload][subdir] = contrib
 projects[onbeforeunload][version] = "1.0"
@@ -164,11 +173,9 @@ projects[uuid_features][version] = "1.0-alpha1"
 projects[views][subdir] = contrib
 projects[views][version] = "2.16"
 
-; TODO: find a concrete version or git id
 projects[views_hacks][subdir] = contrib
 projects[views_hacks][version] = "1.x-dev"
 
-; TODO: find a concrete version or git id
 projects[views_php][subdir] = contrib
 projects[views_php][version] = "1.x-dev"
 
@@ -188,7 +195,13 @@ projects[views_bulk_operations][version] = "1.10"
 
 projects[ninesixty][version] = "1.0"
 
+projects[tao][version] = "3.3"
 projects[rubik][version] = "3.0-beta3"
 
-projects[tao][version] = "3.3"
+; Libraries
+
+libraries[jquery_ui][download][type] = "get"
+libraries[jquery_ui][download][url] = "http://jquery-ui.googlecode.com/files/jquery.ui-1.6.zip"
+libraries[jquery_ui][directory_name] = "jquery.ui"
+libraries[jquery_ui][destination] = "modules/contrib/jquery_ui"
 
