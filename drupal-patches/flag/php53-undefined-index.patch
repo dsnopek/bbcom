@@ -1,7 +1,5 @@
-diff --git a/drupal/sites/all/modules/flag/flag.inc b/drupal/sites/all/modules/flag/flag.inc
-index 98b6c72..ed27f21 100644
---- a/drupal/sites/all/modules/flag/flag.inc
-+++ b/drupal/sites/all/modules/flag/flag.inc
+--- a/flag.inc
++++ b/flag.inc
 @@ -162,7 +162,7 @@ class flag_flag {
        $flag->$option = $value;
      }

@@ -1,5 +1,5 @@
---- notifications_content/notifications_content.module
-+++ notifications_content/notifications_content.module
+--- a/notifications_content/notifications_content.module
++++ b/notifications_content/notifications_content.module
 @@ -938,8 +938,9 @@ function notifications_content_token_values($type, $object = NULL, $options = ar
        break;
      case 'comment':
