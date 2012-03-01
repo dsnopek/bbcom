@@ -3,6 +3,16 @@ api = 2
 
 ; Contrib modules
 
+projects[lingwo][type] = module
+projects[lingwo][subdir] = contrib
+projects[lingwo][download][type] = git
+projects[lingwo][download][url] = http://github.com/dsnopek/lingwo
+
+projects[lingwo-old][type] = module
+projects[lingwo-old][subdir] = contrib
+projects[lingwo-old][download][type] = git
+projects[lingwo-old][download][url] = http://github.com/dsnopek/lingwo-old
+
 projects[admin][subdir] = contrib
 projects[admin][version] = "2.0"
 
