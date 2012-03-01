@@ -1,6 +1,5 @@
-=== modified file 'sites/all/modules/flag/includes/flag_handler_filter_flagged.inc'
---- sites/all/modules/flag/includes/flag_handler_filter_flagged.inc	2010-03-26 19:21:57 +0000
-+++ sites/all/modules/flag/includes/flag_handler_filter_flagged.inc	2010-07-29 12:32:07 +0000
+--- a/includes/flag_handler_filter_flagged.inc	2010-03-26 19:21:57 +0000
++++ b/includes/flag_handler_filter_flagged.inc	2010-07-29 12:32:07 +0000
 @@ -22,7 +22,7 @@
      parent::options_form($form, $form_state);
      $form['value']['#type'] = 'radios';

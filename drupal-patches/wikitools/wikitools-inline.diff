@@ -1,6 +1,5 @@
-diff -u wikitools-6.x-1.3/wikitools.admin.inc wikitools/wikitools.admin.inc
---- wikitools-6.x-1.3/wikitools.admin.inc	2011-03-11 15:59:43.000000000 -0600
-+++ wikitools/wikitools.admin.inc	2011-03-24 12:41:46.000000000 -0500
+--- a/wikitools.admin.inc	2011-03-11 15:59:43.000000000 -0600
++++ b/wikitools.admin.inc	2011-03-24 12:41:46.000000000 -0500
 @@ -81,6 +81,12 @@
        '#description' => t('If you activate this option, the links of the freelinking filter will be processed by the wikitools module rather than the freelinking module. When active, a link to <em>freelinking/Page Name</em> behaves exactly as a link to <em>wikipath/Page Name</em>.'),
      );
@@ -14,9 +13,8 @@ diff -u wikitools-6.x-1.3/wikitools.admin.inc wikitools/wikitools.admin.inc
    $form['subpages'] = array(
      '#type' => 'fieldset',
      '#title' => t('Subpages'),
-diff -u wikitools-6.x-1.3/wikitools.module wikitools/wikitools.module
---- wikitools-6.x-1.3/wikitools.module	2011-03-11 15:59:43.000000000 -0600
-+++ wikitools/wikitools.module	2011-04-08 12:41:23.000000000 -0500
+--- a/wikitools.module	2011-03-11 15:59:43.000000000 -0600
++++ b/wikitools.module	2011-04-08 12:41:23.000000000 -0500
 @@ -27,6 +27,37 @@
   */
  
@@ -72,9 +70,8 @@ diff -u wikitools-6.x-1.3/wikitools.module wikitools/wikitools.module
  /*
   * Operations
   */
-diff -u wikitools-6.x-1.3/wikitools.pages.inc wikitools/wikitools.pages.inc
---- wikitools-6.x-1.3/wikitools.pages.inc	2011-03-11 15:59:43.000000000 -0600
-+++ wikitools/wikitools.pages.inc	2011-03-24 12:38:24.000000000 -0500
+--- a/wikitools.pages.inc	2011-03-11 15:59:43.000000000 -0600
++++ b/wikitools.pages.inc	2011-03-24 12:38:24.000000000 -0500
 @@ -69,11 +69,15 @@
        // Single match for title.
        $node = current($found_nodes);

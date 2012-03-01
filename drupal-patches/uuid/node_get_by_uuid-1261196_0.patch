@@ -1,5 +1,3 @@
-diff --git a/uuid.module b/uuid.module
-index 875ba1d..26b08b3 100644
 --- a/uuid.module
 +++ b/uuid.module
 @@ -146,27 +146,13 @@ function uuid_views_api() {
