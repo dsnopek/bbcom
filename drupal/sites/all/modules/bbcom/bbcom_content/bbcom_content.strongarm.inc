@@ -75,16 +75,16 @@ function bbcom_content_strongarm() {
   $strongarm->name = 'content_extra_weights_content';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '-2',
-    'revision_information' => '4',
-    'author' => '8',
-    'options' => '9',
-    'comment_settings' => '5',
+    'body_field' => '-1',
+    'revision_information' => '5',
+    'author' => '9',
+    'options' => '10',
+    'comment_settings' => '6',
     'language' => '-3',
     'menu' => '-4',
-    'path' => '6',
-    'lingwo_korpus_settings' => '0',
-    'notifications' => '7',
+    'path' => '7',
+    'lingwo_korpus_settings' => '1',
+    'notifications' => '8',
   );
   $export['content_extra_weights_content'] = $strongarm;
 
@@ -199,6 +199,7 @@ function bbcom_content_strongarm() {
   $strongarm->value = array(
     0 => 'status',
     1 => 'promote',
+    2 => 'revision',
   );
   $export['node_options_content'] = $strongarm;
 
