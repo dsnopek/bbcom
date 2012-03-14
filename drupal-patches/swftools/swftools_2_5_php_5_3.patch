@@ -1,11 +1,5 @@
-? swftools_2_5_php_5_3.patch
-Index: swftools.module
-===================================================================
-RCS file: /cvs/drupal-contrib/contributions/modules/swftools/swftools.module,v
-retrieving revision 1.20.2.16
-diff -u -p -r1.20.2.16 swftools.module
---- swftools.module	18 Apr 2009 23:30:52 -0000	1.20.2.16
-+++ swftools.module	6 Jul 2010 12:58:52 -0000
+--- a/swftools.module	18 Apr 2009 23:30:52 -0000	1.20.2.16
++++ b/swftools.module	6 Jul 2010 12:58:52 -0000
 @@ -497,9 +497,9 @@ function swf($file, $options = array()) 
    // all existing values by reference to allow optional override at the player.module level.
    if (module_hook($resolved_methods->player['module'], 'swftools_flashvars')) {

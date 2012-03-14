@@ -1,5 +1,5 @@
---- includes/language.inc	2011-05-25 15:43:55.000000000 -0500
-+++ includes/language.inc	2011-05-30 10:34:28.000000000 -0500
+--- a/includes/language.inc	2011-05-25 15:43:55.000000000 -0500
++++ b/includes/language.inc	2011-05-30 10:34:28.000000000 -0500
 @@ -24,7 +24,8 @@
      case LANGUAGE_NEGOTIATION_DOMAIN:
        foreach ($languages as $language) {

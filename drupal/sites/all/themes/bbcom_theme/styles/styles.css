@@ -503,6 +503,15 @@ ul.primary li a {
 }
 
 /*
+ * DRS: 'Content' customizations.
+ */
+.field-field-content-level {
+  margin-top: -.5em;
+  margin-bottom: 1em;
+  font-size: 10px;
+}
+
+/*
  * DRS: Comments
  */
 .comment {

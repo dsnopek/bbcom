@@ -11,8 +11,16 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_audio',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '1',
+      'weight' => '2',
       'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
       ),
@@ -23,14 +31,6 @@ function bbcom_content_content_default_fields() {
       'full' => array(
         'format' => 'swftools',
         'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 1,
       ),
       '4' => array(
         'format' => 'default',
@@ -66,7 +66,7 @@ function bbcom_content_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Audio (natural speed)',
-      'weight' => '1',
+      'weight' => '2',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -78,8 +78,16 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_audio_slower',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '2',
+      'weight' => '3',
       'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
       'label' => array(
         'format' => 'above',
       ),
@@ -92,14 +100,6 @@ function bbcom_content_content_default_fields() {
         'exclude' => 0,
       ),
       '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -166,7 +166,7 @@ function bbcom_content_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Audio (slower)',
-      'weight' => '2',
+      'weight' => '3',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -178,8 +178,16 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_content_image',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '-1',
+      'weight' => 0,
       'parent' => '',
+      '2' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
       ),
@@ -188,14 +196,6 @@ function bbcom_content_content_default_fields() {
         'exclude' => 1,
       ),
       'full' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
-      ),
-      '2' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
-      ),
-      '3' => array(
         'format' => 'image_plain',
         'exclude' => 1,
       ),
@@ -246,10 +246,72 @@ function bbcom_content_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Images',
-      'weight' => '-1',
+      'weight' => 0,
       'description' => '',
       'type' => 'imagefield_widget',
       'module' => 'imagefield',
+    ),
+  );
+
+  // Exported field: field_content_level
+  $fields['content-field_content_level'] = array(
+    'field_name' => 'field_content_level',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'weight' => '-1',
+      'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'label' => array(
+        'format' => 'inline',
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '1',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => 'beginner|Beginner
+intermediate|Intermediate
+advanced|Advanced',
+    'allowed_values_php' => '',
+    'widget' => array(
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Level',
+      'weight' => '-2',
+      'description' => 'What level of learners is this text for?',
+      'type' => 'optionwidgets_select',
+      'module' => 'optionwidgets',
     ),
   );
 
@@ -258,8 +320,16 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_remote_url',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '3',
+      'weight' => '4',
       'parent' => '',
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
       ),
@@ -270,14 +340,6 @@ function bbcom_content_content_default_fields() {
       'full' => array(
         'format' => 'default',
         'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 1,
       ),
       '4' => array(
         'format' => 'default',
@@ -309,7 +371,7 @@ function bbcom_content_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Remote URL',
-      'weight' => '3',
+      'weight' => '4',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -321,6 +383,7 @@ function bbcom_content_content_default_fields() {
   t('Audio (natural speed)');
   t('Audio (slower)');
   t('Images');
+  t('Level');
   t('Remote URL');
 
   return $fields;

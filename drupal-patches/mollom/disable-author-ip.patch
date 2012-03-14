@@ -1,6 +1,5 @@
-=== modified file 'sites/all/modules/mollom/mollom.module'
---- sites/all/modules/mollom/mollom.module	2011-02-12 19:01:28 +0000
-+++ sites/all/modules/mollom/mollom.module	2011-04-02 19:56:14 +0000
+--- a/mollom.module	2011-02-12 19:01:28 +0000
++++ b/mollom.module	2011-04-02 19:56:14 +0000
 @@ -1107,7 +1107,7 @@
    }
  

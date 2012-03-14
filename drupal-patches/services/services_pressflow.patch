@@ -1,26 +1,5 @@
-? .svn
-? services_pressflow.patch
-? auth/.svn
-? auth/services_keyauth/.svn
-? servers/.svn
-? servers/xmlrpc_server/.svn
-? services/.svn
-? services/comment_service/.svn
-? services/file_service/.svn
-? services/menu_service/.svn
-? services/node_service/.svn
-? services/search_service/.svn
-? services/system_service/.svn
-? services/taxonomy_service/.svn
-? services/user_service/.svn
-? services/views_service/.svn
-Index: services.module
-===================================================================
-RCS file: /cvs/drupal-contrib/contributions/modules/services/services.module,v
-retrieving revision 1.8.2.88.2.18
-diff -u -p -r1.8.2.88.2.18 services.module
---- services.module	12 May 2010 19:17:06 -0000	1.8.2.88.2.18
-+++ services.module	21 Jun 2010 18:07:39 -0000
+--- a/services.module	12 May 2010 19:17:06 -0000	1.8.2.88.2.18
++++ b/services.module	21 Jun 2010 18:07:39 -0000
 @@ -832,9 +832,11 @@ function services_session_load($sessid) 
      return $user;
    }
