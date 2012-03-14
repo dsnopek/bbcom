@@ -5,7 +5,7 @@ import os, datetime
 
 # I'm a little weary of this being here by default, since I don't want to accidently
 # do something on production (with the exception of pulling data down for testing)
-prod_host = 'dsnopek@bibliobird.com'
+prod_host = 'webuser@bibliobird.com'
 #env.hosts = [prod_host]
 
 env.local_prj_dir = '/home/webuser/prj'
@@ -13,10 +13,10 @@ env.local_drupal_dir = env.local_prj_dir+'/bbcom/drupal'
 env.local_python_env_dir = env.local_prj_dir+'/python-env'
 env.local_drush_alias = '@en.master.bibliobird.vm'
 
-env.remote_prj_dir = '/home/dsnopek/prj';
-env.remote_drupal_dir = env.remote_prj_dir+'/bibliobird/bbcom/drupal'
-env.remote_python_env_dir = env.remote_prj_dir+'/bibliobird/python-env'
-env.remote_drush_alias = '@bibliobird.com'
+env.remote_prj_dir = '/home/webuser/prj';
+env.remote_drupal_dir = env.remote_prj_dir+'/bbcom/drupal'
+env.remote_python_env_dir = env.remote_prj_dir+'/python-env'
+env.remote_drush_alias = '@en.bibliobird.com'
 
 env.repos = ['bbcom','lingwo','lingwo-old']
 
@@ -88,11 +88,14 @@ def _python(*args):
 def pull_live_db():
     """Pull data from the live database and set it up here for testing"""
 
+    drush = _Drush(remote=True)
+
     backup = 'bibliobird-backup.mysql.gz'
 
     with cd(env.remote_drupal_dir):
         with hide('stdout','stderr'):
-            run("drush bam-backup db manual 60a4968e1a793e5a8a20fa52644244e2")
+            drush.run('bam-backup', 'db', 'manual', '60a4968e1a793e5a8a20fa52644244e2')
+            #run("drush bam-backup db manual 60a4968e1a793e5a8a20fa52644244e2".format(env.remote_drush_alias))
         get("{0}/lingwo_backup/manual/{1}".format(env.remote_prj_dir,backup), "/tmp/")
 
     with cd(env.local_drupal_dir):
