@@ -124,7 +124,7 @@ function bbcom_notifications_user($op, &$edit, &$account, $category = NULL) {
         '#options' => $forums,
         //'#default_value' => array_keys($forums),
         // By default, they should be subscribed to "General Discussion"
-        '#default_value' => array(2),
+        //'#default_value' => array(2),
         '#description' => t('The forums you would like to subscribe to.'),
       );
       $form['bbcom_notifications']['send_method'] = array(
