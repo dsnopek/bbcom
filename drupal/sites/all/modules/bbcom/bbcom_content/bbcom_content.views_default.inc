@@ -19,7 +19,7 @@ function bbcom_content_views_default_views() {
   $handler->override_option('relationships', array(
     'entry_hash' => array(
       'label' => 'dictionary entry',
-      'required' => 0,
+      'required' => 1,
       'id' => 'entry_hash',
       'table' => 'lingwo_korpus_entry',
       'field' => 'entry_hash',
@@ -27,7 +27,7 @@ function bbcom_content_views_default_views() {
     ),
     'nid' => array(
       'label' => 'entry node',
-      'required' => 0,
+      'required' => 1,
       'id' => 'nid',
       'table' => 'lingwo_entry_info',
       'field' => 'nid',
@@ -433,7 +433,7 @@ echo $view->total_rows; ?> entries that match this query.');
   $handler->override_option('relationships', array(
     'entry_hash' => array(
       'label' => 'dictionary entry',
-      'required' => 0,
+      'required' => 1,
       'id' => 'entry_hash',
       'table' => 'lingwo_korpus_entry',
       'field' => 'entry_hash',
@@ -441,7 +441,7 @@ echo $view->total_rows; ?> entries that match this query.');
     ),
     'nid' => array(
       'label' => 'entry node',
-      'required' => 0,
+      'required' => 1,
       'id' => 'nid',
       'table' => 'lingwo_entry_info',
       'field' => 'nid',
@@ -449,7 +449,7 @@ echo $view->total_rows; ?> entries that match this query.');
     ),
     'translation' => array(
       'label' => 'Translations',
-      'required' => 0,
+      'required' => 1,
       'language' => 'current',
       'id' => 'translation',
       'table' => 'node',
