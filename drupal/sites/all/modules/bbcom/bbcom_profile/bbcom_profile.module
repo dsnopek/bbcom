@@ -25,8 +25,18 @@ function bbcom_profile_theme() {
   return array(
     'bbcom_profile_badges' => array(
       'arguments' => array('roles' => NULL),
-    )
+    ),
+    'bbcom_profile_founder_number' => array(
+      'arguments' => array('founder_number' => NULL),
+    ),
   );
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function bbcom_profile_perm() {
+  return array('administer founder numbers');
 }
 
 /**
@@ -39,6 +49,17 @@ function bbcom_profile_theme_registry_alter(&$registry) {
   }
 }
 
+function bbcom_profile_get_badges($account) {
+  $roles = array();
+  $titles = variable_get('bbcom_profile_role_titles', array());
+  foreach ($account->roles as $rid => $role) {
+    if (!empty($titles[$rid])) {
+      $roles[] = array('rid' => $rid, 'role' => $role, 'title' => $titles[$rid]);
+    }
+  }
+  return $roles;
+}
+
 /**
  * Implementation of hook_user().
  */
@@ -48,14 +69,8 @@ function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
     unset($account->content['user_picture']);
 
     // integrate the titles and badges
-    $roles = array();
-    $titles = variable_get('bbcom_profile_role_titles', array());
-    foreach ($account->roles as $rid => $role) {
-      if (!empty($titles[$rid])) {
-        $roles[] = array('rid' => $rid, 'role' => $role, 'title' => $titles[$rid]);
-      }
-    }
-    if (!empty($roles)) {
+    $badges = bbcom_profile_get_badges($account);
+    if (!empty($badges)) {
       $account->content['badges'] = array(
         '#type' => 'user_profile_category',
         '#title' => t('Badges'),
@@ -64,9 +79,31 @@ function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
       
       $account->content['badges']['badges'] = array(
         '#type' => 'user_profile_item',
-        '#value' => theme('bbcom_profile_badges', $roles),
+        '#value' => theme('bbcom_profile_badges', $badges),
       );
+
+      if (in_array('founder', $account->roles) && !empty($account->founder_number)) {
+        $account->content['badges']['founder_number'] = array(
+          '#type' => 'user_profile_item',
+          '#value' => theme('bbcom_profile_founder_number', $account->founder_number),
+          '#weight' => 1,
+        );
+      }
     }
+  }
+  else if ($type == 'form' && $category == 'account' && in_array('founder', $account->roles)) {
+    $form = array();
+    $form['founder'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Founding member'),
+      '#access' => user_access('administer founder numbers'),
+    );
+    $form['founder']['founder_number'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Founder number'),
+      '#default_value' => $account->founder_number,
+    );
+    return $form;
   }
 }
 
@@ -126,25 +163,60 @@ function bbcom_profile_profile_alter(&$account) {
 // Theming
 
 function theme_bbcom_profile_badges($roles) {
+  global $language;
+  $langs = array($language->language);
+  if ($language->language != 'en') {
+    $langs[] = 'en';
+  }
+
   $imgs = array();
   $text = array();
   foreach($roles as $role) {
-    $img = str_replace(' ', '-', $role['role']);
-    $img = drupal_get_path('module', 'bbcom_profile') .'/badges/'. $img .'.jpg';
+    $name = str_replace(' ', '-', $role['role']);
 
-    if (file_exists($img)) {
-      $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
+    $found = FALSE;
+    foreach ($langs as $lang) {
+      $img = drupal_get_path('module', 'bbcom_profile') . "/badges/{$lang}/{$name}.png";
+
+      drupal_set_message($img);
+      if (file_exists($img)) {
+        $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
+        $found = TRUE;
+        break;
+      }
     }
-    else {
+    if (!$found) {
       $text[] = '<div class="bbcom-badge">'. check_plain($role['title']) .'</div>';
     }
   }
   return implode('', $imgs) . implode('', $text);
 }
 
+function theme_bbcom_profile_founder_number($founder_number) {
+  return '<p><strong>' . t('Founder number %founder_number', array('%founder_number' => $founder_number)) . '</strong></p>';
+}
+
 function bbcom_profile_pre_preprocess_author_pane_user_picture(&$vars) {
   // tell author_pane to use the 'tiny' imagecache preset
   $vars['picture_preset'] = 'tiny';
+}
+
+function bbcom_profile_preprocess_author_pane(&$vars) {
+  $account = $vars['account'];
+
+  $badges = array();
+  foreach (bbcom_profile_get_badges($account) as $badge) {
+    if (in_array($badge['role'], array('admin', 'founder1', 'founder2', 'founder3'))) {
+      $badges[] = $badge;
+    }
+  }
+  if (!empty($badges)) {
+    $vars['user_badges'] = theme('bbcom_profile_badges', $badges);
+
+    if (in_array('founder', $account->roles) && !empty($account->founder_number)) {
+      $vars['user_badges'] .= theme('bbcom_profile_founder_number', $account->founder_number);
+    }
+  }
 }
 
 function bbcom_profile_preprocess_node($vars) {
