@@ -7,7 +7,7 @@ function bbcom_profile_strongarm() {
   $export = array();
 
   $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'bbcom_profile_role_titles';
   $strongarm->value = array(
@@ -19,6 +19,10 @@ function bbcom_profile_strongarm() {
     4 => '',
     10 => 'Verified editor',
     12 => 'Source editor',
+    13 => '',
+    14 => 'Founder',
+    15 => 'Founder',
+    16 => 'Founder',
     11 => '',
     6 => '',
     8 => '',

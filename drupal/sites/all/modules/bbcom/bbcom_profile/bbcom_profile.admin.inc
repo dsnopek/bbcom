@@ -10,7 +10,7 @@ function bbcom_profile_admin_settings() {
   $form['bbcom_misc_role_titles'] = array(
     '#type' => 'fieldset',
     '#title' => t('Role titles'),
-	'#tree' => TRUE,
+    '#tree' => TRUE,
   );
 
   $values = variable_get('bbcom_profile_role_titles', array());
