@@ -14,7 +14,7 @@ Drupal.behaviors.bibliobird = function (context) {
     } catch(e) { };
 
     /* Warn the user about remote links. */
-    $("a[@rel='remote']").click(function (evt) {
+    $("a[rel='remote']").click(function (evt) {
         if (!confirm(Drupal.t('This text is located on an external site.  Do you want to continue?'))) {
             evt.preventDefault();
             return false;
