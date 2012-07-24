@@ -265,7 +265,8 @@ div.messages ul {
   margin-top: 15px;
 }
 */
-#content-wrapper {
+#content-wrapper,
+.modalframe-page-wrapper {
   background-color: white;
   border: 1px solid black;
 
