@@ -178,7 +178,6 @@ function theme_bbcom_profile_badges($roles) {
     foreach ($langs as $lang) {
       $img = drupal_get_path('module', 'bbcom_profile') . "/badges/{$lang}/{$name}.png";
 
-      drupal_set_message($img);
       if (file_exists($img)) {
         $imgs[] = theme('image', $img, $role['title'], $role['title'], array('class' => 'bbcom-badge'), TRUE);
         $found = TRUE;
