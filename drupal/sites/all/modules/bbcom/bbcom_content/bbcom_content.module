@@ -57,6 +57,27 @@ function bbcom_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     drupal_add_js(drupal_get_path('module', 'flag') .'/theme/flag.js');
     drupal_add_css(drupal_get_path('module', 'flag') .'/theme/flag.css');
   }
+  elseif ($node->type == LingwoEntry::$settings->content_type && $op == 'update') {
+    // TODO: should this work with the 'translation' module's 'retranslate' checkbox instead?
+    $flag = flag_get_flag('verified');
+    if ($flag) {
+      // if it isn't set as verified by the current usuer, remove the verified flag for everyone on this node
+      if (!$node->flag['verified']) {
+        db_query("DELETE FROM {flag_content} WHERE fid = %d AND content_id = %d", $flag->fid, $node->nid);
+        db_query("DELETE FROM {flag_counts} WHERE fid = %d AND content_id = %d", $flag->fid, $node->nid);
+      }
+
+      // if this is a source node, remove the verified flag from all the nodes translations
+      if (empty($node->tnid) || $node->tnid == $node->nid) {
+        foreach (translation_node_get_translations($node->nid) as $lang_name => $trans) {
+          if ($trans->nid != $node->nid) {
+            db_query("DELETE FROM {flag_content} WHERE fid = %d AND content_id = %d", $flag->fid, $trans->nid);
+            db_query("DELETE FROM {flag_counts} WHERE fid = %d AND content_id = %d", $flag->fid, $trans->nid);
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
