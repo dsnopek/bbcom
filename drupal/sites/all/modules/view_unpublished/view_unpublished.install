@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implementation of hook_install()
+ */
+function view_unpublished_install() {
+  // Make sure that the view_unpublished module runs after other access modules.
+  db_query("UPDATE {system} SET weight = 1 WHERE name = 'view_unpublished' AND type = 'module' AND weight = 0");
+}
+
+/**
+ * Make sure that the view_unpublished module runs after other access modules.
+ */
+function view_unpublished_update_6000() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 1 WHERE name = 'view_unpublished' AND type = 'module' AND weight = 0");
+  return $ret;
+}
