@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Allow users to view all unpublished nodes, or unpublished nodes
+ * of a specific type.
+ */
+
+/**
+ * Implementation of hook_perm().
+ *
+ * Adds a global 'view all unpublished content' permission and also
+ * a new permission for each content type.
+ */
+function view_unpublished_perm() {
+  $perms = array('view all unpublished content');
+
+  foreach (node_get_types() as $type => $name) {
+    $perms[] = 'view unpublished ' . $type . ' content';
+  }
+
+  return $perms;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ *
+ * Modifies the path node/nid to use our access callback.
+ */
+function view_unpublished_menu_alter(&$items) {
+  $old_access_callback = $items['node/%node']['access callback'];
+  $old_access_arguments = $items['node/%node']['access arguments'];
+  $items['node/%node']['access callback'] = '_view_unpublished_node_access';
+  $items['node/%node']['access arguments'] = array(1, $old_access_callback, $old_access_arguments);
+}
+
+/**
+ * Returns true if the user has 'view all unpublished content' or if
+ * they have the permission corresponding to the node's content type.
+ */
+function _view_unpublished_node_access($node, $old_access_callback, $old_access_arguments) {
+  // Only check permissions on nodes that are unpublished.
+  if ($node->status == 0) {
+    if (user_access('view all unpublished content')) {
+      return TRUE;
+    }
+
+    if (user_access('view unpublished ' . $node->type . ' content')) {
+      return TRUE;
+    }
+  }
+  // If none of the above conditions were satisfied, then use the original callback.
+  $old_access_arguments[1] = $node; // arg 1 is node object
+  return call_user_func_array($old_access_callback, $old_access_arguments);
+}
+
+/**
+ * Implementation of hook_views_data_alter()
+ */
+function view_unpublished_views_data_alter(&$data) {
+  // published status + extra handler is taken over by our handler
+  $data['node']['status_extra']['filter']['handler'] = 'view_unpublished_handler_filter_node_status';
+}
+
+
+/**
+ * Implementation of hook_views_handlers()
+ */
+function view_unpublished_views_handlers() {
+  return array(
+    'info' => array(
+      'path' => drupal_get_path('module', 'view_unpublished'),
+    ),
+    'handlers' => array(
+      'view_unpublished_handler_filter_node_status' => array(
+        'parent' => 'views_handler_filter_node_status',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_views_query_substitutions().
+ */
+function view_unpublished_views_query_substitutions() {
+  $substitutions = array(
+    '***VIEWALLUNPUBLISHED_NODES***' => intval(user_access('view all unpublished content')),
+  );
+
+  foreach (node_get_types() as $type => $name) {
+    $substitutions["***VIEWUNPUBLISHED_$type***"] = intval(user_access('view unpublished ' . $type . ' content'));
+  }
+
+  return $substitutions;
+}
