@@ -1,0 +1,19 @@
+<?php
+
+include_once('bbcom_exercises.features.inc');
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function bbcom_exercises_menu_alter(&$items) {
+  // make the node/add/% menu for all the question types a callback, so they don't
+  // clutter up the 'Create content' menu.
+  $quiz_question_types = array_keys(_quiz_get_question_types());
+  foreach ($quiz_question_types as $type) {
+    $menu_name = 'node/add/' . str_replace('_', '-', $type);
+    if (isset($items[$menu_name])) {
+      $items[$menu_name]['type'] = MENU_CALLBACK;
+    }
+  }
+}
+
