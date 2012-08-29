@@ -17,3 +17,22 @@ function bbcom_exercises_menu_alter(&$items) {
   }
 }
 
+/**
+ * Implementation of hook_form_quiz_questions_form_alter().
+ */
+function bbcom_exercises_form_quiz_questions_form_alter(&$form, &$form_state) {
+  // TODO: add some hooks to 'quiz' to allow us to filter what is in the browser, rather than
+  // removing it entirely.
+
+  // disable the question browser - we want questions to only exist on a single quiz
+  $form['question_list']['browser']['#access'] = FALSE;
+  if (isset($form['question_list']['no_questions'])) {
+    $form['question_list']['no_questions']['#value'] = '<div id = "no-questions">'. t('There are currently no questions in this quiz. Use the links above to create new questions.') .'</div>';
+  }
+
+  // disable the ability to remove a question from a quiz - you have to delete the node
+  foreach ($form['question_list']['stayers'] as $id => &$element) {
+    $element['#access'] = FALSE;
+  }
+}
+
