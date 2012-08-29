@@ -143,6 +143,13 @@ function bbcom_exercises_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'multichoice_def_num_of_alts';
+  $strongarm->value = '4';
+  $export['multichoice_def_num_of_alts'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_options_long_answer';
   $strongarm->value = array(
     0 => 'status',
@@ -267,6 +274,69 @@ function bbcom_exercises_strongarm() {
   $strongarm->name = 'notifications_content_type_truefalse';
   $strongarm->value = array();
   $export['notifications_content_type_truefalse'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_autotitle_length';
+  $strongarm->value = '50';
+  $export['quiz_autotitle_length'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_auto_revisioning';
+  $strongarm->value = 1;
+  $export['quiz_auto_revisioning'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_def_uid';
+  $strongarm->value = '1';
+  $export['quiz_def_uid'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_durod';
+  $strongarm->value = 1;
+  $export['quiz_durod'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_index_questions';
+  $strongarm->value = 0;
+  $export['quiz_index_questions'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_max_result_options';
+  $strongarm->value = '0';
+  $export['quiz_max_result_options'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_name';
+  $strongarm->value = 'Exercises';
+  $export['quiz_name'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_remove_partial_quiz_record';
+  $strongarm->value = '0';
+  $export['quiz_remove_partial_quiz_record'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'quiz_use_passfail';
+  $strongarm->value = 0;
+  $export['quiz_use_passfail'] = $strongarm;
 
   return $export;
 }
