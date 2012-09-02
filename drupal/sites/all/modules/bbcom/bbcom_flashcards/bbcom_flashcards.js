@@ -11,7 +11,7 @@ Drupal.behaviors.bibliobird_flashcards = function (context) {
         .insertAfter($('#bibliobird-flashcards-flashcard', context));
 
     // setup our tabs
-    $('#bibliobird-flashcards-study-options-tabs', context).tabs();
+    $('#bibliobird-flashcards-study-options', context).tabs();
 
     // should use .unwrap() but this is jquery 1.2
     $('#tab-new-cards fieldset, #tab-reviews fieldset', context).each(function () {
