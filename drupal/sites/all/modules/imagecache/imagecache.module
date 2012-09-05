@@ -87,6 +87,7 @@ function imagecache_menu() {
  */
 function _imagecache_menu_access_public_files() {
   //return (FILE_DOWNLOADS_PUBLIC == variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC));
+  return TRUE;
 }
 
 /**
