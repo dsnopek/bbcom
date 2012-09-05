@@ -1,0 +1,38 @@
+<?php
+
+include_once('bbcom_exercises.features.inc');
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function bbcom_exercises_menu_alter(&$items) {
+  // make the node/add/% menu for all the question types a callback, so they don't
+  // clutter up the 'Create content' menu.
+  $quiz_question_types = array_keys(_quiz_get_question_types());
+  foreach ($quiz_question_types as $type) {
+    $menu_name = 'node/add/' . str_replace('_', '-', $type);
+    if (isset($items[$menu_name])) {
+      $items[$menu_name]['type'] = MENU_CALLBACK;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_quiz_questions_form_alter().
+ */
+function bbcom_exercises_form_quiz_questions_form_alter(&$form, &$form_state) {
+  // TODO: add some hooks to 'quiz' to allow us to filter what is in the browser, rather than
+  // removing it entirely.
+
+  // disable the question browser - we want questions to only exist on a single quiz
+  $form['question_list']['browser']['#access'] = FALSE;
+  if (isset($form['question_list']['no_questions'])) {
+    $form['question_list']['no_questions']['#value'] = '<div id = "no-questions">'. t('There are currently no questions in this quiz. Use the links above to create new questions.') .'</div>';
+  }
+
+  // disable the ability to remove a question from a quiz - you have to delete the node
+  foreach ($form['question_list']['stayers'] as $id => &$element) {
+    $element['#access'] = FALSE;
+  }
+}
+
