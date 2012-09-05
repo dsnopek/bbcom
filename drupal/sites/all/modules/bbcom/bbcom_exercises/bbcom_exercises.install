@@ -18,7 +18,7 @@ function bbcom_exercises_install() {
     'summary_default' => NULL,
     'randomization' => 0,
     'backwards_navigation' => 1,
-    'keep_results' => 2,
+    'keep_results' => 1,
     'repeat_until_correct' => 1,
     'feedback_time' => 1,
     'display_feedback' => 1,
