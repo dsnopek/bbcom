@@ -157,4 +157,9 @@ DirectoryIndex index.php
   </IfModule>
 </FilesMatch>
 
+# DRS: make sure that the appropriate caching takes place with HTTPS
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+  Header set Cache-Control "public, must-revalidate, max-age=1209600"
+</FilesMatch>
+
 # $Id: .htaccess,v 1.90.2.5 2010/02/02 07:25:22 dries Exp $
