@@ -1,0 +1,138 @@
+/* $Id: upgrade_status.css,v 1.6 2010/09/05 00:18:42 sun Exp $ */
+
+.upgrade-status .project {
+  font-size: 110%;
+  padding: 0.3em 0 0 1em;
+}
+
+.upgrade-status .project .collapse-icon {
+  margin: 0 .3em 0 0;
+  padding: .4em .8em .7em 0;
+  display: block;
+  float: left;
+  cursor: pointer;
+}
+.upgrade-status .project .project-title {
+  font-weight: bold;
+}
+.upgrade-status .project .existing-version {
+  font-size: 90%;
+}
+
+.upgrade-status .version-status {
+  float: right; /* LTR */
+  padding-right: 10px; /* LTR */
+  font-weight: normal;
+  height: 20px;
+  line-height: 145%;
+}
+
+.upgrade-status .version-status .icon {
+  display: inline-block;
+  padding-left: .5em; /* LTR */
+  width: 17px;
+}
+.upgrade-status .version-status .icon img {
+  vertical-align: middle;
+}
+
+.upgrade-status .details-wrapper {
+  clear: both;
+  padding: 0 3.1em 0 1.8em;
+  font-weight: normal;
+  font-size: 90%;
+}
+
+.upgrade-status .version-date {
+  white-space: nowrap;
+}
+
+.upgrade-status .info {
+  margin: 0;
+  padding: 1em 0 .25em;
+}
+
+.upgrade-status tr td {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+.upgrade-status tr.error {
+  background: #fcc;
+}
+
+.upgrade-status tr.error .version-recommended {
+  background: #fdd;
+}
+
+.upgrade-status tr.ok {
+  background: #dfd;
+}
+
+.upgrade-status tr.warning {
+  background: #ffd;
+}
+
+.upgrade-status tr.warning .version-recommended {
+  background: #ffe;
+}
+
+.current-version, .new-version {
+  direction: ltr; /* Note: version numbers should always be LTR. */
+}
+
+.upgrade-status tr.unknown {
+  background: #fff;
+  color: #777;
+}
+
+table.upgrade-status,
+.upgrade-status table.version {
+  width: 100%;
+  margin-top: .5em;
+}
+
+.upgrade-status table.version tbody {
+  border: none;
+}
+
+.upgrade-status table.version tr,
+.upgrade-status table.version td {
+  line-height: .9em;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.upgrade-status table.version .version-title {
+  width: 14em;
+}
+
+.upgrade-status table.version .version-details {
+  padding-right: .5em; /* LTR */
+}
+
+.upgrade-status table.version .version-links {
+  text-align: right; /* LTR */
+}
+
+.upgrade-status table.version-security .version-title {
+  color: #970F00;
+}
+
+.upgrade-status table.version-recommended-strong .version-title {
+  font-weight: bold;
+}
+
+.upgrade-status .security-error {
+  font-weight: bold;
+  color: #970F00;
+}
+
+.upgrade-status-settings .form-select {
+  width: 12em;
+}
+
+.upgrade-status .check-manually {
+  padding-left: 1em; /* LTR */
+}

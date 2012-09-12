@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * premium_access module install file.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function premium_access_schema() {
+  $schema = array();
+
+  $schema['premium_access'] = array(
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('nid', 'uid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function premium_access_install() {
+  drupal_install_schema('premium_access');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function premium_access_uninstall() {
+  drupal_uninstall_schema('premium_access');
+}
+

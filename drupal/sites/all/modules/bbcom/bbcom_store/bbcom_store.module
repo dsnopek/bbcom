@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Implementation of hook_init().
+ *
+ * Set the current country based on the current language.
+ *
+ */
+function bbcom_store_init() {
+  global $language;
+
+  if (module_exists('uc_store')) {
+    // kind of a hack where the country code equals the language code
+    $countries = uc_get_country_data(array('country_iso_code_2' => $language->language));
+    if (!empty($countries)) {
+      uc_multiprice_country_id($countries[0]['country_id']);
+    }
+    else {
+      uc_multiprice_country_id(uc_store_default_country());
+    }
+  }
+}
+

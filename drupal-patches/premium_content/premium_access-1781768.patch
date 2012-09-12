@@ -1,0 +1,13 @@
+diff --git a/premium.module b/premium.module
+index 6670e05..ff99177 100644
+--- a/premium.module
++++ b/premium.module
+@@ -352,7 +352,7 @@ function premium_user_content_access(&$node, $account = NULL) {
+   // Access is granted or revoked explicitly.
+   foreach (module_implements('premium_access') as $name) {
+     $function = $name . '_premium_access';
+-    if (is_bool($access = $function($node, $teaser))) {
++    if (is_bool($access = $function($node, $account))) {
+       return $access;
+     }
+   }

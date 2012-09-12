@@ -1,0 +1,17 @@
+// $Id: CHANGELOG.txt,v 1.10 2010/10/12 22:35:25 sun Exp $
+
+Upgrade Assist 6.x-1.x, xxxx-xx-xx
+----------------------------------
+
+
+Upgrade Assist 6.x-1.1, 2010-10-12
+----------------------------------
+by sun: Fixed post-upgrade handling of previously disabled modules.
+by sun: Fixed fatal errors after upgrading.
+by sun: Fixed pre/post-upgrade handling of disabled modules.
+by sun: Fixed project download instructions.
+by sun: Fixed post upgrade path.
+by sun: Added more upgrade steps, filled out some gaps.
+by sun: Revamped for Drupal X.
+by sun: Added first draft of Upgrade Assist module.
+

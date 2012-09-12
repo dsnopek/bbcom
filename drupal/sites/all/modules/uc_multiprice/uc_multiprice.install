@@ -1,0 +1,219 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for uc_multiprice.module
+ */
+
+function uc_multiprice_schema() {
+  $schema = array();
+
+  $schema['uc_multiprice'] = array(
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'country_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'list_price' => array(
+        'description' => t('Suggested retail price.'),
+        'type' => 'numeric',
+        'precision' => 15,
+        'scale' => 3,
+        'not null' => TRUE,
+        'default' => 0.0,
+      ),
+      'cost' => array(
+        'description' => t('The amount the store pays to sell the product.'),
+        'type' => 'numeric',
+        'precision' => 15,
+        'scale' => 3,
+        'not null' => TRUE,
+        'default' => 0.0,
+      ),
+      'sell_price' => array(
+        'description' => t('The amount the customer pays for the product.'),
+        'type' => 'numeric',
+        'precision' => 15,
+        'scale' => 3,
+        'not null' => TRUE,
+        'default' => 0.0,
+      ),
+      'data' => array(
+        'description' => 'Extra data.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'role_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+  );
+
+  $schema['uc_multiprice_currencies'] = array(
+    'fields' => array(
+      'country_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'currency_code' => array(
+        'type' => 'char',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '   ',
+      ),
+      'sign' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'not null',
+        'default' => '$',
+      ),
+      'sign_after' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'prec' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 2,
+      ),
+      'deci' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => '.',
+      ),
+      'thou' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => ',',
+      ),
+    ),
+    'primary keys' => array('country_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_multiprice_install() {
+  drupal_install_schema('uc_multiprice');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_multiprice_uninstall() {
+  drupal_uninstall_schema('uc_multiprice');
+  $variables = array(
+    'uc_multiprice_default',
+    'uc_multiprice_roles',
+    'uc_multiprice_roles_fallback',
+    'uc_multiprice_currency_disable_unpriced_product'
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}
+
+function uc_multiprice_update_6001() {
+  $ret = array();
+
+  $schema = array(
+    'fields' => array(
+      'country_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'currency_code' => array(
+        'type' => 'char',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '   ',
+      ),
+      'sign' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'not null',
+        'default' => '$',
+      ),
+      'sign_after' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'prec' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 2,
+      ),
+      'deci' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => '.',
+      ),
+      'thou' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => ',',
+      ),
+    ),
+    'primary keys' => array('country_id'),
+  );
+
+  db_create_table($ret, 'uc_multiprice_currencies', $schema);
+  $ret[] = update_sql("INSERT INTO {uc_multiprice_currencies} (country_id, currency_code) VALUES (840, 'USD')");
+
+  return $ret;
+}
+
+function uc_multiprice_update_6002() {
+  $ret = array();
+  db_add_field($ret, 'uc_multiprice', 'data', array(
+        'description' => 'Extra data.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ));
+  return $ret;
+}
+
+function uc_multiprice_update_6003() {
+  $ret = array();
+  db_add_field($ret, 'uc_multiprice', 'role_id', array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ));
+  return $ret;
+}

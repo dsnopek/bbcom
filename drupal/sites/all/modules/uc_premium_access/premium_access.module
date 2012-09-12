@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Implementation of hook_premium_access().
+ */
+function premium_access_premium_access($node, $account = NULL) {
+  global $user;
+
+  // For when this patch is missing: http://drupal.org/node/1781768
+  if (empty($account)) {
+    $account = $user;
+  }
+
+  if (db_result(db_query("SELECT 1 FROM {premium_access} WHERE nid = %d AND uid = %d", $node->nid, $account->uid))) {
+    return TRUE;
+  }
+
+  // Don't return anything - let other modules decide!
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function premium_access_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'delete':
+      db_query("DELETE FROM {premium_access} WHERE nid = %d", $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function premium_access_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'delete':
+      db_query("DELETE FROM {premium_access} WHERE uid = %d", $account->uid);
+      break;
+  }
+}
+
+/**
+ * Grants or revokes access to a node for a given uid.
+ */
+function premium_access_op($op, $nid, $uid) {
+  switch ($op) {
+    case 'grant':
+      db_query("INSERT INTO {premium_access} (nid, uid) VALUES (%d, %d)", $nid, $uid);
+      break;
+
+    case 'revoke':
+      db_query("DELETE FROM {premium_access} WHERE nid = %d AND uid = %d", $nid, $uid);
+      break;
+  }
+}
+

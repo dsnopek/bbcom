@@ -1,0 +1,209 @@
+<?php
+
+/*******************************************************************************
+ * Hook Functions (Drupal)
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_transferuj_menu() {
+
+    // Always accessible, helps for testing while site is offline.
+    $items['uc_transferuj/ipn'] = array(
+      'title' => t('Transferuj IPN'),
+      'page callback' => 'uc_transferuj_ipn',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    );
+
+    // Callback functions for Website Payments Standard.
+    $items['uc_transferuj/wps/complete'] = array(
+      'title' => t('Transferuj payment complete'),
+      'page callback' => 'uc_transferuj_complete',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    );
+    
+  return $items;
+}
+
+/**
+ * Implementation of hook_payment_method().
+ */
+function uc_transferuj_payment_method() {
+  $path = base_path() . drupal_get_path('module', 'uc_transferuj');
+  $title1 ='<img src="http://transferuj.pl/img/t.ico" />'.t('Transferuj.pl');
+
+  $methods[] = array(
+    'id' => 'transferuj_wps',
+    'name' => t('Transferuj.pl'),
+    'title' => $title1,
+    'review' => t('Transferuj.pl'),
+    'desc' => t('Redirect users to submit payments through Moneybookers.'),
+    'callback' => 'uc_payment_method_transferuj_wps',
+    'weight' => 1,
+    'checkout' => FALSE,
+    'no_gateway' => TRUE,
+  );
+
+  
+  return $methods;
+}
+
+function uc_payment_method_transferuj_wps($op, &$arg1){
+switch ($op) {
+
+    case 'settings':
+      $form['uc_transferuj_wps_ids'] = array(
+        '#type' => 'textfield',
+        '#title' => t('ID Sprzedawcy'),
+        '#description' => t('ID sprzedawcy przydzielone przez transferuj.pl'),
+        '#default_value' => variable_get('uc_transferuj_wps_ids', '0'),
+      );
+      $form['uc_transferuj_wps_kodp'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Kod Potwierdzający'),
+        '#description' => t('Taki sam jak wpisany w panelu transferuj.pl'),
+        '#default_value' => variable_get('uc_transferuj_wps_kodp', '0'),
+      );
+      $form['uc_transferuj_wps_tekstp'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Tekst Powrotu'),
+        '#description' => t('Zostanie wyświetlony na przycisku, powrotu do sklepu'),
+        '#default_value' => variable_get('uc_transferuj_wps_tekstp', ''),
+      );
+
+      return $form;
+
+}
+}
+
+function uc_transferuj_ipn($order_id = 0) {
+//tutaj odbieramy dane od transferuj.pl
+
+if(!empty($_POST) && $_SERVER['REMOTE_ADDR']=='195.149.229.109') // weryfikuj IP serwera
+{
+
+	$sid=variable_get('uc_transferuj_wps_ids','0');
+	$tr_id=$_POST['tr_id'];
+	$tr_amount=$_POST['tr_amount'];
+	$tr_crc=$_POST['tr_crc'];
+	$kod=variable_get('uc_transferuj_wps_kodp','0');
+	
+	if(md5($sid.$tr_id.$tr_amount.$tr_crc.$kod)==$_POST['md5sum'])
+	{
+		$tr_paid=$_POST['tr_paid'];
+		$orderid=base64_decode($_POST['tr_crc']);
+		if ($orderid!=$order_id){
+    echo "błąd";
+    }
+    
+    $order = uc_order_load($order_id);
+    if ($order == FALSE) {
+      watchdog('uc_transferuj', t('IPN attempted for non-existent order.'), WATCHDOG_ERROR);
+      return;
+    }
+    
+		$status_transakcji = $_POST['tr_status'];
+		if ($status_transakcji=='TRUE')
+		{
+		   $comment = t('Transferuj.pl zamówienie ID: @txn_id', array('@txn_id' => $order_id));
+			 uc_payment_enter($order_id, 'transferuj_wps', $tr_amount, $order->uid, NULL, $comment);
+       uc_cart_complete_sale($order);
+		} else{
+			//status oczekuje 
+			uc_order_update_status($order_id, 'pending');
+      uc_order_comment_save($order_id, 0, t('Transakcja nie opłacona'), 'admin');
+		}
+		
+	}
+	else
+	{
+		// odebrane dane są błędne - obsłużyć to jakoś
+		echo "Błąd źródła";
+	}
+}
+echo "TRUE";
+exit;
+}
+
+function uc_transferuj_complete($order_id = 0) {
+
+if (intval($_SESSION['cart_order']) != $order_id) {
+    $_SESSION['cart_order'] = $order_id;
+  }
+
+  if (!($order = uc_order_load($order_id))) {
+    drupal_goto('cart');
+  }
+
+  // This lets us know it's a legitimate access of the complete page.
+  $_SESSION['do_complete'] = TRUE;
+
+  drupal_goto('cart/checkout/complete');
+}
+
+function uc_transferuj_wps_form($form_state,$order) {
+
+  $ids=variable_get('uc_transferuj_wps_ids','0');
+  $kodp=variable_get('uc_transferuj_wps_kodp','0');
+  $kwota=$order->order_total;
+  $otr="Zamówienie nr: ".$order->order_id;
+  $mail=$order->primary_email;
+  $nazwisko=$order->billing_last_name;
+  $imie=$order->billing_first_name;
+  $adres=$order->billing_street1." ".$order->billing_street2;
+  $miasto=$order->billing_city;
+  $kod=$order->billing_postal_code;
+  $crc = base64_encode($order->order_id);
+  $suma = md5($ids.$kwota.$crc.$kodp);
+  $telefon=$order->billing_phone;
+  $notify=url('uc_transferuj/ipn/'. $order->order_id, array('absolute' => TRUE));
+  $goBackURL=url('uc_transferuj/wps/complete/'. $order->order_id, array('absolute' => TRUE));
+  $dane=array(
+    'id'=>$ids,
+    'kwota'=>$kwota,
+    'opis'=>$otr,
+    'email'=>$mail,
+    'nazwisko'=>$nazwisko,
+    'imie'=>$imie,
+    'adres'=>$adres,
+    'miasto'=>$miasto,
+    'kraj'=>'Polska',
+    'kod'=>$kod,
+    'crc'=>$crc,
+    'md5sum'=>$suma,
+    'telefon'=>$telefon,
+    'pow_tekst'=>$tekstp,
+    'wyn_url'=>$notify,
+    'pow_url'=>$goBackURL
+  );
+  $form['#action'] = 'https://secure.transferuj.pl';
+  foreach ($dane as $name => $value) {
+    if (!empty($value)) {
+      $form[$name] = array('#type' => 'hidden', '#value' => $value);
+    }
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'zapłać z transferuj.pl',
+  );
+
+  return $form;
+
+}
+
+function uc_transferuj_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
+    $order = uc_order_load($order_id);
+    if ($order->payment_method == 'transferuj_wps') {
+      unset($form['submit']);
+      $form['#prefix'] = '<table style="display: inline; padding-top: 1em;"><tr><td>';
+      $form['#suffix'] = '</td><td>'. drupal_get_form('uc_transferuj_wps_form', $order) .'</td></tr></table>';
+    }
+  }
+}
+
+?>

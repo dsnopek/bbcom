@@ -1,0 +1,62 @@
+<?php
+// $Id: upgrade_assist.install,v 1.3 2010/10/11 02:58:55 sun Exp $
+
+/**
+ * @file
+ * Installation functions for Upgrade Assist.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function upgrade_assist_install() {
+  // Ensure that potential constants are defined.
+  drupal_load('module', 'system');
+
+  // Figure out current major versions.
+  $core = (defined('DRUPAL_CORE_COMPATIBILITY') ? DRUPAL_CORE_COMPATIBILITY : VERSION);
+  preg_match('@^(\d+)@', $core, $matches);
+  $core = (int) $matches[0];
+
+  switch ($core) {
+    case 6:
+      $core_current = db_result(db_query("SELECT schema_version FROM {system} WHERE type = 'module' AND name = 'system'"));
+      break;
+
+    case 7:
+      $core_current = db_query("SELECT schema_version FROM {system} WHERE type = 'module' AND name = 'system'")->fetchField();
+      break;
+  }
+  $core_current = (int) $core_current[0];
+
+  variable_set('upgrade_assist_core', $core);
+  variable_set('upgrade_assist_core_current', $core_current);
+}
+
+/**
+ * Implements hook_enable().
+ */
+function upgrade_assist_enable() {
+  // Try to auto-enable the upgrade tasks block. Requires a 'left' region.
+  _block_rehash();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function upgrade_assist_uninstall() {
+  variable_del('upgrade_assist_core');
+  variable_del('upgrade_assist_core_current');
+}
+
+if (DRUPAL_CORE_COMPATIBILITY == '7.x') {
+  /**
+   * Update the stored version of Drupal core.
+   */
+  function upgrade_assist_update_7000() {
+    preg_match('@^(\d+)@', DRUPAL_CORE_COMPATIBILITY, $matches);
+    $core = (int) $matches[0];
+    variable_set('upgrade_assist_core', $core);
+  }
+}
+

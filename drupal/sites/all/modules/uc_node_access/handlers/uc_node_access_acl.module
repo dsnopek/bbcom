@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Integrates UC Node Access with ACL and Content Access for granting node
+ * access on purchase.
+ */
+
+/**
+ * Implementation of hook_ucna_handler().
+ */
+function uc_node_access_acl_ucna_handler() {
+  $handlers = array();
+
+  $handlers[] = array(
+    'title' => t('ACL/Content Access'),
+    'callback' => 'ucna_handler_acl_content_access',
+  );
+
+  return $handlers;
+}
+
+// Controls the default node access system using ACL + Content Access.
+function ucna_handler_acl_content_access($op, $nid, $uid) {
+  switch ($op) {
+    case 'grant':
+      // Load the ID for the Access Control List.
+      $acl_id = acl_get_id_by_name('content_access', 'view_'. $nid);
+
+      // Create a new one if it didn't already exist.
+      if (!$acl_id) {
+        $acl_id = acl_create_new_acl('content_access', 'view_'. $nid);
+      }
+
+      // Add the target node to the list.
+      acl_node_add_acl($nid, $acl_id, TRUE, FALSE, FALSE);
+
+      // Add the user to the Access Control List for the target node.
+      acl_add_user($acl_id, $uid);
+
+      break;
+
+    case 'revoke':
+      // Load the ID for the Access Control List.
+      $acl_id = acl_get_id_by_name('content_access', 'view_'. $nid);
+
+      // Remove the user from the ACL.
+      if ($acl_id) {
+        acl_remove_user($acl_id, $uid);
+      }
+
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function uc_node_access_acl_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'content_access_page') {
+    // Get the list of users from the form.
+    $users = unserialize($form['acl']['view']['user_list']['#default_value']);
+
+    // Load up all the expirations for this node and add them to the names.
+    $result = db_query("SELECT uid, expiration FROM {uc_node_access_expirations} WHERE access_nid = %d", $form['#parameters'][2]->nid);
+    while ($row = db_fetch_array($result)) {
+      $users[$row['uid']] .= ' - '. t('Expires @date', array('@date' => format_date($row['expiration'], 'small')));
+    }
+
+    // Stuff the data back in the form.
+    $form['acl']['view']['user_list']['#default_value'] = serialize($users);
+  }
+}

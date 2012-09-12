@@ -1,0 +1,5 @@
+name = Premium field access
+description = Field access based on access to node's premium content. 
+package = Content
+core = 6.x
+dependencies[] = premium

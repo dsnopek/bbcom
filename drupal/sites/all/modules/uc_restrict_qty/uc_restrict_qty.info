@@ -1,0 +1,11 @@
+name = UC Restrict Qty
+description = Restrict the quantity on specified products so that only specified quantity may be purchased at a time.
+dependencies[] = uc_cart
+package = Ubercart - extra
+core = 6.x
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "uc_restrict_qty"
+datestamp = "1298620523"
+

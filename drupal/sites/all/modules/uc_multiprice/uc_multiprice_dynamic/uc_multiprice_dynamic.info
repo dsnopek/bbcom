@@ -1,0 +1,12 @@
+name = Multiprice Dynamic price
+description = Allows dynamic calculation of the price
+package = "Ubercart - extra"
+dependencies[] = uc_multiprice
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "uc_multiprice"
+datestamp = "1298620506"
+

@@ -1,0 +1,12 @@
+; $Id: upgrade_status.info,v 1.3 2010/09/04 23:53:07 sun Exp $
+name = Upgrade status
+description = Checks to see if the installed modules are available for the next major version of Drupal.
+core = 6.x
+dependencies[] = update
+
+; Information added by drupal.org packaging script on 2010-10-12
+version = "6.x-1.1"
+core = "6.x"
+project = "upgrade_status"
+datestamp = "1286923264"
+

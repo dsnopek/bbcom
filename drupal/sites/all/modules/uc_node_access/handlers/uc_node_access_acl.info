@@ -1,0 +1,16 @@
+name = UC Node Access ACL
+description = Integrates UC Node Access with ACL and Content Access for granting node access on purchase.
+dependencies[] = uc_node_access
+dependencies[] = acl
+dependencies[] = content_access
+package = Access control
+core = 6.x
+php = 5.0
+
+
+; Information added by drupal.org packaging script on 2012-01-18
+version = "6.x-1.0"
+core = "6.x"
+project = "uc_node_access"
+datestamp = "1326866751"
+
