@@ -1,0 +1,7 @@
+name = Premium access
+description = Allow specific users access to specific premium nodes
+dependencies[] = premium
+package = Access control
+core = 6.x
+php = 5.0
+

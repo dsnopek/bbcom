@@ -1,0 +1,262 @@
+<?php
+
+/**
+ * Provides Multiprice options
+ *
+ * Module developed by Docc | Optixdesigns.nl
+ * @author Docc 
+ * Module extended by Bartezz | Intrige.nl
+ * @author Bartezz <bartezz@gmail.com>
+ *
+ */
+
+/**
+ * Hook Functions (Drupal)
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_multiprice_dynamic_menu() {
+  $items['uc_multiprice_dynamic/js/edit/%/%'] = array(
+    'page callback' => 'uc_multiprice_dynamic_js',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['uc_multiprice_dynamic/js/save/%'] = array(
+    'page callback' => 'uc_multiprice_dynamic_js_save',
+    'page arguments' => array(3),
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function uc_multiprice_dynamic_theme() {
+  return array(
+    'uc_multiprice_dynamic_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+    'uc_multiprice_dynamic_element_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
+
+/**
+ * Theme functions
+ */
+
+/**
+ * theme_uc_multiprice_dynamic_element_form
+ */
+function theme_uc_multiprice_dynamic_element_form($form) {
+  $output = '';
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/**
+ * theme_uc_multiprice_dynamic_form
+ */
+function theme_uc_multiprice_dynamic_form($form) {
+  $path = drupal_get_path('module', 'uc_multiprice_dynamic');
+  drupal_add_js($path .'/js/uc_multiprice_dynamic.js', 'module', 'header');  
+  drupal_add_css($path .'/css/uc_multiprice_dynamic_style.css', 'module', 'all', FALSE);
+  
+  $header = array(array('data' => t('Country/role'), 'width' => '125px'), '', t('List price'), '', t('Cost'), '', t('Sell price'), t('Delete'));
+  
+  $row = array();
+  foreach (element_children($form) as $multiprice_id) {
+    $row = array();
+    if ($multiprice_id != '0' || $multiprice_id != 'dynamic') {
+      foreach (element_children($form[$multiprice_id]) as $mpid) {
+        $row = array();
+        $row[] = check_plain($form[$multiprice_id][$mpid]['title']['#value']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['edit']['list_price']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['list_price']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['edit']['cost']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['cost']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['edit']['sell_price']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['sell_price']);
+        $row[] = drupal_render($form[$multiprice_id][$mpid]['delete']);
+        $rows[] = $row;
+        
+        $row = array();
+        $row[] = array('data' => drupal_render($form[$multiprice_id][$mpid]['dynamic']['list_price']), 'colspan' => '8');
+        $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-'. $mpid .'-edit-list-price-dynamic', 'class' => 'popup');
+        
+        $row = array();
+        $row[] = array('data' => drupal_render($form[$multiprice_id][$mpid]['dynamic']['cost']), 'colspan' => '8');
+        $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-'. $mpid .'-edit-cost-dynamic', 'class' => 'popup');
+        
+        $row = array();
+        $row[] = array('data' => drupal_render($form[$multiprice_id][$mpid]['dynamic']['sell_price']), 'colspan' => '8');
+        $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-'. $mpid .'-edit-sell-price-dynamic', 'class' => 'popup');
+      }
+    }
+    elseif ($multiprice_id == '0') {
+      $row[] = check_plain($form[$multiprice_id]['title']['#value']);
+      $row[] = '';
+      $row[] = drupal_render($form[$multiprice_id]['list_price']);
+      $row[] = '';
+      $row[] = drupal_render($form[$multiprice_id]['cost']);
+      $row[] = '';
+      $row[] = drupal_render($form[$multiprice_id]['sell_price']);
+      $row[] = '';
+      $rows[] = $row;
+      
+      $row = array();
+      $row[] = array('data' => drupal_render($form[$multiprice_id]['dynamic']['list_price']), 'colspan' => '8');
+      $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-edit-list-price-dynamic', 'class' => 'popup');
+      
+      $row = array();
+      $row[] = array('data' => drupal_render($form[$multiprice_id]['dynamic']['cost']), 'colspan' => '8');
+      $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-edit-cost-dynamic', 'class' => 'popup');
+      
+      $row = array();
+      $row[] = array('data' => drupal_render($form[$multiprice_id]['dynamic']['sell_price']), 'colspan' => '8');
+      $rows[] = array('data' => $row, 'id' => 'edit-multiprice-multiprices-'. $multiprice_id .'-edit-sell-price-dynamic', 'class' => 'popup');
+    }    
+  }
+  
+  $output .= theme('table', $header, $rows, array('id' => 'uc_multiprice_table'));
+  
+  return $output;
+}
+
+/**
+ * Callbacks, forms etc
+ */
+function uc_multiprice_dynamic_element($multiprice, $type) {
+  $field['#theme'] = 'uc_multiprice_dynamic_element_form';
+  $field['enabled'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enabled'),
+      '#description' => t("Calculate @type for @country", array('@type' => str_replace('_', ' ', $type), '@country' => ($multiprice->country_name ? $multiprice->country_name : $multiprice->role_name))),
+      '#default_value' => isset($multiprice->data[$type]['enabled']) ? $multiprice->data[$type]['enabled'] : 0,
+      '#attributes' => array('onclick' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+  );
+  $field['type'] = array(
+    '#type' => 'hidden',
+    '#value' => $type,
+  );
+  $field['1'] = array(
+      '#type' => 'fieldset',
+      '#tree' => TRUE,
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+  );
+  $field['1']['operator'] = array(
+    '#type' => 'select',
+    '#required' => FALSE,
+    '#options' => array('default' => 'Default', 'custom' => 'Custom'),
+    '#default_value' => isset($multiprice->data[$type]['1']) ? check_plain($multiprice->data[$type]['1']['operator']) : 'custom',
+    '#attributes' => array('onchange' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+  );
+  $field['1']['value'] = array(
+    '#type' => 'textfield',
+    '#default_value' => isset($multiprice->data[$type]['1']['value']) ? check_plain($multiprice->data[$type]['1']['value']) : 0.00,
+    '#size' => 5,
+    '#attributes' => array('onchange' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+    //'#disabled' => ($multiprice->data[$type]['1']['operator']=='default')? TRUE : FALSE,
+  );
+  $field['operator'] = array(
+      '#type' => 'fieldset',
+      '#tree' => TRUE,
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+  );
+  $field['operator']['value'] = array(
+    '#type' => 'select',
+    '#required' => FALSE,
+    '#options' => array('x' => 'x', '-' => '-', '+' => '+', '/' => '/'),
+    '#attributes' => array('onchange' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+    '#default_value' => isset($multiprice->data[$type]) ? check_plain($multiprice->data[$type]['value']) : 'x',
+  );
+  $field['2'] = array(
+      '#type' => 'fieldset',
+      '#tree' => TRUE,
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+  );
+  $field['2']['operator'] = array(
+    '#type' => 'select',
+    '#options' => array('default' => 'Default', 'custom' => 'Custom'),
+    '#default_value' => isset($multiprice->data[$type]['2']) ? check_plain($multiprice->data[$type]['2']['operator']) : 'default',
+    '#attributes' => array('onchange' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+  );
+  $field['2']['value'] = array(
+    '#type' => 'textfield',
+    '#default_value' => isset($multiprice->data[$type]['2']) ? check_plain($multiprice->data[$type]['2']['value']) : 0.00,
+    '#size' => 5,
+    '#attributes' => array('onchange' => 'uc_multiprice_dynamic("'. ($multiprice->country_id ? $multiprice->country_id : $multiprice->role_id) .'", "'. $type .'", "'. ($multiprice->country_name ? 'country' : 'role') .'");'),
+    //'#disabled' => ($multiprice->data[$type]['2']['operator']=='default')? TRUE : FALSE,
+  );
+
+  return $field;
+}
+
+function uc_multiprice_dynamic_field_element($multiprice) {
+  $field['country_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $multiprice->country_id,
+  );
+  $field['role_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $multiprice->role_id,
+  );
+  $field['title'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $multiprice->country_name ? $multiprice->country_name : $multiprice->role_name,
+  );
+  $field['edit']['list_price'] = array(
+    '#type' => 'button',
+    '#weight' => 1,
+    '#attributes' => array('class' => ($multiprice->data['list_price']['enabled']==1) ? 'dynamic dynamic_on' : 'dynamic'),
+  );
+  $field['list_price'] = array(
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#default_value' => isset($multiprice->list_price) ? check_plain($multiprice->list_price) : 0.00,
+    '#weight' => 0,
+    '#size' => 10,
+    '#maxlength' => 35,
+  );
+  $field['edit']['cost'] = array(
+    '#type' => 'button',
+    '#weight' => 1,
+    '#attributes' => array('class' => ($multiprice->data['cost']['enabled']==1) ? 'dynamic dynamic_on' : 'dynamic'),
+  );
+  $field['cost'] = array(
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#default_value' => isset($multiprice->cost) ? check_plain($multiprice->cost) : 0.00,
+    '#weight' => 1,
+    '#size' => 20,
+    '#maxlength' => 35,
+  );
+  $field['edit']['sell_price'] = array(
+    '#type' => 'button',
+    '#weight' => 1,
+    '#attributes' => array('class' => ($multiprice->data['sell_price']['enabled']==1) ? 'dynamic dynamic_on' : 'dynamic'),
+  );
+  $field['sell_price'] = array(
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#weight' => 2,
+    '#default_value' => isset($multiprice->sell_price) ? check_plain($multiprice->sell_price) : 0.00,
+    '#size' => 20,
+    '#maxlength' => 35,
+  );
+  $field['delete'] = array(
+    '#type' => 'checkbox',
+    '#required' => FALSE,
+  );
+  return $field;
+}

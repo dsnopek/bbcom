@@ -1,0 +1,24 @@
+diff --git a/uc_multiprice.module b/uc_multiprice.module
+index ab1fbc2..aa01406 100644
+--- a/uc_multiprice.module
++++ b/uc_multiprice.module
+@@ -120,8 +120,10 @@ function uc_multiprice_form_alter(&$form, $form_state, $form_id) {
+     drupal_add_js(drupal_get_path('module', 'uc_multiprice') .'/js/uc_multiprice.js', 'module', 'header');  
+     $id = uc_multiprice_country_id();
+     
+-    $form['panes']['delivery']['delivery_country']['#default_value'] = $id;
+-    $form['#validate'][] = 'uc_multiprice_checkout_validate';
++    if (!empty($form['panes']['delivery'])) {
++      $form['panes']['delivery']['delivery_country']['#default_value'] = $id;
++      $form['#validate'][] = 'uc_multiprice_checkout_validate';
++    }
+   }
+   
+ }
+@@ -797,4 +799,4 @@ function uc_multiprice_add_js($form) {
+   }
+   drupal_add_js(array('uc_multiprice' => array('country' => $countries, 'role' => $roles)), 'setting');
+   return $form;
+-}
+\ No newline at end of file
++}

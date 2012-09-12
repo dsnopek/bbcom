@@ -1,0 +1,593 @@
+<?php
+
+/**
+ * @file
+ * Defines a node access product feature that grants customers access to nodes
+ * on your site upon order completion.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_node_access_menu() {
+  $items = array();
+
+  $items['uc_node_access/autocomplete'] = array(
+    'title' => 'UC Node Access autocomplete',
+    'page callback' => 'uc_node_access_autocomplete',
+    'access arguments' => array('administer product features'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_cron().
+ */
+function uc_node_access_cron() {
+  $items = array();
+
+  // Load and process any expired node access rules.
+  $result = db_query("SELECT uid, access_nid FROM {uc_node_access_expirations} WHERE expiration <= %d", time());
+  while ($access = db_fetch_array($result)) {
+    // Revoke access for the user through the current node access handler.
+    uc_node_access_op('revoke', $access['access_nid'], $access['uid']);
+
+    // Delete the expiration from the database.
+    db_query("DELETE FROM {uc_node_access_expirations} WHERE uid = %d AND access_nid = %d", $access['uid'], $access['access_nid']);
+
+    $items[] = t('User @uid lost access to <a href="!url">node @nid</a>.', array('@uid' => $access['uid'], '@nid' => $access['access_nid'], '!url' => url('node/'. $access['access_nid'])));
+
+    $node = node_load($access['access_nid']);
+    $account = user_load($access['uid']);
+
+    ca_pull_trigger('uc_node_access_revoke', $node, $account);
+  }
+
+  if (!empty($items)) {
+    watchdog('uc_node_access', 'The following expirations occurred: !expirations', array('!expirations' => theme('item_list', $items)));
+  }
+
+  $items = array();
+  // Load and process any delayed node access rules.
+  $result = db_query("SELECT uid, pfid FROM {uc_node_access_delays} WHERE inception <= %d", time());
+  while ($access = db_fetch_array($result)) {
+    // Grant access for the user through the current node access handler.
+    uc_node_access_grant_user_access($access['pfid'], $access['uid']);
+
+    // Delete the delay from the database.
+    db_query("DELETE FROM {uc_node_access_delays} WHERE uid = %d AND pfid = %d", $access['uid'], $access['pfid']);
+  }
+}
+
+/**
+ * Implementation of hook_product_feature().
+ */
+function uc_node_access_product_feature() {
+  $features[] = array(
+    'id' => 'node_access',
+    'title' => t('Node access'),
+    'callback' => 'uc_node_access_feature_form',
+    'delete' => 'uc_node_access_feature_delete',
+    'settings' => 'uc_node_access_feature_settings_form',
+  );
+
+  return $features;
+}
+
+// Display the settings form for the node access product feature.
+function uc_node_access_feature_form($form_state, $node, $feature) {
+  $handler = variable_get('ucna_handler', '');
+
+  // Throw up a warning if the handler hasn't been selected yet.
+  if (empty($handler) || !function_exists($handler)) {
+    drupal_set_message(t('The node access handler is either not specified or missing. Node access features can be added to products but cannot be processed until this is resolved.'), 'error');
+  }
+
+  drupal_add_css(drupal_get_path('module', 'uc_node_access') .'/uc_node_access.css');
+
+  if (!empty($feature)) {
+    $access = uc_node_access_feature_load($feature['pfid']);
+  }
+
+  $options = array('' => t('<Any>'), $node->model => $node->model);
+  if (module_exists('uc_attribute')) {
+    $result = db_query("SELECT model FROM {uc_product_adjustments} WHERE nid = %d", $node->nid);
+    while ($row = db_fetch_object($result)) {
+      if (!in_array($row->model, $options)) {
+        $options[$row->model] = $row->model;
+      }
+    }
+  }
+  $form['model'] = array(
+    '#type' => 'select',
+    '#title' => t('Applicable Model/SKU'),
+    '#description' => t('Select the applicable product model/SKU.'),
+    '#options' => $options,
+    '#default_value' => $access['model'],
+  );
+
+  $form['access_nid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Node ID'),
+    '#description' => t('Specify the node the customer will get access to after purchasing this product.<br />Start typing in a node title to view an autocomplete list that will change to an nid upon selection.'),
+    '#default_value' => $access['access_nid'],
+    '#autocomplete_path' => 'uc_node_access/autocomplete',
+    '#required' => TRUE,
+  );
+
+  $form['delay_period'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Access time delay'),
+    '#collapsible' => FALSE,
+    '#description' => t('Specify the length of time after purchase the customer must wait to have access to the node.'),
+    '#attributes' => array('class' => 'time-period-fieldset'),
+  );
+  $form['delay_period']['delay_period_value'] = array(
+    '#type' => 'select',
+    '#options' => drupal_map_assoc(uc_range(0, 52)),
+    '#default_value' => $access['delay_period_value'],
+  );
+  $form['delay_period']['delay_period_unit'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'days' => t('day(s)'),
+      'weeks' => t('week(s)'),
+      'months' => t('month(s)'),
+      'years' => t('year(s)'),
+    ),
+    '#default_value' => $access['delay_period_unit'],
+  );
+
+  $form['access_limit'] = array(
+    '#type' => 'radios',
+    '#title' => t('Access limit type'),
+    '#description' => t('Select an access limit type to govern how long the customer will have access to the node.'),
+    '#options' => array(
+      'indefinite' => t('The customer can have indefinite access to the node.'),
+      'time_period' => t('The customer can access the node for the time specified below.'),
+      'end_date' => t('The customer can access the node until the date specified below.'),
+    ),
+    '#default_value' => $access['access_limit'],
+    '#required' => TRUE,
+  );
+
+  $form['time_period'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Access time period'),
+    '#collapsible' => FALSE,
+    '#description' => t('Specify the length of time the customer should have access to the node.'),
+    '#attributes' => array('class' => 'time-period-fieldset'),
+  );
+  $form['time_period']['time_period_value'] = array(
+    '#type' => 'select',
+    '#options' => drupal_map_assoc(uc_range(1, 52)),
+    '#default_value' => $access['time_period_value'],
+  );
+  $form['time_period']['time_period_unit'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'days' => t('day(s)'),
+      'weeks' => t('week(s)'),
+      'months' => t('month(s)'),
+      'years' => t('year(s)'),
+    ),
+    '#default_value' => $access['time_period_unit'],
+  );
+
+  $form['end_date_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Access end date'),
+    '#collapsible' => FALSE,
+    '#description' => t('Specify the end date on which a customer will lose access to the node.'),
+  );
+  $form['end_date_fieldset']['end_date'] = array(
+    '#type' => 'date',
+    '#default_value' => $access['end_date']
+  );
+
+  return uc_product_feature_form($form);
+}
+
+function uc_node_access_feature_form_submit($form, &$form_state) {
+  $access = array(
+    'pfid' => $form_state['values']['pfid'],
+    'model' => $form_state['values']['model'],
+    'access_nid' => $form_state['values']['access_nid'],
+    'access_limit' => $form_state['values']['access_limit'],
+    'delay_period' => $form_state['values']['delay_period_value'] .' '. $form_state['values']['delay_period_unit'],
+    'time_period' => $form_state['values']['time_period_value'] .' '. $form_state['values']['time_period_unit'],
+    'end_date' => $form_state['values']['end_date'],
+  );
+
+  switch ($form_state['values']['access_limit']) {
+    case 'time_period':
+      $description = t('Grant access to <a href="!url">node @nid</a> for @period, @delay after purchase.', array('@nid' => $access['access_nid'], '@period' => $access['time_period'], '@delay' => $access['delay_period'], '!url' => url('node/'. $access['access_nid'])));
+      break;
+    case 'end_date':
+      $description = t('Grant access to <a href="!url">node @nid</a> until @date, @delay after purchase.', array('@nid' => $access['access_nid'], '@date' => $access['end_date']['month'] .'/'. $access['end_date']['day'] .'/'. $access['end_date']['year'], '@delay' => $access['delay_period'], '!url' => url('node/'. $access['access_nid'])));
+      break;
+    case 'indefinite':
+    default:
+      $description = t('Grant indefinite access to <a href="!url">node @nid</a>, @delay after purchase.', array('@nid' => $access['access_nid'], '!url' => url('node/'. $access['access_nid']), '@delay' => $access['delay_period']));
+      break;
+  }
+
+  if (!empty($access['model'])) {
+    $description .= '<br />'. t('Applies to SKU: @sku', array('@sku' => $access['model']));
+  }
+  else {
+    $description .= '<br />'. t('Applies to any SKU.');
+  }
+
+  $data = array(
+    'pfid' => $access['pfid'],
+    'nid' => $form_state['values']['nid'],
+    'fid' => 'node_access',
+    'description' => $description,
+  );
+
+  $form_state['redirect'] = uc_product_feature_save($data);
+
+  // On an insert, get the pfid used for the node access feature.
+  if (empty($access['pfid'])) {
+    $access['pfid'] = db_last_insert_id('uc_product_features', 'pfid');
+  }
+
+  uc_node_access_feature_save($access);
+}
+
+// Adds the fields for this feature in the product features settings form.
+function uc_node_access_feature_settings_form() {
+  $options = array();
+
+  $handlers = module_invoke_all('ucna_handler');
+  foreach ($handlers as $handler) {
+    $options[$handler['callback']] = $handler['title'];
+  }
+
+  if (empty($options)) {
+    $options[''] = t('No handlers available. You must install one to use this feature.');
+  }
+
+  $form['ucna_handler'] = array(
+    '#type' => 'radios',
+    '#title' => t('Node access handler'),
+    '#description' => t('Node access features are processed using handlers that integrate UC Node Access with other access control modules.<br />You must select one in order to start using this feature.'),
+    '#options' => $options,
+    '#default_value' => variable_get('ucna_handler', ''),
+  );
+
+  return $form;
+}
+
+function uc_node_access_feature_save($data) {
+  // First attempt to update an existing row.
+  db_query("UPDATE {uc_node_access_products} SET model = '%s', access_nid = %d, access_limit = '%s', delay_period = '%s', time_period = '%s', end_date = '%s' WHERE pfid = %d",
+    $data['model'], $data['access_nid'], $data['access_limit'], $data['delay_period'], $data['time_period'], serialize($data['end_date']), $data['pfid']);
+
+  // Otherwise insert this feature as a new row.
+  if (db_affected_rows() == 0) {
+    db_query("INSERT INTO {uc_node_access_products} (pfid, model, access_nid, access_limit, delay_period, time_period, end_date) VALUES (%d, '%s', %d, '%s', '%s', '%s', '%s')",
+      $data['pfid'], $data['model'], $data['access_nid'], $data['access_limit'], $data['delay_period'], $data['time_period'], serialize($data['end_date']));
+  }
+}
+
+function uc_node_access_feature_load($pfid) {
+  $access = db_fetch_array(db_query("SELECT nap.*, pf.nid FROM {uc_node_access_products} AS nap LEFT JOIN {uc_product_features} AS pf ON nap.pfid = pf.pfid WHERE nap.pfid = %d", $pfid));
+  if (!empty($access)) {
+    list($access['delay_period_value'], $access['delay_period_unit']) = explode(' ', $access['delay_period']);
+    list($access['time_period_value'], $access['time_period_unit']) = explode(' ', $access['time_period']);
+    $access['end_date'] = unserialize($access['end_date']);
+  }
+
+  return $access;
+}
+
+function uc_node_access_feature_delete($feature) {
+  db_query("DELETE FROM {uc_node_access_delays} WHERE pfid = %d", $feature['pfid']);
+  db_query("DELETE FROM {uc_node_access_products} WHERE pfid = %d", $feature['pfid']);
+}
+
+function uc_node_access_op($op, $nid, $uid) {
+  $handler = variable_get('ucna_handler', '');
+
+  // Fail if the handler hasn't been specified or has been uninstalled.
+  if (empty($handler) || !function_exists($handler)) {
+    watchdog('uc_node_access', 'The node access handler is either not specified or missing. Node access features cannot be processed until this is resolved.', array(), WATCHDOG_WARNING);
+    return;
+  }
+
+  // Fail if we receive an invalid nid or uid.
+  if (intval($nid) <= 0 || intval($uid) <= 0) {
+    watchdog('uc_node_access', 'Invalid arguments passed to UC Node Access for processing.', array(), WATCHDOG_WARNING);
+    return;
+  }
+
+  // Pass the arguments onto the handler for processing.
+  $result = $handler($op, $nid, $uid);
+
+  // Log failed node access operations.
+  if ($result === FALSE) {
+    watchdog('uc_node_access', 'A node access operation failed! $op = @op, $nid = @nid, $uid = @uid', array('@op' => $op, '@nid' => $nid, '@uid' => $uid), WATCHDOG_WARNING);
+  }
+}
+
+function uc_node_access_delay_user_access($pfid, $uid) {
+  $access = uc_node_access_feature_load($pfid);
+
+  if (empty($access) || $uid == 0) {
+    return;
+  }
+
+  if ($access['delay_period_value']) {
+    $inception = strtotime('+'. $access['delay_period']);
+  }
+  else {
+    $inception = FALSE;
+  }
+
+  // Set the inception in the DB if necessary.
+  if ($inception) {
+    // Get a prior inception if one exists.
+    $result = db_result(db_query("SELECT inception FROM {uc_node_access_delays} WHERE uid = %d AND pfid = %d", $uid, $access['pfid']));
+
+    // If there was no prior inception, insert a new one.
+    if (empty($result)) {
+      db_query("INSERT INTO {uc_node_access_delays} (uid, pfid, inception) VALUES (%d, %d, %d)",
+        $uid, $access['pfid'], $inception);
+      watchdog('uc_node_access', 'User @uid will be granted access to node @nid on @date.', array('@uid' => $uid, '@nid' => $access['access_nid'], '@date' => format_date($inception, 'custom', 'm/d/Y')));
+    }
+    elseif ($result > $inception) {
+      // Otherwise we need to update the inception to be later.
+      db_query("UPDATE {uc_node_access_delays} SET inception = %d WHERE uid = %d AND pfid = %d", $inception, $uid, $access['pfid']);
+      watchdog('uc_node_access', 'User @uid hastened access to node @nid to @date.', array('@uid' => $uid, '@nid' => $access['access_nid'], '@date' => format_date($inception, 'custom', 'm/d/Y')));
+    }
+    else {
+      watchdog('uc_node_access', 'User @uid purchased duplicate access for node @nid that will be granted later than their current access.', array('@uid' => $uid, '@nid' => $access['access_nid']));
+    }
+  }
+  else {
+    // Delete any prior inception reference.
+    db_query("DELETE FROM {uc_node_access_delays} WHERE uid = %d AND pfid = %d", $uid, $access['pfid']);
+
+    watchdog('uc_node_access', 'User @uid granted immediate access to node @nid.', array('@uid' => $uid, '@nid' => $access['access_nid']));
+
+    uc_node_access_grant_user_access($pfid, $uid);
+  }
+}
+
+function uc_node_access_grant_user_access($pfid, $uid) {
+  // Load up the node access feature and target node data.
+  $access = uc_node_access_feature_load($pfid);
+  $node = node_load($access['access_nid']);
+
+  if (empty($access) || empty($node) || $uid == 0) {
+    return;
+  }
+
+  // Grant access for the user through the current node access handler.
+  uc_node_access_op('grant', $access['access_nid'], $uid);
+
+  // Let Drupal know to adjust the access for the target node.
+  node_access_acquire_grants($node);
+
+  // Calculate an expiration timestamp based on the site's timezone.
+  $expiration = FALSE;
+
+  switch ($access['access_limit']) {
+    case 'time_period':
+      $expiration = strtotime('+'. $access['time_period']);
+      break;
+    case 'end_date':
+      $expiration = gmmktime(0, 0, 0, $access['end_date']['month'], $access['end_date']['day'], $access['end_date']['year']);
+      break;
+  }
+
+  // Set the expiration in the DB if necessary.
+  if ($expiration) {
+    // Get a prior expiration if one exists.
+    $result = db_result(db_query("SELECT expiration FROM {uc_node_access_expirations} WHERE uid = %d AND access_nid = %d", $uid, $access['access_nid']));
+
+    // If there was no prior expiration, insert a new one.
+    if (empty($result)) {
+      db_query("INSERT INTO {uc_node_access_expirations} (uid, access_nid, expiration) VALUES (%d, %d, %d)",
+        $uid, $access['access_nid'], $expiration);
+      watchdog('uc_node_access', 'User @uid granted access to node @nid until @date.', array('@uid' => $uid, '@nid' => $access['access_nid'], '@date' => format_date($expiration, 'custom', 'm/d/Y')));
+    }
+    elseif ($result < $expiration) {
+      // Otherwise we need to update the expiration to be later.
+      db_query("UPDATE {uc_node_access_expirations} SET expiration = %d WHERE uid = %d AND access_nid = %d", $expiration, $uid, $access['access_nid']);
+      watchdog('uc_node_access', 'User @uid extended access for node @nid until @date.', array('@uid' => $uid, '@nid' => $access['access_nid'], '@date' => format_date($expiration, 'custom', 'm/d/Y')));
+    }
+    else {
+      watchdog('uc_node_access', 'User @uid purchased duplicate access for node @nid that expires earlier than their current access.', array('@uid' => $uid, '@nid' => $access['access_nid'], '@date' => format_date($expiration, 'custom', 'm/d/Y')));
+    }
+  }
+  else {
+    // Delete any prior expiration reference.
+    db_query("DELETE FROM {uc_node_access_expirations} WHERE uid = %d AND access_nid = %d", $uid, $access['access_nid']);
+
+    watchdog('uc_node_access', 'User @uid granted indefinite access to node @nid.', array('@uid' => $uid, '@nid' => $access['access_nid']));
+  }
+
+  $account = user_load($uid);
+  ca_pull_trigger('uc_node_access_grant', $node, $account);
+}
+
+// Returns an autocomplete list for nodes on the node access feature form.
+function uc_node_access_autocomplete($string = '') {
+  $matches = array();
+
+  if ($string) {
+    $result = db_query_range(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE LOWER(n.title) LIKE LOWER('%s%%')"), $string, 0, 10);
+    while ($node = db_fetch_object($result)) {
+      $matches[$node->nid] = check_plain($node->title);
+    }
+  }
+
+  print drupal_to_js($matches);
+  exit();
+}
+
+
+/*******************************************************************************
+ * Conditional Actions Integration
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_ca_trigger().
+ */
+function uc_node_access_ca_trigger() {
+  $triggers = array();
+
+  $triggers['uc_node_access_grant'] = array(
+    '#title' => t('Node access is granted to a user'),
+    '#category' => t('Node access'),
+    '#arguments' => array(
+      'node' => array(
+        '#entity' => 'node',
+        '#title' => t('Node'),
+      ),
+      'user' => array(
+        '#entity' => 'user',
+        '#title' => t('User'),
+      ),
+    ),
+  );
+  $triggers['uc_node_access_revoke'] = array(
+    '#title' => t('Node access is revoked from a user'),
+    '#category' => t('Node access'),
+    '#arguments' => array(
+      'node' => array(
+        '#entity' => 'node',
+        '#title' => t('Node'),
+      ),
+      'user' => array(
+        '#entity' => 'user',
+        '#title' => t('User'),
+      ),
+    ),
+  );
+
+  return $triggers;
+}
+
+/**
+ * Implementation of hook_ca_predicate().
+ */
+function uc_node_access_ca_predicate() {
+  $predicates = array();
+
+  $predicates['uc_node_access_grant_on_completed_status'] = array(
+    '#title' => 'Grant appropriate node access on ORDER UPDATE',
+    '#description' =>  t('Renew purchased nodes if the order status matches.'),
+    '#class' => 'uc_node_access',
+    '#status' => '1',
+    '#weight' => '0',
+    '#trigger' => 'uc_order_status_update',
+    '#conditions' =>  array(
+      '#operator' => 'AND',
+      '#conditions' =>  array(
+        array(
+          '#name' => 'uc_order_status_condition',
+          '#title' => 'Check the order status',
+          '#argument_map' => array(
+            'order' => 'order',
+          ),
+          '#settings' => array(
+            'negate' => 1,
+            'order_status' => 'completed',
+          ),
+        ),
+        array(
+          '#name' => 'uc_order_status_condition',
+          '#title' => 'Check the order status',
+          '#argument_map' => array(
+            'order' => 'updated_order',
+          ),
+          '#settings' => array(
+            'negate' => 0,
+            'order_status' => 'completed',
+          ),
+        ),
+      ),
+    ),
+    '#actions' => array(
+      array(
+        '#name' => 'uc_node_access_grant_access',
+        '#title' => 'Grant node access to customer',
+        '#argument_map' => array(
+          'order' => 'order',
+        ),
+        '#settings' => array(),
+      ),
+    ),
+  );
+
+  return $predicates;
+}
+
+/**
+ * Implementation of hook_ca_action().
+ */
+function uc_node_access_ca_action() {
+  $actions['uc_node_access_delay_access'] = array(
+    '#title' => t('Grant node access to customer at a later time'),
+    '#category' => t('UC Node Access'),
+    '#callback' => 'uc_node_access_delay_access',
+    '#arguments' => array(
+      'order' => array('#entity' => 'uc_order', '#title' => t('Order')),
+    ),
+  );
+
+  $actions['uc_node_access_grant_access'] = array(
+    '#title' => t('Grant node access to customer'),
+    '#category' => t('UC Node Access'),
+    '#callback' => 'uc_node_access_grant_access',
+    '#arguments' => array(
+      'order' => array('#entity' => 'uc_order', '#title' => t('Order')),
+    ),
+  );
+
+  return $actions;
+}
+
+function uc_node_access_delay_access($order, $settings) {
+  if (is_array($order->products)) {
+    $nids = array();
+    $models = array();
+
+    foreach ($order->products as $product) {
+      $nids[] = $product->nid;
+      $models[] = $product->model;
+    }
+
+    $result = db_query("SELECT pf.pfid, nap.model FROM {uc_product_features} AS pf LEFT JOIN {uc_node_access_products} AS nap ON pf.pfid = nap.pfid WHERE pf.nid IN (". implode(", ", $nids) .") AND pf.fid = 'node_access'");
+    while ($row = db_fetch_array($result)) {
+      if (empty($row['model']) || in_array($row['model'], $models)) {
+        uc_node_access_delay_user_access($row['pfid'], $order->uid);
+      }
+    }
+  }
+}
+
+function uc_node_access_grant_access($order, $settings) {
+  if (is_array($order->products)) {
+    $nids = array();
+    $models = array();
+
+    foreach ($order->products as $product) {
+      $nids[] = $product->nid;
+      $models[] = $product->model;
+    }
+
+    $result = db_query("SELECT pf.pfid, nap.model FROM {uc_product_features} AS pf LEFT JOIN {uc_node_access_products} AS nap ON pf.pfid = nap.pfid WHERE pf.nid IN (". implode(", ", $nids) .") AND pf.fid = 'node_access'");
+    while ($row = db_fetch_array($result)) {
+      if (empty($row['model']) || in_array($row['model'], $models)) {
+        uc_node_access_grant_user_access($row['pfid'], $order->uid);
+      }
+    }
+  }
+}

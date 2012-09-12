@@ -1,0 +1,11 @@
+name = UC premium access
+description = Grant customers access to perium nodes on your site when they purchase specified products.
+dependencies[] = uc_store
+dependencies[] = uc_order
+dependencies[] = uc_product
+dependencies[] = ca
+dependencies[] = premium_access
+package = Access control
+core = 6.x
+php = 5.0
+

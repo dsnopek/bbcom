@@ -1,0 +1,50 @@
+// $Id: CHANGELOG.txt,v 1.23 2010/10/12 22:35:25 sun Exp $
+
+Upgrade Status 6.x-1.x, xxxx-xx-xx
+----------------------------------
+
+
+Upgrade Status 6.x-1.0, 2010-09-05
+----------------------------------
+by sun: Removed .info for experimental and outdated Upgrade Assist module.
+#732054 by sun: Added support for Update status advanced module.
+by sun: Fixed PHP notice and styling for not yet ported components.
+#620714 by philbar, sun, klonos: Added modules which are in D7 core.
+by sun: Revamped entire module and synced with Update module.
+#728608 by philbar, sun: Fixed unsupported releases are missing status text.
+#297335 by naught101, Rob Loach, sun: Ported to 6.x.
+#303279 by sun: Added JavaScript Aggregator note for 6.x.
+#303279 by sun: Added JavaScript Aggregator moved into Drupal 6 core.
+#270531 by sun: Added Find Path to modules moved into Drupal 6 core.
+
+
+Upgrade Status 5.x-1.3, 2008-08-17
+----------------------------------
+#265412 by sun: Removed auto-update of cached data.
+#269663 by sun: Removed local tasks on Upgrade Status pages.
+#270531 by sun: Added a bunch of other modules moved into Drupal 6 core.
+#268578 by dww, sun: Fixed missing modules moved into Drupal 6 core.
+
+
+Upgrade Status 5.x-1.2, 2008-06-08
+----------------------------------
+#265062 by webchick, sun: Added select to choose target version of Drupal core.
+Moved core functions of this module into separate upgrade_status.admin.inc.
+#265419 by sun: Fixed clicking on project title/link toggles collapse status.
+#265061 by webchick, sun: Added title and link for not (yet) upgraded modules.
+
+
+Upgrade Status 5.x-1.1, 2008-05-31
+----------------------------------
+#264980 by sun: Removed upgrade_status from list output.
+Added pointer to Coder module to help porting modules.
+Fixed wrong URL for manually updating.
+Removed superfluous help text.
+Fixed ambigious CSS class for project title.
+
+
+Upgrade Status 5.x-1.0, 2008-05-31
+----------------------------------
+Initial release of Upgrade Status.
+
+

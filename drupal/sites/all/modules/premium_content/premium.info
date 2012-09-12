@@ -1,0 +1,12 @@
+name = Premium content
+description = Restrict access to premium content.
+core = 6.x
+dependencies[] = ctools
+
+
+; Information added by drupal.org packaging script on 2012-03-10
+version = "6.x-1.0-rc1"
+core = "6.x"
+project = "premium_content"
+datestamp = "1331338552"
+

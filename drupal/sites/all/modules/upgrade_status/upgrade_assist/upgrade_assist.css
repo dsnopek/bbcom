@@ -1,0 +1,31 @@
+/* $Id: upgrade_assist.css,v 1.5 2010/10/11 22:32:17 sun Exp $ */
+
+div.item-list ol.task-list {
+  list-style-type: none;
+  list-style-image: none;
+  padding: 0;
+  margin-left: 0; /* LTR */
+}
+div.item-list ol.task-list li {
+  color: #adadad;
+  list-style-type: none;
+  list-style-image: none;
+  margin: 0;
+  padding: 0.5em 1em 0.5em 20px; /* LTR */
+}
+div.item-list ol.task-list li.active {
+  background: transparent url(images/task-item.png) no-repeat 3px 50%; /* LTR */
+  color: #000;
+  padding: 0.5em 1em 0.5em 20px; /* LTR */
+}
+div.item-list ol.task-list li.done {
+  background: transparent url(images/task-check.png) no-repeat 0px 50%; /* LTR */
+}
+div.item-list ol.task-list li.done, div.item-list ol.task-list li.done a {
+  color: green;
+}
+
+pre.command {
+  margin: 1em 0;
+  white-space: pre-wrap;
+}

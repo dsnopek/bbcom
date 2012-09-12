@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * Implementation of hook_field_settings_alter().
+ */
+function premium_fields_field_settings_alter(&$settings, $op, $field) {
+  switch ($op) {
+    case 'form':
+      $settings['premium_fields'] = array(
+        '#title' => t('Premium field'),
+        '#type' => 'checkbox',
+        '#default_value' => (isset($field['premium_fields']) ? $field['field_permissions'] : 0),
+        '#description' => t('Protect this field as a premium field'),
+        '#weight' => -1,
+      );
+      break;
+
+    case 'save':
+      $settings[] = 'premium_fields';
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_field_access().
+ *
+ * @param $op
+ *   The operation to be performed. Possible values:
+ *   - 'edit'
+ *   - 'view'
+ * @param $field
+ *   The field on which the operation is to be performed.
+ * @param $account
+ *   The account to check.
+ *   Note that this argument is optional to content_access(), but it is
+ *   always passed to hook_field_access(), with current user if not supplied.
+ *   This is an argument that was added to CCK in 6.x-2.2 release.
+ * @param $node
+ *   (optional) The node on which the operation is to be performed.
+ *   Note that this argument is optional to content_access(), but it is
+ *   always passed to hook_field_access(), with NULL if not supplied.
+ *   This is an argument that was added to CCK in 6.x-2.5 release.
+ *
+ * @return
+ *   FALSE if the operation is not allowed.
+ *   Note when content_access() is invoked, access is granted unless one
+ *   implementation of hook_field_access() explicitly returns FALSE.
+ *
+ * @see content_access()
+ */
+function premium_fields_field_access($op, $field, $account, $node) {
+  // Ignore the request if permissions have not been enabled for this field.
+  if (empty($field['premium_fields'])) {
+    return;
+  }
+
+  if ($op == 'view') {
+    return premium_user_content_access($node, $account);
+  }
+}
+

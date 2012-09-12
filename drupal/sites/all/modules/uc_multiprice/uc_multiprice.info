@@ -1,0 +1,11 @@
+name = Multiprice
+description = Allows price overide on a country level
+package = "Ubercart - extra"
+dependencies[] = uc_product
+core = 6.x
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "uc_multiprice"
+datestamp = "1298620506"
+

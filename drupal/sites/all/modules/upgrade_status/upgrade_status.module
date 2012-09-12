@@ -1,0 +1,120 @@
+<?php
+// $Id: upgrade_status.module,v 1.12 2010/09/04 23:53:07 sun Exp $
+
+/**
+ * @file
+ * Checks to see if your installed modules are available for the next major
+ * release of Drupal.
+ */
+
+/**
+ * Default version of core we want to query for.
+ */
+define('UPGRADE_STATUS_CORE_VERSION', '7.x');
+
+/**
+ * Project has a new release available, but it is not a security release.
+ */
+define('UPGRADE_STATUS_DEVELOPMENT', 1000);
+
+/**
+ * Project is available.
+ */
+define('UPGRADE_STATUS_STABLE', 5);
+
+/**
+ * Project has been moved into core.
+ */
+define('UPGRADE_STATUS_CORE', 5000);
+
+/**
+ * Implementation of hook_help().
+ */
+function upgrade_status_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#module':
+      $file = drupal_get_path('module', 'upgrade_status') .'/README.txt';
+      if (file_exists($file)) {
+        return _filter_autop(file_get_contents($file));
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function upgrade_status_menu() {
+  $items['admin/reports/updates/upgrade'] = array(
+    'title' => 'Upgrade status',
+    'page callback' => 'upgrade_status_status',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'upgrade_status.report.inc'
+  );
+  $items['admin/reports/updates/upgrade/check'] = array(
+    'page callback' => 'upgrade_status_manual_status',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'upgrade_status.fetch.inc'
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function upgrade_status_theme() {
+  return array(
+    'upgrade_status_report' => array(
+      'arguments' => array('data' => NULL),
+      'file' => 'upgrade_status.report.inc',
+    ),
+    'upgrade_status_version' => array(
+      'arguments' => array('version' => NULL, 'tag' => NULL, 'class' => NULL),
+      'file' => 'upgrade_status.report.inc',
+    ),
+  );
+}
+
+/**
+ * Internal helper to try to get the update information from the cache
+ * if possible, and to refresh the cache when necessary.
+ *
+ * In addition to checking the cache lifetime, this function also ensures that
+ * there are no .info files for enabled modules or themes that have a newer
+ * modification timestamp than the last time we checked for available update
+ * data. If any .info file was modified, it almost certainly means a new
+ * version of something was installed. Without fresh available update data,
+ * the logic in update_calculate_project_data() will be wrong and produce
+ * confusing, bogus results.
+ *
+ * @param $refresh
+ *   Boolean to indicate if this method should refresh the cache automatically
+ *   if there's no data.
+ *
+ * @see update_refresh()
+ * @see update_get_projects()
+ */
+function upgrade_status_get_available($refresh = FALSE) {
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
+  $available = array();
+
+  if (!$refresh && ($cache = _update_cache_get('upgrade_status_available_releases')) && $cache->expire > time()) {
+    $available = $cache->data;
+  }
+  else {
+    $available = upgrade_status_refresh();
+  }
+  return $available;
+}
+
+/**
+ * Wrapper to load the include file and then refresh the release data.
+ */
+function upgrade_status_refresh() {
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
+  return _upgrade_status_refresh();
+}
+

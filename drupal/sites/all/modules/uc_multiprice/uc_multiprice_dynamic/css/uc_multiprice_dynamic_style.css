@@ -1,0 +1,77 @@
+#uc_multiprice_table th { white-space: nowrap; }
+
+#uc_multiprice_table th:last-child,
+#uc_multiprice_table td:last-child { text-align:center; }
+#uc_multiprice_table .popup td:last-child { text-align:left; }
+
+#uc_multiprice_table input:disabled,
+#uc_multiprice_table input.disabled {
+	color:#999999;
+	background: #EDF5FA;
+	}
+
+#uc_multiprice_table .popup input:disabled,
+#uc_multiprice_table .popup input.disabled {
+	background: #D3E7F4;
+	}
+.dynamic {
+	border:0;
+	height:20px;
+	width:20px;
+	cursor:pointer;
+	margin:0;
+	background: transparent url(../images/calculator_off.png) center no-repeat;
+}
+.dynamic_on {
+	background: transparent url(../images/calculator_on.png) center no-repeat;
+}
+td.dynamic_tab {
+	background: #AFD1E9 url(../images/bg_calc.gif) left bottom repeat-x;
+	}
+
+.popup {
+	display:none;
+	width:100%;	
+	}
+
+.popup td {
+	padding: 10px 0;
+	background:#AFD1E9 url(../images/bg_popup.gif) 0 0 repeat-x;
+	}
+
+.popup fieldset {
+	width:23%;
+	margin:0;
+	padding:0;
+	border:0;
+	background:none;
+	float:left;
+	position:relative;
+	}
+.popup div {
+	width:23%;
+	padding:2px 14px;
+	display:block;
+	float:left;
+	}
+.popup fieldset div {
+	width:auto;
+	float:none;
+	}
+.popup div.description {
+	color:#4C80B2;
+	width:auto;
+	padding:0;
+	float:none;
+	}
+.popup label { 
+	color:#23476E;
+	font-weight:bold;
+	}
+.popup textarea,
+.popup select {
+	width: 100%;
+	padding:0;
+	margin:0;
+	}
+

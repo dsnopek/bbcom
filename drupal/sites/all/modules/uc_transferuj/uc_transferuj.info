@@ -1,0 +1,8 @@
+; $Id$
+name = Modul transferuj.pl
+description = obsluga transferuj.pl
+dependencies[] = uc_payment
+package = Ubercart - payment
+version = 6.x-1.x-dev
+
+core = 6.x

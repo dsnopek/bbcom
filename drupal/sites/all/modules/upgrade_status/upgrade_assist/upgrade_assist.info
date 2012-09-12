@@ -1,0 +1,13 @@
+; $Id: upgrade_assist.info,v 1.6 2010/10/11 22:32:17 sun Exp $
+name = Upgrade Assist
+description = Assists in upgrading Drupal to a new major version.
+core = 6.x
+;dependencies[] = demo
+files[] = upgrade_assist.module
+
+; Information added by drupal.org packaging script on 2010-10-12
+version = "6.x-1.1"
+core = "6.x"
+project = "upgrade_status"
+datestamp = "1286923264"
+
