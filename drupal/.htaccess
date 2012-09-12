@@ -76,6 +76,10 @@ DirectoryIndex index.php
   </FilesMatch>
 </IfModule>
 
+#<Directory sites/en.bibliobird.com/files/audio>
+#  Deny from all
+#</Directory>
+
 # Various rewrite rules.
 <IfModule mod_rewrite.c>
   RewriteEngine on
@@ -101,13 +105,13 @@ DirectoryIndex index.php
   # adapt and uncomment the following:
   # RewriteCond %{HTTP_HOST} ^example\.com$ [NC]
   # RewriteRule ^(.*)$ http://www.example.com/$1 [L,R=301]
-  RewriteCond %{HTTP_HOST} ^lingwo\.org$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^www.lingwo\.org$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^lingwo\.biz$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^www.lingwo\.biz$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^bibliobird\.pl$ [NC,OR]
-  RewriteCond %{HTTP_HOST} ^www\.bibliobird\.pl$ [NC]
-  RewriteRule ^(.*)$ http://pl.bibliobird.com/$1 [L,R=301]
+  #RewriteCond %{HTTP_HOST} ^lingwo\.org$ [NC,OR]
+  #RewriteCond %{HTTP_HOST} ^www.lingwo\.org$ [NC,OR]
+  #RewriteCond %{HTTP_HOST} ^lingwo\.biz$ [NC,OR]
+  #RewriteCond %{HTTP_HOST} ^www.lingwo\.biz$ [NC,OR]
+  #RewriteCond %{HTTP_HOST} ^bibliobird\.pl$ [NC,OR]
+  #RewriteCond %{HTTP_HOST} ^www\.bibliobird\.pl$ [NC]
+  #RewriteRule ^(.*)$ http://pl.bibliobird.com/$1 [L,R=301]
 
   #RewriteCond %{HTTP_HOST} ^bibliobird\.com$ [NC]
   #RewriteRule ^(.*)$ http://www.bibliobird.com/$1 [L,R=301]
