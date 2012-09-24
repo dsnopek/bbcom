@@ -7,6 +7,10 @@
   font-size: 12pt;
 }
 
+#modalframe-page .lingwo-senses {
+  font-size: inherit;
+}
+
 /*
  * Tables used when theming lingwo_fields_widget_form
  */
