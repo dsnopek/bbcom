@@ -6,6 +6,12 @@ body {
 body.admin-expanded {
   background-image: none;
 }
+body.modalframe-page {
+  background-color: inherit;
+}
+.modalframe-page-content {
+  padding: 5px 10px;
+}
 
 #page {
   background-color: #CCCEDA;
@@ -265,8 +271,7 @@ div.messages ul {
   margin-top: 15px;
 }
 */
-#content-wrapper,
-.modalframe-page-wrapper {
+#content-wrapper {
   background-color: white;
   border: 1px solid black;
 

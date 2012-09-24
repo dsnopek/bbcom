@@ -1,0 +1,12 @@
+name = Discount Coupons
+description = Allow administrators to manage store coupons
+dependencies[] = uc_cart
+package = Ubercart - payment
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-08-16
+version = "6.x-1.7"
+core = "6.x"
+project = "uc_coupon"
+datestamp = "1313511121"
+
