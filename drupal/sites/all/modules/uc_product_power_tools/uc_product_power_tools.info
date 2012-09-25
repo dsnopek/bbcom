@@ -1,0 +1,13 @@
+; $Id: uc_product_power_tools.info,v 1.4 2010/06/28 17:21:38 tcindie Exp $
+name = Product Power Tools
+description = "Set up default parameters by product type: Set/Show/Hide shippable flag, Show/Hide shipping fields, Set/Show/Hide Dimensions, Set/Show/Hide Package Quantity, Set/Show/Hide Default Quantity, Set/Show/Hide List Position, Set default stock levels, Auto Generate SKU, Set/Show/Hide List Price, Set/Show/Hide Cost"
+package = Ubercart - extra
+core = "6.x"
+dependencies[] = uc_cart
+dependencies[] = token
+; Information added by drupal.org packaging script on 2010-09-16
+version = "6.x-1.12"
+core = "6.x"
+project = "uc_product_power_tools"
+datestamp = "1284660965"
+

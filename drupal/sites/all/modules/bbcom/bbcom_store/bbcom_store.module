@@ -1,5 +1,7 @@
 <?php
 
+require_once('bbcom_store.features.inc');
+
 /**
  * Implementation of hook_init().
  *
@@ -9,7 +11,7 @@
 function bbcom_store_init() {
   global $language;
 
-  if (module_exists('uc_store')) {
+  if (module_exists('uc_store') && module_exists('uc_multiprice')) {
     // kind of a hack where the country code equals the language code
     $countries = uc_get_country_data(array('country_iso_code_2' => $language->language));
     if (!empty($countries)) {
