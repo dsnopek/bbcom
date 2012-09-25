@@ -1,0 +1,286 @@
+<?php
+
+// $Id: uc_product_power_tools.install,v 1.10 2010/09/16 18:10:57 tcindie Exp $
+
+/**
+ * @file
+ * Schema for Ubercart Product Power Tools module
+ * @author Will Vincent (tcindie) <tcindie at gmail dot com>
+ */
+
+
+/**
+ * Implementation of hook_schema().
+ */
+function uc_product_power_tools_schema() {
+  $schema = array();
+  $schema['uc_power_tools'] = array(
+    'description' => t('Table for settings of Ubercart Product Power Tools module.'),
+    'fields'            => array(
+      'pcid'            => array(
+        'description'   => t('product class ID'),
+        'type'          => 'varchar',
+        'length'        => 32,
+        'not null'      => TRUE,
+        'default'       => '',
+      ),
+      'enabled'         => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      // Auto SKU Generation Boolean on/off setting & replacement pattern
+      'asku'            => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => FALSE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'asku_settings'   => array(
+        'description'   => t('replacement pattern'),
+        'type'          => 'text',
+        'not null'      => FALSE,
+      ),
+
+      // List Price Boolean on/off setting & default price
+      'lp'              => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'lp_settings'     => array(
+        'description'   => t('default list price value'),
+        'type'          => 'numeric',
+        'precision'     => 15,
+        'scale'         => 3,
+        'not null'      => TRUE,
+        'default'       => 0.0,
+      ),
+
+      // Cost Boolean on/off setting & default price
+      'cost'            => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'cost_settings'   => array(
+        'description'   => t('default cost value'),
+        'type'          => 'numeric',
+        'precision'     => 15,
+        'scale'         => 3,
+        'not null'      => TRUE,
+        'default'       => 0.0,
+      ),
+
+      // Sell Price Boolean on/off setting & default price
+      'sp'              => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'sp_settings'     => array(
+        'description'   => t('default sell price value'),
+        'type'          => 'numeric',
+        'precision'     => 15,
+        'scale'         => 3,
+        'not null'      => TRUE,
+        'default'       => 0.0,
+      ),
+
+      // Default Qty Boolean on/off setting & default qty value
+      'dq'              => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'dq_settings'     => array(
+        'description'   => t('default quantity value'),
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'default'       => 1,
+      ),
+
+      // Package Qty Boolean on/off setting & default qty value
+      'pq'              => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'pq_settings'     => array(
+        'description'   => t('default package quantity value'),
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'default'       => 1,
+      ),
+
+      // Shipping: 0 - Disable, 1 - Hide Checkbox & other shipping fields, 2 - Hide checkbox and show other shipping fields
+      'ship'            => array(
+        'description'   => t('shippable setting'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      // List Position Boolean on/off setting & default position value
+      'lpos'         => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'lpos_settings'   => array(
+        'description'   => t('default list position value'),
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      // Stock Boolean on/off setting & default stock level (if stock module is installed)
+      'stock'           => array(
+        'description'   => t('boolean'),
+        'type'          => 'int',
+        'size'          => 'tiny',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'stock_settings'   => array(
+        'description'   => t('default stock value'),
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'stock_threshold' => array(
+        'description'   => t('stock threshold'),
+        'type'          => 'int',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'weight'          => array(
+        'description'   => t('weight'),
+        'type'          => 'float',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'weight_units'    => array(
+        'description'   => t('weight units'),
+        'type'          => 'varchar',
+        'length'        => 255,
+        'not null'      => TRUE,
+        'default'       => 'lb',
+      ),
+
+      'length'          => array(
+        'description'   => t('length'),
+        'type'          => 'float',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'width'           => array(
+        'description'   => t('width'),
+        'type'          => 'float',
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'height'          => array(
+        'description'   => t('height'),
+        'type'          => 'numeric',
+        'precision'     => 15,
+        'scale'         => 3,
+        'not null'      => TRUE,
+        'unsigned'      => TRUE,
+        'default'       => 0,
+      ),
+
+      'length_units'    => array(
+        'description'   => t('size units'),
+        'type'          => 'varchar',
+        'length'        => 255,
+        'not null'      => TRUE,
+        'default'       => 'in',
+      ),
+    ),
+    'primary key'     => array('pcid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ * @return array
+ */
+function uc_product_power_tools_update_6105() {
+    $changes = array();
+
+    db_change_field($changes, 'uc_power_tools', 'asku-settings', 'asku_settings', array('description'   => t('replacement pattern'), 'type' => 'text', 'not null' => FALSE,));
+    db_change_field($changes, 'uc_power_tools', 'lp-settings','lp_settings', array('description' => t('default list price value'), 'type' => 'numeric', 'precision' => 15, 'scale' => 3, 'not null' => TRUE,'default' => 0.0));
+    db_change_field($changes, 'uc_power_tools', 'cost-settings','cost_settings', array('description' => t('default list price value'), 'type' => 'numeric', 'precision' => 15, 'scale' => 3, 'not null' => TRUE,'default' => 0.0));
+    db_change_field($changes, 'uc_power_tools', 'sp-settings','sp_settings', array('description' => t('default list price value'), 'type' => 'numeric', 'precision' => 15, 'scale' => 3, 'not null' => TRUE,'default' => 0.0));
+    db_change_field($changes, 'uc_power_tools', 'dq-settings', 'dq_settings', array('description' => t('default quantity value'), 'type' => 'int', 'not null' => TRUE, 'default' => 1));
+    db_change_field($changes, 'uc_power_tools', 'pq-settings', 'pq_settings', array('description' => t('package quantity value'), 'type' => 'int', 'not null' => TRUE, 'default' => 0));
+    db_change_field($changes, 'uc_power_tools', 'lops-settings', 'lpos_settings', array('description' => t('default list position value'), 'type' => 'int', 'not null' => TRUE, 'unsigned' => TRUE, 'default' => 0));
+    db_change_field($changes, 'uc_power_tools', 'stock-settings', 'stock_settings', array('description' => t('default stock value'), 'type' => 'int', 'not null' => TRUE, 'unsigned' => TRUE, 'default' => 0));
+    db_change_field($changes, 'uc_power_tools', 'stock-threshold', 'stock_threshold', array('description' => t('stock threshold'), 'type' => 'int', 'not null' => TRUE, 'unsigned' => TRUE, 'default' => 0));
+
+    return $changes;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_product_power_tools_install() {
+  drupal_install_schema('uc_product_power_tools');
+  db_query("UPDATE {system} SET weight = 10 WHERE name = 'uc_product_power_tools'");
+  db_query("REPLACE INTO {uc_power_tools} (`pcid`, `enabled`) VALUES ('product', 0)");
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_product_power_tools_uninstall() {
+  drupal_uninstall_schema('uc_product_power_tools');
+}
