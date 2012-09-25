@@ -263,7 +263,8 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   // Remove the right sidebar when on the marketing pages, or in the forum.
   //if ($_GET['q'] == 'about' || context_get('bbcom', 'section') == 'forum') {
   //if (preg_match('/^user\/\d+/', $_GET['q']) || context_isset('context', 'bbcom-section-forum')) {
-  if (module_exists('context') && context_isset('context', 'bbcom-section-forum')) {
+  if (module_exists('context') && (context_isset('context', 'bbcom-section-forum') || context_isset('context', 'bbcom-section-store'))) {
+    // TODO: replace this with context_layouts
     $vars['always_right'] = FALSE;
   }
   else {
