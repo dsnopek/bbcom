@@ -8,7 +8,7 @@ define('SPAMBOT_ACTION_DELETE', 2);
  * Implementation of hook_perm()
  */
 function spambot_perm() {
-  return array('administer spambot');
+  return array('administer spambot', 'protected from spambot scans');
 }
 
 /**
@@ -102,6 +102,12 @@ function spambot_user_register_validate($form, &$form_state) {
           spambot_report_account($account, array($ip));
           watchdog('spambot', t('Reported as spammer: email=@email,username=@username,ip=@ip', array('@email' => $account->mail, '@username' => $account->name, '@ip' => $ip)));
         }
+
+        // Slow them down if configured
+        $delay = variable_get('spambot_blacklisted_delay', 0);
+        if ($delay) {
+          sleep($delay);
+        }
       }
     }
   }
@@ -133,7 +139,13 @@ function spambot_user_operations_report($accounts) {
       user_save($account, array('status' => 0));
     }
     if ($key) {
-      spambot_report_account($account);
+      $ips = spambot_account_ip_addresses($account);
+      if (count($ips)) {
+        spambot_report_account($account, $ips);
+      }
+      else {
+        drupal_set_message(t('Reporting %name as a spammer failed because there are no IP addresses stored for that user.', array('%name' => $account->name)));
+      }
     }
   }
 }
@@ -163,7 +175,7 @@ function spambot_cron() {
       $result = spambot_account_is_spammer($account);
       if ($result > 0) {
         $link = l(t('spammer'), 'user/' . $account->uid);
-        switch ($action) {
+        switch (user_access('protected from spambot scans', $account) ? SPAMBOT_ACTION_NONE : $action) {
           case SPAMBOT_ACTION_BLOCK:
             user_save($account, array('status' => 0));
             watchdog('spambot', t('Blocked spam account: @name &lt;@email&gt; (uid @uid)', array('@name' => $account->name, '@email' => $account->mail, '@uid' => $account->uid)), array(), WATCHDOG_NOTICE, $link);
@@ -246,11 +258,11 @@ function spambot_sfs_request($query, &$data) {
       return TRUE;
     }
     else {
-      watchdog('spambot', t('Request unsuccessful: @url !dump', array('@url' => $url, '!dump' => "<pre>\n" . print_r($data, TRUE) . "</pre>\n")));
+      watchdog('spambot', t("Request unsuccessful: @url <pre>\n@dump</pre>", array('@url' => $url, '@dump' => print_r($data, TRUE)))); 
     }
   }
   else {
-    watchdog('spambot', t('Error contacting service: @url !dump', array('@url' => $url, '!dump' => "<pre>\n" . print_r($result, TRUE) . "</pre>\n")));
+    watchdog('spambot', t("Error contacting service: @url <pre>\n@dump</pre>", array('@url' => $url, '@dump' => print_r($result, TRUE))));
   }
 
   return FALSE;
@@ -334,14 +346,14 @@ function spambot_account_ip_addresses($account) {
   $hostnames = array();
 
   // Retrieve IPs from any sessions which may still exist
-  $result = db_query("SELECT DISTINCT hostname FROM {sessions} WHERE uid = %d ORDER BY timestamp DESC", $account->uid);
+  $result = db_query("SELECT DISTINCT hostname FROM {sessions} WHERE uid = %d", $account->uid);
   while ($object = db_fetch_object($result)) {
     $hostnames[] = $object->hostname;
   }
 
   // Retrieve IPs from comments
-  if (module_exists('comments')) {
-    $result = db_query("SELECT DISTINCT hostname FROM {comments} WHERE uid = %d ORDER BY timestamp DESC", $account->uid);
+  if (module_exists('comment')) {
+    $result = db_query("SELECT DISTINCT hostname FROM {comments} WHERE uid = %d", $account->uid);
     while ($object = db_fetch_object($result)) {
       $hostnames[] = $object->hostname;
     }
@@ -349,7 +361,7 @@ function spambot_account_ip_addresses($account) {
 
   // Retrieve IPs from statistics
   if (module_exists('statistics')) {
-    $result = db_query("SELECT DISTINCT hostname FROM {accesslog} WHERE uid = %d ORDER BY timestamp DESC", $account->uid);
+    $result = db_query("SELECT DISTINCT hostname FROM {accesslog} WHERE uid = %d", $account->uid);
     while ($object = db_fetch_object($result)) {
       $hostnames[] = $object->hostname;
     }
@@ -374,19 +386,14 @@ function spambot_account_ip_addresses($account) {
  *   Account to report
  * @param $ips
  *   An array of IP addresses to report.
- *   If not specified, then use ip addresses from spambot_account_ip_addresses()
  *   If there are no IPs, the report will fail. 
  *
  * @return
  *   TRUE if successful, FALSE if error
  */
-function spambot_report_account($account, $ips = NULL) {
+function spambot_report_account($account, $ips) {
   $success = FALSE;
   $key = variable_get('spambot_sfs_api_key', FALSE);
-
-  if (is_null($ips)) {
-    $ips = spambot_account_ip_addresses($account);
-  }
 
   if ($key && count($ips)) {
     $query['email'] = $account->mail;
@@ -405,12 +412,12 @@ function spambot_report_account($account, $ips = NULL) {
 
       $url = 'http://www.stopforumspam.com/add.php?' . join('&', $params);
       $result = drupal_http_request($url);
-      if (!empty($result->code) && $result->code == 200 && !empty($result->data) && strpos($result->data, 'Data submitted successfully')) {
+      if (!empty($result->code) && $result->code == 200 && !empty($result->data) && stripos($result->data, 'data submitted successfully') !== FALSE) {
         // If one report is successful, then all are successful
         $success = TRUE;
       }
       else {
-        watchdog('spambot', t('Error reporting account: @url !dump', array('@url' => $url, '!dump' => "<pre>\n" . print_r($result, TRUE) . "</pre>\n")));
+        watchdog('spambot', t("Error reporting account: @url <pre>\n@dump</pre>", array('@url' => $url, '@dump' => print_r($result, TRUE))));
       }
     }
   }
