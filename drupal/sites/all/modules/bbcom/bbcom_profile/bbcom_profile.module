@@ -74,7 +74,7 @@ function bbcom_profile_user($type, &$edit, &$account, $category = NULL) {
       $account->content['badges'] = array(
         '#type' => 'user_profile_category',
         '#title' => t('Badges'),
-        '#weight' => -1,
+        '#weight' => -9,
       );
       
       $account->content['badges']['badges'] = array(
@@ -156,7 +156,7 @@ function _bbcom_profile_node_form_submit($form, &$form_state) {
  */
 function bbcom_profile_profile_alter(&$account) {
   // move the content profile to the top of the pile
-  $account->content['content_profile']['#weight'] = -2;
+  $account->content['content_profile']['#weight'] = -10;
 }
 
 //////
