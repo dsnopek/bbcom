@@ -219,6 +219,23 @@ tbody {
   font-size: 12px;
 }
 
+/**
+ * DRS: A classy looking table.
+ */
+table.neat-table {
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+}
+table.neat-table td {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 2px 5px;
+}
+table.neat-table thead td {
+  background: LightGrey;
+  vertical-align: bottom;
+}
+
 /*
  * DRS: Messages
  */
