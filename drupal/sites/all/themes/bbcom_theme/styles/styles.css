@@ -435,7 +435,8 @@ ul.primary li a {
 /*
  * DRS: Blocks created in the database.
  */
-.block-block {
+.block-block,
+.block-book {
   border: 4px solid #aaa;
   background: white;
   padding: 10px;
