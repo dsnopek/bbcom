@@ -648,6 +648,19 @@ div.content-profile-display {
   padding: 5px 5px;
 }
 
+/**
+ * DRS: Premium content
+ */
+.premium-message {
+  clear: both;
+  margin: 0 0 1em 0;
+  border: 2px solid #0c0;
+  padding: 1em;
+  background-color: #efe;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
 /*
 ** Formatting for administration page
 **
