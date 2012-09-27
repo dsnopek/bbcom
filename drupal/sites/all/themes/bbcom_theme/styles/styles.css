@@ -633,6 +633,20 @@ div.content-profile-display {
   margin: 0 0 5px 5px;
 }
 
+/**
+ * DRS: Ubercart
+ */
+.node .content .add-to-cart {
+  float: right;
+}
+#cart-form-products td {
+  vertical-align: middle;
+  padding: 5px 0;
+}
+#cart-form-products td.image {
+  padding: 5px 5px;
+}
+
 /*
 ** Formatting for administration page
 **
