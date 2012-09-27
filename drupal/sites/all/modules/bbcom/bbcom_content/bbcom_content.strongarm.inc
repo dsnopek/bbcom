@@ -9,6 +9,29 @@ function bbcom_content_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'book_allowed_types';
+  $strongarm->value = array(
+    0 => 'content',
+  );
+  $export['book_allowed_types'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'book_block_mode';
+  $strongarm->value = 'book pages';
+  $export['book_block_mode'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'book_child_type';
+  $strongarm->value = 'content';
+  $export['book_child_type'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_anonymous_content';
   $strongarm->value = 0;
   $export['comment_anonymous_content'] = $strongarm;
