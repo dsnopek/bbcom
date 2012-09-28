@@ -36,3 +36,12 @@ function bbcom_exercises_form_quiz_questions_form_alter(&$form, &$form_state) {
   }
 }
 
+/**
+ * Implementation of hook_form_quiz_question_answering_form_alter().
+ */
+function bbcom_exercises_form_quiz_question_answering_form_alter(&$form, &$form_state) {
+  if ($form['#theme'] == 'long_answer_answering_form') {
+    $form['question']['#value'] .= '<p><em>' . t('Please limit your answer to 250 words.') . '</em></p>';
+  }
+}
+
