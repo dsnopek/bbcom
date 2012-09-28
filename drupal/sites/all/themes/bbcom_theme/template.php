@@ -238,11 +238,21 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   $vars['language_switcher'] = drupal_get_form('bbcom_theme_language_switcher_form', $vars['node']);
 
   if ($user->uid) {
-    $vars['account_links'] = theme('bbcom_account_links', array(
+    $links = array(
       theme('bbcom_join_btn', url("wial/{$user->uid}/edit"), t('Words I Am Learning')),
       l(t('My Account'), 'user/'. $user->uid),
       l(t('Sign out'), 'logout')
-    ));
+    );
+
+    /*
+    $route = menu_get_item('support');
+    if ($route['access']) {
+      array_splice($links, 1, 0, '<strong>' . l(t('Customer support'), 'support') . '</strong>');
+      //array_unshift($links, '<strong>' . l(t('Customer support'), 'support') . '</strong>');
+    }
+    */
+
+    $vars['account_links'] = theme('bbcom_account_links', $links);
   }
   else {
     $login_options = array();

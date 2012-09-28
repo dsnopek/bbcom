@@ -32,7 +32,7 @@
           <div id="site-name" class="grid-2"><?php print $linked_site_name; ?></div>
         <?php endif; ?>
 
-          <div class="grid-5 <?php print ns('prefix-7', $linked_logo_img, 1, $linked_site_name, 2); ?>">
+          <div class="grid-6 <?php print ns('prefix-6', $linked_logo_img, 1, $linked_site_name, 2); ?>">
             <?php print $account_links; ?>
           </div>
         </div>

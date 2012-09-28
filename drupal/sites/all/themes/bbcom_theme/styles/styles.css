@@ -146,7 +146,7 @@ ul.links.main-menu li a:visited {
   text-decoration: none;
   color: black !important;
   font-weight: bold;
-  font-size: 120%;
+  font-size: 118%;
 }
 
 ul.links.main-menu li.active {
@@ -669,11 +669,21 @@ div.content-profile-display {
   font-size: 1.3em;
 }
 
-/**
+/*
  * DRS: Fix up book navigation.
  */
 .book-navigation ul.menu {
   margin-left: 0;
+}
+
+/**
+ * DRS: for the support overview page.
+ */
+#support-page-form table.support {
+  margin-top: 1em;
+}
+#support-page-form table.support td{
+  padding: 5px;
 }
 
 /*
