@@ -146,7 +146,7 @@ ul.links.main-menu li a:visited {
   text-decoration: none;
   color: black !important;
   font-weight: bold;
-  font-size: 118%;
+  font-size: 120%;
 }
 
 ul.links.main-menu li.active {
@@ -684,6 +684,9 @@ div.content-profile-display {
 }
 #support-page-form table.support td{
   padding: 5px;
+}
+li.menu-2640 {
+  margin-left: 1em;
 }
 
 /*
