@@ -611,7 +611,9 @@ function _uc_premium_access_theme_premium_body($node) {
   $html .= '<div class="premium-message">';
 
   // TODO: this should probably be optional!
-  $html .= check_markup($node->premium_level['denied_message'], $node->premium_level['denied_message_format'], FALSE);
+  $html .= '<div class="premium-message-text">';
+  $html .= check_markup(t($node->premium_level['denied_message']), $node->premium_level['denied_message_format'], FALSE);
+  $html .= '</div>';
 
   $products = uc_premium_access_products($node);
   if (!empty($products)) {

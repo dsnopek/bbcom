@@ -1,0 +1,13 @@
+diff --git a/premium.module b/premium.module
+index 6670e05..7adf0df 100644
+--- a/premium.module
++++ b/premium.module
+@@ -50,7 +50,7 @@ function premium_nodeapi(&$node, $op, $teaser) {
+       _premium_set_premium($node, $node->premium);
+       break;
+     case 'view':
+-      if (!$node->premium_access) {
++      if (!$node->premium_access && empty($node->preview)) {
+         $node->content['body']['#value'] = theme('premium_body', $node);
+       }
+       break;
