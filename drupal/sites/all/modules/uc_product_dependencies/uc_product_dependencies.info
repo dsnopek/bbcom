@@ -1,0 +1,15 @@
+; $Id: uc_product_dependencies.info,v 1.1.2.1 2010/04/08 22:09:44 joelstein Exp $
+name = Product Dependencies
+description = Restricts products from being purchased based on Node Reference dependencies.
+core = 6.x
+package = Ubercart - extra
+dependencies[] = uc_cart
+dependencies[] = nodereference
+
+
+; Information added by drupal.org packaging script on 2010-06-22
+version = "6.x-1.1"
+core = "6.x"
+project = "uc_product_dependencies"
+datestamp = "1277217021"
+

@@ -72,6 +72,28 @@ function bbcom_store_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'content_extra_weights_package';
+  $strongarm->value = array(
+    'title' => '-5',
+    'body_field' => '-4',
+    'revision_information' => '4',
+    'author' => '5',
+    'options' => '6',
+    'comment_settings' => '8',
+    'language' => '0',
+    'translation' => '10',
+    'menu' => '-1',
+    'book' => '3',
+    'path' => '9',
+    'attachments' => '7',
+    'base' => '-2',
+    'body' => '1',
+  );
+  $export['content_extra_weights_package'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_package';
   $strongarm->value = '2';
   $export['language_content_type_package'] = $strongarm;
@@ -91,6 +113,34 @@ function bbcom_store_strongarm() {
   $strongarm->name = 'uc_image_package';
   $strongarm->value = 'field_image_cache';
   $export['uc_image_package'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'uc_product_dependencies_location';
+  $strongarm->value = '1';
+  $export['uc_product_dependencies_location'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'uc_product_dependencies_multiple';
+  $strongarm->value = '2';
+  $export['uc_product_dependencies_multiple'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'uc_product_dependencies_order_status';
+  $strongarm->value = 'payment_received';
+  $export['uc_product_dependencies_order_status'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'uc_product_dependencies_package_nodereference';
+  $strongarm->value = 'field_package_dependencies';
+  $export['uc_product_dependencies_package_nodereference'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
