@@ -15,6 +15,35 @@ function bbcom_exercises_menu_alter(&$items) {
       $items[$menu_name]['type'] = MENU_CALLBACK;
     }
   }
+
+  // TODO: this should probably be a patch to the 'quiz' module.
+  // In the e-mail sent to the author of a quiz when a user completes it, a link to 
+  // user/quiz/%/userresults is sent - for admins, we're going to redirect this to
+  // the page to evaluate their result.
+  $items['user/quiz/%/userresults']['access callback'] = '_bbcom_exercises_quiz_userresults_access';
+  $items['user/quiz/%/userresults']['page callback'] = '_bbcom_exercises_quiz_userresults_page';
+}
+
+function _bbcom_exercises_quiz_userresults_access($rid) {
+  return user_access('view any quiz results') || quiz_access_my_result($rid);
+}
+
+function _bbcom_exercises_quiz_userresults_page($rid) {
+  global $user;
+
+  if (user_access('view any quiz results')) {
+    $sql = 'SELECT qnp.nid, qnp.vid, qnrs.uid
+      FROM {quiz_node_properties} qnp
+      INNER JOIN {quiz_node_results} qnrs ON qnrs.vid = qnp.vid
+      WHERE qnrs.result_id = %d';
+    $result = db_fetch_object(db_query($sql, $rid));
+
+    if ($result->uid != $user->uid) {
+      return drupal_goto("node/{$result->nid}/results/{$rid}");
+    }
+  }
+
+  return quiz_user_results($rid);
 }
 
 /**
