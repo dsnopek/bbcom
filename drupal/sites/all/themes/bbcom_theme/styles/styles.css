@@ -661,6 +661,13 @@ div.content-profile-display {
   font-size: 1.3em;
 }
 
+/**
+ * DRS: Fix up book navigation.
+ */
+.book-navigation ul.menu {
+  margin-left: 0;
+}
+
 /*
 ** Formatting for administration page
 **
