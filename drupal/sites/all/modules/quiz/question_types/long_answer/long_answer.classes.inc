@@ -262,6 +262,11 @@ class LongAnswerResponse extends QuizQuestionResponse {
    */
   public function isValid() {
     if (trim($this->answer) == '') return t('You must provide an answer');
+
+    // DRS: limit words to 250!
+    $word_count = count(explode(' ', trim($this->answer)));
+    if ($word_count > 250) return t('Your answer must be less than 250 words (yours is %length)', array('%length' => $word_count));
+
     return TRUE;
   }
 
