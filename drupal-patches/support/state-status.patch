@@ -1,0 +1,31 @@
+diff --git a/drupal/sites/all/modules/support/support.module b/drupal/sites/all/modules/support/support.module
+index f3cbfe5..82d8633 100644
+--- a/drupal/sites/all/modules/support/support.module
++++ b/drupal/sites/all/modules/support/support.module
+@@ -955,7 +955,7 @@ function support_comment_view(&$comment) {
+     $client = $current->client;
+   }
+   if (!empty($current) && $state != $current->state) {
+-    $comment->comment = '<div class="support-state">'. t('State') .': '. check_plain(_support_state($state)) .' -> '. check_plain(_support_state($current->state)) ."</div>\n" . $comment->comment;
++    $comment->comment = '<div class="support-state">'. t('Status') .': '. check_plain(_support_state($state)) .' -> '. check_plain(_support_state($current->state)) ."</div>\n" . $comment->comment;
+     $state = $current->state;
+   }
+   if (!empty($current) && $priority != $current->priority) {
+@@ -2099,7 +2099,7 @@ function support_status_form(&$form_state, $edit, $title) {
+     }
+     $form['support']['state'] = array(
+       '#type' => 'select',
+-      '#title' => t('State'),
++      '#title' => t('Status'),
+       '#options' => _support_states(FALSE, $state),
+       '#default_value' => $default,
+     );
+@@ -2672,7 +2672,7 @@ function support_page_form(&$form_state, $client = NULL, $state = NULL) {
+   foreach (array(
+     SUPPORT_SORT_UPDATE => array('data' => t('Updated'), 'field' => 'last_updated'),
+     SUPPORT_SORT_NID => array('data' => t('Id'), 'field' => 'n.nid'),
+-    SUPPORT_SORT_STATE => array('data' => t('State'), 'field' => 't.state'),
++    SUPPORT_SORT_STATE => array('data' => t('Status'), 'field' => 't.state'),
+     SUPPORT_SORT_PRIORITY => array('data' => t('Priority'), 'field' => 't.priority')) as $key => $array) {
+     if ($sort == $key) {
+       $headers[$key] = $array + array('sort' => $order);
