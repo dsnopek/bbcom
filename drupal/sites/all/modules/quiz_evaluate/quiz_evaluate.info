@@ -1,0 +1,6 @@
+name = Quiz Evaluate
+package = Quiz
+description = "Allow certain users to evaluate a quiz, manually giving the quiz taker comments on their answers."
+dependencies[] = quiz
+core = 6.x
+
