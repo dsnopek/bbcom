@@ -1,0 +1,94 @@
+<?php
+
+// TODO: alter 'long_answer_score_form' and add the comment field
+// TODO: alter 'short_answer_score_form' and add the comment field
+
+/**
+ * Implementation of hook_form_quiz_report_form_alter().
+ */
+function quiz_evaluate_form_quiz_report_form_alter(&$form, &$form_state) {
+  // pull this from the original forms arguments
+  $allow_scoring = isset($form['#parameters'][5]) ? (bool)$form['#parameters'][5] : FALSE;
+
+  foreach (element_children($form) as $key) {
+    if (is_numeric($key)) {
+      _quiz_evaluate_question_report_form_alter($form, $form_state, $key, $allow_scoring);
+    }
+  }
+
+  if ($allow_scoring) {
+    if (!isset($form['submit'])) {
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit'),
+      );
+    }
+    $form['submit']['#submit'][] = '_quiz_evaluate_report_form_submit';
+  }
+}
+
+/**
+ * Alters the report_form for an individual question.
+ */
+function _quiz_evaluate_question_report_form_alter(&$form, &$form_state, $key, $allow_scoring = FALSE) {
+  // get the comment value
+  $comment = isset($form_state['values'][$key]['comment']) ? $form_state['values'][$key]['comment'] : NULL;
+  if (is_null($comment)) {
+    $value = db_fetch_array(db_query("SELECT comment, format FROM {quiz_evaluate_comments} WHERE result_id = %d AND question_nid = %d AND question_vid = %d",
+      $form[$key]['rid']['#value'], $form[$key]['nid']['#value'], $form[$key]['vid']['#value']));
+    if ($value) {
+      $comment = $value['comment'];
+      $format = $value['format'];
+    }
+  }
+
+  // build our comment field
+  $element = array();
+  if ($allow_scoring && !empty($form[$key]['submit']['#value'])) {
+    // we figure that if this question has a submit handler, it must be doing manual evaluation,
+    // so we show the comment form.
+    $element['comment'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Comment'),
+      '#parents' => array($key, 'comment'),
+      '#default_value' => $comment,
+    );
+    $element['format'] = filter_form($format, NULL, array($key, 'comment_format'));
+  }
+  elseif (!empty($comment)) {
+    $element['comment'] = array(
+      '#type' => 'item',
+      '#title' => t('Comment'),
+      '#value' => check_markup($comment, $format, FALSE),
+    );
+  }
+
+  // We stash the comment field inside the response field so that the default quiz-report-form.tpl.php
+  // template will show it. This template could probably use some revision, but I'm not sure on the best
+  // change yet.
+  $form[$key]['response'] = array('response' => $form[$key]['response']);
+  $form[$key]['response']['#parents'] = array($key, 'response');
+  $form[$key]['response']['comment'] = $element;
+}
+
+/**
+ * Stores the evaluation comments.
+ */
+function _quiz_evaluate_report_form_submit($form, &$form_state) {
+  foreach ($form_state['values'] as $key => $values) {
+    // skip non-questions and non-manual questions
+    if (!is_numeric($key) || empty($values['submit']))
+      continue;
+
+    // delete the old comment
+    db_query("DELETE FROM {quiz_evaluate_comments} WHERE result_id = %d AND question_nid = %d AND question_vid = %d",
+      $values['rid'], $values['nid'], $values['vid']);
+    
+    if (!empty($values['comment'])) {
+      // insert the new one
+      db_query("INSERT INTO {quiz_evaluate_comments} (result_id, question_nid, question_vid, comment, format) VALUES (%d, %d, %d, '%s', %d)",
+        $values['rid'], $values['nid'], $values['vid'], $values['comment'], $values['comment_format']);
+    }
+  }
+}
+
