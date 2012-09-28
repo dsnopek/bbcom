@@ -515,6 +515,14 @@ ul.primary li a {
   visibility: hidden;
 }
 
+/**
+ * DRS: Basic node page stuff.
+ */
+.field,
+.book-navigation {
+  margin-bottom: 1em;
+}
+
 /*
  * DRS: Entry customizations.
  */
