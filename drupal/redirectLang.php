@@ -43,7 +43,7 @@ class Language{
 
 $supported = array('en', 'pl');
 $lang = Language::getBestMatch($supported, $supported[0]);
-$url = 'http://'. $lang .'.bibliobird.com'. $_SERVER['PATH_INFO'];
+$url = 'https://'. $lang .'.bibliobird.com'. $_SERVER['PATH_INFO'];
 if (!empty($_SERVER['QUERY_STRING'])) {
   $url .= '?'. $_SERVER['QUERY_STRING'];
 }

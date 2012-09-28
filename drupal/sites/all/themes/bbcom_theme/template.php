@@ -389,6 +389,13 @@ function bbcom_theme_preprocess_block(&$vars, $hook) {
   }
 }
 
+/**
+ * Remove the tree view from the book_navigation.
+ */
+function bbcom_theme_preprocess_book_navigation(&$vars) {
+  $vars['tree'] = '';
+}
+
 /*
  * Mark some of the node form elements as inline
  */
