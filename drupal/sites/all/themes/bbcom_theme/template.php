@@ -83,6 +83,9 @@ function bbcom_theme_theme(&$existing, $type, $theme, $path) {
     'menu_local_tasks' => array(
       'arguments' => array(),
     ),
+    'premium_body' => array(
+      'arguments' => array('node' => NULL),
+    ),
     'bbcom_join_btn' => array(
       'template' => 'bbcom-join-btn',
       'path' => drupal_get_path('theme', 'bbcom_theme') .'/templates',
@@ -139,6 +142,40 @@ function bbcom_theme_menu_local_tasks() {
   }
 
   return $output;
+}
+
+function bbcom_theme_premium_body($node) {
+  // Hack to allow 'content' to still work with the reader when it's being hidden via 'premium_content'
+  if ($node->type == 'content' && module_exists('lingwo_korpus')) {
+    $node_language = $node->language ? $node->language : language_default();
+    $teaser = lingwo_korpus_filter_text($node->teaser, $node_language, $node->nid . ':teaser');
+  }
+  else {
+    $teaser = check_markup($node->teaser, $node->format, FALSE);
+  }
+
+  /**
+   * Copied from uc_premium_access!
+   */
+
+  $html = $teaser;
+  $html .= '<div class="premium-message">';
+
+  // TODO: this should probably be optional!
+  $html .= '<div class="premium-message-text">';
+  $html .= check_markup(t($node->premium_level['denied_message']), $node->premium_level['denied_message_format'], FALSE);
+  $html .= '</div>';
+
+  if (module_exists('uc_premium_access')) {
+    $products = uc_premium_access_products($node);
+    if (!empty($products)) {
+      $html .= theme('uc_premium_access_product_list', $products, $node);
+    }
+  }
+
+  $html .= '</div>';
+
+  return $html;
 }
 
 function bbcom_theme_language_switcher_form(&$form_state, $node=NULL) {

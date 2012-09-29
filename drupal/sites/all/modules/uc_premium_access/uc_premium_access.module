@@ -580,7 +580,7 @@ function uc_premium_access_theme() {
  * Implementation of hook_theme_registry_alter().
  */
 function uc_premium_access_theme_registry_alter(&$theme_registry) {
-  if (isset($theme_registry['premium_body'])) {
+  if (isset($theme_registry['premium_body']) && $theme_registry['premium_body']['function'] == 'theme_premium_body') {
     $theme_registry['premium_body']['function'] = '_uc_premium_access_theme_premium_body';
   }
 }
