@@ -668,6 +668,9 @@ div.content-profile-display {
   font-weight: bold;
   font-size: 1.3em;
 }
+.premium-message h3 {
+  font-size: inherit;
+}
 
 /*
  * DRS: Fix up book navigation.
