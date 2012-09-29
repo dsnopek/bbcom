@@ -23,3 +23,12 @@ function bbcom_store_init() {
   }
 }
 
+/**
+ * Implementation of hook_uc_get_message_alter().
+ */
+function bbcom_store_uc_get_message_alter(&$messages) {
+  if (isset($messages['continue_shopping'])) {
+    $messages['continue_shopping'] = '<strong>' . t('Please <a href="!url">visit the library</a> in order to start enjoying your content!', array('!url' => url('content'))) . '</strong>';
+  }
+}
+
