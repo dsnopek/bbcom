@@ -596,6 +596,16 @@ function uc_premium_access_products($node) {
     $products[] = $obj;
   }
 
+  // also include product kits that contain any of the above products
+  if (module_exists('uc_product_kit')) {
+    foreach ($products as $product) {
+      $res = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} AS n LEFT JOIN {uc_product_kits} as pk ON n.vid = pk.vid WHERE n.status = 1 AND pk.product_id = %d"), $product->nid);
+      while ($obj = db_fetch_object($res)) {
+        $products[] = $obj;
+      }
+    }
+  }
+
   // allow other modules to modify it
   drupal_alter('uc_premium_access_products', $products, $node);
 
@@ -640,7 +650,7 @@ function theme_uc_premium_access_product_list($products, $node) {
       $items[] = l($product->title, 'node/' . $product->nid);
     }
 
-    $html .= theme('item_list', $items, t('Purchase one of these items to get access'));
+    $html .= theme('item_list', $items, t('Purchase one of these items to get access:'));
   }
 
   return $html;
