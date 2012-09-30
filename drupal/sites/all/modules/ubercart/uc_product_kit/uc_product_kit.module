@@ -702,13 +702,13 @@ function uc_product_kit_view($node, $teaser = 0, $page = 0) {
     }
     if (module_exists('uc_cart')) {
       $node->content['add_to_cart'] = array('#value' => theme('uc_product_kit_add_to_cart', $node),
-        '#weight' => 10,
+        '#weight' => $weight['add_to_cart'],
       );
     }
   }
   elseif (module_exists('uc_cart') && variable_get('uc_product_add_to_cart_teaser', TRUE)) {
     $node->content['add_to_cart'] = array('#value' => theme('uc_product_kit_add_to_cart', $node),
-      '#weight' => 10,
+      '#weight' => $weight['add_to_cart'],
     );
   }
 
