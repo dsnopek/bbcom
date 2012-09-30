@@ -32,3 +32,44 @@ function bbcom_store_uc_get_message_alter(&$messages) {
   }
 }
 
+/**
+ * Implementation of hook_user().
+ *
+ * Autosubscribe users of particular roles to particular forums!
+ *
+ * TODO: This functionality could be turned into a forum_autosubscribe_role module,
+ *       which adds checkboxes to the forum edit page about which roles to autosubscribe,
+ *       and to automatically unsubscribe them too!
+ *
+ */
+function bbcom_store_user($op, &$edit, &$account, $category = NULL) {
+  $tid = variable_get('bbcom_store_forum_motivated', 0);
+  if ($tid == 0 || !module_exists('bbcom_notifications')) {
+    return;
+  }
+
+  $rid = array_search('motivated', user_roles());
+
+  if ($op == 'update' && $category == 'account') {
+    /*
+    drupal_set_message('account: ' . print_r($account->roles, TRUE));
+    drupal_set_message('edit: ' . print_r($edit['roles'], TRUE));
+    */
+
+    // if the 'motivated' role is being added or removed
+    if (empty($account->roles[$rid]) && !empty($edit['roles'][$rid])) {
+      // subscribe the users to it!
+      _bbcom_notifications_subscribe_to_forum($account, $tid, array(
+        'send_method' => 'mail',
+        'send_interval' => 0,
+      ));
+    }
+    // This is so wacky because $edit['roles'] only contains the ids - I don't know why...
+    elseif (!empty($account->roles[$rid]) && empty($edit['roles'][$rid])) {
+      // unsubscribe the user from it!
+      $sub = array_shift(notifications_get_subscriptions(array('type' => 'taxonomy', 'uid' => $account->uid, 'tid' => $tid)));
+      notifications_subscription_delete($sub);
+    }
+  }
+}
+
