@@ -1,0 +1,4 @@
+name = Node body protection
+description = Uses Javascript to protect the node body of certain nodes
+core = 6.x
+

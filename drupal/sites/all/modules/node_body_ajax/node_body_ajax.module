@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function node_body_ajax_perm() {
+  return array('administer node_body_ajax');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function node_body_ajax_menu() {
+  $items = array();
+
+  $items['admin/settings/node_body_ajax'] = array(
+    'title' => 'Node body ajax settings',
+    'description' => 'Settings for protecting the body of certain nodes.',
+    'access arguments' => array('administer node_body_ajax'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('node_body_ajax_admin_settings'),
+    'file' => 'node_body_ajax.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['node_body_ajax/%node'] = array(
+    'page callback' => '_node_body_ajax_callback',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function _node_body_ajax_callback($node) {
+  // get the teaser and page flags
+  $teaser = (bool)$_GET['teaser'];
+  $page = (bool)$_GET['page'];
+
+  // build and return the body content
+  $node = (object)$node;
+  $node = node_build_content($node, $teaser, $page);
+  drupal_json(array('content' => drupal_render($node->content)));
+}
+
+function _node_body_ajax_id() {
+  static $counter = 0;
+  return 'node-body-ajax-' . ($counter++);
+}
+
+function _nody_body_ajax_enabled($node, $teaser, $page) {
+  foreach (module_implements('node_body_ajax') as $module) {
+    $func = $module . '_node_body_ajax';
+    if ($func($node, $teaser, $page)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_preprocess_node().
+ */
+function node_body_ajax_preprocess_node(&$vars) {
+  static $js_added = FALSE;
+
+  $node = $vars['node'];
+  $teaser = (bool)$vars['teaser'];
+  $page = (bool)$vars['page'];
+
+  if (_nody_body_ajax_enabled($node, $teaser, $page)) {
+    $id = _node_body_ajax_id();
+
+    // replace the content with an empty div
+    $vars['content'] = '<div class="node-body-ajax" id="' . $id . '"></div>';
+
+    // setup the javascript config
+    drupal_add_js(array(
+      'node_body_ajax' => array(
+        $id => array(
+          'nid'    => $node->nid,
+          'teaser' => $teaser,
+          'page'   => $page,
+        )
+      )
+    ), 'setting');
+
+    // add script to the page
+    if (!$js_added) {
+      drupal_add_js(drupal_get_path('module', 'node_body_ajax') . '/node_body_ajax.js');
+      drupal_add_js(array('node_body_ajax' => array(
+        'url' => url('node_body_ajax'),
+        'disable_selection' => variable_get('node_body_ajax_disable_selection', FALSE),
+      )), 'setting');
+      $js_added = TRUE;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_nody_body_ajax().
+ */
+function node_body_ajax_node_body_ajax($node) {
+  // Use the admin settings
+  $node_types = array_filter(variable_get('node_body_ajax_node_types', array()));
+  return in_array($node->type, array_values($node_types));
+}
+
