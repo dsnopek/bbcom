@@ -1,0 +1,498 @@
+<?php
+
+/**
+ * @file
+ * Limits multiple sessions per user.
+ */
+
+/**
+ * Do nothing if the session limit is exceeded.
+ */
+define('SESSION_LIMIT_DO_NOTHING', 0);
+
+/**
+ * Automatically drop sessions that would exceed the limit.
+ */
+define('SESSION_LIMIT_DROP', 1);
+
+/**
+ * Disallow sessions that would exceed the limit.
+ */
+define('SESSION_LIMIT_DISALLOW_NEW', 2);
+
+/**
+ * Implementation of hook_help().
+ */
+function session_limit_help($path, $args) {
+  switch ($path) {
+    case 'admin/help#session_limit':
+      $output = '<p>'. t("The two major notice messages to users are passed through Drupal's t() function. This maintains locale support, allowing you to override strings in any language, but such text is also available to be changed through other modules like !stringoverridesurl.", array('!stringoverridesurl' => l('String Overrides', 'http://drupal.org/project/stringoverrides'))) .'</p>';
+      $output .= '<p>'. t("The two major strings are as follows:") .'</p>';
+      $output .= '<p><blockquote>';
+      $output .=  'The maximum number of simultaneous sessions (@number) for your account has been reached. You did not log off from a previous session or someone else is logged on to your account. This may indicate that your account has been compromised or that account sharing is limited on this site. Please contact the site administrator if you suspect your account has been compromised.';
+      $output .= '</blockquote></p><p><blockquote>';
+      $output .= 'You have been automatically logged out. Someone else has logged in with your username and password and the maximum number of @number simultaneous sessions was exceeded. This may indicate that your account has been compromised or that account sharing is not allowed on this site. Please contact the site administrator if you suspect your account has been compromised.';
+      $output .= '</blockquote></p>';
+      return $output;
+    case 'session/limit':
+      return t('The maximum number of simultaneous sessions (@number) for your account has been reached. You did not log off from a previous session or someone else is logged on to your account. This may indicate that your account has been compromised or that account sharing is limited on this site. Please contact the site administrator if you suspect your account has been compromised.', array('@number' => session_limit_user_max_sessions()));
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function session_limit_perm() {
+  return array(
+    'administer session limits by role',
+    'administer session limits per user'
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function session_limit_menu() {
+  $items['session/limit'] = array(
+    'title' => 'Session limit exceeded',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_page'),
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_CALLBACK
+  );
+  $items['mysessions'] = array(
+    'title' => 'My sessions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_page'),
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_SUGGESTED_ITEM
+  );
+  $items['admin/user/session_limit'] = array(
+    'title' => 'Session limit',
+    'description' => 'Configure session limits.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['admin/user/session_limit/defaults'] = array(
+    'title' => 'Defaults',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
+  $items['admin/user/session_limit/roles'] = array(
+    'title' => 'Role limits',
+    'description' => 'Configure session limits by role.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_settings_byrole'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer session limits by role'),
+    'type' => MENU_LOCAL_TASK
+  );
+  $items['user/%user/session_limit'] = array(
+    'title' => 'Session limit',
+    'description' => 'Configure session limit for one user.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session_limit_user_settings', 1),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer session limits per user'),
+    'type' => MENU_LOCAL_TASK
+  );
+  return $items;
+}
+
+function session_limit_settings() {
+  $form['session_limit_max'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default maximum number of active sessions'),
+    '#default_value' => variable_get('session_limit_max', 1),
+    '#size' => 2,
+    '#maxlength' => 3,
+    '#description' => t('The maximum number of active sessions a user can have. 0 implies unlimited sessions.')
+  );
+  $limit_behaviours = array(
+    SESSION_LIMIT_DO_NOTHING => t('Do nothing.'),
+    SESSION_LIMIT_DROP => t('Automatically drop the oldest sessions without prompting.'),
+    SESSION_LIMIT_DISALLOW_NEW => t('Prevent new session.'),
+  );
+  $form['session_limit_behaviour'] = array(
+    '#type' => 'radios',
+    '#title' => t('When the session limit is exceeded'),
+    '#default_value' => variable_get('session_limit_behaviour', SESSION_LIMIT_DO_NOTHING),
+    '#options' => $limit_behaviours,
+  );
+  if (module_exists('masquerade')) {
+    $form['session_limit_masquerade_ignore'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Ignore masqueraded sessions.'),
+      '#description' => t("When a user administrator uses the masquerade module to impersonate a different user, it won't count against the session limit counter"),
+      '#default_value' => variable_get('session_limit_masquerade_ignore', FALSE)
+    );
+  }
+
+  return system_settings_form($form);
+}
+
+function session_limit_settings_validate($form, &$form_state) {
+  $maxsessions = $form_state['values']['session_limit_max'];
+  if (!is_numeric($maxsessions)) {
+    form_set_error('session_limit_max', t('You must enter a number for the maximum number of active sessions'));
+  }
+  elseif ($maxsessions < 0) {
+    form_set_error('session_limit_max', t('Maximum number of active sessions must be positive'));
+  }
+}
+
+function session_limit_settings_byrole() {
+  $result = db_query('SELECT name, value FROM {variable} WHERE name LIKE "session_limit_rid_%" ORDER BY name');
+
+  while ($setting = db_fetch_object($result)) {
+    $role_limits[$setting->name] = unserialize($setting->value);
+  }
+
+  $roles = user_roles(TRUE);
+  foreach ($roles as $rid => $role) {
+    $form["session_limit_rid_$rid"] = array(
+      '#type' => 'select',
+      '#options' => _session_limit_user_options(),
+      '#title' => check_plain($role),
+      '#default_value' => empty($role_limits["session_limit_rid_$rid"]) ? 0 : $role_limits["session_limit_rid_$rid"]
+    );
+  }
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save permissions'));
+  return $form;
+}
+
+function session_limit_settings_byrole_submit($form, &$form_state) {
+  db_query('DELETE FROM {variable} WHERE name LIKE "session_limit_rid_%"');
+  foreach ($form_state['values'] as $setting_name => $setting_limit) {
+    variable_set($setting_name, $setting_limit);
+  }
+  drupal_set_message(t('Role settings updated.'), 'status');
+  watchdog('session_limit', 'Role limits updated.', array(), WATCHDOG_INFO);
+}
+
+/**
+ * Implementation of hook_init().
+ *
+ * Determine whether session has been verified. Redirect user if over session
+ * limit. Established Sessions do NOT need to verify every page load. The new
+ * session must deal w/ determining which connection is cut.
+ *
+ * This intentionally doesn't use hook_user()'s login feature because that's
+ * only really useful if the login event always boots off at least one other
+ * active session. Doing it this way makes sure that the newest session can't
+ * browse to a different page after their login has validated.
+ */
+function session_limit_init() {
+  global $user;
+  if ($user->uid > 1 && !isset($_SESSION['session_limit'])) {
+
+    // Exclude from the redirect.
+    if ((arg(0) == 'session' && arg(1) == 'limit') || arg(0) == 'logout') {
+      return;
+    }
+    if (module_exists('masquerade') && variable_get('session_limit_masquerade_ignore', FALSE)) {
+      $result = db_query('SELECT COUNT(s.uid) FROM {sessions} AS s
+        LEFT JOIN {masquerade} AS m ON s.uid = m.uid_as AND s.sid = m.sid
+        WHERE s.uid = %d AND m.sid IS NULL', $user->uid);
+    }
+    else {
+      $result = db_query('SELECT COUNT(*) FROM {sessions} WHERE uid = %d', $user->uid);
+    }
+
+    $max_sessions = session_limit_user_max_sessions();
+    if (!empty($max_sessions) && db_result($result) > $max_sessions) {
+      session_limit_invoke_session_limit(session_id(), 'collision');
+    }
+    else {
+      // force checking this twice as there's a race condition around session creation.
+      // see issue #1176412
+      if (!isset($_SESSION['session_limit_checkonce'])) {
+        $_SESSION['session_limit_checkonce'] = TRUE;
+      }
+      else {
+        // mark session as verified to bypass this in future.
+        $_SESSION['session_limit'] = TRUE;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_action_info_alter().
+ */
+function session_limit_action_info_alter(&$info) {
+  if (module_exists('token_actions')) {
+    foreach ($info as $type => $data) {
+      if (stripos($type, "token_actions_") === 0 || stripos($type, "system_") === 0) {
+        if (isset($info[$type]['hooks']['session_limit'])) {
+          array_merge($info[$type]['hooks']['session_limit'], array('collision', 'disconnect'));
+        }
+        else {
+          $info[$type]['hooks']['session_limit'] = array('collision', 'disconnect');
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function session_limit_token_list($type = 'all') {
+  $tokens = array();
+
+  if ($type == 'session_limit' || $type == 'user' || $type == 'all') {
+    $tokens['session_limit']['session-limit-default'] = 'Maximum number of active sessions configured specific to the user.';
+    $tokens['session_limit']['session-limit-max']     = 'Maximum number of active sessions allowed, accounting for all configuration possibilities.';
+    $tokens['session_limit']['session-limit-role']    = 'Maximum number of active sessions allowed by role.';
+    $tokens['session_limit']['session-limit-user']    = 'Maximum number of active sessions configured specific to the user.';
+  }
+
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function session_limit_token_values($type, $object = NULL, $options = array()) {
+
+  if ($object == 'session_limit' || $object == 'system' || $type == 'global') {
+    global $user;
+    $tokens['session-limit-default'] = variable_get('session_limit_max', 1);
+    $tokens['session-limit-max']     = session_limit_user_max_sessions($user);
+    $tokens['session-limit-role']    = session_limit_user_max_sessions_byrole($user);
+    $tokens['session-limit-user']    = empty($user->session_limit) ? 0 : check_plain($user->session_limit);
+
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function session_limit_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'view':
+      if (user_access('administer session limits per user')) {
+        $account->content['session_limit'] = array(
+          '#title' => t('Session limit'),
+          '#type' => 'user_profile_category',
+          'session_limit' => array('#value' => empty($account->session_limit) ? t('Default') : $account->session_limit)
+        );
+      }
+      break;
+  }
+}
+
+function session_limit_user_settings($args, $account) {
+  $form['account'] = array(
+    '#type' => 'value',
+    '#value' => $account
+  );
+  $form['session_limit'] = array(
+    '#type' => 'select',
+    '#title' => t('Maximum sessions'),
+    '#description' => t('Total number simultaneous active sessions this user may have at one time. The default defers to the limits that apply to each of the user\'s roles.'),
+    '#required' => FALSE,
+    '#default_value' => empty($account->session_limit) ? 0 : $account->session_limit,
+    '#options' => _session_limit_user_options(),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration')
+  );
+  return $form;
+}
+
+function session_limit_user_settings_validate($form, &$form_state) {
+  if (!is_numeric($form_state['values']['session_limit'])) {
+    form_set_error('session_limit', t('Only numeric submissions are valid.'));
+    watchdog('session_limit', 'Invalid session limit submission for @user.', array('@user' => $form_state['values']['account']->name), WATCHDOG_DEBUG);
+  }
+}
+
+function session_limit_user_settings_submit($form, &$form_state) {
+  watchdog('session_limit', 'Maximum sessions for @user updated to @count.', array('@user' => $form_state['values']['account']->name, '@count' => $form_state['values']['session_limit']), WATCHDOG_INFO, l(t('view'), "user/{$form_state['values']['account']->uid}"));
+  if (empty($form_state['values']['session_limit'])) {
+    $form_state['values']['session_limit'] = NULL;
+  }
+  user_save($form_state['values']['account'], array('session_limit' => $form_state['values']['session_limit']));
+  drupal_set_message(t('Session limit updated for %user.', array('%user' => $form_state['values']['account']->name)), 'status', TRUE);
+}
+
+/**
+ * Display/Delete sessions..
+ */
+function session_limit_page() {
+  global $user;
+
+  if (variable_get('session_limit_behaviour', SESSION_LIMIT_DO_NOTHING) == SESSION_LIMIT_DROP) {
+    // Get the oldest sessions.
+    $count = db_result(db_query("SELECT COUNT(sid) FROM {sessions} WHERE uid = %d", $user->uid));
+    $max_sessions = $count - session_limit_user_max_sessions($user);
+    $result = db_query_range("SELECT sid FROM {sessions} WHERE uid = %d ORDER BY timestamp", $user->uid, 0, $max_sessions);
+
+    while ($sids = db_fetch_object($result)) {
+      session_limit_invoke_session_limit($sids->sid, 'disconnect');
+    }
+
+    drupal_goto();
+  }
+  else if (variable_get('session_limit_behaviour', SESSION_LIMIT_DO_NOTHING) == SESSION_LIMIT_DISALLOW_NEW) {
+    session_destroy();
+    $user = drupal_anonymous_user();
+
+    return;
+  }
+
+  $result = db_query('SELECT * FROM {sessions} WHERE uid = %d', $user->uid);
+  while ($obj =  db_fetch_object($result)) {
+    $message = $user->sid == $obj->sid ? t('Your current session.') : '';
+
+    $sids[$obj->sid] = t('<strong>Host:</strong> %host (idle: %time) <b>@message</b>',
+      array(
+        '%host' => $obj->hostname,
+        '@message' => $message,
+        '%time' => format_interval(time() - $obj->timestamp))
+    );
+  }
+  $form['sid'] = array(
+    '#type' => 'radios',
+    '#title' => t('Select a session to disconnect.'),
+    '#options' => $sids,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Disconnect session'),
+  );
+  return $form;
+}
+
+/**
+ * Handler for submissions from session_limit_page().
+ */
+function session_limit_page_submit($form, &$form_state) {
+  global $user;
+
+  // There used to be drupal_set_messages here for the disconnect,
+  // but now that there is trigger/action support built in, you can add
+  // a message through there and make it say whatever you want.
+  if ($user->sid == $form_state['values']['sid']) {
+    // force a normal logout for ourself.
+    drupal_goto('logout');
+  }
+  else {
+    session_limit_invoke_session_limit($form_state['values']['sid'], 'disconnect');
+
+    // redirect to main page.
+    drupal_goto();
+  }
+}
+
+function _session_limit_user_options() {
+  $options = drupal_map_assoc(range(0, 250));
+  $options[0] = t('Default');
+  $options['999999'] = t('Disabled');
+  return $options;
+}
+
+/**
+ * Implementation of hook_hook_info().
+ */
+function session_limit_hook_info() {
+  return array(
+    'session_limit' => array(
+      'session_limit' => array(
+        'collision' => array(
+          'runs when' => t('User logs in and has too many active sessions'),
+        ),
+        'disconnect' => array(
+          'runs when' => t('When an active user is logged out by a newer session'),
+        ),
+      ),
+    ),
+  );
+}
+
+function session_limit_user_max_sessions($account = array()) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+
+  static $limits;
+  if (isset($limits[0])) {
+    return $limits[0];
+  }
+
+  $limits['default'] = check_plain(variable_get('session_limit_max', 1));
+  $limits['user'] = session_limit_user_max_sessions_byuser($account);
+  $limits['role'] = session_limit_user_max_sessions_byrole($account);
+
+  rsort($limits);
+  return check_plain($limits[0]);
+}
+
+function session_limit_user_max_sessions_byuser($account) {
+  return empty($account->session_limit) ? 0 : check_plain($account->session_limit);
+}
+
+function session_limit_user_max_sessions_byrole($account) {
+  $limits = array();
+  foreach ($account->roles as $rid => $name) {
+    $limits[] = variable_get("session_limit_rid_$rid", 0);
+  }
+
+  rsort($limits);
+  return check_plain($limits[0]);
+}
+
+/**
+ * Implementation of hook_trigger_name().
+ */
+function session_limit_session_limit($sid, $op) {
+  $aids = _trigger_get_hook_aids('session_limit', $op);
+  $context = array(
+    'hook' => 'session_limit',
+    'op' => $op,
+    'sid' => $sid,
+  );
+  actions_do(array_keys($aids), $user, $context);
+
+  switch ($op) {
+    case 'collision':
+      watchdog('session_limit', 'Exceeded maximum allowed active sessions.', array(), WATCHDOG_INFO);
+      // redirect to session handler.
+      drupal_goto('session/limit');
+      break;
+
+    case 'disconnect':
+      $logout_message = t('You have been automatically logged out. Someone else has logged in with your username and password and the maximum number of @number simultaneous sessions was exceeded. This may indicate that your account has been compromised or that account sharing is not allowed on this site. Please contact the site administrator if you suspect your account has been compromised.', array('@number' => session_limit_user_max_sessions()));
+      $logout_message = 'messages|'. serialize(array('error' => array($logout_message)));
+      db_query("UPDATE {sessions} SET uid = 0, session = '%s' WHERE sid = '%s'", $logout_message, $sid);
+
+      watchdog('session_limit', 'Disconnected for excess active sessions.', array(), WATCHDOG_NOTICE);
+      break;
+  }
+}
+
+function session_limit_invoke_session_limit($session, $op) {
+  $return = array();
+  foreach (module_implements('session_limit') as $name) {
+    $function = $name .'_session_limit';
+    $result = $function($session, $op);
+    if (isset($result) && is_array($result)) {
+      $return = array_merge($return, $result);
+    }
+    elseif (isset($result)) {
+      $return[] = $result;
+    }
+  }
+  return $return;
+}

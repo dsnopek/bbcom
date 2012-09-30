@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Session Limit.
+ *
+ * @ingroup session_limit
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function session_limit_uninstall() {
+  variable_del('session_limit_max');
+  variable_del('session_limit_behaviour');
+  variable_del('session_limit_masquerade_ignore');
+  db_query('DELETE FROM {variable} WHERE name LIKE "session_limit_rid_%"');
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function session_limit_update_6200() {
+  if (variable_get('session_limit_auto_drop', 0)) {
+    drupal_load('module', 'session_limit');
+    variable_set('session_limit_behaviour', SESSION_LIMIT_DROP);
+  }
+  variable_del('session_limit_auto_drop');
+
+  return array();
+}

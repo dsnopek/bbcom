@@ -1,0 +1,11 @@
+name = Session Limit
+description = "Limit simultaneous user sessions."
+core = 6.x
+dependencies[] = trigger
+
+; Information added by drupal.org packaging script on 2012-08-23
+version = "6.x-2.3"
+core = "6.x"
+project = "session_limit"
+datestamp = "1345731156"
+

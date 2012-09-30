@@ -110,6 +110,15 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+/**
+ * Implementation of hook_nody_body_ajax().
+ */
+function bbcom_content_node_body_ajax($node, $teaser, $page) {
+  // Do a minor trick to hide the content of premium nodes from users - really smart
+  // folks will be able to get past it easily...
+  return $node->premium && $page && $node->build_mode == NODE_BUILD_NORMAL;
+}
+
 /////
 // Theme functions
 
