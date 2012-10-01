@@ -1,0 +1,109 @@
+<?php // $Id: block_titlelink.module,v 1.5 2011/02/09 16:05:12 ngmaloney Exp $
+
+/**
+ * @file module for adding a link to a block title
+**/
+
+// Variable Table Prefex
+define('BLOCK_TITLELINK_VARIABLE_PREFIX', 'block_titlelink_');
+
+/**
+ * Implementation of hook_form_alter
+**/
+function block_titlelink_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'block_admin_configure') {
+    $block->module = $form['module']['#value'];
+    $block->delta = $form['delta']['#value'];
+    $link = _block_titlelink_get_link($block);
+    //Assign weight to block title so it appears above link
+    if (!isset($form['block_settings']['#weight'])) {
+      $form['block_settings']['#weight'] = -1;
+    }
+    $form['block_titlelink'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Block Title Link settings'),
+      '#collapsible' => TRUE,
+      '#weight' => 0,
+    );
+    $form['block_titlelink']['title_path'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title Path'),
+      '#default_value' => $link,
+      '#description' => t('URL for Block Title to link to.'),
+    );
+
+   $form['#validate'][] = 'block_titlelink_validate';
+  }
+}
+
+/**
+ * Implementation of hook_validation()
+**/
+function block_titlelink_validate($form, &$form_state) {
+  if ($form_state['values']['form_id'] == 'block_admin_configure') {
+    if (isset($form_state['values']['title_path']) && user_access('administer blocks')) {
+      $module = arg(4);
+      $delta = arg(5);
+      //TODO: Validate Link based on URL and PATH
+      $link = $form_state['values']['title_path'];
+      //Save Form Link
+      if ($module && (isset($delta) || $delta !== FALSE)) {
+        $name = $module .'_'. $delta;
+        //Delete link if empty
+        if (strlen($link) == 0) {
+          _block_titlelink_delete_link($name);
+        }
+        else {
+          _block_titlelink_save_link($name, $link);
+        }
+      }
+    }
+  }
+  block_admin_configure_validate($form, $form_state);
+}
+
+/**
+ * Implementation of hook_preprocess_block
+**/
+function block_titlelink_preprocess_block(&$vars, $hook) {
+  if ($hook == 'block') {
+    $vars['block']->title_link = _block_titlelink_get_link($vars['block']);
+    $title_link = $vars['block']->title_link;
+    if ($title_link != '') {
+      $vars['block']->subject = l($vars['block']->subject, $title_link, array('attributes' => array('class' => 'block-title-link'), 'html'=>'true'));
+    }
+  }
+}
+
+/**
+ * Function to return a title link of a block
+ * @param array $block - Block to search by
+ * @return string Title Link
+**/
+function _block_titlelink_get_link($block) {
+  if (!isset($block->module) && !isset($block->delta)) {
+    return FALSE;
+  }
+  $varname = BLOCK_TITLELINK_VARIABLE_PREFIX . $block->module .'_'. $block->delta;
+  return variable_get($varname, NULL);
+}
+
+/**
+ * Function to save a title link block
+ * @param string $name - Variable name (module . '_' . delta)
+ * @param string $value - A valid drupal path or URL
+ * @return void
+**/
+function _block_titlelink_save_link($name, $value) {
+  $varname = BLOCK_TITLELINK_VARIABLE_PREFIX . $name;
+  variable_set($varname, $value);
+}
+
+/**
+ * Function to delete a link variable
+ * @param string $name
+**/
+function _block_titlelink_delete_link($name) {
+  $varname = BLOCK_TITLELINK_VARIABLE_PREFIX . $name;
+  variable_del($varname);
+}

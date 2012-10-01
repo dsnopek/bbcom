@@ -1,0 +1,11 @@
+; $Id: block_titlelink.info,v 1.1 2009/08/28 18:24:05 ngmaloney Exp $
+name = Block Title Link
+description = Allows assigning links to Block Titles
+core = 6.x
+
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+version = "6.x-1.7"
+core = "6.x"
+project = "block_titlelink"
+datestamp = "1297268247"
+
