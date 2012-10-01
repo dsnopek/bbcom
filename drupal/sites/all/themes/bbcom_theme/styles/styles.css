@@ -441,12 +441,6 @@ ul.primary li a {
   background: white;
   padding: 10px;
 }
-/*
-.block-block h2 {
-  margin-bottom: 10px;
-  font-size: 20px;
-}
-*/
 
 /*
 ** DRS: Icons
@@ -690,6 +684,21 @@ div.content-profile-display {
 }
 li.menu-2640 {
   margin-left: 1em;
+}
+
+/**
+ * Hacks for the "Real Life in the USA" blocks.
+ */
+#block-block-2 {
+  margin: 1.5em;
+}
+#block-block-2,
+.view-recent-content #node-15036 {
+  background-color: #FFFFa0;
+  border: 4px solid #d4d44c;
+}
+.view-recent-content #node-15036 {
+  padding: 0 1.5em;
 }
 
 /*
