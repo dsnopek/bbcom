@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * Implementation of hook_nodeapi().
+ *
+ * Will display a special message if the user submission limit is reached.
+ */
+function webform_once_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  global $user;
+
+  if (!in_array($node->type, webform_variable_get('webform_node_types'))) {
+    return;
+  }
+
+  if ($op == 'view') {
+    // Check if this page is cached or not.
+    $cached = $user->uid == 0 && (variable_get('cache', 0) || (function_exists('drupal_page_is_cacheable') && drupal_page_is_cacheable() === FALSE));
+
+    if ($node->webform['submit_limit'] == 1) {
+      module_load_include('inc', 'webform', 'includes/webform.submissions');
+
+      // Disable the form if the limit is exceeded and page cache is not active.
+      if (($user_limit_exceeded = _webform_submission_user_limit_check($node)) && !$cached) {
+        $query = "SELECT sid FROM {webform_submissions} " .
+           "WHERE (( 0 = %d AND remote_addr = '%s') OR (uid > 0 AND uid = %d)) " .
+           "AND submitted > %d AND nid = %d AND is_draft = 0";
+        $sid = db_result(db_query($query, $user->uid, ip_address(), $user->uid, ($node->webform['submit_interval'] != -1) ? (time() - $node->webform['submit_interval']) : $node->webform['submit_interval'], $node->nid));
+
+        $submission = webform_get_submission($node->nid, $sid);
+
+        $output = '';
+
+        // show the user their submission
+        if (webform_submission_access($node, $submission, 'view')) {
+          //$output  = '<h2>' . t('Your submission:') . '</h2>';
+          $output .= webform_submission_render($node, $submission, NULL, 'html');
+        }
+
+        // Allow them to delete it
+        // TODO: Allow them to update it!
+        $output .= '<p><strong>';
+        $output .= t('You have already submitted this form.');
+        if (webform_submission_access($node, $submission, 'delete')) {
+          $output .= ' ' . t('<a href="!delete-url">Click here</a> to clear your submission.', array('!delete-url' => url("node/$node->nid/submission/$sid/delete", array('query' => array('destination' => "node/$node->nid")))));
+        }
+        $output .= '</strong></p>';
+
+        $node->content['custom'] = array(
+          '#value'  => $output,
+          '#weight' => 10,
+        );
+      }
+    }
+  }
+}
+
