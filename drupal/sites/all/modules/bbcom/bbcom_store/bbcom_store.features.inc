@@ -32,3 +32,12 @@ function bbcom_store_uc_product_default_classes() {
   );
   return $items;
 }
+
+/**
+ * Implementation of hook_views_api().
+ */
+function bbcom_store_views_api() {
+  return array(
+    'api' => '2',
+  );
+}
