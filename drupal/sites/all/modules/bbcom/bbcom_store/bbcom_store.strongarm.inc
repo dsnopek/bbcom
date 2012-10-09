@@ -149,5 +149,12 @@ function bbcom_store_strongarm() {
   $strongarm->value = 0;
   $export['uc_product_shippable_package'] = $strongarm;
 
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'upload_package';
+  $strongarm->value = '0';
+  $export['upload_package'] = $strongarm;
+
   return $export;
 }

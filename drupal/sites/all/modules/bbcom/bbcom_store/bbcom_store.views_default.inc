@@ -94,38 +94,6 @@ function bbcom_store_views_default_views() {
       'field' => 'order_id',
       'relationship' => 'none',
     ),
-    'actions' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'absolute' => 0,
-        'link_class' => '',
-        'alt' => '',
-        'rel' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 1,
-      'empty_zero' => 0,
-      'hide_alter_empty' => 1,
-      'exclude' => 0,
-      'id' => 'actions',
-      'table' => 'uc_orders',
-      'field' => 'actions',
-      'relationship' => 'none',
-    ),
     'order_status' => array(
       'label' => 'Status',
       'alter' => array(
@@ -415,10 +383,10 @@ function bbcom_store_views_default_views() {
   $handler = $view->new_display('page', 'Page', 'page_1');
   $handler->override_option('path', 'user/%/orders');
   $handler->override_option('menu', array(
-    'type' => 'none',
-    'title' => '',
-    'description' => '',
-    'weight' => 0,
+    'type' => 'tab',
+    'title' => 'Orders',
+    'description' => 'View your order history',
+    'weight' => '0',
     'name' => 'navigation',
   ));
   $handler->override_option('tab_options', array(
