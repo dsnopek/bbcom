@@ -12,7 +12,8 @@ function bbcom_dictionary_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'editor',
-      '2' => 'translator',
+      '2' => 'founder',
+      '3' => 'translator',
     ),
   );
 
@@ -70,7 +71,8 @@ function bbcom_dictionary_user_default_permissions() {
       '3' => 'editor',
       '4' => 'editor1',
       '5' => 'editor2',
-      '6' => 'translator',
+      '6' => 'founder',
+      '7' => 'translator',
     ),
   );
 

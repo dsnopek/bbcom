@@ -59,7 +59,7 @@ function bbcom_wiki_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_default_order_wiki';
-  $strongarm->value = '1';
+  $strongarm->value = '2';
   $export['comment_default_order_wiki'] = $strongarm;
 
   $strongarm = new stdClass;
@@ -197,6 +197,20 @@ function bbcom_wiki_strongarm() {
     1 => 'revision',
   );
   $export['node_options_wiki'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'upload_rwiki';
+  $strongarm->value = '0';
+  $export['upload_rwiki'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'upload_wiki';
+  $strongarm->value = '0';
+  $export['upload_wiki'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

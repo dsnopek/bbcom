@@ -11,19 +11,20 @@ function bbcom_exercises_content_default_fields() {
     'field_name' => 'field_content_exercises',
     'type_name' => 'content',
     'display_settings' => array(
+      'weight' => '4',
+      'parent' => '',
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
       'label' => array(
         'format' => 'above',
-        'exclude' => 0,
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       'full' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -33,7 +34,11 @@ function bbcom_exercises_content_default_fields() {
       ),
       '3' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 1,
       ),
       'token' => array(
         'format' => 'default',
@@ -54,19 +59,17 @@ function bbcom_exercises_content_default_fields() {
       'forum' => 0,
       'language' => 0,
       'long_answer' => 0,
-      'matching' => 0,
       'multichoice' => 0,
       'page' => 0,
-      'quiz_directions' => 0,
+      'profile' => 0,
       'rwiki' => 0,
-      'scale' => 0,
-      'short_answer' => 0,
       'story' => 0,
       'truefalse' => 0,
       'wiki' => 0,
     ),
     'advanced_view' => '--',
     'advanced_view_args' => '',
+    'premium_fields' => 1,
     'widget' => array(
       'autocomplete_match' => 'contains',
       'size' => '60',

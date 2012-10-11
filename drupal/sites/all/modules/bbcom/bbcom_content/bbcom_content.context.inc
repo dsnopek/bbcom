@@ -43,14 +43,14 @@ function bbcom_content_context_default_contexts() {
           'region' => 'right',
           'weight' => 0,
         ),
-        'book-0' => array(
-          'module' => 'book',
+        'lingwo_korpus-0' => array(
+          'module' => 'lingwo_korpus',
           'delta' => 0,
           'region' => 'right',
           'weight' => 1,
         ),
-        'lingwo_korpus-0' => array(
-          'module' => 'lingwo_korpus',
+        'book-0' => array(
+          'module' => 'book',
           'delta' => 0,
           'region' => 'right',
           'weight' => 2,

@@ -293,7 +293,7 @@ function bbcom_exercises_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'quiz_def_uid';
-  $strongarm->value = '1';
+  $strongarm->value = 1;
   $export['quiz_def_uid'] = $strongarm;
 
   $strongarm = new stdClass;

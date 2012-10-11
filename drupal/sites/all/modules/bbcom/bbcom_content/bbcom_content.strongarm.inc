@@ -240,5 +240,12 @@ function bbcom_content_strongarm() {
   $strongarm->value = 'flowplayer3_mediaplayer';
   $export['swftools_mp3_display'] = $strongarm;
 
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'upload_content';
+  $strongarm->value = '0';
+  $export['upload_content'] = $strongarm;
+
   return $export;
 }

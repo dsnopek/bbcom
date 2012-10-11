@@ -21,11 +21,17 @@ function bbcom_marketing_context_default_contexts() {
   $context->reactions = array(
     'block' => array(
       'blocks' => array(
+        'block-2' => array(
+          'module' => 'block',
+          'delta' => 2,
+          'region' => 'content_bottom',
+          'weight' => 0,
+        ),
         'views-all_news-block_1' => array(
           'module' => 'views',
           'delta' => 'all_news-block_1',
           'region' => 'content_bottom',
-          'weight' => 0,
+          'weight' => 1,
         ),
       ),
     ),

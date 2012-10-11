@@ -11,7 +11,7 @@ function bbcom_content_menu_default_menu_links() {
     'menu_name' => 'primary-links',
     'link_path' => 'content',
     'router_path' => 'content',
-    'link_title' => 'Content',
+    'link_title' => 'Library',
     'options' => array(
       'attributes' => array(
         'title' => '',
@@ -27,7 +27,7 @@ function bbcom_content_menu_default_menu_links() {
   );
   // Translatables
   // Included for use with string extractors like potx.
-  t('Content');
+  t('Library');
 
 
   return $menu_links;

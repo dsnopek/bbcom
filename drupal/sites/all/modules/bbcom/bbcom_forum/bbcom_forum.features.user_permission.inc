@@ -37,8 +37,9 @@ function bbcom_forum_user_default_permissions() {
   $permissions['edit own forum_reply content'] = array(
     'name' => 'edit own forum_reply content',
     'roles' => array(
-      '0' => 'admin',
-      '1' => 'authenticated user',
+      '0' => 'Forum Moderator',
+      '1' => 'admin',
+      '2' => 'authenticated user',
     ),
   );
 
