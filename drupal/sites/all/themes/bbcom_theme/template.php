@@ -343,6 +343,8 @@ function bbcom_theme_preprocess_node_entry(&$vars, $hook) {
   $pos = $entry->getPos(TRUE);
   $vars['pos'] = $pos;
 
+  unset($vars['submitted']);
+
   $vars['title'] .= ' ('. $pos .')';
 
   if (!$vars['teaser']) {
