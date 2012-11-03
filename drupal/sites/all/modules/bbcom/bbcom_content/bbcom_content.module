@@ -81,6 +81,17 @@ function bbcom_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 }
 
 /**
+ * Implementation of hook_link().
+ */
+function bbcom_content_link_alter(&$links, $node, $comment = NULL) {
+  if (!module_exists('print') && $node->type == 'content') {
+    // the book modules printer friend page won't work because it won't display the page
+    // if the language is different than the language of the node -- some misuse of db_rewrite_sql().
+    unset($links['book_printer']);
+  }
+}
+
+/**
  * Implementation of hook_block().
  */
 function bbcom_content_block($op = 'list', $delta = 0, $edit = array()) {

@@ -41,6 +41,15 @@ function bbcom_login_menu_alter(&$items) {
   $items['user/login']['weight'] = -10;
 }
 
+/**
+ * Implementation of hook_url_outbound_alter().
+ */
+function bbcom_login_url_outbound_alter(&$path, &$options, $original) {
+  if (user_is_anonymous() && in_array($original, array('user', 'user/register', 'user/login')) && empty($options['query'])) {
+    $options['query'] = drupal_get_destination();
+  }
+}
+
 /*
  * Implementation of hook_menu().
  */
