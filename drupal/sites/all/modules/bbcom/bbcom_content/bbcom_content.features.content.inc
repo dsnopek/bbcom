@@ -100,7 +100,7 @@ function bbcom_content_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Audio (natural speed)',
-      'weight' => '2',
+      'weight' => '4',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
@@ -205,10 +205,93 @@ function bbcom_content_content_default_fields() {
       'insert_class' => '',
       'insert_width' => '',
       'label' => 'Audio (slower)',
-      'weight' => '3',
+      'weight' => '5',
       'description' => '',
       'type' => 'filefield_widget',
       'module' => 'filefield',
+    ),
+  );
+
+  // Exported field: field_content_category
+  $fields['content-field_content_category'] = array(
+    'field_name' => 'field_content_category',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '1',
+    'multiple' => '1',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => 'Business and Economics
+Careers
+Culture and Religion
+Daily Life
+Ecology
+Education
+Entertainment
+Food
+Health and Beauty
+History
+Language
+Literature
+News and Politics
+Other
+Poland
+Science and Technology
+Shopping
+Sports
+Travel
+USA',
+    'allowed_values_php' => '',
+    'premium_fields' => 0,
+    'widget' => array(
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Category',
+      'weight' => 0,
+      'description' => '',
+      'type' => 'optionwidgets_select',
+      'module' => 'optionwidgets',
     ),
   );
 
@@ -414,7 +497,7 @@ function bbcom_content_content_default_fields() {
       'filefield_source_attach_absolute' => '0',
       'filefield_source_attach_mode' => 'move',
       'label' => 'Images',
-      'weight' => 0,
+      'weight' => '2',
       'description' => '',
       'type' => 'imagefield_widget',
       'module' => 'imagefield',
@@ -488,6 +571,73 @@ advanced|Advanced',
     ),
   );
 
+  // Exported field: field_content_type
+  $fields['content-field_content_type'] = array(
+    'field_name' => 'field_content_type',
+    'type_name' => 'content',
+    'display_settings' => array(
+      'label' => array(
+        'format' => 'above',
+        'exclude' => 0,
+      ),
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'teaser' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+    'widget_active' => '1',
+    'type' => 'text',
+    'required' => '1',
+    'multiple' => '0',
+    'module' => 'text',
+    'active' => '1',
+    'text_processing' => '0',
+    'max_length' => '',
+    'allowed_values' => 'article|Article
+conversation|Conversation / Dialog
+interview|Interview
+narrative|Narrative story',
+    'allowed_values_php' => '',
+    'premium_fields' => 0,
+    'widget' => array(
+      'default_value' => array(
+        '0' => array(
+          'value' => '',
+        ),
+      ),
+      'default_value_php' => NULL,
+      'label' => 'Type',
+      'weight' => '-1',
+      'description' => '',
+      'type' => 'optionwidgets_select',
+      'module' => 'optionwidgets',
+    ),
+  );
+
   // Exported field: field_remote_url
   $fields['content-field_remote_url'] = array(
     'field_name' => 'field_remote_url',
@@ -549,7 +699,7 @@ advanced|Advanced',
       ),
       'default_value_php' => NULL,
       'label' => 'Remote URL',
-      'weight' => '5',
+      'weight' => '7',
       'description' => '',
       'type' => 'text_textfield',
       'module' => 'text',
@@ -560,9 +710,11 @@ advanced|Advanced',
   // Included for use with string extractors like potx.
   t('Audio (natural speed)');
   t('Audio (slower)');
+  t('Category');
   t('Images');
   t('Level');
   t('Remote URL');
+  t('Type');
 
   return $fields;
 }

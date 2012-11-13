@@ -319,6 +319,11 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   if (!module_exists('context') || !context_isset('context', 'bbcom-section-forum')) {
     $vars['breadcrumb'] = '';
   }
+
+  // hack enabling inner_title on the library page
+  if ($_GET['q'] == 'content') {
+    $vars['inner_title'] = TRUE;
+  }
 }
 
 /**
@@ -384,6 +389,11 @@ function bbcom_theme_preprocess_node_content(&$vars, $hook) {
 
   if (!$vars['teaser']) {
     $vars['inner_title'] = TRUE;
+  }
+
+  watchdog('debug', print_r($node->field_audio, TRUE));
+  if (!empty($node->field_audio[0]['fid'])) {
+    $vars['post_title'] .= ' <img class="icon-has-audio" src="' . url(drupal_get_path('theme', 'bbcom_theme') . '/images/audio.png') . '" alt="' . t('Has audio') . '" />';
   }
 }
 

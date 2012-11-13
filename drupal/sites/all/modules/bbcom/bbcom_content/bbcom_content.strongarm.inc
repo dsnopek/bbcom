@@ -98,16 +98,18 @@ function bbcom_content_strongarm() {
   $strongarm->name = 'content_extra_weights_content';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '-1',
-    'revision_information' => '5',
-    'author' => '9',
-    'options' => '10',
-    'comment_settings' => '6',
+    'body_field' => '1',
+    'revision_information' => '8',
+    'author' => '12',
+    'options' => '13',
+    'comment_settings' => '9',
     'language' => '-3',
     'menu' => '-4',
-    'path' => '7',
-    'lingwo_korpus_settings' => '1',
-    'notifications' => '8',
+    'book' => '14',
+    'path' => '10',
+    'print' => '15',
+    'lingwo_korpus_settings' => '3',
+    'notifications' => '11',
   );
   $export['content_extra_weights_content'] = $strongarm;
 

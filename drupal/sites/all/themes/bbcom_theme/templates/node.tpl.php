@@ -53,7 +53,7 @@
 <?php print $picture ?>
 
 <?php if (!$page): ?>
-  <h2><?php print $lang_spec ?><a href="<?php print $node_url ?>" <?php if ($node_url_remote) print 'rel="remote" '; ?>title="<?php print $title ?>"><?php print $title ?></a></h2>
+  <h2><?php print $lang_spec ?><a href="<?php print $node_url ?>" <?php if ($node_url_remote) print 'rel="remote" '; ?>title="<?php print $title ?>"><?php print $title ?></a><?php print $post_title; ?></h2>
 <?php endif; ?>
 
   <div class="meta">
