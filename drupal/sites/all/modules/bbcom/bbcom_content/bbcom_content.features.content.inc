@@ -11,9 +11,13 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_audio',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '2',
+      'weight' => '4',
       'parent' => '',
-      '5' => array(
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
@@ -28,11 +32,7 @@ function bbcom_content_content_default_fields() {
         'format' => 'swftools',
         'exclude' => 0,
       ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
+      '5' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
@@ -112,9 +112,13 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_audio_slower',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '3',
+      'weight' => '5',
       'parent' => '',
-      '5' => array(
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
@@ -129,11 +133,7 @@ function bbcom_content_content_default_fields() {
         'format' => 'swftools',
         'exclude' => 0,
       ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
+      '5' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
@@ -217,13 +217,18 @@ function bbcom_content_content_default_fields() {
     'field_name' => 'field_content_category',
     'type_name' => 'content',
     'display_settings' => array(
-      'label' => array(
-        'format' => 'above',
-        'exclude' => 0,
-      ),
-      '5' => array(
+      'weight' => 0,
+      'parent' => '',
+      '2' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'label' => array(
+        'format' => 'inline',
       ),
       'teaser' => array(
         'format' => 'default',
@@ -233,15 +238,11 @@ function bbcom_content_content_default_fields() {
         'format' => 'default',
         'exclude' => 0,
       ),
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
       '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -300,11 +301,15 @@ USA',
     'field_name' => 'field_content_image',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => 0,
+      'weight' => '2',
       'parent' => '',
-      '5' => array(
-        'format' => 'default',
-        'exclude' => 0,
+      '2' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'image_plain',
+        'exclude' => 1,
       ),
       'label' => array(
         'format' => 'above',
@@ -317,13 +322,9 @@ USA',
         'format' => 'image_plain',
         'exclude' => 1,
       ),
-      '2' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
-      ),
-      '3' => array(
-        'format' => 'image_plain',
-        'exclude' => 1,
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
       ),
       '4' => array(
         'format' => 'image_plain',
@@ -511,9 +512,13 @@ USA',
     'display_settings' => array(
       'weight' => '-2',
       'parent' => '',
-      '5' => array(
+      '2' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
       ),
       'label' => array(
         'format' => 'inline',
@@ -526,13 +531,9 @@ USA',
         'format' => 'default',
         'exclude' => 0,
       ),
-      '2' => array(
+      '5' => array(
         'format' => 'default',
-        'exclude' => 1,
-      ),
-      '3' => array(
-        'format' => 'default',
-        'exclude' => 1,
+        'exclude' => 0,
       ),
       '4' => array(
         'format' => 'default',
@@ -576,13 +577,18 @@ advanced|Advanced',
     'field_name' => 'field_content_type',
     'type_name' => 'content',
     'display_settings' => array(
-      'label' => array(
-        'format' => 'above',
-        'exclude' => 0,
-      ),
-      '5' => array(
+      'weight' => '-1',
+      'parent' => '',
+      '2' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
+      ),
+      '3' => array(
+        'format' => 'default',
+        'exclude' => 1,
+      ),
+      'label' => array(
+        'format' => 'inline',
       ),
       'teaser' => array(
         'format' => 'default',
@@ -592,15 +598,11 @@ advanced|Advanced',
         'format' => 'default',
         'exclude' => 0,
       ),
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
       '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
         'format' => 'default',
         'exclude' => 0,
       ),
@@ -643,9 +645,13 @@ narrative|Narrative story',
     'field_name' => 'field_remote_url',
     'type_name' => 'content',
     'display_settings' => array(
-      'weight' => '5',
+      'weight' => '7',
       'parent' => '',
-      '5' => array(
+      '2' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      '3' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
@@ -660,11 +666,7 @@ narrative|Narrative story',
         'format' => 'default',
         'exclude' => 0,
       ),
-      '2' => array(
-        'format' => 'default',
-        'exclude' => 0,
-      ),
-      '3' => array(
+      '5' => array(
         'format' => 'default',
         'exclude' => 1,
       ),
