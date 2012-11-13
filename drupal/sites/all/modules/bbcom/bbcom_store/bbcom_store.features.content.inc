@@ -11,17 +11,26 @@ function bbcom_store_content_default_fields() {
     'field_name' => 'field_image_cache',
     'type_name' => 'package',
     'display_settings' => array(
+      'weight' => '-3',
+      'parent' => '',
+      '4' => array(
+        'format' => 'hidden',
+        'exclude' => 0,
+      ),
+      '5' => array(
+        'format' => 'default',
+        'exclude' => 0,
+      ),
       'label' => array(
         'format' => 'hidden',
       ),
       'teaser' => array(
         'format' => 'hidden',
+        'exclude' => 0,
       ),
       'full' => array(
         'format' => 'hidden',
-      ),
-      '4' => array(
-        'format' => 'hidden',
+        'exclude' => 0,
       ),
     ),
     'widget_active' => '1',
@@ -199,25 +208,26 @@ function bbcom_store_content_default_fields() {
     'field_name' => 'field_package_dependencies',
     'type_name' => 'package',
     'display_settings' => array(
-      'label' => array(
-        'format' => 'above',
-        'exclude' => 0,
+      'weight' => '2',
+      'parent' => '',
+      '4' => array(
+        'format' => 'default',
+        'exclude' => 1,
       ),
       '5' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
+      ),
+      'label' => array(
+        'format' => 'above',
       ),
       'teaser' => array(
         'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       'full' => array(
         'format' => 'default',
-        'exclude' => 0,
-      ),
-      '4' => array(
-        'format' => 'default',
-        'exclude' => 0,
+        'exclude' => 1,
       ),
       '2' => array(
         'format' => 'default',
@@ -240,6 +250,7 @@ function bbcom_store_content_default_fields() {
     'active' => '1',
     'referenceable_types' => array(
       'package' => 'package',
+      'product_kit' => 'product_kit',
       'book' => 0,
       'content' => 0,
       'entry' => 0,
@@ -247,20 +258,16 @@ function bbcom_store_content_default_fields() {
       'forum' => 0,
       'language' => 0,
       'long_answer' => 0,
-      'matching' => 0,
       'multichoice' => 0,
       'page' => 0,
       'product' => 0,
-      'product_kit' => 0,
       'profile' => 0,
       'quiz' => 0,
-      'quiz_directions' => 0,
       'rwiki' => 0,
-      'scale' => 0,
-      'short_answer' => 0,
       'story' => 0,
       'support_ticket' => 0,
       'truefalse' => 0,
+      'webform' => 0,
       'wiki' => 0,
     ),
     'advanced_view' => '--',
