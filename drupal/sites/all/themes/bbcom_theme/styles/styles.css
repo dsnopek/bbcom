@@ -699,6 +699,26 @@ li.menu-2640 {
   padding: 10px;
 }
 
+/**
+ * The library exposed filters.
+ */
+#block-views--exp-recent_content-page {
+  border: 4px solid #aaa;
+  background: white;
+  padding: 10px;
+  font-size: 16px;
+}
+#views-exposed-form-recent-content-page .views-exposed-widget {
+  display: block;
+  float: none;
+}
+#views-exposed-form-recent-content-page .views-exposed-widget .form-submit{
+  margin-top: 0;
+}
+#views-exposed-form-recent-content-page .form-checkboxes {
+  margin: 0;
+}
+
 /*
 ** Formatting for administration page
 **

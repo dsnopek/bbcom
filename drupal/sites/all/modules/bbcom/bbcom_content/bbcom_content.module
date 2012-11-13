@@ -116,8 +116,36 @@ function bbcom_content_block($op = 'list', $delta = 0, $edit = array()) {
  * Implementation of hook_form_alter().
  */
 function bbcom_content_form_alter(&$form, $form_state, $form_id) {
-  if ($form_state['view']->name == 'search_content') {
-    $form['submit']['#value'] = t('Search');
+  if ($form_id == 'views_exposed_form') {
+    if ($form_state['view']->name == 'search_content') {
+      $form['submit']['#value'] = t('Search');
+    }
+    elseif ($form_state['view']->name == 'recent_content') {
+      $form['has_audio']['#options']['1'] = t('Yes');
+      unset($form['has_audio']['#options']['0']);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_context_load_alter().
+ */
+function bbcom_content_context_load_alter(&$context) {
+  if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && $_GET['q'] === 'content') {
+    // remove all the other blocks in the right sidebar except for the create content one
+    foreach ($context->reactions['block']['blocks'] as $name => $block) {
+      if ($block['region'] === 'right' && $name != 'bbcom_content-0') {
+        unset($context->reactions['block']['blocks'][$name]);
+      }
+    }
+
+    // add the views exposed filter
+    $context->reactions['block']['blocks']['views--exp-recent_content-page'] = array(
+      'module' => 'views',
+      'delta' => '-exp-recent_content-page',
+      'region' => 'right',
+      'weight' => 3,
+    );
   }
 }
 

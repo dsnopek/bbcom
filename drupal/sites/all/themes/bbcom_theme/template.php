@@ -319,6 +319,11 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   if (!module_exists('context') || !context_isset('context', 'bbcom-section-forum')) {
     $vars['breadcrumb'] = '';
   }
+
+  // hack enabling inner_title on the library page
+  if ($_GET['q'] == 'content') {
+    $vars['inner_title'] = TRUE;
+  }
 }
 
 /**
