@@ -531,10 +531,15 @@ ul.primary li a {
 /*
  * DRS: 'Content' customizations.
  */
-.field-field-content-level {
+.field-field-content-level,
+.field-field-content-type,
+.field-field-content-category {
   margin-top: -.5em;
-  margin-bottom: 1em;
+  margin-bottom: .5em;
   font-size: 10px;
+}
+.field-field-content-category {
+  margin-bottom: 1em;
 }
 
 /*

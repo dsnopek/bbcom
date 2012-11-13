@@ -60,7 +60,7 @@
 
         <?php print $breadcrumb; ?>
         <?php if ($title && !$inner_title): ?>
-          <h1 class="title" id="page-title"><?php print $lang_spec; ?><?php print $title; ?></h1>
+          <h1 class="title" id="page-title"><?php print $lang_spec; ?><?php print $title; ?><?php print $post_title; ?></h1>
         <?php endif; ?>
 
         <?php if ($tabs): ?>
@@ -83,7 +83,7 @@
               <div id="content-main" class="region alpha <?php if (!$right && !$always_right && !$content_right) print "omega" ?> <?php print ns('grid-12', $right || $always_right, 4, $content_right, 4); ?>">
                 <div id="content-main-inner">
                   <?php if ($title && $inner_title): ?>
-                    <h1 class="title" id="page-title"><?php print $title; ?></h1>
+                    <h1 class="title" id="page-title"><?php print $title; ?><?php print $post_title; ?></h1>
                   <?php endif; ?>
 
                   <?php print $messages; ?>
