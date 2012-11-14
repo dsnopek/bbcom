@@ -108,6 +108,7 @@ function bbcom_content_strongarm() {
     'book' => '14',
     'path' => '10',
     'print' => '15',
+    'scheduler_settings' => '10',
     'lingwo_korpus_settings' => '3',
     'notifications' => '11',
   );

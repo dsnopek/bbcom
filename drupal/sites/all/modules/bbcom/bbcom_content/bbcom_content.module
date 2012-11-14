@@ -130,7 +130,6 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
 /**
  * Implementation of hook_context_load_alter().
  */
-/*
 function bbcom_content_context_load_alter(&$context) {
   if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && $_GET['q'] === 'content') {
     // remove all the other blocks in the right sidebar except for the create content one
@@ -149,7 +148,6 @@ function bbcom_content_context_load_alter(&$context) {
     );
   }
 }
-*/
 
 /**
  * Implementation of hook_nody_body_ajax().

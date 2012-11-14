@@ -261,6 +261,7 @@ function bbcom_content_content_default_fields() {
     'max_length' => '',
     'allowed_values' => 'Business and Economics
 Careers
+Community and Society
 Culture and Religion
 Daily Life
 Ecology
@@ -272,8 +273,10 @@ History
 Language
 Literature
 News and Politics
+Music
 Other
 Poland
+Psychology and the Mind
 Science and Technology
 Shopping
 Sports
@@ -622,7 +625,9 @@ advanced|Advanced',
     'allowed_values' => 'article|Article
 conversation|Conversation / Dialog
 interview|Interview
-narrative|Narrative story',
+narrative|Narrative story
+poetry|Poetry
+song|Song',
     'allowed_values_php' => '',
     'premium_fields' => 0,
     'widget' => array(
