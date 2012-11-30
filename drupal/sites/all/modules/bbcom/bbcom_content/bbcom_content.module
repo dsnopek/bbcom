@@ -14,35 +14,6 @@ function bbcom_content_theme_registry_alter(&$registry) {
 }
 
 /*
- * Implementation of hook_flag_default_flags().
- */
-function bbcom_content_flag_default_flags() {
-  $flags = array();
-  $flags[] = array(
-    'content_type' => 'node',
-    'name' => 'verified',
-    'title' => 'Verified',
-    'global' => FALSE,
-    'types' => array('entry'),
-    'flag_short' => 'Mark as verified',
-    'flag_long' => '',
-    'flag_message' => '',
-    'unflag_short' => 'Unmark as verified',
-    'unflag_long' => '',
-    'unflag_message' => '',
-    'show_on_page' => TRUE,
-    'show_on_teaser' => TRUE,
-    'show_on_form' => TRUE,
-    'roles' => array(3,4,6),
-    'link_type' => 'toggle',
-    'i18n' => '0',
-    // enabled by default
-    'status' => TRUE,
-  );
-  return $flags;
-}
-
-/*
  * Implementation of hook_nodeapi().
  */
 function bbcom_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {

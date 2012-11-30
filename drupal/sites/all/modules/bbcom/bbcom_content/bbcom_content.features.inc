@@ -48,6 +48,46 @@ function bbcom_content_flag_default_flags() {
     'show_on_form' => 1,
     'access_author' => '',
     'i18n' => '0',
+    'module' => 'bbcom_content',
+    'locked' => array(
+      '0' => 'name',
+    ),
+    'api_version' => 2,
+  );
+  // Exported flag: "Verified".
+  $flags['verified'] = array(
+    'content_type' => 'node',
+    'title' => 'Verified',
+    'global' => '0',
+    'types' => array(
+      '0' => 'entry',
+    ),
+    'flag_short' => 'Mark as verified',
+    'flag_long' => '',
+    'flag_message' => '',
+    'unflag_short' => 'Unmark as verified',
+    'unflag_long' => '',
+    'unflag_message' => '',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'roles' => array(
+      'flag' => array(
+        '0' => '3',
+        '1' => '4',
+        '2' => '6',
+      ),
+      'unflag' => array(
+        '0' => '3',
+        '1' => '4',
+        '2' => '6',
+      ),
+    ),
+    'weight' => 0,
+    'show_on_page' => 1,
+    'show_on_teaser' => 1,
+    'show_on_form' => 1,
+    'access_author' => '',
+    'i18n' => '0',
     'flag_confirmation' => '',
     'unflag_confirmation' => '',
     'api_version' => 2,
