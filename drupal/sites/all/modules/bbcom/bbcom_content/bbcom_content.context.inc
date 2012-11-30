@@ -27,6 +27,11 @@ function bbcom_content_context_default_contexts() {
         'content/search' => 'content/search',
       ),
     ),
+    'views' => array(
+      'values' => array(
+        'recent_content' => 'recent_content',
+      ),
+    ),
   );
   $context->reactions = array(
     'block' => array(

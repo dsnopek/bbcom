@@ -373,16 +373,20 @@ ul.primary li a {
  * oocss love, really.
  */
 #block-lingwo_entry-0,
-#block-views--exp-search_content-page {
+#block-views--exp-search_content-page,
+#block-views--exp-search_content-page_1 {
   margin: 0;
 }
 #block-views--exp-search_content-page .views-exposed-form,
-#block-views--exp-search_content-page .views-exposed-widget {
+#block-views--exp-search_content-page .views-exposed-widget,
+#block-views--exp-search_content-page_1 .views-exposed-form,
+#block-views--exp-search_content-page_1 .views-exposed-widget {
   padding: 0;
   margin: 0;
 }
 #block-lingwo_entry-0 .form-item,
-#block-views--exp-search_content-page {
+#block-views--exp-search_content-page,
+#block-views--exp-search_content-page_1 {
   margin: 0;
 }
 #edit-search-word,
@@ -707,20 +711,24 @@ li.menu-2640 {
 /**
  * The library exposed filters.
  */
-#block-views--exp-recent_content-page {
+#block-views--exp-recent_content-page,
+#block-views--exp-recent_content-page_1 {
   border: 4px solid #aaa;
   background: white;
   padding: 10px;
   font-size: 16px;
 }
-#views-exposed-form-recent-content-page .views-exposed-widget {
+#views-exposed-form-recent-content-page .views-exposed-widget,
+#views-exposed-form-recent-content-page-1 .views-exposed-widget {
   display: block;
   float: none;
 }
-#views-exposed-form-recent-content-page .views-exposed-widget .form-submit{
+#views-exposed-form-recent-content-page .views-exposed-widget .form-submit,
+#views-exposed-form-recent-content-page-1 .views-exposed-widget .form-submit {
   margin-top: 0;
 }
-#views-exposed-form-recent-content-page .form-checkboxes {
+#views-exposed-form-recent-content-page .form-checkboxes,
+#views-exposed-form-recent-content-page-1 .form-checkboxes {
   margin: 0;
 }
 

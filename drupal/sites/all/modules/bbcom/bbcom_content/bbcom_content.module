@@ -106,7 +106,7 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
  * Implementation of hook_context_load_alter().
  */
 function bbcom_content_context_load_alter(&$context) {
-  if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && $_GET['q'] === 'content') {
+  if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && strpos($_GET['q'], 'content') === 0) {
     // remove all the other blocks in the right sidebar except for the create content one
     foreach ($context->reactions['block']['blocks'] as $name => $block) {
       if ($block['region'] === 'right' && $name != 'bbcom_content-0') {
@@ -114,10 +114,12 @@ function bbcom_content_context_load_alter(&$context) {
       }
     }
 
+    $display = strpos($_GET['q'], 'my') !== FALSE ? 'page_1' : 'page';
+
     // add the views exposed filter
-    $context->reactions['block']['blocks']['views--exp-recent_content-page'] = array(
+    $context->reactions['block']['blocks']["views--exp-recent_content-$display"] = array(
       'module' => 'views',
-      'delta' => '-exp-recent_content-page',
+      'delta' => "-exp-recent_content-$display",
       'region' => 'right',
       'weight' => 3,
     );
