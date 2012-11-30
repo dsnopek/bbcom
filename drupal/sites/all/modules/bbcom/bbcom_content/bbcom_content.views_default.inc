@@ -923,6 +923,18 @@ echo $view->total_rows; ?> entries that match this query.');
   $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
+  $handler->override_option('relationships', array(
+    'flag_content_rel' => array(
+      'label' => 'promoted',
+      'required' => 0,
+      'flag' => 'promoted',
+      'user_scope' => 'any',
+      'id' => 'flag_content_rel',
+      'table' => 'node',
+      'field' => 'flag_content_rel',
+      'relationship' => 'none',
+    ),
+  ));
   $handler->override_option('sorts', array(
     'sticky' => array(
       'id' => 'sticky',
@@ -1082,6 +1094,27 @@ echo $view->total_rows; ?> entries that match this query.');
       'table' => 'node_data_field_audio',
       'field' => 'field_audio_list',
       'relationship' => 'none',
+    ),
+    'flagged' => array(
+      'operator' => '=',
+      'value' => '1',
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'operator' => '',
+        'identifier' => 'promoted',
+        'label' => 'Promoted',
+        'bef_filter_description' => '',
+        'bef_format' => 'default',
+        'optional' => 1,
+        'remember' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'flagged',
+      'table' => 'flag_content',
+      'field' => 'flagged',
+      'relationship' => 'flag_content_rel',
     ),
     'field_content_category_value_many_to_one' => array(
       'operator' => 'or',

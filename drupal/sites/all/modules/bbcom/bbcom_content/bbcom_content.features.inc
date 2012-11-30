@@ -14,6 +14,53 @@ function bbcom_content_ctools_plugin_api() {
 }
 
 /**
+ * Implementation of hook_flag_default_flags().
+ */
+function bbcom_content_flag_default_flags() {
+  $flags = array();
+  // Exported flag: "Promoted content".
+  $flags['promoted'] = array(
+    'content_type' => 'node',
+    'title' => 'Promoted content',
+    'global' => '0',
+    'types' => array(
+      '0' => 'content',
+    ),
+    'flag_short' => 'Promote this content',
+    'flag_long' => '',
+    'flag_message' => '',
+    'unflag_short' => 'Demote this content',
+    'unflag_long' => '',
+    'unflag_message' => '',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'roles' => array(
+      'flag' => array(
+        '0' => '3',
+      ),
+      'unflag' => array(
+        '0' => '3',
+      ),
+    ),
+    'weight' => 0,
+    'show_on_page' => 0,
+    'show_on_teaser' => 0,
+    'show_on_form' => 1,
+    'access_author' => '',
+    'i18n' => '0',
+    'flag_confirmation' => '',
+    'unflag_confirmation' => '',
+    'api_version' => 2,
+    'module' => 'bbcom_content',
+    'locked' => array(
+      '0' => 'name',
+    ),
+  );
+  return $flags;
+
+}
+
+/**
  * Implementation of hook_node_info().
  */
 function bbcom_content_node_info() {

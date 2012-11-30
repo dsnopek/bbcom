@@ -123,6 +123,10 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
     elseif ($form_state['view']->name == 'recent_content') {
       $form['has_audio']['#options']['1'] = t('Yes');
       unset($form['has_audio']['#options']['0']);
+
+      $form['promoted']['#options']['1'] = t('Yes');
+      $form['promoted']['#default_value'] = '1';
+      unset($form['promoted']['#options']['0']);
     }
   }
 }
