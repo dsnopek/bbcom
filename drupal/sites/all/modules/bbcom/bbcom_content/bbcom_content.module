@@ -158,6 +158,26 @@ function bbcom_content_node_body_ajax($node, $teaser, $page) {
   return $node->premium && $page && $node->build_mode == NODE_BUILD_NORMAL;
 }
 
+/**
+ * Implementation of hook_perm().
+ */
+function bbcom_content_perm() {
+  return array(
+    'edit field_remote_url',
+  );
+}
+
+/**
+ * Implementation of hook_field_access().
+ *
+ * Hack to control access to field_remote_url.
+ */
+function bbcom_content_field_access($op, $field, $account, $node) {
+  if ($op == 'edit' && $field['field_name'] == 'field_remote_url') {
+    return user_access('edit field_remote_url', $account);
+  }
+}
+
 /////
 // Theme functions
 
