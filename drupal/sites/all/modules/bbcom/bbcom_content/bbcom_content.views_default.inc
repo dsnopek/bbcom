@@ -1371,6 +1371,10 @@ echo $view->total_rows; ?> entries that match this query.');
       'relationship' => 'none',
     ),
   ));
+  $handler->override_option('access', array(
+    'type' => 'perm',
+    'perm' => 'create content content',
+  ));
   $handler->override_option('path', 'content/my');
   $handler->override_option('menu', array(
     'type' => 'tab',

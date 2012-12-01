@@ -88,8 +88,6 @@ function bbcom_content_flag_default_flags() {
     'show_on_form' => 1,
     'access_author' => '',
     'i18n' => '0',
-    'flag_confirmation' => '',
-    'unflag_confirmation' => '',
     'module' => 'bbcom_content',
     'locked' => array(
       '0' => 'name',
