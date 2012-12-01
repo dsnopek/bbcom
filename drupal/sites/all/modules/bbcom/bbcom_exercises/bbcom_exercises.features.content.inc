@@ -81,7 +81,7 @@ function bbcom_exercises_content_default_fields() {
       ),
       'default_value_php' => NULL,
       'label' => 'Exercises',
-      'weight' => '4',
+      'weight' => '6',
       'description' => '',
       'type' => 'nodereference_autocomplete',
       'module' => 'nodereference',

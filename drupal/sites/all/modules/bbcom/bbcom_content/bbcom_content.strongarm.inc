@@ -100,17 +100,17 @@ function bbcom_content_strongarm() {
     'title' => '-5',
     'body_field' => '1',
     'revision_information' => '8',
-    'author' => '12',
-    'options' => '13',
+    'author' => '13',
+    'options' => '14',
     'comment_settings' => '9',
     'language' => '-3',
     'menu' => '-4',
-    'book' => '14',
+    'book' => '15',
     'path' => '10',
-    'print' => '15',
-    'scheduler_settings' => '10',
+    'print' => '16',
+    'scheduler_settings' => '11',
     'lingwo_korpus_settings' => '3',
-    'notifications' => '11',
+    'notifications' => '12',
   );
   $export['content_extra_weights_content'] = $strongarm;
 
