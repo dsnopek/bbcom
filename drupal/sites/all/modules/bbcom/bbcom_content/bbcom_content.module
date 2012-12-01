@@ -14,35 +14,6 @@ function bbcom_content_theme_registry_alter(&$registry) {
 }
 
 /*
- * Implementation of hook_flag_default_flags().
- */
-function bbcom_content_flag_default_flags() {
-  $flags = array();
-  $flags[] = array(
-    'content_type' => 'node',
-    'name' => 'verified',
-    'title' => 'Verified',
-    'global' => FALSE,
-    'types' => array('entry'),
-    'flag_short' => 'Mark as verified',
-    'flag_long' => '',
-    'flag_message' => '',
-    'unflag_short' => 'Unmark as verified',
-    'unflag_long' => '',
-    'unflag_message' => '',
-    'show_on_page' => TRUE,
-    'show_on_teaser' => TRUE,
-    'show_on_form' => TRUE,
-    'roles' => array(3,4,6),
-    'link_type' => 'toggle',
-    'i18n' => '0',
-    // enabled by default
-    'status' => TRUE,
-  );
-  return $flags;
-}
-
-/*
  * Implementation of hook_nodeapi().
  */
 function bbcom_content_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
@@ -123,6 +94,10 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
     elseif ($form_state['view']->name == 'recent_content') {
       $form['has_audio']['#options']['1'] = t('Yes');
       unset($form['has_audio']['#options']['0']);
+
+      $form['promoted']['#options']['1'] = t('Yes');
+      $form['promoted']['#default_value'] = '1';
+      unset($form['promoted']['#options']['0']);
     }
   }
 }
@@ -131,7 +106,7 @@ function bbcom_content_form_alter(&$form, $form_state, $form_id) {
  * Implementation of hook_context_load_alter().
  */
 function bbcom_content_context_load_alter(&$context) {
-  if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && $_GET['q'] === 'content') {
+  if ($context->name === 'bbcom-section-content' && isset($context->reactions['block']) && strpos($_GET['q'], 'content') === 0) {
     // remove all the other blocks in the right sidebar except for the create content one
     foreach ($context->reactions['block']['blocks'] as $name => $block) {
       if ($block['region'] === 'right' && $name != 'bbcom_content-0') {
@@ -139,10 +114,12 @@ function bbcom_content_context_load_alter(&$context) {
       }
     }
 
+    $display = strpos($_GET['q'], 'my') !== FALSE ? 'page_1' : 'page';
+
     // add the views exposed filter
-    $context->reactions['block']['blocks']['views--exp-recent_content-page'] = array(
+    $context->reactions['block']['blocks']["views--exp-recent_content-$display"] = array(
       'module' => 'views',
-      'delta' => '-exp-recent_content-page',
+      'delta' => "-exp-recent_content-$display",
       'region' => 'right',
       'weight' => 3,
     );
@@ -156,6 +133,26 @@ function bbcom_content_node_body_ajax($node, $teaser, $page) {
   // Do a minor trick to hide the content of premium nodes from users - really smart
   // folks will be able to get past it easily...
   return $node->premium && $page && $node->build_mode == NODE_BUILD_NORMAL;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function bbcom_content_perm() {
+  return array(
+    'edit field_remote_url',
+  );
+}
+
+/**
+ * Implementation of hook_field_access().
+ *
+ * Hack to control access to field_remote_url.
+ */
+function bbcom_content_field_access($op, $field, $account, $node) {
+  if ($op == 'edit' && $field['field_name'] == 'field_remote_url') {
+    return user_access('edit field_remote_url', $account);
+  }
 }
 
 /////

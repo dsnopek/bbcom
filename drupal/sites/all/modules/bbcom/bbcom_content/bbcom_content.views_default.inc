@@ -923,6 +923,18 @@ echo $view->total_rows; ?> entries that match this query.');
   $view->api_version = '2';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
+  $handler->override_option('relationships', array(
+    'flag_content_rel' => array(
+      'label' => 'promoted',
+      'required' => 0,
+      'flag' => 'promoted',
+      'user_scope' => 'any',
+      'id' => 'flag_content_rel',
+      'table' => 'node',
+      'field' => 'flag_content_rel',
+      'relationship' => 'none',
+    ),
+  ));
   $handler->override_option('sorts', array(
     'sticky' => array(
       'id' => 'sticky',
@@ -1083,6 +1095,27 @@ echo $view->total_rows; ?> entries that match this query.');
       'field' => 'field_audio_list',
       'relationship' => 'none',
     ),
+    'flagged' => array(
+      'operator' => '=',
+      'value' => '1',
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'operator' => '',
+        'identifier' => 'promoted',
+        'label' => 'Promoted',
+        'bef_filter_description' => '',
+        'bef_format' => 'default',
+        'optional' => 1,
+        'remember' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'flagged',
+      'table' => 'flag_content',
+      'field' => 'flagged',
+      'relationship' => 'flag_content_rel',
+    ),
     'field_content_category_value_many_to_one' => array(
       'operator' => 'or',
       'value' => array(),
@@ -1119,6 +1152,7 @@ echo $view->total_rows; ?> entries that match this query.');
   $handler->override_option('title', 'Library');
   $handler->override_option('header_format', '1');
   $handler->override_option('footer_format', '1');
+  $handler->override_option('empty', '<p>No texts found! <a href="/content">Click here</a> to return to the full list...</p>');
   $handler->override_option('empty_format', '1');
   $handler->override_option('use_pager', '1');
   $handler->override_option('row_plugin', 'node');
@@ -1126,22 +1160,21 @@ echo $view->total_rows; ?> entries that match this query.');
     'teaser' => 1,
     'links' => 1,
   ));
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->override_option('empty', '<p>No texts found! <a href="/content">Click here</a> to return to the full list...</p>');
   $handler->override_option('exposed_block', TRUE);
-  $handler->override_option('path', 'content');
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->override_option('path', 'content/all');
   $handler->override_option('menu', array(
-    'type' => 'none',
-    'title' => '',
+    'type' => 'default tab',
+    'title' => 'All',
     'description' => '',
-    'weight' => 0,
+    'weight' => '-1',
     'name' => 'navigation',
   ));
   $handler->override_option('tab_options', array(
-    'type' => 'none',
-    'title' => '',
+    'type' => 'normal',
+    'title' => 'Library',
     'description' => '',
-    'weight' => 0,
+    'weight' => '0',
     'name' => 'navigation',
   ));
   $handler = $view->new_display('feed', 'Feed', 'feed');
@@ -1175,6 +1208,184 @@ echo $view->total_rows; ?> entries that match this query.');
     'page' => 'page',
   ));
   $handler->override_option('sitename_title', '1');
+  $handler = $view->new_display('page', 'My texts', 'page_1');
+  $handler->override_option('relationships', array());
+  $handler->override_option('filters', array(
+    'type' => array(
+      'operator' => 'in',
+      'value' => array(
+        'content' => 'content',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'none',
+    ),
+    'language' => array(
+      'operator' => 'in',
+      'value' => array(
+        'en' => 'en',
+        'pl' => 'pl',
+      ),
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'use_operator' => 0,
+        'operator' => 'language_op',
+        'identifier' => 'language',
+        'label' => 'Language',
+        'bef_filter_description' => '',
+        'bef_format' => 'bef',
+        'optional' => 1,
+        'single' => 0,
+        'remember' => 0,
+        'reduce' => 1,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'language',
+      'table' => 'node',
+      'field' => 'language',
+      'relationship' => 'none',
+    ),
+    'field_content_level_value_many_to_one' => array(
+      'operator' => 'or',
+      'value' => array(),
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'use_operator' => 0,
+        'operator' => 'field_content_level_value_many_to_one_op',
+        'identifier' => 'level',
+        'label' => 'Level',
+        'bef_filter_description' => '',
+        'bef_format' => 'bef',
+        'optional' => 1,
+        'single' => 0,
+        'remember' => 0,
+        'reduce' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'field_content_level_value_many_to_one',
+      'table' => 'node_data_field_content_level',
+      'field' => 'field_content_level_value_many_to_one',
+      'override' => array(
+        'button' => 'Override',
+      ),
+      'relationship' => 'none',
+      'reduce_duplicates' => 0,
+    ),
+    'field_content_type_value_many_to_one' => array(
+      'operator' => 'or',
+      'value' => array(),
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'use_operator' => 0,
+        'operator' => 'field_content_type_value_many_to_one_op',
+        'identifier' => 'type',
+        'label' => 'Type',
+        'bef_filter_description' => '',
+        'bef_format' => 'bef',
+        'optional' => 1,
+        'single' => 0,
+        'remember' => 0,
+        'reduce' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'field_content_type_value_many_to_one',
+      'table' => 'node_data_field_content_type',
+      'field' => 'field_content_type_value_many_to_one',
+      'relationship' => 'none',
+      'reduce_duplicates' => 0,
+    ),
+    'field_audio_list' => array(
+      'operator' => '=',
+      'value' => 'All',
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'operator' => '',
+        'identifier' => 'has_audio',
+        'label' => 'Has audio',
+        'bef_filter_description' => '',
+        'bef_format' => 'default',
+        'optional' => 1,
+        'remember' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 0,
+      ),
+      'id' => 'field_audio_list',
+      'table' => 'node_data_field_audio',
+      'field' => 'field_audio_list',
+      'relationship' => 'none',
+    ),
+    'field_content_category_value_many_to_one' => array(
+      'operator' => 'or',
+      'value' => array(),
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'use_operator' => 0,
+        'operator' => 'field_content_category_value_many_to_one_op',
+        'identifier' => 'category',
+        'label' => 'Category',
+        'bef_filter_description' => '',
+        'bef_format' => 'bef',
+        'optional' => 1,
+        'single' => 0,
+        'remember' => 0,
+        'reduce' => 0,
+        'bef_select_all_none' => 0,
+        'bef_collapsible' => 1,
+      ),
+      'id' => 'field_content_category_value_many_to_one',
+      'table' => 'node_data_field_content_category',
+      'field' => 'field_content_category_value_many_to_one',
+      'relationship' => 'none',
+      'reduce_duplicates' => 1,
+    ),
+    'uid_current' => array(
+      'operator' => '=',
+      'value' => '1',
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'uid_current',
+      'table' => 'users',
+      'field' => 'uid_current',
+      'override' => array(
+        'button' => 'Use default',
+      ),
+      'relationship' => 'none',
+    ),
+  ));
+  $handler->override_option('path', 'content/my');
+  $handler->override_option('menu', array(
+    'type' => 'tab',
+    'title' => 'My texts',
+    'description' => '',
+    'weight' => '0',
+    'name' => 'navigation',
+  ));
+  $handler->override_option('tab_options', array(
+    'type' => 'none',
+    'title' => '',
+    'description' => '',
+    'weight' => 0,
+    'name' => 'navigation',
+  ));
 
   $views[$view->name] = $view;
 

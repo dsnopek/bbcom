@@ -9,32 +9,6 @@ include_once('bbcom_wial.features.inc');
  */
 
 /*
- * Implementation of hook_flag_default_flags().
- */
-function bbcom_wial_flag_default_flags() {
-  $flags = array();
-  $flags[] = array(
-    'content_type' => 'node',
-    'name' => 'wial',
-    'title' => 'Words I Am Learning',
-    'global' => FALSE,
-    'types' => array('entry'),
-    'flag_short' => 'Add to "Words I Am Learning"',
-    'flag_long' => '',
-    'flag_message' => '',
-    'unflag_short' => 'Remove from "Words I Am Learning"',
-    'unflag_long' => '',
-    'unflag_message' => '',
-    'show_on_page' => TRUE,
-    'show_on_teaser' => TRUE,
-    'show_on_form' => FALSE,
-    // enabled by default
-    'status' => TRUE,
-  );
-  return $flags;
-}
-
-/*
  * Implementation of hook_link_alter().
  */
 function bbcom_wial_link_alter(&$links, $node) {

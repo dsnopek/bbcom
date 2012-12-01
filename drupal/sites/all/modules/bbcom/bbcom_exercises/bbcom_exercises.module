@@ -3,6 +3,26 @@
 include_once('bbcom_exercises.features.inc');
 
 /**
+ * Implementation of hook_perm().
+ */
+function bbcom_exercises_perm() {
+  return array(
+    'edit field_content_exercises',
+  );
+}
+
+/**
+ * Implementation of hook_field_access().
+ *
+ * Hack to control access to field_content_exercises.
+ */
+function bbcom_exercises_field_access($op, $field, $account, $node) {
+  if ($op == 'edit' && $field['field_name'] == 'field_content_exercises') {
+    return user_access('edit field_content_exercises', $account);
+  }
+}
+
+/**
  * Implementation of hook_menu_alter().
  */
 function bbcom_exercises_menu_alter(&$items) {
