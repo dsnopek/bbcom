@@ -1211,32 +1211,6 @@ echo $view->total_rows; ?> entries that match this query.');
   $handler = $view->new_display('page', 'My texts', 'page_1');
   $handler->override_option('relationships', array());
   $handler->override_option('filters', array(
-    'promote' => array(
-      'id' => 'promote',
-      'table' => 'node',
-      'field' => 'promote',
-      'operator' => '=',
-      'value' => '1',
-      'group' => 0,
-      'exposed' => FALSE,
-      'expose' => array(
-        'operator' => FALSE,
-        'label' => '',
-      ),
-    ),
-    'status' => array(
-      'id' => 'status',
-      'table' => 'node',
-      'field' => 'status',
-      'operator' => '=',
-      'value' => '1',
-      'group' => 0,
-      'exposed' => FALSE,
-      'expose' => array(
-        'operator' => FALSE,
-        'label' => '',
-      ),
-    ),
     'type' => array(
       'operator' => 'in',
       'value' => array(

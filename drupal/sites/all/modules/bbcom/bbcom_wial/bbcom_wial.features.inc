@@ -1,6 +1,55 @@
 <?php
 
 /**
+ * Implementation of hook_flag_default_flags().
+ */
+function bbcom_wial_flag_default_flags() {
+  $flags = array();
+  // Exported flag: "Words I Am Learning".
+  $flags['wial'] = array(
+    'content_type' => 'node',
+    'title' => 'Words I Am Learning',
+    'global' => '0',
+    'types' => array(
+      '0' => 'entry',
+    ),
+    'flag_short' => 'Add to "Words I Am Learning"',
+    'flag_long' => '',
+    'flag_message' => '',
+    'unflag_short' => 'Remove from "Words I Am Learning"',
+    'unflag_long' => '',
+    'unflag_message' => '',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'roles' => array(
+      'flag' => array(
+        '0' => '2',
+        '1' => '8',
+      ),
+      'unflag' => array(
+        '0' => '2',
+        '1' => '8',
+      ),
+    ),
+    'weight' => 0,
+    'show_on_page' => 1,
+    'show_on_teaser' => 1,
+    'show_on_form' => 0,
+    'access_author' => '',
+    'i18n' => '0',
+    'flag_confirmation' => '',
+    'unflag_confirmation' => '',
+    'api_version' => 2,
+    'module' => 'bbcom_wial',
+    'locked' => array(
+      '0' => 'name',
+    ),
+  );
+  return $flags;
+
+}
+
+/**
  * Implementation of hook_rules_defaults().
  */
 function bbcom_wial_rules_defaults() {
