@@ -6,6 +6,24 @@
 function bbcom_content_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: annotate lingwo_korpus texts
+  $permissions['annotate lingwo_korpus texts'] = array(
+    'name' => 'annotate lingwo_korpus texts',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'annotator',
+    ),
+  );
+
+  // Exported permission: annotate own lingwo_korpus texts
+  $permissions['annotate own lingwo_korpus texts'] = array(
+    'name' => 'annotate own lingwo_korpus texts',
+    'roles' => array(
+      '0' => 'admin',
+      '1' => 'beta',
+    ),
+  );
+
   // Exported permission: create content content
   $permissions['create content content'] = array(
     'name' => 'create content content',
