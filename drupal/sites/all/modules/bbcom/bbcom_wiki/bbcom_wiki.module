@@ -56,7 +56,10 @@ function _bbcom_wiki_image($fid, $opts=array()) {
     }
 
     $getsize = !isset($attrs['width']) && !isset($attrs['height']);
-    return theme('image', $filepath, '', '', $attrs, $getsize);
+    return l(theme('image', $filepath, '', '', $attrs, $getsize), $filepath, array(
+      'html' => TRUE,
+      'attributes' => array('rel' => 'lightbox'),
+    ));
   }
   else {
     return "[IMAGE: $fid]";
