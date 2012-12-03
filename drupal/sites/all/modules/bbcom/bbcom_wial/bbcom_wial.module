@@ -65,6 +65,16 @@ function bbcom_wial_user($op, &$edit, &$account, $category = NULL) {
   }
 }
 
+/**
+ * Implementation of hook_form_alter().
+ */
+function bbcom_wial_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['#plugin']) && is_a($form['#plugin'], 'views_bulk_operations_plugin_style') && $form['#plugin']->view->name == 'wial_list') {
+    // pull the objects list to the top (so the operation buttons go below it)
+    $form['objects']['#weight'] = -99;
+  }
+}
+
 function bbcom_wial_page_access($account) {
   global $user;
 
