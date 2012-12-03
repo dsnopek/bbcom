@@ -1,5 +1,4 @@
 <?php
-// $Id: autoload.module,v 1.1.2.11.2.3 2010/11/08 04:30:49 davereid Exp $
 
 /**
  * Signals that the registry lookup cache should be reset.
@@ -203,6 +202,13 @@ function _autoload_registry_check_code($type, $name = NULL) {
     return TRUE;
   }
   else {
+    if (variable_get('autoload_registry_watchdog_misses', FALSE)) {
+      $variables = array(
+        '%type' => $type,
+        '%name' => $name,
+      );
+      watchdog('autoload', "Registry had no entry for %type %name", $variables, WATCHDOG_NOTICE);
+    }
     return FALSE;
   }
 }
