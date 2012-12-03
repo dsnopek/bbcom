@@ -1,5 +1,5 @@
 <?php
-// $Id: voting_rules.module,v 1.1 2010/07/27 08:53:36 heydemo Exp $
+// $Id$
 
 /**
  * @file
@@ -20,9 +20,11 @@
  */
 function voting_rules_votingapi_insert($votes) {
   foreach ($votes as $vote) {
+    $user = user_load($vote['uid']);
     $content = voting_rules_load_content($vote['content_type'], $vote['content_id']);
     if ($content) {
-      rules_invoke_event('voting_rules_insert_'. $vote['content_type'], $vote, $content);
+      rules_invoke_event('voting_rules_insert_'. $vote['content_type'], $vote, $content, $user);
+      rules_invoke_event('voting_rules_insert', $vote, $user);
     }
   }
 }
@@ -35,6 +37,7 @@ function voting_rules_votingapi_delete($votes) {
     $content = voting_rules_load_content($vote['content_type'], $vote['content_id']);
     if ($content) {
       rules_invoke_event('voting_rules_delete_'. $vote['content_type'], $vote, $content);
+      rules_invoke_event('voting_rules_delete', $vote);
     }
   }
 }
@@ -46,6 +49,7 @@ function voting_rules_votingapi_results($cached, $content_type, $content_id) {
   $content = voting_rules_load_content($content_type, $content_id);
   if ($content) {
     rules_invoke_event('voting_rules_results_'. $content_type, $cached, $content);
+    rules_invoke_event('voting_rules_results', $vote);
   }
 }
 
@@ -54,10 +58,10 @@ function voting_rules_votingapi_results($cached, $content_type, $content_id) {
  */
 function voting_rules_token_values($type, $object = NULL, $options = array()) {
   $tokens = array();
-  if ($type == 'vote') {
+  if ($type == 'vote' || $type == 'all') {
     $tokens = $object;
   }
-  elseif ($type == 'vote_results') {
+  elseif ($type == 'vote_results' || $type == 'all') {
     foreach ($object as $data) {
       $tokens[$data['function']] = $data['value'];
     }
@@ -70,7 +74,7 @@ function voting_rules_token_values($type, $object = NULL, $options = array()) {
  */
 function voting_rules_token_list($type = 'all') {
   $tokens = array();
-  if ($type == 'vote') {
+  if ($type == 'vote' || $type == 'all') {
     $tokens['vote']['value'] = t("Value of the vote");
     $tokens['vote']['value_type'] = t("Type of the vote value - e.g. points");
     $tokens['vote']['tag'] = t("Tag of the vote");
@@ -82,7 +86,7 @@ function voting_rules_token_list($type = 'all') {
     $tokens['vote']['prepped'] = t("Prepped");
     $tokens['vote']['vote_id'] = t("Id of the vote");
   }
-  elseif ($type = 'vote_results') {
+  elseif ($type = 'vote_results' || $type == 'all') {
     $tokens['vote_results']['count'] = t("Total number of votes");
     $tokens['vote_results']['average'] = t("Average value of votes cast");
     $tokens['vote_results']['sum'] = t("Sum of all votes cast");
