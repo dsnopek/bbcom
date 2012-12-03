@@ -11,7 +11,7 @@ div.filefield-source .form-item {
   white-space: normal;
 }
 
-div.filefield-source input.hint {
+div.filefield-source .hint {
   color: #999;
 }
 

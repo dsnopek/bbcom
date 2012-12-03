@@ -4,42 +4,39 @@
  * Behavior to add source options to configured fields.
  */
 Drupal.behaviors.fileFieldSources = function(context) {
-  $('div.filefield-sources-list:not(.filefield-sources-processed)', context).each(function() {
-    $(this).addClass('filefield-sources-processed');
-    var $fileFieldElement = $(this).parents('div.form-item:first').find('div.filefield-element:first');
-    $(this).find('a').click(function() {
-      // Remove the active class.
-      $(this).parents('div.filefield-sources-list').find('a.active').removeClass('active');
-  
-      // Find the unique FileField Source class name.
-      var fileFieldSourceClass = this.className.match(/filefield-source-[0-9a-z]+/i)[0];
-  
-      // The default upload element is a special case.
-      if ($(this).is('.filefield-source-upload')) {
-        $fileFieldElement.find('div.filefield-upload').parent().css('display', '');
-        $fileFieldElement.find('div.filefield-source').css('display', 'none');
-      }
-      else {
-        $fileFieldElement.find('div.filefield-upload').parent().css('display', 'none');
-        $fileFieldElement.find('div.filefield-source').not('div.' + fileFieldSourceClass).css('display', 'none');
-        $fileFieldElement.find('div.' + fileFieldSourceClass).css('display', '');
-      }
-  
-      // Add the active class.
-      $(this).addClass('active');
-      Drupal.fileFieldSources.updateHintText($fileFieldElement.get(0));
-    });
+  $('div.filefield-sources-list a', context).click(function() {
+    $fileFieldElement = $(this).parents('div.form-item:first').find('div.filefield-element:first');
 
-    // Hide all the other upload mechanisms on page load.
-    $fileFieldElement.find('div.filefield-source', this).css('display', 'none');
-    $(this).find('a:first').addClass('active');
+    // Remove the active class.
+    $(this).parents('div.filefield-sources-list').find('a.active').removeClass('active');
+
+    // Find the unique FileField Source class name.
+    var fileFieldSourceClass = this.className.match(/filefield-source-[0-9a-z]+/i)[0];
+
+    // The default upload element is a special case.
+    if ($(this).is('.filefield-source-upload')) {
+      $fileFieldElement.find('div.filefield-upload').parent().css('display', '');
+      $fileFieldElement.find('div.filefield-source').css('display', 'none');
+    }
+    else {
+      $fileFieldElement.find('div.filefield-upload').parent().css('display', 'none');
+      $fileFieldElement.find('div.filefield-source').not('div.' + fileFieldSourceClass).css('display', 'none');
+      $fileFieldElement.find('div.' + fileFieldSourceClass).css('display', '');
+    }
+
+    // Add the active class.
+    $(this).addClass('active');
+    Drupal.fileFieldSources.updateHintText($fileFieldElement.get(0));
   });
 
-  if (context === document) {
-    $('form').submit(function() {
-      Drupal.fileFieldSources.removeHintText();
-    });
-  }
+  // Hide all the other upload mechanisms on page load.
+  $('div.filefield-source', context).css('display', 'none');
+  $('div.filefield-sources-list', context).each(function() {
+    $(this).find('a:first').addClass('active');
+  });
+  $('form#node-form', context).submit(function() {
+    Drupal.fileFieldSources.removeHintText();
+  });
 };
 
 /**
