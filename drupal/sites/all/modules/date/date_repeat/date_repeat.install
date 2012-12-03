@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @file
+ * Install file for Date Repeat.
+ */
 /**
  * Implementation of hook_install().
  */

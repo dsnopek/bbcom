@@ -1,11 +1,15 @@
 <?php
 /**
+ * @file
+ * Identification for fields the Date handlers can use.
+ */
+
+/**
  *  Identify all potential date/timestamp fields.
  *
  *  @return
  *    array with fieldname, type, and table.
- *  @see 
- *    date_api_date_api_fields() which implements 
+ *  @see date_api_date_api_fields() which implements
  *    the hook_date_api_fields() for the core date fields.
  */
 function _date_api_fields($base = 'node') {
@@ -26,7 +30,7 @@ function _date_api_fields($base = 'node') {
     $alias = str_replace('.', '_', $name);
 
     if (!$handler = views_get_handler($table_name, $field_name, 'field')) {
-      continue; 
+      continue;
     }
 
     $handler_name = $handler->definition['handler'];
@@ -156,13 +160,13 @@ function _date_api_fields($base = 'node') {
         }
       }
       if (isset($handler->content_field)) {
-        if (substr($field_name, -1) == '2') {
-          $len = (strlen($field_name) - 7);
+        if (drupal_substr($field_name, -1) == '2') {
+          $len = (drupal_strlen($field_name) - 7);
         }
         else {
-          $len = (strlen($field_name) - 6);
+          $len = (drupal_strlen($field_name) - 6);
         }
-        $fields['name'][$name]['real_field_name'] = substr($field_name, 0, $len);
+        $fields['name'][$name]['real_field_name'] = drupal_substr($field_name, 0, $len);
       }
       else {
         $fields['name'][$name]['real_field_name'] = $field_name;

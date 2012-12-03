@@ -116,16 +116,16 @@ function date_timezone_process($element, $edit, $form_state, $form) {
  *
  * The exact parts displayed in the field are those in #date_granularity.
  * The display of each part comes from #date_format.
- * 
+ *
  * In regular FAPI processing $element['#value'] will contain a string
  * value before the form is submitted, and an array during submission.
- * 
+ *
  * In regular FAPI processing $edit is empty until the form is submitted
  * when it will contain an array.
- * 
+ *
  * Views widget processing now receives the same values as normal FAPI
  * processing (that was not true in Views 1).
- * 
+ *
  */
 function date_text_process($element, $edit, $form_state, $form) {
   $date = NULL;
@@ -173,16 +173,16 @@ function date_text_process($element, $edit, $form_state, $form) {
  *
  * The exact parts displayed in the field are those in #date_granularity.
  * The display of each part comes from ['#date_settings']['format'].
- * 
+ *
  * In regular FAPI processing $element['#value'] will contain a string
  * value before the form is submitted, and an array during submission.
- * 
+ *
  * In regular FAPI processing $edit is empty until the form is submitted
  * when it will contain an array.
- * 
+ *
  * Views widget processing now receives the same values as normal FAPI
  * processing (that was not true in Views 1).
- * 
+ *
  */
 function date_select_process($element, $edit, $form_state, $form) {
   $date = NULL;
@@ -245,7 +245,7 @@ function date_parts_element($element, $date, $format) {
   $count = 0;
   $increment = min(intval($element['#date_increment']), 1);
   foreach ($granularity as $field) {
-    // Allow empty value as option if date is not required 
+    // Allow empty value as option if date is not required
     // or if empty value was provided as a starting point.
     $part_required = ($element['#required'] && is_object($date)) ? TRUE : FALSE;
     $part_type = in_array($field, $element['#date_text_parts']) ? 'textfield' : 'select';
@@ -362,11 +362,11 @@ function date_parts_element($element, $date, $format) {
 
 /**
  *  Validation function for date selector.
- * 
+ *
  * When used as a Views widget, the validation step always gets triggered,
  * even with no form submission. Before form submission $element['#value']
  * contains a string, after submission it contains an array.
- * 
+ *
  */
 function date_select_validate($element, &$form_state) {
   if (is_string($element['#value'])) {
@@ -374,7 +374,7 @@ function date_select_validate($element, &$form_state) {
   }
   // Strip field labels out of the results.
   foreach ($element['#value'] as $field => $field_value) {
-    if (substr($field_value, 0, 1) == '-') {
+    if (drupal_substr($field_value, 0, 1) == '-') {
       $element['#value'][$field] = '';
     }
   }
@@ -386,7 +386,7 @@ function date_select_validate($element, &$form_state) {
   if (in_array('year', $element['#granularity']) && ($element['#required'] || !empty($element['#value']['year']))) {
     if ($element['#value']['year'] < variable_get('date_min_year', 1) || $element['#value']['year'] > variable_get('date_max_year', 4000)) {
       $errors[] = t('The year must be a number between %min and %max.', array(
-        '%min' => variable_get('date_min_year', 1), '%max' => variable_get('date_max_year', 4000)));  
+        '%min' => variable_get('date_min_year', 1), '%max' => variable_get('date_max_year', 4000)));
     }
     else {
       $year = $element['#value']['year'];
@@ -469,11 +469,11 @@ function date_select_input_value($element) {
 
 /**
  *  Validation for text input.
- * 
+ *
  * When used as a Views widget, the validation step always gets triggered,
  * even with no form submission. Before form submission $element['#value']
  * contains a string, after submission it contains an array.
- * 
+ *
  */
 function date_text_validate($element, &$form_state) {
   if (is_string($element['#value'])) {
@@ -484,10 +484,10 @@ function date_text_validate($element, &$form_state) {
   $value = date_text_input_value($element);
 
   if (empty($value) && !empty($element['#required'])) {
-    form_error($element, t('A valid date is required for %title.', array('%title' => $label))); 
+    form_error($element, t('A valid date is required for %title.', array('%title' => $label)));
   }
   elseif (empty($value) && !empty($element['#value']['date'])) {
-    form_error($element, t('%title is invalid.', array('%title' => $label))); 
+    form_error($element, t('%title is invalid.', array('%title' => $label)));
   }
   elseif (!empty($value)) {
     form_set_value($element, $value, $form_state);
@@ -599,7 +599,7 @@ function date_convert_from_custom($date, $format) {
       case 'y':
         $year = $value;
         // if no century, we add the current one ("06" => "2006")
-        $final_date['year'] = str_pad($year, 4, substr(date("Y"), 0, 2), STR_PAD_LEFT);
+        $final_date['year'] = str_pad($year, 4, drupal_substr(date("Y"), 0, 2), STR_PAD_LEFT);
         break;
       case 'a':
       case 'A':

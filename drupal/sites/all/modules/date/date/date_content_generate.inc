@@ -33,7 +33,7 @@ function _date_content_generate($node, $field) {
 	$start2 = drupal_clone($start);
 	$max = !empty($field['repeat']) ? 720 : 4320;
 	$max = 240;
-  date_modify($start2, '+'. mt_rand(60, $max) .' minutes');  
+  date_modify($start2, '+'. mt_rand(60, $max) .' minutes');
   date_increment_round($start2, $increment);
 
   if ($field['tz_handling'] == 'date') {
@@ -71,7 +71,7 @@ function _date_content_generate($node, $field) {
   $node_field['timezone'] = $timezone;
   $node_field['offset'] = date_offset_get($start);
   date_timezone_set($start2, timezone_open($timezone));
-  $node_field['offset2'] = date_offset_get($start2);     	 	
+  $node_field['offset2'] = date_offset_get($start2);
 
   if (!empty($field['repeat'])) {
     include_once('./'. drupal_get_path('module', 'date_repeat') .'/date_repeat_calc.inc');

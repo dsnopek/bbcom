@@ -61,7 +61,7 @@
  * @param $timezone name
  *   Use 'UTC' to avoid timezone conversion.
  */
-function _date_getdate($timestamp = false, $timezone = false) {
+function _date_getdate($timestamp = FALSE, $timezone = FALSE) {
   static $YRS;
   if ($timezone === FALSE) {
     $timezone = date_default_timezone_name();
@@ -221,7 +221,7 @@ function _date_getdate($timestamp = false, $timezone = false) {
  * @param $timezone name
  *   Use 'UTC' to avoid timezone conversion.
  */
-function _date_date($format, $timestamp = false, $timezone = false) {
+function _date_date($format, $timestamp = FALSE, $timezone = FALSE) {
   if ($timezone === FALSE) {
     $timezone = date_default_timezone_name();
   }
@@ -257,7 +257,7 @@ function _date_date($format, $timestamp = false, $timezone = false) {
       $gmt = date_get_gmt_diff_ts($timestamp, $timezone);
       $dates .= sprintf(' %s%04d', ($gmt >= 0) ? '+' : '-', abs($gmt) / 36); break;
     case 'Y': $dates .= date_pad($year, 4); break;
-    case 'y': $dates .= substr($year, strlen($year)-2, 2); break;
+    case 'y': $dates .= drupal_substr($year, strlen($year)-2, 2); break;
     // MONTH
     case 'm': if ($month<10) $dates .= '0'. $month; else $dates .= $month; break;
     case 'Q': $dates .= ($month + 3)>>2; break;
@@ -275,8 +275,8 @@ function _date_date($format, $timestamp = false, $timezone = false) {
     case 'S':
       $d10 = $day % 10;
       if ($d10 == 1) $dates .= 'st';
-      else if ($d10 == 2 && $day != 12) $dates .= 'nd';
-      else if ($d10 == 3) $dates .= 'rd';
+      elseif ($d10 == 2 && $day != 12) $dates .= 'nd';
+      elseif ($d10 == 3) $dates .= 'rd';
       else $dates .= 'th';
       break;
     // HOUR
@@ -285,7 +285,7 @@ function _date_date($format, $timestamp = false, $timezone = false) {
       break;
     case 'O':
       $gmt = date_get_gmt_diff_ts($timestamp, $timezone);
-      $dates .= sprintf('%s%04d', ($gmt<0)?'+':'-', abs($gmt)/36); 
+      $dates .= sprintf('%s%04d', ($gmt<0)?'+':'-', abs($gmt)/36);
       break;
     case 'H':
       if ($hour < 10) $dates .= '0'. $hour;
@@ -350,7 +350,7 @@ function _date_date($format, $timestamp = false, $timezone = false) {
  * @param $timezone name
  *   Use 'UTC' to avoid timezone conversion.
  */
-function _date_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false, $timezone = false) {
+function _date_mktime($hr, $min, $sec, $mon = FALSE, $day = FALSE, $year = FALSE, $timezone = FALSE) {
   if ($timezone === FALSE) {
     $timezone = date_default_timezone_name();
   }
@@ -371,7 +371,7 @@ function _date_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false
     $year += $y;
     $mon -= $y * 12;
   }
-  else if ($mon < 1) {
+  elseif ($mon < 1) {
     $y = ceil((1-$mon) / 12);
     $year -= $y;
     $mon += $y * 12;
@@ -432,7 +432,7 @@ function _date_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false
     $_day_time = $_day_power - $_day_time;
     $ret = -( $_total_date * $_day_power + $_day_time);
     if ($ret < -12220185600) $ret += 10*86400; // if earlier than 5 Oct 1582 - gregorian correction
-    else if ($ret < -12219321600) $ret = -12219321600; // if in limbo, reset to 15 Oct 1582.
+    elseif ($ret < -12219321600) $ret = -12219321600; // if in limbo, reset to 15 Oct 1582.
   }
   return $ret;
 }

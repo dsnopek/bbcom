@@ -231,7 +231,7 @@ function date_api_date_format_select_field(&$form, $type, $type_info, $default, 
     // then closing it below.
     '#suffix' => ($show_remove == 1 && $type_info['locked'] == 0) ? '</div>' : '</div></div>',
     '#type' => 'select',
-    '#title' => t('!type date format', array('!type' => $type_info['title'])),
+    '#title' => t('!type date format', array('!type' => t($type_info['title']))),
     '#attributes' => array('class' => 'date-format'),
     '#default_value' => (isset($choices[$default]) ? $default : 'custom'),
     '#options' => $choices,

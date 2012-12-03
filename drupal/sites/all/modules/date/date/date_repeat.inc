@@ -102,7 +102,7 @@ function _date_repeat_widget_validate($element, &$form_state) {
       if (empty($item[$key])) {
         $item[$key] = '';
       }
-    }    
+    }
     $value = date_repeat_build_dates($rrule, $values, $field, $item);
     form_set_value($element, $value, $form_state);
   }
@@ -121,7 +121,6 @@ function _date_repeat_widget_validate($element, &$form_state) {
  * whichever is missing will be created when needed.
  */
 function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $item) {
-
   module_load_include('inc', 'date_api', 'date_api_ical');
   $field_name = $field['field_name'];
 
@@ -150,8 +149,10 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
   }
   $duration = date_difference($start, $end);
   $start_datetime = date_format($start, DATE_FORMAT_DATETIME);
-
   if (!empty($rrule_values['UNTIL']['datetime'])) {
+    if (strlen($form_values['UNTIL']['datetime']) < 11) {
+      $rrule_values['UNTIL']['datetime'] .= ' 23:59:59';
+    }
     $end = date_ical_date($rrule_values['UNTIL'], $timezone);
     $end_datetime = date_format($end, DATE_FORMAT_DATETIME);
   }
@@ -168,6 +169,9 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
   $parsed_exceptions = (array) $parts[1];
   $exceptions = array();
   foreach ($parsed_exceptions as $exception) {
+    if (strlen($exception['datetime']) < 11) {
+      $exception['datetime'] .= ' 00:00:00';
+    }
     $date = date_ical_date($exception, $timezone);
     $exceptions[] = date_format($date, 'Y-m-d');
   }
@@ -175,6 +179,9 @@ function date_repeat_build_dates($rrule = NULL, $rrule_values = NULL, $field, $i
   $parsed_rdates = (array) $parts[2];
   $additions = array();
   foreach ($parsed_rdates as $rdate) {
+    if (strlen($rdate['datetime']) < 11) {
+      $rdate['datetime'] .= ' 00:00:00';
+    }
     $date = date_ical_date($rdate, $timezone);
     $additions[] = date_format($date, 'Y-m-d');
   }

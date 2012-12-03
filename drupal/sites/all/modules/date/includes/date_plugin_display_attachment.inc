@@ -1,8 +1,13 @@
 <?php
 /**
+ * @file
+ * Views attachment display handler.
+ */
+
+/**
  * The plugin that handles date navigation attachments.
- * 
- * Creates a special attachment for this purpose only. 
+ *
+ * Creates a special attachment for this purpose only.
  */
 class date_plugin_display_attachment extends views_plugin_display_attachment {
 
@@ -30,5 +35,5 @@ class date_plugin_display_attachment extends views_plugin_display_attachment {
     $options['defaults']['default']['row_options'] = FALSE;
 
     return $options;
-  } 
+  }
 }

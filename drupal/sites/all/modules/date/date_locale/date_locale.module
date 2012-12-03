@@ -151,7 +151,7 @@ function date_locale_format_form($form_state) {
       '#title' => t('Language'),
       '#type' => 'select',
       '#options' => $languages,
-      '#multiple' => false,
+      '#multiple' => FALSE,
     );
 
     $form['buttons']['submit'] = array(

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Code to migrate Events to use Date fields instead.
+ */
 
 /**
  *  Event import form.
@@ -56,7 +60,7 @@ function date_tools_copy_import_event_form($form_state) {
       );
       $form['fields'] = array(
         '#type' => 'fieldset',
-        '#title' => t('!type Fields', array('!type' => $node_types[$type])),
+        '#title' => t('!type Fields', array('!type' => check_plain($node_types[$type]))),
         '#weight' => -1,
       );
       $form['fields'] += date_tools_copy_type_fields_form($type);

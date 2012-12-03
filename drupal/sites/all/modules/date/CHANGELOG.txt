@@ -1,7 +1,39 @@
 Date Module 6.x
 =================
-Version 6.2-dev
-=================
+
+Version 6.2.8
+=============
+
+- Issue #1005968 by jcmarco, dnotes: Added Ajax for date navigation attachment views.
+- Issue #1545254, Use remember in filter only if a value exists.
+- Add a test for force_value to the code that checks the default value for the exposed filter. In some cases the relative value wasn't overriding a fixed value as it should have been doing.
+- Issue #1223956 by mikeytown2 and hyrcan, Fix undefined index in date_handler_fields().
+- Issue #1517548 by joachim, Fix incorrect documentation for date_default_timezone_name().
+- Issue #884310 by AlexisWilke, Postgres earlier than 8.3 needs different syntax in date update.
+- Issue #606658 by johnmunro and KarenS, Make sure ical import processes multi-day all-day events correctly.
+- Issue #1282538 by benjifisher, crifi, and KarenS, Make sure ical feed for all day events adds 1 day to the end date to comply with the spec.
+- Issue #1463438 by hyrcan, Fix some 5.3 notices.
+- Issue #1513396 by JoeMcGuire, Fix failing Date Popup test.
+- Clean up to eliminate PHP notices when running tests on PHP 5.3.
+- Issue #1408216 follow up, Need to be sure that NULL is the default state for the sql functions.
+- Issue #337666, Make sure the UNTIL date for repeating dates is inclusive.
+- Backport the D7 version of date_ical.ical.inc to D6 so we can keep D6 and D7 synched up more easily.
+- Issue #975320 by mvc, Add translation to jQuery date picker.
+- Issue #1408216, Remove remaining references to ->offset, which is no longer defined, nor needed. The timezone defaults should be properly set by date_views_set_timezone().
+- Issue #1408216 by technicalknockout, artkon, tangent: Fixed Events no longer appearing in calendar (regression introduced in Issue #1017866).
+- Issue #1360672, Fix limit format code to remove leftover non-ascii text as well as leftover ascii text.
+- Issue #1033856 by joachim: Fixed conflicting messages about jquery UI requirement.
+- Issue #1049992 by jjwhitney: Fixed Failed validation causes values to disappear when using popup widget.
+- Issue #436490 by kong, xjm: Fixed Add support for jQuery update to 1.3.x and jQuery UI 1.7.x.
+- Issue #1161814 by Scyther: Bad code in function date_field().
+- Issue #232954 by rho_, arlinsandbulte: Fixed text 'Empty 'To date' values will use the 'From date' values' is always visibl under the second row of selectboxes ('date - to').
+- Issue #536832 by aturetta: Fixed Date format types not translated in admin pages.
+- Issue #488078 by emmajane: Fixed Broken link.
+- Issue #1017216 by tim.plunkett, arlinsandbulte: Added custom date format without time shows 'all day'.
+- Issue #1407064 by nairb: Fixed undefined function drupal_substr_replace().
+- Issue #1162962 by mikeryan: Fixed E_STRICT notices in date_make_date().
+- Issue #554546 by master-of-magic: Fix Timezone list translation
+- Finally found why tests are failing on d.o. Some of the needed modules aren't getting set up in the test.
 
 Version 6.2.8
 =============

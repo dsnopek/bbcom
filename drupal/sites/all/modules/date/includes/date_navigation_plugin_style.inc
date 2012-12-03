@@ -1,7 +1,12 @@
 <?php
 /**
+ * @file
+ * Date navigation style handler.
+ */
+
+/**
  * Style plugin to create date back/next navigation.
- * 
+ *
  * The style plugin passes some argument values to the theme, and
  * ensures that the date argument is present and that the default
  * value is set to the current date.
@@ -20,17 +25,17 @@ class date_navigation_plugin_style extends views_plugin_style {
     foreach ($arguments as $id => $argument) {
       if ($argument['field'] == 'date_argument') {
         if ($count > 0) {
-          $errors[] = t('The %style cannot use more than one Date: Date argument.', array('%style' => $this->definition['title']));          
+          $errors[] = t('The %style cannot use more than one Date: Date argument.', array('%style' => $this->definition['title']));
         }
         elseif ($argument['default_argument_type'] != 'date') {
-          $errors[] = t('The %style requires the Date: Date argument be set to default to the current date.', array('%style' => $this->definition['title']));      
+          $errors[] = t('The %style requires the Date: Date argument be set to default to the current date.', array('%style' => $this->definition['title']));
         }
         $count++;
         $found = TRUE;
       }
     }
     if (!$found) {
-      $errors[] = t('The %style requires the Date: Date argument.', array('%style' => $this->definition['title']));      
+      $errors[] = t('The %style requires the Date: Date argument.', array('%style' => $this->definition['title']));
     }
     return $errors;
   }
@@ -39,7 +44,7 @@ class date_navigation_plugin_style extends views_plugin_style {
     require_once('./'. drupal_get_path('module', 'date_api') .'/date_api_sql.inc');
 
     // Bring the argument information into the view so our theme can access it.
-    $i = 0;    
+    $i = 0;
     foreach ($this->view->argument as $id => $argument) {
       if ($id == 'date_argument') {
         $this->view->date_info->granularity = $argument->granularity;

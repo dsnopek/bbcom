@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ * Date test.
+ */
+
 class DateTestCase extends DrupalWebTestCase {
   protected $privileged_user;
 
@@ -25,7 +30,7 @@ class DateTestCase extends DrupalWebTestCase {
     variable_set('date_popup_timepicker', 'none');
   }
 
-  function testDate() {  
+  function testDate() {
     // Creates select list date field stored as a date with default settings.
     $this->createDateField($type = 'date', $widget = 'date_select');
     $edit = array();
@@ -42,7 +47,9 @@ class DateTestCase extends DrupalWebTestCase {
     $this->deleteDateField();
     // Creates popup date field stored as a date with default settings.
     $this->createDateField($type = 'date', $widget = 'date_popup');
-    $edit = array();
+    $edit = array(
+      'input_format' => 'm/d/Y - H:i',
+    );
     $this->drupalPost(NULL, $edit, t('Save field settings'));
     $this->dateForm($options = 'popup');
     $this->assertText('Thu, 10/07/2010 - 10:30', 'Found the correct date for a date field using the date_popup widget.');
@@ -63,7 +70,9 @@ class DateTestCase extends DrupalWebTestCase {
     $this->deleteDateField();
     // Creates popup date field stored as a datestamp with default settings.
     $this->createDateField($type = 'datestamp', $widget = 'date_popup');
-    $edit = array();
+    $edit = array(
+      'input_format' => 'm/d/Y - H:i',
+    );
     $this->drupalPost(NULL, $edit, t('Save field settings'));
     $this->dateForm($options = 'popup');
     $this->assertText('Thu, 10/07/2010 - 10:30', 'Found the correct date for a datestamp field using the date_popup widget.');
@@ -84,7 +93,9 @@ class DateTestCase extends DrupalWebTestCase {
     $this->deleteDateField();
     // Creates popup date field stored as a datetime with default settings.
     $this->createDateField($type = 'datetime', $widget = 'date_popup');
-    $edit = array();
+    $edit = array(
+      'input_format' => 'm/d/Y - H:i',
+    );
     $this->drupalPost(NULL, $edit, t('Save field settings'));
     $this->dateForm($options = 'popup');
     $this->assertText('Thu, 10/07/2010 - 10:30', 'Found the correct date for a datetime field using the date_popup widget.');

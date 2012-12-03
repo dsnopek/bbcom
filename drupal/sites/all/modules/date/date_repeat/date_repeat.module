@@ -37,7 +37,7 @@ function date_repeat_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
-  return $items; 
+  return $items;
 }
 
 function date_repeat_theme() {
@@ -170,11 +170,11 @@ function date_repeat_rrule_description($rrule, $format = 'D M d Y') {
 
   // Make sure there will be an empty description for any unused parts.
   $description = array(
-    '!interval' => '', 
-    '!byday' => '', 
-    '!bymonth' => '', 
+    '!interval' => '',
+    '!byday' => '',
+    '!bymonth' => '',
     '!count' => '',
-    '!until' => '', 
+    '!until' => '',
     '!except' => '',
     '!additional' => '',
     '!week_starts_on' => '',
@@ -204,10 +204,10 @@ function date_repeat_rrule_description($rrule, $format = 'D M d Y') {
     $counts = date_repeat_dow_count_options();
     $results = array();
     foreach ($rrule['BYDAY'] as $byday) {
-      $day = substr($byday, -2);
+      $day = drupal_substr($byday, -2);
       $count = intval(str_replace(' '. $day, '', $byday));
       if ($count = intval(str_replace(' ' . $day, '', $byday))) {
-        $results[] = trim(t('!repeats_every_interval on the !date_order !day_of_week', array('!repeats_every_interval ' => '', '!date_order' => strtolower($counts[substr($byday, 0, 2)]), '!day_of_week' => $days[$day])));
+        $results[] = trim(t('!repeats_every_interval on the !date_order !day_of_week', array('!repeats_every_interval ' => '', '!date_order' => strtolower($counts[drupal_substr($byday, 0, 2)]), '!day_of_week' => $days[$day])));
       }
       else {
         $results[] = trim(t('!repeats_every_interval every !day_of_week', array('!repeats_every_interval ' => '', '!day_of_week' => $days[$day])));

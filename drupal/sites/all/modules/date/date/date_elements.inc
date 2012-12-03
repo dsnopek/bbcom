@@ -151,7 +151,7 @@ function _date_widget(&$form, &$form_state, &$field, $items, $delta = 0) {
       '#delta' => $delta,
       '#default_value' => $timezone,
       '#weight' => $field['widget']['weight'] + .2,
-      );  
+      );
   }
 
   // Add a date repeat form element, if needed.
@@ -287,7 +287,7 @@ function date_combo_process($element, $edit, &$form_state, $form) {
     '#date_label_position' => $field['widget']['label_position'],
     );
 
-  $description =  !empty($field['widget']['description']) ? t($field['widget']['description']) : ''; 
+  $description =  !empty($field['widget']['description']) ? t($field['widget']['description']) : '';
 
   // Give this element the right type, using a Date API
   // or a Date Popup element type.
@@ -295,7 +295,7 @@ function date_combo_process($element, $edit, &$form_state, $form) {
   switch ($field['widget']['type']) {
     case 'date_select':
     case 'date_select_repeat':
-      // From/to selectors with lots of parts will look better if displayed 
+      // From/to selectors with lots of parts will look better if displayed
       // on two rows instead of in a single row.
       if (!empty($field['todate']) && count($field['granularity']) > 3) {
         $element[$from_field]['#attributes'] = array('class' => 'date-clear');
@@ -303,7 +303,7 @@ function date_combo_process($element, $edit, &$form_state, $form) {
       $element[$from_field]['#type'] = 'date_select';
       break;
     case 'date_popup':
-    case 'date_popup_repeat':  
+    case 'date_popup_repeat':
       $element[$from_field]['#type'] = 'date_popup';
       break;
     default:
@@ -321,10 +321,15 @@ function date_combo_process($element, $edit, &$form_state, $form) {
     $element[$to_field] = $element[$from_field];
     $element[$to_field]['#title'] = t('To date');
     $element[$to_field]['#default_value'] = isset($element['#value'][$to_field]) ? $element['#value'][$to_field] : '';
-    $element[$to_field]['#required'] = false;
+    $element[$to_field]['#required'] = FALSE;
     $element[$to_field]['#weight'] += .1;
-    if ($field['widget']['type'] == 'date_select') {
-      $description .= ' '. t("Empty 'To date' values will use the 'From date' values.");
+    if (($field['widget']['type'] == 'date_select') && empty($description)) {
+      $description = t("Empty 'To date' values will use the 'From date' values.");
+    }
+    else {
+      if (trim($description) == "") {
+        $description = NULL;
+      }
     }
     $element['#fieldset_description'] = $description;
   }
@@ -443,10 +448,10 @@ function date_combo_validate($element, &$form_state) {
         }
       }
 
-      // If all date values were empty and a date is required, throw 
-      // an error on the first element. We don't want to create 
-      // duplicate messages on every date part, so the error will 
-      // only go on the first.  
+      // If all date values were empty and a date is required, throw
+      // an error on the first element. We don't want to create
+      // duplicate messages on every date part, so the error will
+      // only go on the first.
       if ($to_date_empty && $field['todate'] == 'required') {
         $errors[] = t('Some value must be entered in the To date.');
       }
@@ -506,9 +511,9 @@ function date_combo_validate($element, &$form_state) {
       // and we are using a date with time granularity,
       // test a roundtrip back to the original timezone to catch
       // invalid dates, like 2AM on the day that spring daylight savings
-      // time begins in the US.  
+      // time begins in the US.
       $granularity = date_format_order($element[$from_field]['#date_format']);
-      if ($timezone != $db_timezone && date_has_time($granularity)) {
+      if ($timezone != $timezone_db && date_has_time($granularity)) {
         date_timezone_set($from_date, timezone_open($timezone));
         date_timezone_set($to_date, timezone_open($timezone));
 
@@ -530,7 +535,7 @@ function date_combo_validate($element, &$form_state) {
       form_set_error($error_field, t('There are errors in @field_name value #@delta:', array('@field_name' => $field['widget']['label'], '@delta' => $delta + 1)) . theme('item_list', $errors));
     }
     else {
-      form_set_error($error_field, t('There are errors in @field_name:', array('@field_name' => $field['widget']['label'])) . theme('item_list', $errors));      
+      form_set_error($error_field, t('There are errors in @field_name:', array('@field_name' => $field['widget']['label'])) . theme('item_list', $errors));
     }
   }
 }
@@ -543,7 +548,7 @@ function date_widget_validate($element, &$form_state) {
   if (module_exists('date_repeat') && $field['repeat'] == 1) {
     module_load_include('inc', 'date', 'date_repeat');
     return _date_repeat_widget_validate($element, $form_state);
-  }  
+  }
 }
 
 /**
