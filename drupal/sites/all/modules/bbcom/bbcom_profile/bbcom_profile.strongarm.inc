@@ -7,7 +7,7 @@ function bbcom_profile_strongarm() {
   $export = array();
 
   $strongarm = new stdClass;
-  $strongarm->disabled = FALSE;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'bbcom_profile_role_titles';
   $strongarm->value = array(
@@ -132,6 +132,13 @@ function bbcom_profile_strongarm() {
     1 => 'promote',
   );
   $export['node_options_profile'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'upload_profile';
+  $strongarm->value = '0';
+  $export['upload_profile'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
