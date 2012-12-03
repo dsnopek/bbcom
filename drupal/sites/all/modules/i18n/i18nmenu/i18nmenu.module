@@ -1,5 +1,4 @@
 <?php
-// $Id: i18nmenu.module,v 1.2.2.28 2010/09/09 14:47:16 jareyero Exp $
 
 /**
  * @file
@@ -29,10 +28,12 @@ function i18nmenu_locale($op = 'groups', $group = NULL) {
 function i18nmenu_locale_refresh() {
   // Rebuild menus to ensure all items are altered in i18nmenu_menu_link_alter().
   menu_rebuild();
+  i18n_selection_mode('off');
   foreach (menu_get_menus() as $name => $title) {
     $tree = menu_tree_all_data($name);
     i18nmenu_localize_tree($tree, TRUE);
   }
+  i18n_selection_mode('reset');
   return TRUE; // Meaning it completed with no issues
 }
 
@@ -372,13 +373,11 @@ function i18nmenu_item_delete_submit($form, &$form_state) {
  * Add language to menu settings of the node form, as well as setting defaults
  * to match the translated item's menu settings.
  */
-function i18nmenu_form_alter(&$form, &$form_state, $form_id) {
+function i18nmenu_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['type']) && isset($form['#node']) && $form['type']['#value'] .'_node_form' == $form_id) {
     $node = $form['#node'];
 
     if (!empty($form['menu'])) {
-      // Set menu language to node language.
-      $form['menu']['language'] = array('#type' => 'value', '#value' => $node->language);
       // Customized must be set to 1 to save language.
       $form['menu']['customized'] = array('#type' => 'value', '#value' => 1);
     }
@@ -422,6 +421,12 @@ function i18nmenu_form_alter(&$form, &$form_state, $form_id) {
  */
 function i18nmenu_nodeapi(&$node, $op) {
   switch ($op) {
+    case 'presave':
+      // Ensure that the menu item language always matches node language.
+      if (isset($node->menu) && isset($node->language)) {
+        $node->menu['language'] = $node->language;
+      }
+      break;
     case 'insert':
     case 'update':
       if (isset($node->menu)) {

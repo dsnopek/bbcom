@@ -1,5 +1,4 @@
 <?php
-// $Id: i18ntaxonomy.pages.inc,v 1.1.2.10 2010/08/12 02:06:20 mirodietiker Exp $
 
 /**
  * @file
