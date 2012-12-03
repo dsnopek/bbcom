@@ -381,7 +381,7 @@ $handler->override_option('fields', array(
     'field' => 'last_comment_name',
     'relationship' => 'none',
   ),
-  'last_comment_timestamp' => array(
+  'last_updated' => array(
     'label' => 'Last post',
     'alter' => array(
       'alter_text' => 0,
@@ -392,7 +392,7 @@ $handler->override_option('fields', array(
       'alt' => '',
       'prefix' => '',
       'suffix' => '',
-      'target' => '',
+
       'help' => '',
       'trim' => 0,
       'max_length' => '',
@@ -407,9 +407,9 @@ $handler->override_option('fields', array(
     'date_format' => 'small',
     'custom_date_format' => '',
     'exclude' => 0,
-    'id' => 'last_comment_timestamp',
+    'id' => 'last_updated',
     'table' => 'node_comment_statistics',
-    'field' => 'last_comment_timestamp',
+    'field' => 'last_updated',
     'relationship' => 'none',
   ),
   'sticky' => array(
@@ -583,8 +583,8 @@ $handler->override_option('style_options', array(
     'comment_count' => 'comment_count',
     'new_comments' => 'comment_count',
     'totalcount' => 'totalcount',
-    'last_comment_name' => 'last_comment_timestamp',
-    'last_comment_timestamp' => 'last_comment_timestamp',
+    'last_comment_name' => 'last_updated',
+    'last_updated' => 'last_updated',
     'sticky' => 'sticky',
     'comment' => 'comment',
   ),
@@ -632,7 +632,7 @@ $handler->override_option('style_options', array(
       'sortable' => 1,
       'separator' => '<br />',
     ),
-    'last_comment_timestamp' => array(
+    'last_updated' => array(
       'sortable' => 1,
       'separator' => '<br />',
     ),
@@ -645,7 +645,7 @@ $handler->override_option('style_options', array(
       'separator' => '',
     ),
   ),
-  'default' => 'last_comment_timestamp',
+  'default' => 'last_updated',
   'tid' => 'argument.tid',
 ));
 

@@ -107,7 +107,7 @@ function advanced_forum_settings_page() {
     '#type' => 'select',
     '#title' => t('Collapsible forum containers'),
     '#options' => array(
-      'none' => t("None"),
+      'none' => t("- None -"),
       'fade' => t("Fade"),
       'slide'=> t("Slide"),
       'toggle' => t("Toggle"),
