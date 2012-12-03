@@ -50,7 +50,7 @@ function premium_nodeapi(&$node, $op, $teaser) {
       _premium_set_premium($node, $node->premium);
       break;
     case 'view':
-      if (!$node->premium_access && empty($node->preview)) {
+      if (!$node->premium_access && empty($node->preview) && !$teaser) {
         $node->content['body']['#value'] = theme('premium_body', $node);
       }
       break;
