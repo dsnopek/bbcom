@@ -5,13 +5,14 @@
  */
 function bbcom_notifications_strongarm() {
   $export = array();
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'messaging_default_method';
   $strongarm->value = 'mail';
-
   $export['messaging_default_method'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -19,15 +20,15 @@ function bbcom_notifications_strongarm() {
   $strongarm->value = array(
     'mail' => 'mail',
   );
-
   $export['messaging_method_enabled'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_content_per_type';
   $strongarm->value = '1';
-
   $export['notifications_content_per_type'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -39,8 +40,8 @@ function bbcom_notifications_strongarm() {
     'author' => 0,
     'typeauthor' => 0,
   );
-
   $export['notifications_content_type'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -48,22 +49,22 @@ function bbcom_notifications_strongarm() {
   $strongarm->value = array(
     0 => 'taxonomy',
   );
-
   $export['notifications_content_type_forum_reply'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_default_auto';
   $strongarm->value = 1;
-
   $export['notifications_default_auto'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_default_send_interval';
   $strongarm->value = 0;
-
   $export['notifications_default_send_interval'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -75,8 +76,8 @@ function bbcom_notifications_strongarm() {
     86400 => 'short',
     604800 => 'long',
   );
-
   $export['notifications_digest_methods'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -110,8 +111,8 @@ function bbcom_notifications_strongarm() {
     'node-entry-comment' => 1,
     'node-page-comment' => 1,
   );
-
   $export['notifications_event_enabled'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -145,15 +146,29 @@ function bbcom_notifications_strongarm() {
     'node-entry-comment' => 'notifications-event-node-comment',
     'node-page-comment' => 'notifications-event-node-comment',
   );
-
   $export['notifications_event_template'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'notifications_sender';
+  $strongarm->value = '1';
+  $export['notifications_sender'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'notifications_sendself';
+  $strongarm->value = 0;
+  $export['notifications_sendself'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_send_immediate';
   $strongarm->value = 0;
-
   $export['notifications_send_immediate'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -165,29 +180,15 @@ function bbcom_notifications_strongarm() {
     86400 => 'Daily',
     604800 => 'Weekly',
   );
-
   $export['notifications_send_intervals'] = $strongarm;
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'notifications_sender';
-  $strongarm->value = '1';
 
-  $export['notifications_sender'] = $strongarm;
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'notifications_sendself';
-  $strongarm->value = 0;
-
-  $export['notifications_sendself'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_tags_showsubscribed';
   $strongarm->value = 0;
-
   $export['notifications_tags_showsubscribed'] = $strongarm;
+
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -198,7 +199,7 @@ function bbcom_notifications_strongarm() {
     4 => 0,
     3 => 0,
   );
-
   $export['notifications_tags_vocabularies'] = $strongarm;
+
   return $export;
 }
