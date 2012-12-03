@@ -39,11 +39,11 @@ function bbcom_wial_flag_default_flags() {
     'i18n' => '0',
     'flag_confirmation' => '',
     'unflag_confirmation' => '',
-    'api_version' => 2,
     'module' => 'bbcom_wial',
     'locked' => array(
       '0' => 'name',
     ),
+    'api_version' => 2,
   );
   return $flags;
 
