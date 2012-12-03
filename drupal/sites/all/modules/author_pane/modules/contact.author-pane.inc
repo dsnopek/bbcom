@@ -18,9 +18,9 @@ function contact_preprocess_author_pane(&$variables) {
   $account = $variables['account'];
   $account_id = $account->uid;
 
-  // If the viewer isn't anonymous and 
-  // the author isn't anonymous and 
-  // the viewer isn't the author and 
+  // If the viewer isn't anonymous and
+  // the author isn't anonymous and
+  // the viewer isn't the author and
   // either the author has contact enabled or the viewer has admin users access
   // then show the link.
   $variables['contact'] = '';
