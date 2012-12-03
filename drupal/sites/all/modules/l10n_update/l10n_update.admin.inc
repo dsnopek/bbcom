@@ -1,8 +1,8 @@
 <?php
-// $Id: l10n_update.admin.inc,v 1.10.2.3 2010/09/15 09:25:18 jareyero Exp $
+
 /**
  * @file
- *   Admin settings and update page
+ *   Admin settings and update page.
  */
 
 /**
@@ -39,7 +39,7 @@ include_once 'l10n_update.project.inc';
  * Page callback: Admin overview page.
  */
 function l10n_update_admin_overview() {
-  // For now we get package information provided by modules
+  // For now we get package information provided by modules.
   $projects = l10n_update_get_projects();
   $languages = l10n_update_language_list('name');
   if ($projects && $languages) {
@@ -61,6 +61,13 @@ function l10n_update_admin_overview() {
  * @todo selectable packages
  * @todo check language support in server
  * @todo check file update dates
+ *
+ * @param $form_state
+ *   Form states array.
+ * @param $projects
+ *   @todo $projects are not used in the form.
+ * @param $updates
+ *   Updates to be displayed in the form.
  */
 function l10n_update_admin_import_form($form_state, $projects, $updates) {
   //module_load_include('inc', 'l10n_update');
@@ -79,11 +86,9 @@ function l10n_update_admin_import_form($form_state, $projects, $updates) {
     $form['lang']['languages'] = array(
       '#type' => 'checkboxes',
       '#options' => $languages,
-      '#default_value' => array(language_default('language')),
-
     );
     $form['mode'] = array('#type' => 'radios',
-      '#title' => t('Mode'),
+      '#title' => t('Update mode'),
       '#default_value' => variable_get('l10n_update_import_mode', LOCALE_IMPORT_KEEP),
       '#options' => _l10n_update_admin_import_options(),
     );
@@ -113,7 +118,7 @@ function l10n_update_admin_import_form_submit($form, $form_state) {
     if ($projects && $updates) {
       module_load_include('batch.inc', 'l10n_update');
       // Filter out updates in other languages. If no languages, all of them will be updated
-      $updates = _l10n_update_prepare_updates($updates, NULL, $languages); 
+      $updates = _l10n_update_prepare_updates($updates, NULL, $languages);
       $batch = l10n_update_batch_multiple($updates, $mode);
       batch_set($batch);
     }
@@ -123,7 +128,9 @@ function l10n_update_admin_import_form_submit($form, $form_state) {
   }
   elseif ($op == t('Refresh information')) {
     l10n_update_build_projects();
+    // Get available translation updates and update file history.
     if ($available = l10n_update_available_releases(TRUE)) {
+      l10n_update_flag_history($available);
       drupal_set_message(t('Fetched information about available updates from the server'));
     }
     else {
@@ -142,7 +149,7 @@ function l10n_update_admin_settings_form() {
     '#options' => _l10n_update_admin_check_options(),
   );
   $form['l10n_update_import_mode'] = array('#type' => 'radios',
-    '#title' => t('Import mode'),
+    '#title' => t('Update mode'),
     '#default_value' => variable_get('l10n_update_import_mode', LOCALE_IMPORT_KEEP),
     '#options' => _l10n_update_admin_import_options(),
   );
@@ -158,19 +165,30 @@ function l10n_update_admin_settings_form() {
     '#description' => t('Select how frequently you want to automatically check for updated translations for installed modules and themes.'),
   );
   $form['l10n_update_check_disabled'] = array(
-    '#type' => 'radios',
-    '#title' => t('Update disabled modules'),
-    '#options' => array(t('Disabled'), t('Enabled')),
+    '#type' => 'checkbox',
+    '#title' => t('Check for updates of disabled modules and themes'),
     '#default_value' => variable_get('l10n_update_check_disabled', 0),
-    '#description' => t('Enable if you want translations for disabled modules to be updated too. This comes with an important performance penalty so it is not recommended.'),
+    '#description' => t('Note that this comes with a performance penalty, so it is not recommended.'),
   );
   $form['l10n_update_download_store'] = array(
     '#title' => t('Store downloaded files'),
     '#type' => 'textfield',
     '#default_value' => variable_get('l10n_update_download_store', ''),
-    '#description' => t('Local directory, relative to your Drupal install, for storing downloaded files so they can be reused by other installs. If left empty the downloaded translation will not be saved.'),
+    '#description' => t('A path relative to the Drupal installation directory where translation files will be stored, e.g. sites/all/translations. Saved translation files can be reused by other installations. If left empty the downloaded translation will not be saved.'),
   );
   return system_settings_form($form);
+}
+
+/**
+ * Additional validation handler for update settings.
+ *
+ * Check for existing files directory and creates one when required.
+ */
+function l10n_update_admin_settings_form_validate($form, &$form_state) {
+  $form_values = $form_state['values'];
+  if ( ! empty($form_values['l10n_update_download_store'])) {
+    file_check_directory($form_values['l10n_update_download_store'], FILE_CREATE_DIRECTORY, 'l10n_update_download_store');
+  }
 }
 
 /**
@@ -179,19 +197,22 @@ function l10n_update_admin_settings_form() {
  * The import options of the Locale module are used but the UI text is altered
  * to suit the Localization update cases.
  *
- * @return Keyed array of strings.
+ * @return
+ *   Keyed array of import options.
  */
 function _l10n_update_admin_import_options() {
   return array(
     LOCALE_IMPORT_OVERWRITE => t('Translation updates replace existing ones, new ones are added'),
-    LOCALE_IMPORT_KEEP => t('Edited translations are kept, only default ones (previously imported) are overwritten and new translations are added')
+    LOCALE_UPDATE_OVERRIDE_DEFAULT => t('Edited translations are kept, only previously imported ones are overwritten and new translations are added'),
+    LOCALE_IMPORT_KEEP => t('All existing translations are kept, only new translations are added.'),
   );
 }
 
 /**
  * Get array of check options.
  *
- * @return Keyed array of strings.
+ * @return
+ *   Keyed array of source download options.
  */
 function _l10n_update_admin_check_options() {
   return array(
@@ -209,7 +230,7 @@ function _l10n_update_admin_check_options() {
  * @params array $languages
  *   Languages listed.
  * @params array $history
- *   Project translation history
+ *   Project translation history.
  * @params array $available
  *   Available translation releases.
  * @params array $updates
@@ -224,31 +245,29 @@ function theme_l10n_update_project_status($projects, $languages, $history, $avai
   $output = '';
   //$header = array(t('Project'), t('Current version'), t('Available update'), '');
   $header = $rows = array();
-
   foreach ($projects as $name => $project) {
     $row = '<div class="version-status">';
     if (empty($available[$name])) {
       // Remote information not checked
-      $class = 'unknown';
       $status = 'unknown';
+      $class = 'unknown';
     }
     elseif (empty($updates[$name])) {
       // No updates available
-      $class = 'ok';
       $status = 'ok';
+      $class = 'ok';
     }
     else {
       // Update available
-      $class = 'warning';
       $status = 'update';
+      $class = 'warning';
     }
-
     $row = theme('l10n_update_version_status', $status);
 
     $row .= "<div class=\"project $class\">";
     $title = isset($project->title) ? $project->title : $project->name;
     $row .= check_plain($title);
-    $row .= ' ' . check_plain($project->version);
+    $row .= ' ' . check_plain(isset($project->info['version']) ? $project->info['version'] : $project->version);
     if ($server = l10n_update_server($project->l10n_server)) {
       $row .= ' ' . l($server['name'], $server['link']);
     }
@@ -258,7 +277,9 @@ function theme_l10n_update_project_status($projects, $languages, $history, $avai
     $versions = array();
     foreach ($languages as $lang => $language) {
       $current = isset($history[$name][$lang]) ? $history[$name][$lang] : NULL;
+      //$installed = isset($history[$name][$lang]) ? $history[$name][$lang] : NULL;
       $update = isset($updates[$name][$lang]) ? $updates[$name][$lang] : NULL;
+
       if ($update) {
         $status = 'update';
         $class = 'warning';
@@ -275,7 +296,7 @@ function theme_l10n_update_project_status($projects, $languages, $history, $avai
         $update ? theme('l10n_update_release', $update) : '',
         theme('l10n_update_version_status', $status, $update ? $update->type : NULL),
       );
-      $versions[] = array('data' => $version, 'class' => $class);
+    $versions[] = array('data' => $version, 'class' => $class);
     }
     $row .= theme('table', array(), $versions);
     $row .= "</div>\n";
@@ -289,11 +310,7 @@ function theme_l10n_update_project_status($projects, $languages, $history, $avai
  * Format tag and release date.
  *
  * @param object $release
- *   Release data:
- *     $release->filename
- *     $release->timestamp
- *     $release->fileurl
- *     $release->filepath
+ *   Source file data.
  * @return string
  *   HTML output.
  */
@@ -319,14 +336,15 @@ function theme_l10n_update_release($release) {
  * Format version status with icon.
  *
  * @param string $status
- *   Version status.
+ *   Version status: 'ok', 'update', 'unknown'.
  * @param string $type
- *   Update type.
+ *   Update type: 'download', 'localfile'.
  *
  * @return sting
  *   HTML output.
  */
 function theme_l10n_update_version_status($status, $type = NULL) {
+  $msg = $icon = '';
   $output = '<div class="version-status">';
   switch ($status) {
     case 'ok':

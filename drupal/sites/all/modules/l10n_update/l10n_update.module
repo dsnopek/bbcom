@@ -1,5 +1,5 @@
 <?php
-// $Id: l10n_update.module,v 1.12.2.7 2010/09/15 17:03:13 jareyero Exp $
+
 /**
  * @file
  *   Download translations from remote localization server.
@@ -23,16 +23,32 @@ define('L10N_UPDATE_CHECK_LOCAL', 2);
 define('L10N_UPDATE_CHECK_ALL', L10N_UPDATE_CHECK_REMOTE | L10N_UPDATE_CHECK_LOCAL);
 
 /**
+ * Translation import mode keeping translations which are edited after enabling
+ * Locale Update module an only override default (un-edited) translations.
+ */
+define('LOCALE_UPDATE_OVERRIDE_DEFAULT', 2);
+
+ /**
+ * The maximum number of projects which are checked for available translations each cron run.
+ */
+define('L10N_UPDATE_CRON_PROJECTS', 10);
+
+/**
+ * The maximum number of projects which are updated each cron run.
+ */
+define('L10N_UPDATE_CRON_UPDATES', 2);
+
+/**
  * Implementation of hook_help().
  */
 function l10n_update_help($path, $arg) {
   switch ($path) {
     case 'admin/build/translate/update':
       $output = '<p>' . t('List of latest imported translations and available updates for each enabled project and language.') . '</p>';
-      $output .= '<p>' . t('If there are available updates you can click on Update for them to be downloaded and imported now or you can edit the configuration for them to be updated automatically on the <a href="@update-settings">Update settings page</a>', array('@update-settings' => url('admin/settings/language/configure/update'))) . '</p>';
+      $output .= '<p>' . t('If there are available updates you can click on Update for them to be downloaded and imported now or you can edit the configuration for them to be updated automatically on the <a href="@update-settings">Update settings page</a>', array('@update-settings' => url('admin/settings/language/update'))) . '</p>';
       return $output;
       break;
-    case 'admin/settings/language/configure/update':
+    case 'admin/settings/language/update':
       $output = '<p>' . t('These are the settings for the translation update system. To update your translations now, check out the <a href="@update-admin">Translation update administration page</a>.', array('@update-admin' => url('admin/build/translate/update'))) . '</p>';
       return $output;
       break;
@@ -52,7 +68,7 @@ function l10n_update_menu() {
     'weight' => 20,
     'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/settings/language/configure/update'] = array(
+  $items['admin/settings/language/update'] = array(
     'title' => 'Translation updates',
     'description' => 'Automatic update configuration',
     'page callback' => 'drupal_get_form',
@@ -66,7 +82,7 @@ function l10n_update_menu() {
 }
 
 /**
- * Implemenation of hook_menu_alter().
+ * Implementation of hook_menu_alter().
  */
 function l10n_update_menu_alter(&$menu) {
   // Redirect l10n_client AJAX callback path for strings.
@@ -75,13 +91,13 @@ function l10n_update_menu_alter(&$menu) {
 
 /**
  * Implementation of hook_cron().
- * 
- * Check one project/language at a time, download and import if update available 
+ *
+ * Check one project/language at a time, download and import if update available
  */
 function l10n_update_cron() {
   if ($frequency = variable_get('l10n_update_check_frequency', 0)) {
     module_load_include('check.inc', 'l10n_update');
-    list($checked, $updated) = l10n_update_check_translations(1, time() - $frequency * 24 * 3600);
+    list($checked, $updated) = l10n_update_check_translations(L10N_UPDATE_CRON_PROJECTS, time() - $frequency * 24 * 3600, L10N_UPDATE_CRON_UPDATES);
     watchdog('l10n_update', 'Automatically checked @checked translations, updated @updated.', array('@checked' => count($checked), '@updated' => count($updated)));
   }
 }
@@ -98,20 +114,27 @@ function l10n_update_form_alter(&$form, $form_state, $form_id) {
     case 'system_modules':
       $form['#submit'][] = 'l10n_update_system_modules_submit';
       break;
+    case 'system_modules_uninstall':
+      $form['#submit'][] = 'l10n_update_system_modules_uninstall_submit';
+      break;
     case 'locale_languages_predefined_form':
     case 'locale_languages_custom_form':
       $form['#submit'][] = 'l10n_update_languages_changed_submit';
+      break;
+    case 'locale_languages_delete_form':
+      // A language is being deleted.
+      $form['#submit'][] = 'l10n_update_languages_delete_submit';
       break;
   }
 }
 
 /**
  * Additional submit hander for System Modules form.
- * 
+ *
  * Rebuild project information, update status, etc. When this callback runs,
  * locale module has already run and update cache is refreshed.
- * 
- * @see l10n_update_form_alter().
+ *
+ * @see l10n_update_form_alter()
  */
 function l10n_update_system_modules_submit($form, $form_state) {
   // Check we are not on the confirm form
@@ -121,24 +144,49 @@ function l10n_update_system_modules_submit($form, $form_state) {
   }
 }
 
+ /**
+ * Additional submit hander for System Modules Uninstall form.
+ *
+ * Remove data of uninstalled modules from {l10n_update_file} table.
+ *
+ * @see l10n_update_form_alter()
+ */
+function l10n_update_system_modules_uninstall_submit($form, $form_state) {
+  if (isset($form['#confirmed'])) {
+    $uninstall = array_keys(array_filter($form_state['values']['uninstall']));
+    db_query("DELETE FROM {l10n_update_file} WHERE project IN (" . db_placeholders($uninstall, 'text') . ")", $uninstall);
+  }
+}
+
 /**
  * Aditional submit handler for language forms
- * 
+ *
  * We need to refresh status when a new language is enabled / disabled
  */
 function l10n_update_languages_changed_submit($form, $form_state) {
   module_load_include('check.inc', 'l10n_update');
   $langcode = $form_state['values']['langcode'];
-  l10n_update_language_refresh(array($langcode));  
+  l10n_update_language_refresh(array($langcode));
+}
+
+/**
+ * Additional submit handler for language deletion form.
+ *
+ * When a language is deleted, the file history of this language is cleared.
+ */
+function l10n_update_languages_delete_submit($form, $form_state) {
+  $langcode = $form_state['values']['langcode'];
+  module_load_include('inc', 'l10n_update');
+  l10n_update_delete_file_history($langcode);
 }
 
 /**
  * Replacement submit handler for translation edit form.
- * 
+ *
  * Process string editing form submissions marking translations as customized.
  * Saves all translations of one string submitted from a form.
- * 
- * @see l10n_update_form_alter().
+ *
+ * @see l10n_update_form_alter()
  * @todo Just mark as customized when string changed.
  */
 function l10n_update_locale_translate_edit_form_submit($form, &$form_state) {
@@ -180,20 +228,56 @@ function l10n_update_locale_translate_edit_form_submit($form, &$form_state) {
 function l10n_update_client_save_string() {
   global $user, $language;
 
-  if (user_access('use on-page translation')) {
-    if (isset($_POST['source']) && isset($_POST['target']) && !empty($_POST['form_token']) && drupal_valid_token($_POST['form_token'], 'l10n_client_form')) {
-      module_load_include('inc', 'l10n_update');
-      $report = array(0, 0, 0);
-      _l10n_update_locale_import_one_string_db($report, $language->language, $_POST['source'], $_POST['target'], 'default', NULL, LOCALE_IMPORT_OVERWRITE, L10N_UPDATE_STRING_CUSTOM);
-      cache_clear_all('locale:', 'cache', TRUE);
-      _locale_invalidate_js($language->language);
+  if (l10n_client_access()) {
+    if (isset($_POST['source']) && isset($_POST['target']) && !empty($_POST['textgroup']) && !empty($_POST['form_token']) && drupal_valid_token($_POST['form_token'], 'l10n_client_form')) {
+      // Ensure we have this source string before we attempt to save it.
+      $lid = db_result(db_query("SELECT lid FROM {locales_source} WHERE source = '%s' AND textgroup = '%s'", $_POST['source'], $_POST['textgroup']));
 
-      // Submit to remote server if enabled.
-      if (variable_get('l10n_client_use_server', FALSE) && user_access('submit translations to localization server') && !empty($user->l10n_client_key)) {
-        l10n_client_submit_translation($language->language, $_POST['source'], $_POST['target'], $user->l10n_client_key, l10n_client_user_token($user));
+      if (!empty($lid)) {
+        module_load_include('inc', 'l10n_update');
+        $report = array('skips' => 0, 'additions' => 0, 'updates' => 0, 'deletes' => 0);
+        _l10n_update_locale_import_one_string_db($report, $language->language, $_POST['source'], $_POST['target'], $_POST['textgroup'], NULL, LOCALE_IMPORT_OVERWRITE, L10N_UPDATE_STRING_CUSTOM);
+        cache_clear_all('locale:', 'cache', TRUE);
+        _locale_invalidate_js($language->language);
+        if (!empty($report['skips'])) {
+          $message = theme('l10n_client_message', t('Not saved locally due to invalid HTML content.'));
+        }
+        elseif (!empty($report['additions']) || !empty($report['updates'])) {
+          $message = theme('l10n_client_message', t('Translation saved locally.'), WATCHDOG_INFO);
+        }
+        elseif (!empty($report['deletes'])) {
+          $message = theme('l10n_client_message', t('Translation successfuly removed locally.'), WATCHDOG_INFO);
+        }
+        else {
+          $message = theme('l10n_client_message', t('Unknown error while saving translation locally.'));
+        }
+
+        // Submit to remote server if enabled.
+        if (variable_get('l10n_client_use_server', FALSE) && user_access('submit translations to localization server') && ($_POST['textgroup'] == 'default')) {
+          if (!empty($user->l10n_client_key)) {
+            $remote_result = l10n_client_submit_translation($language->language, $_POST['source'], $_POST['target'], $user->l10n_client_key, l10n_client_user_token($user));
+            $message .= theme('l10n_client_message', $remote_result[1], $remote_result[0] ? WATCHDOG_INFO : WATCHDOG_ERROR);
+          }
+          else {
+            $server_url = variable_get('l10n_client_server', 'http://localize.drupal.org');
+            $user_edit_url = url('user/'. $user->uid .'/edit', array('absolute' => TRUE));
+            $message .= theme('l10n_client_message', t('You could share your work with !l10n_server if you set your API key at !user_link.', array('!l10n_server' => l($server_url, $server_url), '!user_link' => l($user_edit_url, 'user/'. $user->uid .'/edit'))), WATCHDOG_WARNING);
+          }
+        }
+      }
+      else {
+        $message = theme('l10n_client_message', t('Not saved due to source string missing.'));
       }
     }
+    else {
+      $message = theme('l10n_client_message', t('Not saved due to missing form values.'));
+    }
   }
+  else {
+    $message = theme('l10n_client_message', t('Not saved due to insufficient permissions.'));
+  }
+  drupal_json(array('message' => $message));
+  exit;
 }
 
 /**
@@ -209,7 +293,7 @@ function l10n_update_client_save_string() {
  *   Array of project objects keyed by project name.
  */
 function l10n_update_get_projects($refresh = FALSE, $disabled = FALSE) {
-  static $projects, $enabled;  
+  static $projects, $enabled;
 
   if (!isset($projects) || $refresh) {
     if (variable_get('l10n_update_rebuild_projects', 0)) {
@@ -236,7 +320,7 @@ function l10n_update_get_projects($refresh = FALSE, $disabled = FALSE) {
  * - From server_url in a project, we'll fetch latest data from the server itself
  *
  * @param string $name
- *   Server name e.g. localize.drupal.org 
+ *   Server name e.g. localize.drupal.org
  * @param string $url
  *   Server url
  * @param boolean $refresh
@@ -264,10 +348,10 @@ function l10n_update_server($name = NULL, $url = NULL, $refresh = FALSE) {
   $cid = 'l10n_update_server:' . $url;
   if ($refresh) {
     unset($info);
-    cache_clear_all($cid, 'cache');    
+    cache_clear_all($cid, 'cache_l10n_update');
   }
   if (!isset($info[$url])) {
-    if ($cache = cache_get($cid)) {
+    if ($cache = cache_get($cid, 'cache_l10n_update')) {
       $info[$url] = $cache->data;
     }
     else {
@@ -286,7 +370,7 @@ function l10n_update_server($name = NULL, $url = NULL, $refresh = FALSE) {
       }
       // Now fetch server meta information form the server itself
       if ($server = l10n_update_get_server($server)) {
-        cache_set($cid, $server);
+        cache_set($cid, $server, 'cache_l10n_update');
         $info[$url] = $server;
       }
       else {
@@ -299,8 +383,8 @@ function l10n_update_server($name = NULL, $url = NULL, $refresh = FALSE) {
 }
 
 /**
- * Implementation of hook_l10n_servers
- * 
+ * Implementation of hook_l10n_servers().
+ *
  * @return array
  *   Array of server data:
  *     'name'       => server name
@@ -338,11 +422,10 @@ function l10n_update_get_history($refresh = NULL) {
  * Get language list.
  *
  * @return array
- *   Array of installed language names. English is the source language and 
+ *   Array of installed language names. English is the source language and
  *   is therefore not included.
- * @todo remove the $field param.
  */
-function l10n_update_language_list($field = 'name') {
+function l10n_update_language_list() {
   $languages = locale_language_list('name');
   // Skip English language
   if (isset($languages['en'])) {
@@ -409,5 +492,9 @@ function l10n_update_available_updates($refresh = NULL) {
  * Called from update.php (among others) to flush the caches.
  */
 function l10n_update_flush_caches() {
-  variable_set('l10n_update_rebuild_projects', 1); 
+  if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'update') {
+    cache_clear_all('*', 'cache_l10n_update', TRUE);
+    variable_set('l10n_update_rebuild_projects', 1);
+  }
+  return array();
 }

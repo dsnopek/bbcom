@@ -1,28 +1,37 @@
-<?php 
-// $Id: l10n_update.inc,v 1.9.2.3 2010/09/15 09:25:18 jareyero Exp $
+<?php
+
 /**
  * @file
- *   Reusable API for l10n remote updates
+ *   Reusable API for l10n remote updates.
  */
 
 include_once './includes/locale.inc';
 include_once 'l10n_update.locale.inc';
 
 /**
- * Default update server, filename and URL
+ * Default update server, filename and URL.
  */
 define('L10N_UPDATE_DEFAULT_SERVER', 'localize.drupal.org');
 define('L10N_UPDATE_DEFAULT_SERVER_URL', 'http://localize.drupal.org/l10n_server.xml');
 define('L10N_UPDATE_DEFAULT_UPDATE_URL', 'http://ftp.drupal.org/files/translations/%core/%project/%project-%release.%language.po');
+
 // Translation filename, will be used just for local imports
 define('L10N_UPDATE_DEFAULT_FILENAME', '%project-%release.%language.po');
+
 // Translation status: String imported from po
 define('L10N_UPDATE_STRING_DEFAULT', 0);
+
 // Translation status: Custom string, overridden original import
 define('L10N_UPDATE_STRING_CUSTOM', 1);
 
 /**
- * Retrive data for default server
+ * Retrieve data for default server.
+ *
+ * @return array
+ *   Server parameters:
+ *     name :       Localization server name
+ *     server_url : Localization server URL where language list can be retrieved.
+ *     update_url : URL containing po file pattern.
  */
 function l10n_update_default_server() {
   return array(
@@ -33,7 +42,17 @@ function l10n_update_default_server() {
 }
 
 /**
- * Download and import remote file
+ * Download and import remote translation file.
+ *
+ * @param $download_url
+ *   Download URL.
+ * @param $locale
+ *   Language code.
+ * @param $mode
+ *   Download mode. How to treat exising and modified translations.
+ *
+ * @return boolean
+ *   TRUE on success.
  */
 function l10n_update_download_import($download_url, $locale, $mode = LOCALE_IMPORT_OVERWRITE) {
   if ($file = l10n_update_download_file($download_url)) {
@@ -43,13 +62,20 @@ function l10n_update_download_import($download_url, $locale, $mode = LOCALE_IMPO
 }
 
 /**
- * Import local file into the database
+ * Import local file into the database.
+ *
  * @param $file
+ *   File object of localy stored file
+ *   or path to localy stored file.
  * @param $locale
+ *   Language code.
  * @param $mode
- * @return unknown_type
+ *   Download mode. How to treat exising and modified translations.
+ *
+ * @return boolean
+ *   Result array on success. FALSE on failure.
  */
-function l10n_update_import_file($file, $locale, $mode = LOCALE_IMPORT_OVERWRITE) {   
+function l10n_update_import_file($file, $locale, $mode = LOCALE_IMPORT_OVERWRITE) {
   // If the file is a filepath, create a $file object
   if (is_string($file)) {
     $filepath = $file;
@@ -61,39 +87,65 @@ function l10n_update_import_file($file, $locale, $mode = LOCALE_IMPORT_OVERWRITE
 }
 
 /**
- * Get remote file and download it to a temporary path
+ * Get remote file and download it to a temporary path.
+ *
+ * @param $download_url
+ *   URL of remote file.
+ * @param $destination
+ *   URL of local destination file. By default the download will be stored
+ *   in a temporary file.
  */
 function l10n_update_download_file($download_url, $destination = NULL) {
   $t = get_t();
   $variables['%download_link'] = $download_url;
-  
+
+  // Create temporary file or use specified file destination.
+  // Temporary files get a 'translation-' file name prefix.
   $file = $destination ? $destination : tempnam(file_directory_temp(), 'translation-');
 
   if ($file) {
     $variables['%tmpfile'] = $file;
-    if (($contents = drupal_http_request($download_url)) && file_put_contents($file, $contents->data)) {
+    // We download and store the file (in one if statement! Isnt't that neat ;) ).
+    // @todo remove the timeout once we use the batch API to download the files.
+    if (($contents = drupal_http_request($download_url, array('timeout' => 90))) && $contents->code == 200 && $file_result = file_put_contents($file, $contents->data)) {
       watchdog('l10n_update', 'Successfully downloaded %download_link to %tmpfile', $variables);
-      return $file; 
+      return $file;
     }
     else {
-      watchdog('l10n_update', 'Unable to download and save %download_link file to %tmpfile.', $variables, WATCHDOG_ERROR);
+      if (isset($contents->error)) {
+        watchdog('l10n_update', 'An error occured during the download operation: %error.', array('%error' => $contents->error), WATCHDOG_ERROR);
+      }
+      elseif (isset($contents->code) && $contents->code != 200) {
+        watchdog('l10n_update', 'An error occured during the download operation: HTTP status code %code.', array('%code' => $contents->code), WATCHDOG_ERROR);
+      }
+      if (isset($file_result)) {
+        // file_put_contents() was called but returned FALSE.
+        watchdog('l10n_update', 'Unable to save %download_link file to %tmpfile.', $variables, WATCHDOG_ERROR);
+      }
     }
+
   }
   else {
     $variables['%tmpdir'] = file_directory_temp();
     watchdog('l10n_update', 'Error creating temporary file for download in %tmpdir. Remote file is %download_link.', $variables, WATCHDOG_ERROR);
-  }  
+  }
 }
 
 /**
- * Get names for the language list from locale system
+ * Get names for the language list from locale system.
+ *
+ * @param $string_list
+ *   Comma separated list of language codes.
+ *   Language codes must exist in languages from _locale_get_predefined_list().
+ * @return array
+ *   Array of language names keyed by language code.
  */
 function l10n_update_get_language_names($string_list) {
   $t = get_t();
   $language_codes = array_map('trim', explode(',', $string_list));
   $languages = _locale_get_predefined_list();
   $result = array();
-  foreach ($language_codes as $lang) {      
+  foreach ($language_codes as $lang) {
     if (array_key_exists($lang, $languages)) {
       // Try to use verbose locale name
       $name = $lang;
@@ -105,9 +157,20 @@ function l10n_update_get_language_names($string_list) {
 }
 
 /**
- * Build project data as an object
+ * Build project data as an object.
+ *
+ * @param $name
+ *   Project name.
+ * @param $version
+ *   Project version.
+ * @param $server
+ *   Localisation server name.
+ * @param $path
+ *   Localisation server URL.
+ * @return object
+ *   Project object containing the supplied data.
  */
-function _l10n_update_build_project($name, $version = NULL, $server = L10N_UPDATE_DEFAULT_SERVER, $path = L10N_UPDATE_DEFAULT_URL) {
+function _l10n_update_build_project($name, $version = NULL, $server = L10N_UPDATE_DEFAULT_SERVER, $path = L10N_UPDATE_DEFAULT_SERVER_URL) {
   $project = new stdClass();
   $project->name = $name;
   $project->version = $version;
@@ -117,10 +180,13 @@ function _l10n_update_build_project($name, $version = NULL, $server = L10N_UPDAT
 }
 
 /**
- * Update the file history table
- * 
+ * Update the file history table.
+ *
  * @param $file
- *   Object representing the file just imported or downloaded
+ *   Object representing the file just imported or downloaded.
+ * @return integer
+ *   FALSE on failure. Otherwise SAVED_NEW or SAVED_UPDATED.
+ *   @see drupal_write_record()
  */
 function l10n_update_file_history($file) {
   // Update or write new record
@@ -134,7 +200,54 @@ function l10n_update_file_history($file) {
 }
 
 /**
- * Check file existence and last updated time
+ * Delete the history of downloaded translations.
+ *
+ * @param string $langcode
+ *   Language code of the file history to be deleted.
+ */
+function l10n_update_delete_file_history($langcode) {
+  db_query("DELETE FROM {l10n_update_file} WHERE language = '%s'", $langcode);
+}
+
+/**
+ * Flag the file history as up to date.
+ *
+ * Compare history data in the {l10n_update_file} table with translations
+ * available at translations server(s). Update the 'last_checked' timestamp of
+ * the files which are up to date.
+ *
+ * @param $available
+ *   Available translations as retreived from remote server.
+ */
+function l10n_update_flag_history($available) {
+  $time = time();
+  if ($history = l10n_update_get_history()) {
+    foreach($history as $name => $project) {
+      foreach ($project as $langcode => $current) {
+        if (isset($available[$name][$langcode])) {
+          $update = $available[$name][$langcode];
+          // When the available update is equal to the current translation the current
+          // is marked checked in the {l10n_update_file} table.
+          if (_l10n_update_source_compare($current, $update) == 0 && $current->version == $update->version) {
+            db_query("UPDATE {l10n_update_file} SET last_checked = %d WHERE project = '%s' AND language = '%s'", $time, $current->project, $current->language);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Check if remote file exists and when it was last updated.
+ *
+ * @param $url
+ *   URL of remote file.
+ * @param $headers
+ *   HTTP request headers.
+ * @return object
+ *   Result object containing the HTTP request headers, response code, headers,
+ *   data, redirect status and updated timestamp.
+ *   @see l10n_update_http_request()
  */
 function l10n_update_http_check($url, $headers = array()) {
   $result = l10n_update_http_request($url, $headers, 'HEAD');
@@ -143,15 +256,15 @@ function l10n_update_http_check($url, $headers = array()) {
   }
   return $result;
 }
+
 /**
  * Perform an HTTP request. Installer safe simplified version.
- * 
+ *
  * We cannot use drupal_http_request() at install, see http://drupal.org/node/527484
- * 
- * This one also handles FTP
- * 
+ *
  * This is a flexible and powerful HTTP client implementation. Correctly handles
  * GET, POST, PUT or any other HTTP requests. Handles redirects.
+ * This one also handles FTP.
  *
  * @param $url
  *   A string containing a fully qualified URI.
@@ -164,11 +277,17 @@ function l10n_update_http_check($url, $headers = array()) {
  * @param $retry
  *   An integer representing how many times to retry the request in case of a
  *   redirect.
- * @param $check
- *   Just check file existence and headers (update time)
  * @return
  *   An object containing the HTTP request headers, response code, headers,
- *   data and redirect status.
+ *   data and redirect status. Elements:
+ *   - 'error': Optional error description.
+ *   - 'url': Given $url.
+ *   - 'request': Request message.
+ *   - 'data': Data included in the response.
+ *   - 'headers': HTTP response headers.
+ *   - 'code': HTTP response code.
+ *   - 'redirect_code': HTTP response code after redirect.
+ *   - 'redirect_url': Response location after redirect.
  */
 function l10n_update_http_request($url, $headers = array(), $method = 'GET', $data = NULL, $retry = 3) {
   $result = new stdClass();
@@ -198,7 +317,7 @@ function l10n_update_http_request($url, $headers = array(), $method = 'GET', $da
       $port = isset($uri['port']) ? $uri['port'] : 443;
       $host = $uri['host'] . ($port != 443 ? ':'. $port : '');
       $fp = @fsockopen('ssl://'. $uri['host'], $port, $errno, $errstr, 20);
-      break;  
+      break;
     default:
       $result->error = 'invalid schema '. $uri['scheme'];
       return $result;
@@ -214,7 +333,7 @@ function l10n_update_http_request($url, $headers = array(), $method = 'GET', $da
     // Mark that this request failed. This will trigger a check of the web
     // server's ability to make outgoing HTTP requests the next time that
     // requirements checking is performed.
-    // @see system_requirements()
+    // See: system_requirements()
     // variable_set('drupal_http_request_fails', TRUE);
 
     return $result;
@@ -247,7 +366,9 @@ function l10n_update_http_request($url, $headers = array(), $method = 'GET', $da
   // user-agent is used to ensure that multiple testing sessions running at the
   // same time won't interfere with each other as they would if the database
   // prefix were stored statically in a file or database variable.
-  if (preg_match("/simpletest\d+/", $GLOBALS['db_prefix'], $matches)) {
+  // We only regard the case where the database prefix is a string since currently
+  // no simpletest exist which use an array of database prefixes.
+  if (is_string($GLOBALS['db_prefix']) && preg_match("/^simpletest\d+$/", $GLOBALS['db_prefix'], $matches)) {
     $defaults['User-Agent'] = 'User-Agent: ' . $matches[0];
   }
 
@@ -329,7 +450,19 @@ function l10n_update_http_request($url, $headers = array(), $method = 'GET', $da
 }
 
 /**
- * Build abstract translation source, to be mapped to a file or a download
+ * Build abstract translation source, to be mapped to a file or a download.
+ *
+ * @param $project
+ *   Project object containing data to be inserted in the template.
+ * @param $template
+ *   String containing place holders. Available place holders:
+ *   - '%project': Project name.
+ *   - '%release': Poject version.
+ *   - '%core': Project core version.
+ *   - '%language': Language code.
+ *   - '%filename': Project file name.
+ * @return string
+ *   String with replaced place holders.
  */
 function l10n_update_build_string($project, $template) {
   $variables = array(
@@ -341,4 +474,3 @@ function l10n_update_build_string($project, $template) {
   );
   return strtr($template, $variables);
 }
-
