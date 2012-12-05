@@ -61,21 +61,6 @@ function notifications_forum_menu() {
 }
 
 /**
- * Implements hook_menu_alter().
- */
-function notifications_forum_menu_alter(&$items) {
-  foreach (notifications_subscription_types() as $type => $info) {
-    // exclude the 'taxonomy' and 'thread' tabs, because they aren't great UI.
-    if (!in_array($type, array('taxonomy', 'thread'))) {
-      if (!empty($info['user page'])) {
-        $items[$info['user page']]['access callback'] = 'notifications_forum_user_tab_access';
-        $items[$info['user page']]['access arguments'] = array($type, 1);
-      }
-    }
-  }
-}
-
-/**
  * Access callback for the user forum notifications page.
  */
 function notifications_forum_user_tab_access($type, $account) {
