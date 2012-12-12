@@ -289,7 +289,7 @@ function bbcom_embed_link_alter(&$links, $node, $comment = NULL) {
 }
 
 function bbcom_embed_preprocess_page(&$vars) {
-  if ($GLOBALS['bbcom_embed_view_remote_page']) {
+  if (isset($GLOBALS['bbcom_embed_view_remote_page']) && $GLOBALS['bbcom_embed_view_remote_page']) {
     // sneak in a special template when this is remote
     array_unshift($vars['template_files'], 'page-embed-reader-remote');
   }

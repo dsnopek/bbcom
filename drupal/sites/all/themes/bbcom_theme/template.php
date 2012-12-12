@@ -265,6 +265,9 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
 
   $vars['head'] .= '<meta name="viewport" content="width=960; initial-scale=1.0" />';
 
+  // set some defaults to get rid of PHP warnings
+  $vars['node'] = $vars['lang_spec'] = $vars['post_title'] = $vars['tabs2'] = NULL;
+
   if (isset($vars['node'])) {
     $func = 'bbcom_theme_preprocess_node_'. $vars['node']->type;
     if (function_exists($func)) {
@@ -491,7 +494,7 @@ function bbcom_theme_form_element($element, $value) {
 
   // DRS: my changes here
   $output = '<div class="form-item '.
-    ($element['#inline'] ? 'inline-form-item' : 'block-form-item') .'"';
+    (isset($element['#inline']) && $element['#inline'] ? 'inline-form-item' : 'block-form-item') .'"';
 
   // DRS: Pretty much original from here on in
   if (!empty($element['#id'])) {
