@@ -1099,11 +1099,11 @@ echo $view->total_rows; ?> entries that match this query.');
       'operator' => '=',
       'value' => '1',
       'group' => '0',
-      'exposed' => TRUE,
+      'exposed' => FALSE,
       'expose' => array(
         'operator' => '',
-        'identifier' => 'promoted',
         'label' => 'Promoted',
+        'identifier' => 'promoted',
         'bef_filter_description' => '',
         'bef_format' => 'default',
         'optional' => 1,
