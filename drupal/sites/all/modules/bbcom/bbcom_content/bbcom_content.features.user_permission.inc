@@ -21,6 +21,7 @@ function bbcom_content_user_default_permissions() {
     'roles' => array(
       '0' => 'admin',
       '1' => 'beta',
+      '2' => 'founder',
     ),
   );
 
@@ -31,6 +32,7 @@ function bbcom_content_user_default_permissions() {
       '0' => 'admin',
       '1' => 'beta',
       '2' => 'editor',
+      '3' => 'founder',
     ),
   );
 
@@ -47,6 +49,8 @@ function bbcom_content_user_default_permissions() {
     'name' => 'delete own content content',
     'roles' => array(
       '0' => 'admin',
+      '1' => 'beta',
+      '2' => 'founder',
     ),
   );
 
@@ -66,6 +70,7 @@ function bbcom_content_user_default_permissions() {
       '0' => 'admin',
       '1' => 'beta',
       '2' => 'editor',
+      '3' => 'founder',
     ),
   );
 
