@@ -13,9 +13,9 @@
  * Theme from/to date combination in the view.
  *
  * Useful values:
- * 
- *   $node->date_id 
- *     If set, this will show only an individual date on a field with 
+ *
+ *   $node->date_id
+ *     If set, this will show only an individual date on a field with
  *     multiple dates. The value should be a string that contains
  *     the following values, separated with periods:
  *     - module name of the module adding the item
@@ -23,15 +23,15 @@
  *     - field name
  *     - delta value of the field to be displayed
  *     - other information the module's custom theme might need
- * 
+ *
  *     Used by the calendar module and available for other uses.
  *     example: 'date.217.field_date.3.test'
- * 
+ *
  *   $node->date_repeat_show
  *     If true, tells the theme to show all the computed values
  *     of a repeating date. If not true or not set, only the
  *     start date and the repeat rule will be displayed.
- * 
+ *
  *   $dates['format'] - the format string used on these dates
  *   $dates['value']['local']['object'] - the local date object for the From date
  *   $dates['value2']['local']['object'] - the local date object for the To date
@@ -76,7 +76,7 @@ function theme_date_display_combination($element) {
 
   // Check the formatter settings to see if the repeat rule should be
   // displayed. Show it only with the first multiple value date.
-  if (!in_array($node->nid, $repeating_ids) && module_exists('date_repeat') 
+  if (!in_array($node->nid, $repeating_ids) && module_exists('date_repeat')
   && !empty($item['rrule']) && $options['repeat']['show_repeat_rule'] == 'show') {
     require_once('./'. drupal_get_path('module', 'date') .'/date_repeat.inc');
     $output .= theme('date_repeat_display', $field, $item, $node);
@@ -96,21 +96,21 @@ function theme_date_display_combination($element) {
   }
 
   // Call the right theme for this formatter.
-  // Update the element with values that might have been altered by 
+  // Update the element with values that might have been altered by
   // date_prepare_node() and figure out which values to display.
   $dates = date_formatter_process($element);
   switch ($options['fromto']['fromto']) {
     case 'value':
       $date1 = $dates['value']['formatted'];
       $date2 = $date1;
-      break;    
+      break;
     case 'value2':
       $date2 = $dates['value2']['formatted'];
       $date1 = $date2;
       break;
     default:
       $date1 = $dates['value']['formatted'];
-      $date2 = $dates['value2']['formatted'];  
+      $date2 = $dates['value2']['formatted'];
       break;
   }
 
@@ -133,7 +133,7 @@ function theme_date_display_combination($element) {
   }
   // Same day, different times, don't repeat the date but show both From and To times.
   elseif (date_has_time($field['granularity']) && $dates['value']['formatted_date'] == $dates['value2']['formatted_date']) {
-    // Replace the original time with the from/to time in the formatted start date.  
+    // Replace the original time with the from/to time in the formatted start date.
     // Make sure that parentheses or brackets wrapping the time will be retained in the
     // final result.
     $time1 = preg_replace('`^([\(\[])`', '', $dates['value']['formatted_time']);
@@ -199,7 +199,7 @@ function theme_date_format_interval($element) {
   }
 
   // If this is not coming from Views, it is the full node.
-  // If we aren't retrieving a specific value, adjust the node values 
+  // If we aren't retrieving a specific value, adjust the node values
   // to match the formatter settings, removing values we should not see.
   if (!empty($node->content) && empty($node->date_id)) {
     $node = date_prepare_node($node, $field, $type_name, $context, $options);
@@ -252,18 +252,25 @@ function theme_date_all_day($field, $which, $date1, $date2, $format, $node, $vie
     $date2 = $date1;
   }
 
+  $suffix = '';
   if (!date_has_time($field['granularity'])) {
     $format = date_limit_format($format, array('year', 'month', 'day'));
-    return date_format_date($$which, 'custom', $format);
-  }
-
-  if ($all_day = date_field_all_day($field, $date1, $date2)) {
-    $format = date_limit_format($format, array('year', 'month', 'day'));
-    return trim(date_format_date($$which, 'custom', $format) .' '. theme('date_all_day_label'));
   }
   else {
-    return date_format_date($$which, 'custom', $format);
+    $format_granularity = date_format_order($format);
+    $format_has_time = FALSE;
+    if (in_array('hour', $format_granularity)) {
+      $format_has_time = TRUE;
+    }
+    $all_day = date_field_all_day($field, $date1, $date2);
+    if ($all_day && $format_has_time) {
+      $format = date_limit_format($format, array('year', 'month', 'day'));
+      $suffix = ' ' . theme('date_all_day_label');
+    }
   }
+
+  return trim(date_format_date($$which, 'custom', $format) . $suffix);
+
 }
 
 /**

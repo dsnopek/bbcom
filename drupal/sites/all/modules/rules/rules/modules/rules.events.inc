@@ -1,5 +1,4 @@
 <?php
-// $Id: rules.events.inc,v 1.1.2.14 2010/07/27 11:09:27 fago Exp $
 
 
 /**

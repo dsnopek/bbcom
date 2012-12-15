@@ -1,5 +1,4 @@
 <?php
-// $Id: node_export.drush.inc,v 1.1.2.15 2010/12/09 05:53:56 danielb Exp $
 
 /**
  * @file
@@ -13,43 +12,42 @@ function node_export_drush_command() {
   $items = array();
 
   $items['node-export-export'] = array(
-    'callback' => 'node_export_drush_callback_export',
-    'description' => "Export nodes by Node ID.",
+    'callback' => 'drupal_node_export_callback_export',
+    'description' => "Export nodes using Node export.",
     'arguments' => array(
       'nids' => "A list of space-separated node IDs to export.",
     ),
     'options' => array(
-      '--file' => "The filename of the output file.  If supplied, the node code will be exported to that file, otherwise it will export to stdout.",
-      '--status' => "Filter for 'status'; A boolean value (0 or 1) indicating whether the node is published (visible to non-administrators).",
-      '--promote' => "Filter for 'promote'; A boolean value (0 or 1) indicating whether the node should be displayed on the front page.",
-      '--sticky' => "Filter for 'sticky'; A boolean value (0 or 1) indicating whether the node should be displayed at the top of lists in which it appears.",
-      '--translate' => "Filter for 'translate'; A boolean value (0 or 1) indicating whether the node translation needs to be updated.",
-      '--language' => "Filter for 'language'; The language code (e.g. de or en-US) of this node.",
-      '--type' => "Filter for 'type'; The machine-readable name (e.g. story or page) of the type of this node.",
+      'file' => "The filename of the output file.  If supplied, the node code will be exported to that file, otherwise it will export to stdout.",
+      'format' => "If supplied, node code will be output using a particular export format, if available. (e.g. serialize)",
+      'status' => "Filter for 'status'; A boolean value (0 or 1) indicating whether the node is published (visible to non-administrators).",
+      'promote' => "Filter for 'promote'; A boolean value (0 or 1) indicating whether the node should be displayed on the front page.",
+      'sticky' => "Filter for 'sticky'; A boolean value (0 or 1) indicating whether the node should be displayed at the top of lists in which it appears.",
+      'translate' => "Filter for 'translate'; A boolean value (0 or 1) indicating whether the node translation needs to be updated.",
+      'language' => "Filter for 'language'; The language code (e.g. de or en-US) of this node.",
+      'type' => "Filter for 'type'; The machine-readable name (e.g. story or page) of the type of this node.",
+      'sql' => "Filter by SQL (EXPERIMENTAL); An SQL query string that returns nids (e.g. \"SELECT nid FROM nodes WHERE nid < 10\").",
+      'code' => "Filter by PHP code (EXPERIMENTAL); PHP code that prints or returns, an array or CSV string of nids (e.g. \"custom_get_my_nids();\"). Don't include PHP tags.",
     ),
     'examples' => array(
       'drush node-export-export 45 46 47 --file=filename' =>
-        "Export nodes with node IDs 45, 46, and 47 to the file with the supplied filename.",
+        "export nodes with node IDs 45, 46, and 47 to the file with the supplied filename.",
       'drush node-export-export --type=story,page --file=filename' =>
-        "Export nodes of type story and page to the file with the supplied filename.",
-      //'drush node-export-export 45 46 47 > filename' =>
-      //  "Export nodes with node IDs 45, 46, and 47 to the file with the supplied filename.  NOTE: Error messages may be output to the file.",
+        "export nodes of type story and page to the file with the supplied filename.",
     ),
   );
   $items['node-export-import'] = array(
-    'callback' => 'node_export_drush_callback_import',
-    'description' => "Import nodes from a previous export.",
+    'callback' => 'drupal_node_export_callback_import',
+    'description' => "Import nodes previously exported with Node export.",
     'options' => array(
-      '--uid' => "User ID of user to save nodes as. If not given will use the user with an ID of 1. You may specify 0 for the Anonymous user.",
-      '--file' => "The filename of the input file.  If supplied, the node code will be imported from that file, otherwise it will import to stdin.",
+      'uid' => "User ID of user to save nodes as. If not given will use the user with an ID of 1. You may specify 0 for the Anonymous user.",
+      'file' => "The filename of the input file.  If supplied, the node code will be imported from that file, otherwise it will import to stdin.",
     ),
     'examples' => array(
       'drush node-export-import --file=filename' =>
         'Import nodes from the file with the given filename.',
       'drush node-export-import --uid=2 --file=filename' =>
         "Import nodes from the file with the given filename.  The author of the nodes will be set to the user that has the user ID of 2.",
-      //'drush node-export-import < filename' =>
-      //  'Import nodes from the file with the given filename.',
     ),
   );
 
@@ -65,16 +63,16 @@ function node_export_drush_command() {
  * A function to help alias commands as other commands.
  */
 function node_export_drush_command_add_alias(&$items, $command, $alias) {
-   // Create a property on the command for adding aliases, if not there.
-   if (!isset($items[$command]['node_export command aliases'])) {
-      $items[$command]['node_export command aliases'] = array();
-   }
-   // Record the alias into that property.
-   $items[$command]['node_export command aliases'][] = $alias;
-   // Create the alias as a new command.
-   $items[$alias] = $items[$command];
-   // Indicate what this new command is an alias for.
-   $items[$alias]['node_export alias for'] = $command;
+  // Create a property on the command for adding aliases, if not there.
+  if (!isset($items[$command]['node_export command aliases'])) {
+    $items[$command]['node_export command aliases'] = array();
+  }
+  // Record the alias into that property.
+  $items[$command]['node_export command aliases'][] = $alias;
+  // Create the alias as a new command.
+  $items[$alias] = $items[$command];
+  // Indicate what this new command is an alias for.
+  $items[$alias]['node_export alias for'] = $command;
 }
 
 /**
@@ -137,9 +135,9 @@ function node_export_drush_help($section) {
 /**
  * Drush command callback.
  *
- * Export nodes.
+ * export nodes.
  */
-function node_export_drush_callback_export() {
+function drupal_node_export_callback_export() {
 
   // Set up an array of nid_filters.
   $nid_filters = array();
@@ -181,11 +179,38 @@ function node_export_drush_callback_export() {
     }
   }
 
+  // Handle SQL option.
+  $sql = drush_get_option('sql');
+  if ($sql) {
+    $result = db_query($sql);
+    while ($row = db_fetch_array($result)) {
+      $nid_filters['sql'][] = $row['nid'];
+    }
+  }
+
+  // Handle PHP option.
+  $code = drush_get_option('code');
+  if ($code) {
+    ob_start();
+    print eval("?><?php ". $code ." ?>");
+    $result = ob_get_contents();
+    ob_end_clean();
+    if (is_array($result)) {
+      $nid_filters['code'] = $result;
+    }
+    else {
+      $nid_filters['code'] = explode(
+        ",",
+        str_replace(array("\n", "\r", "\t", " "), '', $result)
+      );
+    }
+  }
+
   if (count($nid_filters) > 1) {
      // Compute the intersect of all $nid_filters if there are more than one.
     $nids = call_user_func_array('array_intersect', $nid_filters);
   }
-  else if (count($nid_filters) == 1) {
+  elseif (count($nid_filters) == 1) {
     // Use the only filter if there is only one.
     $nids = reset($nid_filters);
   }
@@ -199,29 +224,40 @@ function node_export_drush_callback_export() {
     }
   }
 
+  // Handle format option.
+  $format = drush_get_option('format');
+
   if (empty($nids)) {
     drush_set_error('DRUSH_NOT_COMPLETED', "No nodes found.");
   }
 
-  $data = node_export_node_bulk($nids, TRUE);
+  $result = node_export($nids, $format, 'dt');
 
-  $filename = drush_get_option('file');
+  if ($result['success']) {
+    $filename = drush_get_option('file');
 
-  if ($filename) {
-    // Output data to file. Note this only takes a flat filename for the current directory.
-    // If file exists, ask for whether to overwrite.
-    if (file_exists($filename)) {
-      if (!drush_confirm(dt("File $filename exists. Do you really want to overwrite?"))) {
-        return;
+    if ($filename) {
+      // Output data to file. Note this only takes a flat filename for the current directory.
+      // If file exists, ask for whether to overwrite.
+      if (file_exists($filename)) {
+        if (!drush_confirm(dt("File $filename exists. Do you really want to overwrite?"))) {
+          return;
+        }
       }
+      // Write the file.
+      file_put_contents($filename, $result['output']);
     }
-    // Write the file.
-    file_put_contents($filename, $data);
+    else {
+      // stdout.
+      drush_print_r($result['output']);
+    }
+
   }
   else {
-    // stdout.
-    drush_print_r($data);
+    // We have received an error message.
+    drush_set_error('DRUSH_NOT_COMPLETED', strip_tags(implode("\n", $result['output'])));
   }
+
 }
 
 /**
@@ -229,7 +265,7 @@ function node_export_drush_callback_export() {
  *
  * Import nodes from data.
  */
-function node_export_drush_callback_import() {
+function drupal_node_export_callback_import() {
   // Switch to admin or the specified user so imported nodes are not anonymous.
   $uid = drush_get_option('uid');
   // Test on NULL so uid may be given as 0.
@@ -252,10 +288,13 @@ function node_export_drush_callback_import() {
   }
 
   if (!empty($node_code)) {
-    $result = node_export_import($node_code, 'save-edit', FALSE, 'drush_print', 'dt');
-    if ($result === FALSE) {
-      // There was a problem with types?
-      drush_set_error('DRUSH_NOT_COMPLETED', "A problem was found with the import data. Check that the node types and all the required modules exist.");
+    $result = node_export_import($node_code, 'dt');
+    if (!$result['success']) {
+      // We have received an error message.
+      drush_set_error('DRUSH_NOT_COMPLETED', strip_tags(implode("\n", $result['output'])));
+    }
+    else {
+      drush_print(strip_tags(implode("\n", $result['output'])));
     }
   }
 

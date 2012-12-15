@@ -45,14 +45,11 @@ function wikitools_init() {
       if (wikitools_type_affected($node->type)) {
         $redirect = url(wikitools_wikilink_drupal_path($node->title),
           array('language' => isset($node->language) ? $languages[$node->language] : language_default()));
-      }
-    }
 
-    // do the redirect if we've managed to locate a wikilink
-    if ($redirect) {
-      // if there's a result found, do the redirect
-      unset($_REQUEST['destination']);
-      drupal_goto($redirect);
+        // if there's a result found, do the redirect
+        unset($_REQUEST['destination']);
+        drupal_goto($redirect);
+      }
     }
   }
 }

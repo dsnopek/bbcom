@@ -1,5 +1,5 @@
 <?php
-// $Id: l10n_update.install,v 1.7.2.2 2010/09/19 15:30:39 jareyero Exp $
+
 /**
  * @file
  *   Install file for l10n remote updates.
@@ -106,7 +106,7 @@ function l10n_update_schema() {
         'default' => '',
       ),
       'timestamp' => array(
-        'description' => 'Unix timestamp of the last file downloaded.',
+        'description' => 'Unix timestamp of the time the file was downloaded or saved to disk. Zero if not yet downloaded.',
         'type' => 'int',
         'not null' => FALSE,
         'disp-width' => '11',
@@ -125,22 +125,8 @@ function l10n_update_schema() {
         'not null' => TRUE,
         'default' => 1,
       ),
-      'last_updated' => array(
-        'description' => 'Unix timestamp of last time project was updated.',
-        'type' => 'int',
-        'not null' => FALSE,
-        'disp-width' => '11',
-        'default' => 0,
-      ),
       'last_checked' => array(
-        'description' => 'Unix timestamp of last time project was updated.',
-        'type' => 'int',
-        'not null' => FALSE,
-        'disp-width' => '11',
-        'default' => 0,
-      ),
-      'import_date' => array(
-        'description' => 'Unix timestamp of the last file downloaded.',
+        'description' => 'Unix timestamp of the last time this translation was downloaded from or checked at remote server and confirmed to be the most recent release available.',
         'type' => 'int',
         'not null' => FALSE,
         'disp-width' => '11',
@@ -149,6 +135,10 @@ function l10n_update_schema() {
     ),
     'primary key' => array('project', 'language'),
   );
+
+  $schema['cache_l10n_update'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_l10n_update']['description'] = 'Cache table for the Localization Update module to store information about available releases, fetched from central server.';
+
   return $schema;
 }
 
@@ -177,6 +167,16 @@ function l10n_update_uninstall() {
   $ret = array();
   drupal_uninstall_schema('l10n_update');
   db_drop_field($ret, 'locales_target', 'l10n_status');
+
+  variable_del('l10n_update_check_disabled');
+  variable_del('l10n_update_check_frequency');
+  variable_del('l10n_update_check_mode');
+  variable_del('l10n_update_default_server');
+  variable_del('l10n_update_default_update_url');
+  variable_del('l10n_update_download_store');
+  variable_del('l10n_update_import_mode');
+  variable_del('l10n_update_rebuild_projects');
+
   return $ret;
 }
 
@@ -188,6 +188,7 @@ function l10n_update_requirements($phase) {
     if (l10n_update_get_projects() && l10n_update_language_list()) {
       $requirements['l10n_update']['title'] = t('Translation update status');
       if (l10n_update_available_updates()) {
+        $destination = drupal_get_destination();
         $requirements['l10n_update']['severity'] = REQUIREMENT_WARNING;
         $requirements['l10n_update']['value'] = t('There are available updates');
         $requirements['l10n_update']['description'] = t('There are new or updated translations available for currently installed modules and themes. To check for updates, you can visit the <a href="@check_manually">translation update page</a>.', array(
@@ -217,15 +218,59 @@ function l10n_update_requirements($phase) {
  */
 function l10n_update_update_6001() {
   $ret = array();
-  db_add_field($ret, 'locales_target', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  if (!db_column_exists('locales_target', 'l10n_status')) {
+    db_add_field($ret, 'locales_target', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  }
   return $ret;
 }
 
 /**
- * Add status field to locales_target.
+ * Change status field name to l10n_status.
  */
 function l10n_update_update_6002() {
+  // I18n Strings module adds a 'status' column to 'locales_target' table.
+  // L10n Update module previously added a column with the same name. To avoid
+  // any collision we change the column name here, but only if it was added by
+  // L10n Update module.
   $ret = array();
-  db_change_field($ret, 'locales_target', 'status', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  if (!db_column_exists('locales_target', 'l10n_status') && db_column_exists('locales_target', 'status') && !db_table_exists('i18n_strings')) {
+    db_change_field($ret, 'locales_target', 'status', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  }
+  // Just in case someone did install I18n Strings, we still need to make sure
+  // the 'l10n_status' column gets created.
+  elseif (!db_column_exists('locales_target', 'l10n_status')) {
+    db_add_field($ret, 'locales_target', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+  }
   return $ret;
+}
+
+/**
+ * Delete 'last_updated' field from {l10n_update_file} table.
+ */
+function l10n_update_update_6003() {
+  $ret = array();
+  db_drop_field($ret, 'l10n_update_file', 'last_updated');
+  return $ret;
+}
+
+/**
+ * Delete 'import_date' field from {l10n_update_file} table.
+ */
+function l10n_update_update_6004() {
+  $ret = array();
+  db_drop_field($ret, 'l10n_update_file', 'import_date');
+  return $ret;
+}
+
+/**
+ * Create {cache_l10n_update} table.
+ */
+function l10n_update_update_6005() {
+  if (!db_table_exists('cache_l10n_update')) {
+    $ret = array();
+    $schema = drupal_get_schema_unprocessed('system', 'cache');
+    $schema['description'] = 'Cache table for the Localization Update module to store information about available releases, fetched from central server.';
+    db_create_table($ret, 'cache_l10n_update', $schema);
+    return $ret;
+  }
 }

@@ -103,23 +103,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_anonymous_forum_reply';
-  $strongarm->value = 0;
-  $export['comment_anonymous_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'comment_controls_forum';
   $strongarm->value = '3';
   $export['comment_controls_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'comment_controls_forum_reply';
-  $strongarm->value = '3';
-  $export['comment_controls_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -131,23 +117,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_default_mode_forum_reply';
-  $strongarm->value = '4';
-  $export['comment_default_mode_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'comment_default_order_forum';
   $strongarm->value = '2';
   $export['comment_default_order_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'comment_default_order_forum_reply';
-  $strongarm->value = '2';
-  $export['comment_default_order_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -159,13 +131,6 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_default_per_page_forum_reply';
-  $strongarm->value = '50';
-  $export['comment_default_per_page_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'comment_form_location_forum';
   $strongarm->value = '0';
   $export['comment_form_location_forum'] = $strongarm;
@@ -173,23 +138,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_form_location_forum_reply';
-  $strongarm->value = '0';
-  $export['comment_form_location_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'comment_forum';
-  $strongarm->value = 0;
+  $strongarm->value = '2';
   $export['comment_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'comment_forum_reply';
-  $strongarm->value = 0;
-  $export['comment_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -201,23 +152,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_preview_forum_reply';
-  $strongarm->value = '1';
-  $export['comment_preview_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'comment_subject_field_forum';
   $strongarm->value = '1';
   $export['comment_subject_field_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'comment_subject_field_forum_reply';
-  $strongarm->value = '1';
-  $export['comment_subject_field_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -229,23 +166,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'language_content_type_forum_reply';
-  $strongarm->value = '0';
-  $export['language_content_type_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'node_comment_forum';
-  $strongarm->value = '2';
+  $strongarm->value = 0;
   $export['node_comment_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'node_comment_forum_reply';
-  $strongarm->value = '2';
-  $export['node_comment_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -257,13 +180,6 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'node_comment_plural_forum_reply';
-  $strongarm->value = 'replies';
-  $export['node_comment_plural_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'node_comment_topic_review_forum';
   $strongarm->value = '0';
   $export['node_comment_topic_review_forum'] = $strongarm;
@@ -271,23 +187,9 @@ function bbcom_forum_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'node_comment_topic_review_forum_reply';
-  $strongarm->value = '0';
-  $export['node_comment_topic_review_forum_reply'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'node_comment_type_forum';
-  $strongarm->value = 'forum_reply';
+  $strongarm->value = '';
   $export['node_comment_type_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'node_comment_type_forum_reply';
-  $strongarm->value = 'forum_reply';
-  $export['node_comment_type_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -295,13 +197,6 @@ function bbcom_forum_strongarm() {
   $strongarm->name = 'node_comment_view_forum';
   $strongarm->value = 'nodecomments';
   $export['node_comment_view_forum'] = $strongarm;
-
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'node_comment_view_forum_reply';
-  $strongarm->value = 'nodecomments';
-  $export['node_comment_view_forum_reply'] = $strongarm;
 
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

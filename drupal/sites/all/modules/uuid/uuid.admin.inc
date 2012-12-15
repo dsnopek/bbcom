@@ -1,5 +1,4 @@
 <?php
-// $Id: uuid.admin.inc,v 1.1.2.8 2010/09/08 16:07:14 recidive Exp $
 
 /**
  * @file
@@ -87,7 +86,7 @@ function uuid_admin() {
   $form['settings']['sync'] = array(
     '#type' => 'submit',
     '#value' => t('Create missing UUIDs'),
-    '#submit' => array('uuid_sync'),
+    '#submit' => array('uuid_sync_submit'),
     '#weight' => 10,
   );
 
@@ -95,9 +94,16 @@ function uuid_admin() {
 }
 
 /**
+ * Submit handler for sync
+ */
+function uuid_sync_submit($form, &$form_state) {
+  return uuid_sync();
+}
+
+/**
  * Ensure all content and users have UUIDs, if they are supposed to.
  */
-function uuid_sync() {
+function uuid_sync($types = NULL) {
   // Users.
   if (variable_get('uuid_automatic_for_users', FALSE)) {
     $result = db_query("SELECT uid FROM {users} WHERE uid NOT IN (SELECT uid FROM {uuid_users})");
@@ -114,7 +120,9 @@ function uuid_sync() {
     }
   }
 
-  $types = variable_get('uuid_automatic_for_nodes', array());
+  if (!$types) {
+    $types = variable_get('uuid_automatic_for_nodes', array());
+  }
 
   // Remove disabled node types.
   $types = array_filter($types);
@@ -128,9 +136,9 @@ function uuid_sync() {
     }
 
     // Revisions.
-    $result = db_query("SELECT nr.vid AS vid FROM {node_revisions} AS nr INNER JOIN {node} n ON nr.nid = n.nid WHERE n.type IN (" . $placeholders . ") AND nr.vid NOT IN (SELECT vid FROM {uuid_node_revisions})", $types);
+    $result = db_query("SELECT nr.vid AS vid, nr.nid AS nid FROM {node_revisions} AS nr INNER JOIN {node} n ON nr.nid = n.nid WHERE n.type IN (" . $placeholders . ") AND nr.vid NOT IN (SELECT vid FROM {uuid_node_revisions})", $types);
     while ($item = db_fetch_object($result)) {
-      db_query("INSERT INTO {uuid_node_revisions} (vid, uuid) VALUES(%d, '%s')", $item->vid, uuid_uuid());
+      db_query("INSERT INTO {uuid_node_revisions} (vid, uuid, nid) VALUES(%d, '%s', %d)", $item->vid, uuid_uuid(), $item->nid);
     }
   }
 

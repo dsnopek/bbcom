@@ -1,5 +1,10 @@
 <?php
 /**
+ * @file
+ * Views argument handler.
+ */
+
+/**
  * Date API argument handler.
  */
 class date_api_argument_handler extends views_handler_argument_date {
@@ -163,7 +168,7 @@ class date_api_argument_handler extends views_handler_argument_date {
   }
 
   /**
-   * Set the empty argument value to the current date, 
+   * Set the empty argument value to the current date,
    * formatted appropriately for this argument.
    */
   function get_default_argument($raw = FALSE) {
@@ -173,7 +178,7 @@ class date_api_argument_handler extends views_handler_argument_date {
         $now = date_now();
         $week = date_week(date_format($now, 'Y-m-d'));
         return date_format($now, 'Y') .'-W'. $week;
-      } 
+      }
       else {
         return date($this->format(), time());
       }
@@ -235,7 +240,7 @@ class date_api_argument_handler extends views_handler_argument_date {
    */
   function summary_query() {
     $this->get_query_fields();
-    
+
     // No way to do summaries on more than one field at a time.
     if (count($this->query_fields) > 1) {
       return;
@@ -251,7 +256,7 @@ class date_api_argument_handler extends views_handler_argument_date {
     // Get the SQL format for this granularity, like Y-m,
     // and use that as the grouping value.
     $format = $date_handler->views_formats($this->options['granularity'], 'sql');
-    $this->formula = $date_handler->sql_format($format, $date_handler->sql_field($field['fullname'], $this->offset));
+    $this->formula = $date_handler->sql_format($format, $date_handler->sql_field($field['fullname']));
 
     // Add the computed field.
     $this->base_alias = $this->name_alias = $this->query->add_field(NULL, $this->formula, $field['query_name']);
@@ -280,21 +285,19 @@ class date_api_argument_handler extends views_handler_argument_date {
 
   /**
    * Make sure the date field is added to the query.
-   * 
-   * Do this in pre_query() so it will get done even if the argument 
+   *
+   * Do this in pre_query() so it will get done even if the argument
    * is the wildcard, since query() is skipped when the wildcard is used.
    */
-  function pre_query() { 
+  function pre_query() {
     // Unset invalid date values before the query runs.
     if (!empty($this->view->args) && count($this->view->args) > $this->position) {
       $argument = $this->view->args[$this->position];
       $parts = $this->date_handler->arg_parts($argument);
       if (empty($parts[0]['date']) && empty($parts[0]['period'])) {
-        unset($this->view->args[$this->position]); 
+        unset($this->view->args[$this->position]);
       }
     }
-    // Setting the offset to avoid trying to use timezone adjustments for dates that don't need it.
-    $this->offset = in_array($this->date_handler->granularity, array('hour', 'minute', 'sec')) ? NULL : 0;
   }
 
   /**
@@ -356,14 +359,14 @@ class date_api_argument_handler extends views_handler_argument_date {
       return;
     }
 
-    // The second option seems to work better in the block view if 
-    // set to something other than the original value. 
+    // The second option seems to work better in the block view if
+    // set to something other than the original value.
     // Need to keep an eye on this to be sure nothing else breaks.
     //$format = $this->date_handler->views_formats($this->options['granularity'], 'sql');
     $format = $this->date_handler->views_formats($this->granularity, 'sql');
     $this->get_query_fields();
     if (!empty($this->query_fields)) {
-      // Use set_where_group() with the selected date_method 
+      // Use set_where_group() with the selected date_method
       // of 'AND' or 'OR' to create the where clause.
       $this->query->set_where_group($this->options['date_method'], 'date');
       foreach ($this->query_fields as $query_field) {
@@ -377,13 +380,13 @@ class date_api_argument_handler extends views_handler_argument_date {
         $to_field = str_replace($field['table_name'] .'_', $table_alias .'.', $field['fromto'][1]);
 
         if ($this->granularity != 'week') {
-          $from = $date_handler->sql_where_format($format, $from_field, '<=', date_format($max_date, $format), $this->offset);
-          $to   = $date_handler->sql_where_format($format, $to_field, '>=', date_format($min_date, $format), $this->offset);
+          $from = $date_handler->sql_where_format($format, $from_field, '<=', date_format($max_date, $format));
+          $to   = $date_handler->sql_where_format($format, $to_field, '>=', date_format($min_date, $format));
         }
         else {
           $format = DATE_FORMAT_DATETIME;
-          $from = $date_handler->sql_where_date('DATE', $from_field, '<=', date_format($max_date, $format), $this->offset);
-          $to   = $date_handler->sql_where_date('DATE', $to_field, '>=', date_format($min_date, $format), $this->offset);          
+          $from = $date_handler->sql_where_date('DATE', $from_field, '<=', date_format($max_date, $format));
+          $to   = $date_handler->sql_where_date('DATE', $to_field, '>=', date_format($min_date, $format));
         }
         $sql = str_replace('***table***', $field['table_name'], "($from AND $to)");
         if ($sql) {

@@ -3,9 +3,9 @@ name = Author Pane
 description = Gathers information from core and user related contrib modules and displays it in a template.
 core = 6.x
 
-; Information added by drupal.org packaging script on 2011-03-29
-version = "6.x-2.1"
+; Information added by drupal.org packaging script on 2011-12-30
+version = "6.x-2.3"
 core = "6.x"
 project = "author_pane"
-datestamp = "1301362267"
+datestamp = "1325267737"
 

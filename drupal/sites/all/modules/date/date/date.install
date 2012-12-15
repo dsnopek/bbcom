@@ -43,7 +43,7 @@ function date_update_last_removed() {
  * Granularity options were not saved correctly by CCK if created using checkboxes.
  * Checkboxes have been changed back to a select and we need to fix the values
  * stored in the settings.
- * 
+ *
  * The bad values would have been stored in the form
  *   array(
  *     'year' => 'year'
@@ -53,13 +53,13 @@ function date_update_last_removed() {
  *     'minute' => 0,
  *     'second' => 0,
  *   );
- * 
+ *
  * Good values would have been stored in the form
  *   array(
  *     'year' => 'year',
  *     'month' => 'month',
  *   );
- * 
+ *
  * This might or might not have gotten updated in D5.2,
  * we need to force it again in D6 just in case.
  *
@@ -162,9 +162,9 @@ function date_update_6003() {
       while ($row = db_fetch_array($result)) {
         $ret[] = update_sql("UPDATE {". $table ."} SET $column='". $row[$column] ."' WHERE nid=". $row['nid'] ." AND vid=". $row['vid']);
       }
-    }    
+    }
   }
-  return $ret;    
+  return $ret;
 }
 
 /**
@@ -181,11 +181,11 @@ function date_update_6004() {
       $settings['timezone_db'] = '';
       $settings = serialize($settings);
       db_query("UPDATE {". content_field_tablename() ."} SET global_settings='%s' WHERE field_name='%s'", $settings, $field['field_name']);
-    }    
+    }
   }
   drupal_set_message(t("The database has been updated to correct the stored timezone for fields using timezone 'none'."));
   content_clear_type_cache();
-  return $ret;    
+  return $ret;
 }
 
 function date_update_6005() {
@@ -206,16 +206,16 @@ function date_update_6005() {
   $ret = array();
 
   $new_map = array(
-    'short' => 'short', 
-    'medium' => 'medium', 
-    'long' => 'long', 
-    'time' => 'time', 
-    'time_timezone' => 'time_timezone', 
-    'iso' => 'iso', 
-    'timestamp' => 'timestamp', 
-    'ical' => 'ical', 
+    'short' => 'short',
+    'medium' => 'medium',
+    'long' => 'long',
+    'time' => 'time',
+    'time_timezone' => 'time_timezone',
+    'iso' => 'iso',
+    'timestamp' => 'timestamp',
+    'ical' => 'ical',
     'feed' => 'feed',
-  );  
+  );
 
   // Create new custom formats for each of these:
   date_install_create_format(NULL, t('Time'), 'time', date_limit_format(variable_get('date_format_short', 'm/d/Y - H:i'), array('hour', 'minute', 'second')));
@@ -242,7 +242,7 @@ function date_update_6005() {
     $new_setting = 'default_format';
 
     // Create a map of the old and new formats.
-    $map = $new_map;      
+    $map = $new_map;
 
     // If the field's long, medium, or short formats don't match the system
     // values, create custom format types for them.
@@ -293,7 +293,7 @@ function date_update_6005() {
         $map['default'] = 'short';
       }
       else {
-        // If all else fails, create a new format type 
+        // If all else fails, create a new format type
         // for the default format.
         $name = $field_name .'_default';
         date_install_create_format($field, NULL, $name, $default);
@@ -362,7 +362,7 @@ function date_update_6005() {
   }
   // Clear any caches that may have old formats in them.
   content_clear_type_cache();
-  drupal_set_message(t('Date display formats are now included with the system date and time settings. Please visit <a href="@date-time-page">the Date and time format page</a> to see the new format types.', array('@date-time-page' => base_path() .'admin/settings/date-time/formats')));
+  drupal_set_message(t('Date display formats are now included with the system date and time settings. Please visit <a href="@date-time-page">the Date and time format page</a> to see the new format types.', array('@date-time-page' => url('admin/settings/date-time/formats'))));
   return $ret;
 }
 
@@ -374,13 +374,13 @@ function date_install_create_format($field, $title, $name, $format) {
   if (empty($title)) {
     $type = str_replace($field['field_name'] .'_', '', $name);
     $field = $fields[$field['field_name']];
-    $title = $field['widget']['label'];  
+    $title = $field['widget']['label'];
   }
   variable_set('date_format_'. $name, $format);
   db_query("INSERT INTO {date_format_types} (type, title, locked) VALUES('%s', '%s', 0)", $name, $title);
   if (!db_result(db_query("SELECT dfid FROM {date_formats} WHERE format='%s' AND type='%s'", $format, $type))) {
-    db_query("INSERT INTO {date_formats} (format, type, locked) VALUES('%s', '%s', 0)", $format, 'custom'); 
-  } 
+    db_query("INSERT INTO {date_formats} (format, type, locked) VALUES('%s', '%s', 0)", $format, 'custom');
+  }
 }
 
 function date_db_integrity($name) {
@@ -454,3 +454,4 @@ function date_db_integrity($name) {
   content_clear_type_cache();
   return $ret;
 }
+

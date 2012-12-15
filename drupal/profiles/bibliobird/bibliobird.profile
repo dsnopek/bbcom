@@ -231,7 +231,7 @@ function bibliobird_profile_tasks(&$task, $url) {
     db_query("UPDATE {languages} SET prefix = 'en' WHERE language = 'en'");
     variable_set('language_negotiation', LANGUAGE_NEGOTIATION_PATH_DEFAULT);
     foreach (array('en', 'pl') as $langcode) {
-      node_export_import(file_get_contents("../languages/$langcode.txt"), NULL, FALSE);
+      node_export_import(file_get_contents("../languages/$langcode.txt"));
     }
 
     // This isn't actually necessary as there are no node_access() entries,

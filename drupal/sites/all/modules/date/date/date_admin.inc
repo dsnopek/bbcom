@@ -44,7 +44,7 @@ function _date_widget_settings($op, &$field) {
  * so do it in a custom function.
  */
 function date_widget_settings_validate(&$form, &$form_state) {
-  // TODO Not sure there is any limitation any more in this version. Need to check.  
+  // TODO Not sure there is any limitation any more in this version. Need to check.
   if ($form_state['values']['widget_type'] == 'date_popup') {
     // Only a limited set of formats is available for the Date Popup module
     if (!empty($form_state['values']['input_format_custom']) || !in_array($form_state['values']['input_format'], date_popup_formats())) {
@@ -255,11 +255,11 @@ function _date_field_settings($op, $field) {
       $db_info = content_database_info($field);
       $table_alias = content_views_tablename($field);
 
-      // Swap in the date multiple value handler for 
+      // Swap in the date multiple value handler for
       // CCK's regular multiple value handler.
       $data[$table_alias][$field['field_name'] .'_value']['field']['handler'] = 'date_handler_field_multiple';
 
-      // Unset the filter and argument handlers, dates can use the generic 
+      // Unset the filter and argument handlers, dates can use the generic
       // date argument and filter handlers created by the Date API.
       //unset($data[$table_alias][$field['field_name'] .'_value']['argument']);
       //unset($data[$table_alias][$field['field_name'] .'_value']['filter']);
@@ -329,7 +329,7 @@ function date_field_settings_form($field) {
   );
   // Make sure granularity is in the right format and has no empty values.
   if (!empty($field['granularity']) && is_array($field['granularity'])) {
-    $granularity = array_filter($field['granularity']);  
+    $granularity = array_filter($field['granularity']);
   }
   else {
     $granularity = array('year', 'month', 'day', 'hour', 'minute');
@@ -360,12 +360,12 @@ function date_field_settings_form($field) {
     '#multiple' => TRUE,
     '#description' => t('Set the date elements to be stored (at least a year is required).'),
     );
-  $format_types = array();  
+  $format_types = array();
   foreach (date_get_format_types('', TRUE) as $name => $info) {
     $format_types[$name] = $info['title'];
   }
   $form['default_format'] = array(
-    '#type' => 'select', 
+    '#type' => 'select',
     '#title' => t('Default Display'),
     '#default_value' => !empty($field['default_format']) ? $field['default_format'] : 'medium',
     '#options' => $format_types,
@@ -454,33 +454,33 @@ function date_example_date() {
 }
 
 /**
- * Helper function to create a field array with default values for a date 
+ * Helper function to create a field array with default values for a date
  * $field, based on field type, widget type, and timezone handling.
- * 
+ *
  * This function can be used to make it easier to create new date fields
  * in profiles or custom code.
- * 
+ *
  * @param $field_type
  *   Can be 'date', 'datestamp', or 'datetime'.
  * @param $widget_type
- *   Can be 'date_text', 'date_text_repeat', 'date_select', 
+ *   Can be 'date_text', 'date_text_repeat', 'date_select',
  *   'date_select_repeat', 'date_popup', 'date_popup_repeat'.
  * @param $tz_handling
  *   Can be 'site', 'date', 'utc', 'none', or 'user'.
  * @param $overrides
- *   An optional array of field/widget values that should 
+ *   An optional array of field/widget values that should
  *   override the normal defaults.
  */
 function date_field_default_values($field_type, $widget_type, $tz_handling, $overrides = array()) {
   module_load_include('inc', 'content', 'includes/content.crud');
   $repeat_widgets = array('date_select_repeat', 'date_text_repeat', 'date_popup_repeat');
 
-  $base_field_values = array (
+  $base_field_values = array(
     'field_name' => '',
     'type_name' => '',
     'multiple' => in_array($widget_type, $repeat_widgets) ? 1 : 0,
     'module' => 'date',
-    'granularity' => array (
+    'granularity' => array(
       'year' => 'year',
       'month' => 'month',
       'day' => 'day',
@@ -491,19 +491,19 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
     'tz_handling' => $tz_handling,
     'todate' => 'optional',
     'repeat' => in_array($widget_type, $repeat_widgets) ? 1 : 0,
-    'repeat_collapsed' => 0, 
+    'repeat_collapsed' => 0,
     'default_format' => 'medium',
     );
-  $base_widget_values = array (
+  $base_widget_values = array(
     'label' => '',
     'default_value' => 'now',
-    'default_value_code' => '', 
+    'default_value_code' => '',
     'default_value2' => 'same',
-    'default_value_code2' => '', 
+    'default_value_code2' => '',
     'input_format' => date_default_format($widget_type),
-    'input_format_custom' => '', 
+    'input_format_custom' => '',
     'increment' => 1,
-    'text_parts' => array (),
+    'text_parts' => array(),
     'year_range' => '-3:+3',
     'label_position' => 'above',
     'weight' => 0,
@@ -549,7 +549,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
     $field['widget'][$key] = $value;
   }
 
-  // Allow overrides of specific default values. 
+  // Allow overrides of specific default values.
   foreach ($overrides as $key => $value) {
     if ($key != 'widget') {
       $field[$key] = $value;
@@ -563,7 +563,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
   // Make sure multiple gets set correctly for repeating dates.
   if ($field['repeat']) $field['multiple'] = 1;
 
-  // Reset columns and db_storage, which may need to be 
+  // Reset columns and db_storage, which may need to be
   // adjusted to the new values.
   $field['columns'] = date_columns($field);
   $field['db_storage'] = content_storage_type($field);
@@ -573,7 +573,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
 
 /**
  * Formatter settings.
- * 
+ *
  * Form element used both in the date_handler_field_multiple Views handler
  * and on the CCK Display fields page.
  */
@@ -600,13 +600,13 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   $form['fromto']['fromto'] = array(
     '#type' => 'select',
     '#options' => array(
-      'both' => t('Display From and To dates'), 
-      'value' => t('Display From date only'), 
+      'both' => t('Display From and To dates'),
+      'value' => t('Display From date only'),
       'value2' => t('Display To date only'),
       ),
     '#default_value' => $default,
     '#weight' => 1,
-  );  
+  );
 
   $form['multiple'] = array(
     '#access' => $field['multiple'],
@@ -616,7 +616,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   // Make the string translatable by keeping it as a whole rather than
   // translating prefix and suffix separately.
   if (isset($options['multiple']) && isset($options['multiple']['multiple_number'])) {
-    $default = $options['multiple']['multiple_number'];    
+    $default = $options['multiple']['multiple_number'];
   }
   else {
     $default = '';
@@ -638,7 +638,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   }
 
   if (isset($options['multiple']) && isset($options['multiple']['multiple_from'])) {
-    $default = $options['multiple']['multiple_from'];    
+    $default = $options['multiple']['multiple_from'];
   }
   else {
     $default = '';
@@ -660,7 +660,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   }
 
   if (isset($options['multiple']) && isset($options['multiple']['multiple_to'])) {
-    $default = $options['multiple']['multiple_to'];    
+    $default = $options['multiple']['multiple_to'];
   }
   else {
     $default = '';
@@ -694,7 +694,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   $form['repeat']['show_repeat_rule'] = array(
     '#type' => 'select',
     '#options' => array(
-      'show' => t('Display repeat rule'), 
+      'show' => t('Display repeat rule'),
       'hide' => t('Hide repeat rule')),
     '#default_value' => $default,
   );
@@ -707,11 +707,11 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
     $form['type_name'] = array(
       '#type' => 'value',
       '#value' => $type_name,
-      );  
+      );
     $form['context'] = array(
       '#type' => 'value',
       '#value' => $context,
-      );  
+      );
   }
   return $form;
 }

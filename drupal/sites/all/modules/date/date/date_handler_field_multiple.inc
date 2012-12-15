@@ -15,7 +15,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
       'contains' => array(
         'show_repeat_rule' => array('default' => ''),
       )
-    );  
+    );
     $options['multiple'] = array(
       'contains' => array(
         'group' => array('default' => TRUE),
@@ -30,7 +30,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
       )
     );
 
-    return $options;  
+    return $options;
   }
 
   /**
@@ -45,7 +45,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
     $options = $this->options;
 
     $form += date_formatter_settings($form_state, $field, $options, TRUE);
-    $form['multiple']['#weight']  = 1;   
+    $form['multiple']['#weight']  = 1;
     $form['multiple']['group'] = array(
       '#title' => t('Group multiple values'),
       '#type' => 'checkbox',
@@ -54,7 +54,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
     );
   }
 
-  function pre_render($values) {
+  function pre_render(&$values) {
 
     // If there are no values to render (displaying a summary, or query returned no results),
     // or if this is not a grouped field, do nothing specific.
@@ -91,7 +91,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
       $query_fields[] = "$alias.$attributes[column]";
     }
     // Retrieve all values, we limit them in date_prepare_node(),
-    // a function that is used both by the handler and by the 
+    // a function that is used both by the handler and by the
     // node theme to take advantage of formatter settings.
     $where = array('1');
     $query = 'SELECT '. implode(', ', $query_columns) .
@@ -116,7 +116,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
 
     // By this time $values is a pseudo node that will be passed
     // to the theme. Add view information to it.
-    $values->date_info = !empty($this->view->date_info) ? $this->view->date_info : new StdClass();
+    $values->date_info = !empty($this->view->date_info) ? $this->view->date_info : new stdClass();
     $values->date_info->date_handler_fields = date_handler_fields($this->view);
 
     // Add the formatter settings to the pseudo node.
@@ -178,7 +178,7 @@ class date_handler_field_multiple extends content_handler_field_multiple {
       }
     }
 
-    return '';    
+    return '';
 
   }
 

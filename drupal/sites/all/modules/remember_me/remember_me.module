@@ -1,10 +1,8 @@
 <?php
-// $Id: remember_me.module,v 1.13.2.1 2009/05/25 15:09:03 nickl Exp $
 
 /**
  * @file
  * Adds a "Remember me" checkbox to login forms.
- *
  */
 
 /**
@@ -15,13 +13,13 @@ function remember_me_init() {
 
   // If we have a user logged in, then we have a session.
   if ($user->uid) {
-    if ($user->remember_me && variable_get('remember_me_managed', 0) != 0) {
+    if (isset($user->remember_me) && variable_get('remember_me_managed', 0) != 0) {
       // Set lifetime as configured via admin settings.
       if (variable_get('remember_me_lifetime', 604800) != ini_get('session.cookie_lifetime')) {
         _remember_me_set_lifetime(variable_get('remember_me_lifetime', 604800));
       }
     }
-    else if (!$user->remember_me) {
+    elseif (!isset($user->remember_me)) {
       // If we have cookie lifetime set already then unset it.
       if (0 != ini_get('session.cookie_lifetime')) {
         _remember_me_set_lifetime(0);
@@ -48,12 +46,12 @@ function _remember_me_set_lifetime($cookie_lifetime) {
   // Use remember_me_sess_read() to avoid reloading of user object, because
   // it might be once more reloaded in some other hook_init().
   session_set_save_handler(
-    "sess_open",
-    "sess_close",
-    "remember_me_sess_read",
-    "sess_write",
-    "sess_destroy_sid",
-    "sess_gc"
+    'sess_open',
+    'sess_close',
+    'remember_me_sess_read',
+    'sess_write',
+    'sess_destroy_sid',
+    'sess_gc'
   );
   session_start();
 }
@@ -77,17 +75,12 @@ function remember_me_sess_read() {
  */
 function remember_me_user($op, &$edit, &$user, $category = NULL) {
   if ($category === NULL && $op == 'login') {
-    $remember_me = isset($edit['remember_me']) ? $edit['remember_me'] : NULL;
-    if (isset($remember_me)) {
-      if ($user->uid) {
-        $user = user_save($user, array(
-          'remember_me' => (bool) $remember_me,
-        ), NULL);
-      }
-    }
-    if (variable_get('remember_me_phantom_session', 0)) {
-      module_load_include('inc', 'remember_me', 'includes/remember_me');
-      remember_me_manage_phantom_sessions();
+    // Only keep the state in user object if remember_me is checked, storing NULL will remove property.
+    $remember_me = !empty($edit['remember_me']) ? $edit['remember_me'] : NULL;
+    if ($user->uid) {
+      // Use the category remember-me to identify this persistence request 
+      // and hopefully avoid conflicts with other hook_user() implementations. 
+      $user = user_save($user, array('remember_me' => $remember_me), 'remember-me');
     }
   }
 }
@@ -96,11 +89,33 @@ function remember_me_user($op, &$edit, &$user, $category = NULL) {
  * Implementation of hook_form_alter().
  */
 function remember_me_form_alter(&$form, $form_state, $form_id) {
-  $user_login_forms = array('user_login', 'user_login_block');
-
-  if (in_array($form_id, $user_login_forms)) {
-    module_load_include('inc', 'remember_me', 'includes/remember_me');
-    remember_me_insert_checkbox($form);
+  // Only make changes to these forms.
+  if (in_array($form_id, array('user_login', 'user_login_block'))) {
+    
+    // Configuration for the remember me checkbox.
+    $cbox['remember_me'] = array(
+      '#title' => t('Remember me'),
+      '#type' => variable_get('remember_me_checkbox_visible', 1) ? 'checkbox' : 'hidden',
+      '#default_value' => variable_get('remember_me_checkbox', 1),
+      '#attributes' => array('tabindex' => 1),
+    );
+  
+    $que = array();
+    // Now lets try and insert it right after the password field in the document
+    // and set the tabindex to 1 for each field so that we can jump in sequence.
+    while (list($key, $val) = each($form)) {
+      switch ($key) {
+        case 'name':
+        case 'pass' :
+          $val['#attributes']['tabindex'] = 1;
+        break;
+        case 'submit':
+          $form = $que + $cbox + $form;
+          $form[$key]['#attributes']['tabindex'] = 1;
+        return;
+      }  
+      $que[$key] = $val;
+    } 
   }
 }
 
@@ -122,41 +137,14 @@ function remember_me_theme() {
 function remember_me_menu() {
   $items = array();
   $items['admin/settings/remember_me'] = array(
-    'title'            => 'Remember me settings',
-    'description'      => 'Configure settings like session time out for remember_me module.',
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('remember_me_admin_settings'),
+    'title' => 'Remember me settings',
+    'description' => 'Configure settings like session time out for remember_me module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('remember_me_admin_settings'),
     'access arguments' => array('administer site configuration'),
-    'file'             => 'includes/remember_me.admin.inc',
-    'type'             => MENU_NORMAL_ITEM
+    'file' => 'remember_me.admin.inc',
+    'type' => MENU_NORMAL_ITEM
   );
-
-  $base = array(
-    'type'             => MENU_CALLBACK,
-    'access arguments' => array('administer site configuration'),
-    'file'             => 'includes/remember_me.users.inc',
-  );
-
-  $items['remember_me/ajax/users/online'] = array(
-    'page callback'    => 'remember_me_ajax_users_online',
-  ) + $base;
-
-  $items['admin/settings/remember_me/users/online'] = array(
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('remember_me_ajax_users_online_form'),
-    'title'            => "'Who's online' settings",
-  ) + $base;
-
-  $base = array(
-    'type'             => MENU_CALLBACK,
-    'access arguments' => array('administer site configuration'),
-    'file'             => 'includes/remember_me.test.inc',
-  );
-
-  $items['remember_me/test'] = array(
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('test_fapi_edit'),
-  ) + $base;
 
   return $items;
 }

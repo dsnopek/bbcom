@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Install file for Date Timezone.
+ */
 
 function date_timezone_install() {
   $ret = array();
@@ -76,7 +80,7 @@ function date_timezone_update_5200() {
     }
   }
   $results = db_query("SELECT DISTINCT timezone_name FROM {users} ORDER BY timezone_name");
-  while($row = db_fetch_object($results)) {
+  while ($row = db_fetch_object($results)) {
     if (!empty($row->timezone_name)) {
       $new = _date_timezone_replacement($row->timezone_name);
       if (!empty($new) && $new != $row->timezone_name) {
@@ -93,7 +97,7 @@ function date_timezone_update_5200() {
  * Create replacement values for deprecated timezone names.
  */
 function _date_timezone_replacement($old) {
-  $replace = array (
+  $replace = array(
   'Brazil/Acre' => 'America/Rio_Branco',
   'Brazil/DeNoronha' => 'America/Noronha',
   'Brazil/East' => 'America/Recife',
@@ -102,7 +106,7 @@ function _date_timezone_replacement($old) {
   'Canada/Central' => 'America/Winnipeg',
   'Canada/East-Saskatchewan' => 'America/Regina',
   'Canada/Eastern' => 'America/Toronto',
-  'Canada/Mountain' =>'America/Edmonton',
+  'Canada/Mountain' => 'America/Edmonton',
   'Canada/Newfoundland' => 'America/St_Johns',
   'Canada/Pacific' => 'America/Vancouver',
   'Canada/Saskatchewan' => 'America/Regina',
@@ -183,7 +187,7 @@ function _date_timezone_replacement($old) {
   'PST8PDT' => 'America/Los_Angeles',
   'ROC' => 'Asia/Taipei',
   'ROK' => 'Asia/Seoul',
-  'Singapore' =>'Asia/Singapore',
+  'Singapore' => 'Asia/Singapore',
   'Turkey' => 'Europe/Istanbul',
   'US/Alaska' => 'America/Anchorage',
   'US/Aleutian' => 'America/Adak',

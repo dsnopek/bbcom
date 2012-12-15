@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ * Default Views.
+ */
+
 function date_api_views_default_views() {
 
 $view = new view;

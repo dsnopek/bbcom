@@ -1,5 +1,4 @@
 <?php
-// $Id: rules_forms.rules.inc,v 1.1.2.9 2010/03/11 12:12:19 klausi Exp $
 
 
 /**

@@ -1,9 +1,8 @@
 <?php
-// $Id: views_handler_field_node_link_export.inc,v 1.1.2.2.2.6 2010/10/29 00:32:25 danielb Exp $
 
 /**
  * @file
- * The Node Export views field handler.
+ * The Node export views field handler.
  */
 
 /**
@@ -27,11 +26,11 @@ class views_handler_field_node_link_export extends views_handler_field_node_link
     $node->type = $values->{$this->aliases['type']};
     $node->format = $values->{$this->aliases['format']};
     $node->status = 1; // unpublished nodes ignore access control
-    if (!node_export_access($node)) {
+    if (!node_export_access_check($node)) {
       return;
     }
 
-    $text = !empty($this->options['text']) ? $this->options['text'] : t('export');
-    return l($text, "node/$node->nid/export", array('query' => drupal_get_destination()));
+    $text = !empty($this->options['text']) ? $this->options['text'] : t('Node export');
+    return l($text, "node/$node->nid/node_export", array('query' => drupal_get_destination()));
   }
 }

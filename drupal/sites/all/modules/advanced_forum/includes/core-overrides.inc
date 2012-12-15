@@ -179,6 +179,12 @@ function advanced_forum_get_topics($tid, $sortby, $forum_per_page, $sort_form = 
 
   // Views handles this page
   $view = views_get_view('advanced_forum_topic_list');
+  if (!is_object($view)) {
+    // views wasn't able to get the view - perhaps due to a bad cache?
+    // @see: http://drupal.org/node/687196
+    drupal_set_message(t('Sorry, the topic listing for %term is temporarily unavailable.', array('%term' => $term->name)), 'error', FALSE);
+    return;
+  }
   $view->set_display('default');
   $view->set_arguments(array($tid));
   $view->sort_form = $sort_form;

@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.2.4 2010/07/19 14:17:57 fago Exp $
 
 Rules Forms Module
 ------------------

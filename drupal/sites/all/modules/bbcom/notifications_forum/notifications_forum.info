@@ -1,0 +1,7 @@
+name = "Forum Notifications"
+description = "Additional UI on top of Taxonomy Notifications when working with the core Forum module."
+core = "6.x"
+package = "Notifications"
+dependencies[] = "forum"
+dependencies[] = "notifications_tags"
+

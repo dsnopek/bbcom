@@ -1,9 +1,8 @@
 <?php
-// $Id: node_export_file.install,v 1.1.2.2 2009/09/08 10:14:13 danielb Exp $
 
 /**
  * @file
- * The Node Export File install file.
+ * The Node export file install file.
  */
 
 /**
@@ -12,4 +11,13 @@
 function node_export_file_install() {
   // Weight the module light to ensure it runs before all CCK modules
   db_query("UPDATE {system} SET weight = -10 WHERE name = 'node_export_file'");
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function node_export_file_uninstall() {
+  variable_del('node_export_file_types');
+  variable_del('node_export_file_mode');
+  variable_del('node_export_file_assets_path');
 }

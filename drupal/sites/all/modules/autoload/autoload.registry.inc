@@ -1,5 +1,4 @@
 <?php
-// $Id: autoload.registry.inc,v 1.1.2.1 2010/09/07 22:29:04 davereid Exp $
 
 /**
  * @file

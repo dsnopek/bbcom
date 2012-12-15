@@ -13,7 +13,7 @@ Drupal.behaviors.date_popup = function (context) {
             $(this)
               .datepicker(datePopup.settings)
               .addClass('date-popup-init')
-            $(this).click(function(){
+            $(this).click(function() {
               $(this).focus();
             });
             break;
@@ -22,7 +22,7 @@ Drupal.behaviors.date_popup = function (context) {
             $(this)
               .timeEntry(datePopup.settings)
               .addClass('date-popup-init')
-            $(this).click(function(){
+            $(this).click(function() {
               $(this).focus();
             });
             break;

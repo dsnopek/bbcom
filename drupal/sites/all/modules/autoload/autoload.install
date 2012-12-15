@@ -1,5 +1,4 @@
 <?php
-// $Id: autoload.install,v 1.1.2.2.2.2 2010/09/08 00:24:09 davereid Exp $
 
 /**
  * Implements hook_schema().
@@ -92,6 +91,8 @@ function autoload_enable() {
  */
 function autoload_uninstall() {
   drupal_uninstall_schema('autoload');
+
+  variable_del('autoload_registry_watchdog_misses');
 }
 
 /**

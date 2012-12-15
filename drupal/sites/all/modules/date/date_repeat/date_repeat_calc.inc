@@ -96,22 +96,22 @@ function _date_repeat_calc($rrule, $start, $end, $exceptions, $timezone, $additi
   }
   elseif (!empty($rrule['BYDAY']) && !in_array($rrule['FREQ'], array('MONTHLY', 'WEEKLY', 'YEARLY'))) {
     $rrule['FREQ'] = 'WEEKLY';
-   }
+  }
 
   // Find the time period to jump forward between dates.
   switch ($rrule['FREQ']) {
-   case 'DAILY':
-     $jump = $interval . ' days';
-     break;
-   case 'WEEKLY':
-     $jump = $interval . ' weeks';
-     break;
-   case 'MONTHLY':
-     $jump = $interval . ' months';
-     break;
-   case 'YEARLY':
-     $jump = $interval . ' years';
-     break;
+    case 'DAILY':
+      $jump = $interval . ' days';
+      break;
+    case 'WEEKLY':
+      $jump = $interval . ' weeks';
+      break;
+    case 'MONTHLY':
+      $jump = $interval . ' months';
+      break;
+    case 'YEARLY':
+      $jump = $interval . ' years';
+      break;
   }
   $rrule = date_repeat_adjust_rrule($rrule, $start_date);
 
@@ -403,7 +403,7 @@ function date_repeat_adjust_rrule($rrule, $start_date) {
 
   elseif (!empty($rrule['BYDAY']) && !in_array($rrule['FREQ'], array('MONTHLY', 'YEARLY'))) {
     foreach ($rrule['BYDAY'] as $delta => $BYDAY) {
-      $rrule['BYDAY'][$delta] = substr($BYDAY, -2);
+      $rrule['BYDAY'][$delta] = drupal_substr($BYDAY, -2);
     }
   }
 
@@ -434,7 +434,7 @@ function date_repeat_add_dates(&$days, $current_day, $start_date, $end_date, $ex
   if (!empty($rrule['BYDAY'])) {
     $BYDAYS = $rrule['BYDAY'];
     foreach ($BYDAYS as $delta => $BYDAY) {
-      $BYDAYS[$delta] = substr($BYDAY, -2);
+      $BYDAYS[$delta] = drupal_substr($BYDAY, -2);
     }
     if (!in_array(date_repeat_dow2day(date_format($current_day, 'w')), $BYDAYS)) {
       return FALSE;

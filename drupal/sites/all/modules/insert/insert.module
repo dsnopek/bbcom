@@ -68,6 +68,11 @@ function insert_theme() {
       'template' => 'templates/insert-link',
       'file' => 'includes/insert.inc',
     ),
+    'insert_icon_link' => array(
+      'arguments' => array('item' => NULL, 'widget' => NULL),
+      'template' => 'templates/insert-icon-link',
+      'file' => 'includes/insert.inc',
+    ),
 
     // Theme functions in includes/imagecache.inc.
     'imagecache_insert_image' => array(
@@ -272,6 +277,7 @@ function insert_widget_settings_alter(&$settings, $op, $widget) {
 function insert_widget_settings() {
   return array(
     'insert',
+    'insert_absolute',
     'insert_styles',
     'insert_default',
     'insert_class',
@@ -298,6 +304,15 @@ function insert_widget_form($widget) {
     '#title' => t('Enable insert button'),
     '#default_value' => (bool) $widget['insert'],
     '#description' => t('Enable the insert button and options for this widget.'),
+    '#weight' => -10,
+  );
+
+  $form['insert']['insert_absolute'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use absolute paths'),
+    '#default_value' => isset($widget['insert_absolute']) ? $widget['insert_absolute'] : variable_get('insert_absolute_paths', FALSE),
+    '#description' => t('Includes the full URL prefix "@base_url" in all links and image tags.', array('@base_url' => $GLOBALS['base_url'])),
+    '#weight' => -9,
   );
 
   $form['insert']['insert_styles'] = array(
@@ -308,6 +323,7 @@ function insert_widget_form($widget) {
     '#description' => t('Select which styles should be available when sending items to text areas. If no styles are selected, the option to use a style is not displayed. If all styles are selected, new styles will be enabled by default.'),
     '#element_validate' => array('insert_field_widget_settings_styles_validate'),
     '#theme' => 'insert_field_widget_settings_styles',
+    '#weight' => 0,
   );
 
   $form['insert']['insert_default'] = array(
@@ -316,6 +332,7 @@ function insert_widget_form($widget) {
     '#options' => insert_styles_list(),
     '#default_value' => (array) $widget['insert_default'],
     '#description' => t('Select the default style which will be selected by default or used if no specific styles above are enabled.'),
+    '#weight' => 1,
   );
 
   $form['insert']['insert_class'] = array(
@@ -323,6 +340,7 @@ function insert_widget_form($widget) {
     '#type' => 'textfield',
     '#default_value' => empty($widget['insert_class']) ? '' : $widget['insert_class'],
     '#description' => t('Add any classes that should be added to the item on output.'),
+    '#weight' => 5,
   );
 
   $form['insert']['insert_width'] = array(
@@ -332,6 +350,7 @@ function insert_widget_form($widget) {
     '#field_suffix' => ' '. t('pixels'),
     '#default_value' => empty($widget['insert_width']) ? '' : $widget['insert_width'],
     '#description' => t('When inserting images, the height and width of images may be scaled down to fit within the specified width. Note that this does not resize the image, it only affects the HTML output. To resize images it is recommended to install the <a href="http://drupal.org/project/image_resize_filter">Image Resize Filter</a> module.'),
+    '#weight' => 10,
   );
 
   return $form;
@@ -372,7 +391,7 @@ function theme_insert_field_widget_settings_styles($element) {
  * will consistently use absolute or relative URLs, depending on the Insert
  * setting.
  */
-function insert_create_url($path) {
+function insert_create_url($path, $absolute = NULL) {
   // Strip file_directory_path from $path. We only include relative paths in urls.
   if (strpos($path, file_directory_path() .'/') === 0) {
     $path = trim(substr($path, strlen(file_directory_path())), '\\/');
@@ -384,13 +403,7 @@ function insert_create_url($path) {
     $pieces[$part] = rawurlencode($piece);
   }
   $path = implode('/', $pieces);
-
-  // This variable has no configuration location. It may be set by placing
-  // $conf['insert_absolute_paths'] = FALSE;
-  // in the site settings.php file, or by manually running variable_set().
-  // For reasons why this might not do what you want and why there's no UI
-  // see http://drupal.org/node/640352.
-  $absolute = variable_get('insert_absolute_paths', TRUE);
+  $absolute = isset($absolute) ? $absolute : variable_get('insert_absolute_paths', FALSE);
 
   switch (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC)) {
     case FILE_DOWNLOADS_PUBLIC:

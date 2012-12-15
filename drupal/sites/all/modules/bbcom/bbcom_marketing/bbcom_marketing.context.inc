@@ -5,6 +5,7 @@
  */
 function bbcom_marketing_context_default_contexts() {
   $export = array();
+
   $context = new stdClass;
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
@@ -41,7 +42,7 @@ function bbcom_marketing_context_default_contexts() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Viewing our marketing materials.');
-
   $export['bbcom-section-marketing'] = $context;
+
   return $export;
 }

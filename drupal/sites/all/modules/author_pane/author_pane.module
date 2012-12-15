@@ -118,7 +118,7 @@ function author_pane_include($file) {
 
   foreach (module_list() as $module) {
     $module_path = drupal_get_path('module', $module);
-    
+
     if (file_exists("$module_path/$module.$file")) {
       $includes[] = "./$module_path/$module.$file";
     }

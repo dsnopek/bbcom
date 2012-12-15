@@ -1175,7 +1175,7 @@ echo $view->total_rows; ?> entries that match this query.');
     'title' => 'Library',
     'description' => '',
     'weight' => '0',
-    'name' => 'navigation',
+    'name' => 'primary-links',
   ));
   $handler = $view->new_display('feed', 'Feed', 'feed');
   $handler->override_option('title', 'Front page feed');

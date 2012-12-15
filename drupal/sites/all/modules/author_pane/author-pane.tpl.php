@@ -3,13 +3,13 @@
 /**
  * @file
  * Theme implementation to display information about a given user.
- 
+
  * Since the user is the author of a post or of a profile page, the user is
  * referred to as "author" below.
- 
+
  * Available variables (core modules):
  * - $account: The entire user object for the author.
- * - $picture: Themed user picture for the author. 
+ * - $picture: Themed user picture for the author.
  *   See author-pane-user-picture.tpl.php.
  * - $account_name: Themed user name for the author.
  * - $account_id: User ID number for the author.
@@ -26,9 +26,9 @@
  * - $profile - Profile object from core Profile module.
  *     Usage: $profile['category']['field_name']['#value']
  *     Example: <?php print $profile['Personal info']['profile_name']['#value']; ?>
- 
+
  * Available variables (contributed modules):
- * - $facebook_status: Status, including username, from the Facebook-style 
+ * - $facebook_status: Status, including username, from the Facebook-style
  *   Statuses module.
  * - $facebook_status_status: Status from the Facebook-style Statuses module.
  *
@@ -38,7 +38,7 @@
  * - $user_badges: Badges from User Badges module.
  *
  * - $userpoints_points: Author's total number of points from all categories.
- * - $userpoints_categories: Array holding each category and the points for 
+ * - $userpoints_categories: Array holding each category and the points for
  *   that category. Both provided by the User Points module.
  *
  * - $user_stats_posts: Number of posts from the User Stats module.
@@ -51,14 +51,12 @@
  *
  * - $og_groups: Linked list of Organic Groups that the author is a member of.
  *
- * - $location_user_location: User location as reported by the Location module.
- *
  * - $fasttoggle_block_author: Link to toggle the author blocked/unblocked.
  *
  * - $troll_ban_author: Link to ban author via the Troll module.
 
  * Not working as of this writing but kept for future compatability:
- * - $user_relationships_api: Linked text "Add to <relationship>" or 
+ * - $user_relationships_api: Linked text "Add to <relationship>" or
  *   "Remove from <relationship>".
  * - $flag_friend: Linked text. Actual text depends on module settings.
 
@@ -113,13 +111,6 @@
       <?php if (!empty($user_badges)): ?>
         <div class="author-pane-line author-badges">
           <?php print $user_badges; ?>
-        </div>
-      <?php endif; ?>
-
-      <?php /* Location */ ?>
-      <?php if (!empty($location_user_location)): ?>
-        <div class="author-pane-line author-location">
-          <?php print $location_user_location;  ?>
         </div>
       <?php endif; ?>
 

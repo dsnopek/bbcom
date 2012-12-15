@@ -1,5 +1,9 @@
 <?php
-// $Id: l10n_update.api.php,v 1.1.2.1 2010/09/16 08:08:49 jareyero Exp $
+
+/**
+ * @file
+ *   API documentation for Localize updater module.
+ */
 
 /**
  * Returns available translation servers and server definitions.
@@ -33,8 +37,8 @@ function hook_l10n_servers() {
  */
 function hook_l10n_update_projects_alter(&$projects) {
   // The $projects array contains the project data produced by
-  // update_get_projects(). A number of the array elements are described in the
-  // documentation of hook_update_projects_alter().
+  // update_get_projects(). A number of the array elements are described in
+  // the documentation of hook_update_projects_alter().
 
   // In the .info file of a project a localization server can be specified.
   // Using this hook the localization server specification can be altered or
@@ -45,6 +49,7 @@ function hook_l10n_update_projects_alter(&$projects) {
       'l10n server' => 'example.com',
       'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
       'l10n path' => 'http://example.com/files/translations/%core/%project/%project-%release.%language.po',
+    ),
   );
 
   // With this hook it is also possible to add a new project wich does not
@@ -59,5 +64,6 @@ function hook_l10n_update_projects_alter(&$projects) {
       'l10n server' => 'example.com',
       'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
       'l10n path' => 'http://example.com/files/translations/%core/%project/%project-%release.%language.po',
+    ),
   );
 }

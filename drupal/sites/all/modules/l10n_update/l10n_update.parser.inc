@@ -1,5 +1,5 @@
 <?php
-// $Id: l10n_update.parser.inc,v 1.4.2.1 2010/08/17 13:21:40 jareyero Exp $
+
 /**
  * @file
  * Extends the update parser to work with releases
@@ -33,7 +33,7 @@ function l10n_update_get_server($server) {
 
 /**
  * Fetch remote server metadata from a server URL
- * 
+ *
  * @param unknown_type $server_url
  * @return unknown_type
  */
@@ -62,9 +62,9 @@ class l10n_update_xml_parser {
 
   /**
    * Parse an XML data file.
-   * 
+   *
    * It can contain information for one or more l10n_servers
-   * 
+   *
    * Example data, http://ftp.drupal.org/files/translations/l10n_server.xml
    */
   function parse($data) {

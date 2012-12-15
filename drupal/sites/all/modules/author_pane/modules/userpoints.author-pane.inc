@@ -13,10 +13,10 @@ function userpoints_preprocess_author_pane(&$variables) {
   if (!author_pane_run_preprocess('userpoints', $variables['caller'])) {
     return;
   }
-
+  global $user;
   $account_id = $variables['account']->uid;
 
-  if ($account_id != 0) {
+  if ($account_id != 0 && (user_access(USERPOINTS_PERM_VIEW) || ($user->uid == $account_id && user_access(USERPOINTS_PERM_VIEW_OWN)))) {
     // Implement static caching for cases where this Author Pane appears more
     // than once on a given page.
     static $cached_userpoints_points;

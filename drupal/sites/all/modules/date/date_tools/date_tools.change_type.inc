@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Code to change the type of a date.
+ */
 
 /**
  * A form to change the type of date used in date fields.
@@ -38,7 +42,7 @@ function date_tools_change_type_form() {
     '#required' => TRUE,
     '#description' => t('The type of date to change the field to.'),
     '#prefix' => '<strong>' . t('New type:') .'</strong>',
-  );  
+  );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Change'));
   return $form;
 }
@@ -94,13 +98,13 @@ function date_tools_change_type_form_submit($form, &$form_state) {
     return;
   }
 
-  // Replace old values with modified values, massaging the 
+  // Replace old values with modified values, massaging the
   // original values as necessary for the new type.
 
   require_once('./'. drupal_get_path('module', 'date_api') .'/date_api_sql.inc');
   $date_handler = new date_sql_handler();
   $date_handler->construct();
-  $date_handler->granularity = $field['granularity'];  
+  $date_handler->granularity = $field['granularity'];
   $date_handler->date_type = $old_type;
 
   $new_columns = array();
@@ -115,7 +119,7 @@ function date_tools_change_type_form_submit($form, &$form_state) {
     if ($column != 'value' && $column != 'value2') {
       continue;
     }
-    $old_columns[] = $info['column'];   
+    $old_columns[] = $info['column'];
     $db_field = $date_handler->sql_field($temp_table . '.' . $info['column'], 0);
     switch ($old_type) {
       case 'date':
@@ -145,16 +149,16 @@ function date_tools_change_type_form_submit($form, &$form_state) {
             break;
           case 'datestamp':
             $new_columns[] = $date_handler->sql_format('U', $db_field) . ' AS ' . $info['column'];
-            break;  
+            break;
         }
-        break;  
+        break;
     }
   }
 
   // Make sure database timezone is set to UTC.
   $date_handler->set_db_timezone();
 
-  // Make the replacement.  
+  // Make the replacement.
   $sql = 'REPLACE INTO {'. $table .'} ('. implode(', ', $old_columns) .') '.
     ' SELECT '. implode(', ', $new_columns) .' FROM {'. $temp_table .'}';
   db_query($sql);

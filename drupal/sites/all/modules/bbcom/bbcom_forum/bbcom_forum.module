@@ -2,3 +2,30 @@
 
 include_once('bbcom_forum.features.inc');
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Sets a default subject for comments on the forum - it's the parent comment or node title plus 'Re: '.
+ */
+function bbcom_forum_form_comment_form_alter(&$form, &$form_state, $form_id) {
+  $node = node_load($form['nid']['#value']);
+  if ($node->type == 'forum' && empty($form['cid']['#value'])) {
+    if (!empty($form['pid']['#value'])) {
+      $parent = _comment_load($form['pid']['#value']);
+      $parent_title = $parent->subject;
+    }
+    else {
+      $parent_title = $node->title;
+    }
+
+    $re = t('Re: ');
+    $re_len = drupal_strlen($re);
+    if (drupal_substr($parent_title, 0, $re_len) == $re) {
+      $form['subject']['#default_value'] = $parent_title;
+    }
+    else {
+      $form['subject']['#default_value'] = $re . $parent_title;
+    }
+  }
+}
+

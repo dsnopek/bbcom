@@ -1,0 +1,14 @@
+diff --git a/drupal/sites/all/modules/imagecache/imagecache.module b/drupal/sites/all/modules/imagecache/imagecache.module
+index 55d48ce..9dd7e7a 100644
+--- a/drupal/sites/all/modules/imagecache/imagecache.module
++++ b/drupal/sites/all/modules/imagecache/imagecache.module
+@@ -86,7 +86,8 @@ function imagecache_menu() {
+  * Menu access callback for public file transfers.
+  */
+ function _imagecache_menu_access_public_files() {
+-  return (FILE_DOWNLOADS_PUBLIC == variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC));
++  //return (FILE_DOWNLOADS_PUBLIC == variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC));
++  return TRUE;
+ }
+ 
+ /**

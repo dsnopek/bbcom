@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.4.1 2011/01/11 04:45:27 davereid Exp $
 ABOUT
 
 The autoload module is a utility module.  It allows other modules to leverage

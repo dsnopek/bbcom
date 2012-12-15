@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.1.2.1 2010/09/16 08:08:49 jareyero Exp $
 
 Localization Update
 -------------------
@@ -30,7 +29,7 @@ Installation
     Administer > Site building > Translate interface > Update
 
   Update configuration settings can be found at
-    Administer > Site configuration > Languages > Configure
+    Administer > Site configuration > Languages > Translation updates
 
 Translating Drupal core, modules and themes
 -------------------------------------------
@@ -45,8 +44,8 @@ Translating Drupal core, modules and themes
   Using cron translations may be updated regularly. Depending on setting updates
   are performed daily or weekly.
 
-  Changes to translations made locally using the site's build in translation 
-  interface (Administer > Site building > Translate interface > Search) and 
+  Changes to translations made locally using the site's build in translation
+  interface (Administer > Site building > Translate interface > Search) and
   changes made using the localization client module are marked. Using the
   'Update mode' setting the locally edited string can be kept and not
   overwritten by translation updates.
@@ -71,7 +70,7 @@ API
   Using hook_l10n_servers the l10n update module can be extended to use other
   translation repositories. Which is usefull for organisations who maintain
   their own translation.
-  
+
   Using hook_l10n_update_projects_alter modules can alter or specify the
   translation repositories on a per module basis.
 
@@ -80,4 +79,4 @@ API
 Maintainers
 -----------
   Jose Reyero
-  G�bor Hojtsy
+  Gábor Hojtsy
