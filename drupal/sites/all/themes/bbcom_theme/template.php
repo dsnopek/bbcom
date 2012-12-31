@@ -317,6 +317,10 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
     // TODO: replace this with context_layouts
     $vars['always_right'] = FALSE;
   }
+  elseif (in_array($_GET['q'], array('node/4509', 'node/4510'))) {
+    // TODO: replace this with context_layouts
+    $vars['always_right'] = FALSE;
+  }
 
   // disable breadcrumbs everywhere except the forum
   if (!module_exists('context') || !context_isset('context', 'bbcom-section-forum')) {
