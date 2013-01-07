@@ -183,3 +183,24 @@
 	width: 640px;
 }
 
+/**
+ * Testimonials.
+ */
+
+.testimonial blockquote {
+  background-color: #E7E7E7;
+  padding: .5em;
+  margin-bottom: 1em;
+}
+
+.testimonial blockquote p {
+  margin: 0;
+  padding: .5em;
+  font-style: italic;
+}
+
+.testimonial p.signature {
+  font-weight: bold;
+  padding-left: 3em;
+}
+
