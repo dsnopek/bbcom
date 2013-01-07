@@ -411,7 +411,7 @@ function bbcom_theme_preprocess_node_profile(&$vars, $hook) {
 
 function bbcom_theme_preprocess_node_page(&$vars, $hook) {
   // disable our default, of always including space for a right sidebar
-  $vars['always_right'] = FALSE;
+  //$vars['always_right'] = FALSE;
   // put the title on the inside
   $vars['inner_title'] = TRUE;
 }
