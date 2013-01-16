@@ -6,19 +6,24 @@
 function bbcom_content_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: primary-links:content
-  $menu_links['primary-links:content'] = array(
+  // Exported menu link: primary-links:content/all
+  $menu_links['primary-links:content/all'] = array(
     'menu_name' => 'primary-links',
-    'link_path' => 'content',
-    'router_path' => 'content',
+    'link_path' => 'content/all',
+    'router_path' => 'content/all',
     'link_title' => 'Library',
-    'options' => array(),
-    'module' => 'system',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+      'alter' => TRUE,
+    ),
+    'module' => 'menu',
     'hidden' => '0',
     'external' => '0',
     'has_children' => '0',
     'expanded' => '0',
-    'weight' => '-50',
+    'weight' => '-48',
   );
   // Translatables
   // Included for use with string extractors like potx.

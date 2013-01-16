@@ -24,6 +24,7 @@ function bbcom_content_context_default_contexts() {
     'path' => array(
       'values' => array(
         'content' => 'content',
+        'content/*' => 'content/*',
         'node/*/annotate' => 'node/*/annotate',
         'content/search' => 'content/search',
       ),
@@ -69,7 +70,7 @@ function bbcom_content_context_default_contexts() {
         ),
       ),
     ),
-    'menu' => 'content',
+    'menu' => 'content/all',
   );
   $context->condition_mode = 0;
 

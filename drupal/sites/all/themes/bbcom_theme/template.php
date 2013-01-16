@@ -266,7 +266,7 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   $vars['head'] .= '<meta name="viewport" content="width=960; initial-scale=1.0" />';
 
   // set some defaults to get rid of PHP warnings
-  $vars['node'] = $vars['lang_spec'] = $vars['post_title'] = $vars['tabs2'] = NULL;
+  $vars['lang_spec'] = $vars['post_title'] = $vars['tabs2'] = NULL;
 
   if (isset($vars['node'])) {
     $func = 'bbcom_theme_preprocess_node_'. $vars['node']->type;
@@ -314,6 +314,10 @@ function bbcom_theme_preprocess_page(&$vars, $hook) {
   //if ($_GET['q'] == 'about' || context_get('bbcom', 'section') == 'forum') {
   //if (preg_match('/^user\/\d+/', $_GET['q']) || context_isset('context', 'bbcom-section-forum')) {
   if (module_exists('context') && (context_isset('context', 'bbcom-section-forum') || context_isset('context', 'bbcom-section-support'))) {
+    // TODO: replace this with context_layouts
+    $vars['always_right'] = FALSE;
+  }
+  elseif (in_array($_GET['q'], array('node/4509', 'node/4510'))) {
     // TODO: replace this with context_layouts
     $vars['always_right'] = FALSE;
   }
@@ -407,7 +411,7 @@ function bbcom_theme_preprocess_node_profile(&$vars, $hook) {
 
 function bbcom_theme_preprocess_node_page(&$vars, $hook) {
   // disable our default, of always including space for a right sidebar
-  $vars['always_right'] = FALSE;
+  //$vars['always_right'] = FALSE;
   // put the title on the inside
   $vars['inner_title'] = TRUE;
 }
