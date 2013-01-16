@@ -21,11 +21,14 @@ function bbcom_forum_form_comment_form_alter(&$form, &$form_state, $form_id) {
     $re = t('Re: ');
     $re_len = drupal_strlen($re);
     if (drupal_substr($parent_title, 0, $re_len) == $re) {
-      $form['subject']['#default_value'] = $parent_title;
+      $subject = $parent_title;
     }
     else {
-      $form['subject']['#default_value'] = $re . $parent_title;
+      $subject = $re . $parent_title;
     }
+
+    $size = isset($form['subject']['#size']) ? $form['subject']['size'] : 64;
+    $form['subject']['#default_value'] = drupal_substr($subject, 0, $size);
   }
 }
 
