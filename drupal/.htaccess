@@ -142,6 +142,9 @@ DirectoryIndex index.php
   # Our film redirect
   RewriteRule ^filmik$ http://www.youtube.com/watch?v=wouvM5T8c4A [L,R=307]
 
+  # rewrite old files directory
+  RewriteRule ^sites/default/files/(.*)$ sites/bibliobird.com/files/$1 [L,R=301]
+
   # Rewrite URLs of the form 'x' to the form 'index.php?q=x'.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
