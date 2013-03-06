@@ -528,6 +528,48 @@ function bbcom_theme_form_element($element, $value) {
   return $output;
 }
 
+/**
+ * Theme function for the 'generic' single file formatter.
+ *
+ * Copied and then modified to do targe="_blank" for mp3's.
+ */
+function bbcom_theme_filefield_file($file) {
+  // Views may call this function with a NULL value, return an empty string.
+  if (empty($file['fid'])) {
+    return '';
+  }
+
+  $path = $file['filepath'];
+  $url = file_create_url($path);
+  $icon = theme('filefield_icon', $file);
+
+  // Set options as per anchor format described at
+  // http://microformats.org/wiki/file-format-examples
+  // TODO: Possibly move to until I move to the more complex format described 
+  // at http://darrelopry.com/story/microformats-and-media-rfc-if-you-js-or-css
+  $options = array(
+    'attributes' => array(
+      'type' => $file['filemime'] . '; length=' . $file['filesize'],
+    ),
+  );
+
+  // DRS: Our hack for the iPad! It will open the link in a new tab, so they can listen
+  // and read.
+  if (in_array($file['filemime'], array('audio/mp3', 'audio/mpeg'))) {
+    $options['attributes']['target'] = '_blank';
+  }
+
+  // Use the description as the link text if available.
+  if (empty($file['data']['description'])) {
+    $link_text = $file['filename'];
+  }
+  else {
+    $link_text = $file['data']['description'];
+    $options['attributes']['title'] = $file['filename'];
+  }
+
+  return '<div class="filefield-file">'. $icon . l($link_text, $url, $options) .'</div>';
+}
 /*
  * Helper function for using in tpl.php files for rendering form elements without titles.
  */
@@ -542,4 +584,5 @@ function bbcom_render_no_title(&$element) {
   unset($element['value']['#title']);
   return drupal_render($element);
 }
+
 
