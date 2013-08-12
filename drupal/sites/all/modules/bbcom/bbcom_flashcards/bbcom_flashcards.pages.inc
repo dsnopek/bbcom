@@ -67,14 +67,13 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       $opts = bbcom_flashcards_anki_server_connect()
         ->openWialDeck($form['#user']->uid)
         ->getOptions();
+
+      // TODO: reset and get counts
     }
     catch (AnkiServerException $e) {
       _bbcom_flashcards_error($e);
       return $form;
     }
-
-    jquery_ui_add('ui.tabs');
-    drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/jquery-ui.css');
 
     $form['message'] = array(
       '#value' => '<div class="bbcom-important-message">' . t('You can also review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="http://www.youtube.com/watch?v=juqB3fPFcuM" target="_blank">Watch this video</a> to learn how to install Anki and configure it to communicate with BiblioBird.') . '</div>',
@@ -84,83 +83,34 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       '#tree' => TRUE,
     );
 
-    // generate some stuff for each tab
-    $tabs_list = array(
-      'new-cards' => t('New cards'),
-      'reviews' => t('Reviews'),
-    );
-    $tabs = '<ul>';
-    foreach ($tabs_list as $tab_id => $tab) {
-      $tabs .= '<li><a href="#tab-' . $tab_id . '">' . $tab . '</a></li>';
-      $form['study_options'][str_replace('-', '_', $tab_id)] = array(
-        '#type' => 'fieldset',
-        '#title' => $tabs_list['new-cards'],
-        '#prefix' => '<div id="tab-' . $tab_id . '">',
-        '#suffix' => '</div>',
-      );
-    }
-    $tabs .= '</ul>';
-
-    // setup the tabs html and wrap the whole thing
-    $form['study_options']['#prefix'] = '<h2>' . t('Study Options') . '</h2>' .
-      '<div id="bibliobird-flashcards-study-options">' . $tabs;
-      #'<div id="bibliobird-flashcards-study-options"><div id="bibliobird-flashcards-study-options-tabs">' . $tabs . '</div>';
-    $form['study_options']['#suffix'] = '</div>';
-
-    // New cards
-    $form['study_options']['new_cards']['cards_per_day'] = array(
-      '#type' => 'textfield',
-      '#title' => t('New cards per day'),
-      '#default_value' => $opts->new_cards->cards_per_day,
-    );
-    $form['study_options']['new_cards']['order'] = array(
+    $form['study_options']['type'] = array(
       '#type' => 'select',
-      '#title' => t('Display order'),
+      '#title' => t('Type'),
       '#options' => array(
-        0 => t('Show new cards in random order'),
-        1 => t('Show new cards in order added'),
-        2 => t('Show new cards in reverse order added'),
+        // somehow explain that this is today's daily study regimin
+        'normal' => t('Normal'),
+        'cram'   => t('Cram'),
       ),
-      '#default_value' => $opts->new_cards->order,
-    );
-    $form['study_options']['new_cards']['spacing'] = array(
-      '#type' => 'select',
-      '#options' => array(
-        0 => t('Spread new cards out through reviews'),
-        1 => t('Show new cards after all other cards'),
-        2 => t('Show new cards before reviews'),
-      ),
-      '#default_value' => $opts->new_cards->spacing,
     );
 
-    // Reviews
-    $form['study_options']['reviews']['failed_card_max'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Max failed cards'),
-      '#default_value' => $opts->reviews->failed_card_max,
+    $form['study_options']['new_cards'] = array(
+      '#type' => 'item',
+      '#title' => t('New cards'),
+      '#value' => 0,
     );
-    $form['study_options']['reviews']['order'] = array(
-      '#type' => 'select',
-      '#title' => t('Display order'),
-      '#options' => array(
-        0 => t('Review cards from largest interval'),
-        1 => t('Review cards from smallest interval'),
-        2 => t('Review cards in order due'),
-        3 => t('Review cards in random order'),
-      ),
-      '#default_value' => $opts->reviews->order,
+
+    $form['study_options']['learning_cards'] = array(
+      '#type' => 'item',
+      '#title' => t('Learning cards'),
+      '#value' => 0,
     );
-    $form['study_options']['reviews']['failed_policy'] = array(
-      '#type' => 'select',
-      '#options' => array(
-        0 => t('Show failed cards soon'),
-        1 => t('Show failed cards at end'),
-        2 => t('Show failed cards in 10 minutes'),
-        3 => t('Show failed cards in 8 hours'),
-        4 => t('Show failed cards in 3 days'),
-      ),
-      '#default_value' => $opts->reviews->failed_policy,
+
+    $form['study_options']['review_cards'] = array(
+      '#type' => 'item',
+      '#title' => t('Review cards'),
+      '#value' => 0,
     );
+
 
     $form['start_quiz'] = array(
       '#type' => 'submit',
