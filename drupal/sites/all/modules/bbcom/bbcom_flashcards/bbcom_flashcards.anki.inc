@@ -94,28 +94,20 @@ class AnkiServer {
   // TODO: should we provide convenience functions we the names and normal arguments?
   // I'm not aware of an automatic way to do it, so my inclination is to let it be.
   function request($path, $func, $args=array()) {
-    require_once('HTTP/Request2.php');
+    $url = 'http://'. $this->url .'/'. $path .'/'. $func;
+    $headers = array('Content-Type', 'application/json');
 
-    $req = new HTTP_Request2('http://'. $this->url .'/'. $path .'/'. $func, HTTP_Request2::METHOD_POST);
-    $req->setHeader('Content-Type', 'application/json');
-    $req->setBody(json_encode((object)$args));
+    $resp = drupal_http_request($url, $headers, 'POST', json_encode((object)$args));
 
-    try {
-      $res = $req->send();
-    }
-    catch (HTTP_Request2_Exception $e) {
-      throw new AnkiServerException($e->getMessage());
+    if ($resp->code != 200) {
+      throw new AnkiServerException($resp->data);
     }
 
-    if ($res->getStatus() >= 300) {
-      throw new AnkiServerException($res->getBody());
+    if ($resp->headers['Content-Type'] == 'application/json') {
+      return json_decode($resp->data);
     }
 
-    if ($res->getHeader('Content-Type') == 'application/json') {
-      return json_decode($res->getBody());
-    }
-
-    return $res->getBody();
+    return $resp->data;
   }
 
   function openDeck($path) {
