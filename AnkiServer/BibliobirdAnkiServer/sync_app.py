@@ -18,6 +18,24 @@ class BibliobirdSyncApp(SyncApp):
         # get SQL statements
         self.sql_check_password = kw.get('sql_check_password')
         self.sql_username2dirname = kw.get('sql_username2dirname')
+    
+    def _connect_mysql(self):
+        if self.conn is None and len(self.mysql_args) > 0:
+            self.conn = MySQLdb.connect(**self.mysql_args)
+
+    def _execute_sql(self, sql, args=()):
+        self._connect_mysql()
+        try:
+            cur = self.conn.cursor()
+            cur.execute(sql, args)
+        except MySQLdb.OperationalError, e:
+            if e.args[0] == 2006:
+                # MySQL server has gone away message
+                self.conn = None
+                self._connect_mysql()
+                cur = self.conn.cursor()
+                cur.execute(sql, args)
+        return cur
 
     def authenticate(self, username, password):
         if len(self.mysql_args) > 0 and self.sql_check_password is not None:
