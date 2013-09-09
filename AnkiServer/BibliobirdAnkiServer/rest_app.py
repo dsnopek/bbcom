@@ -7,8 +7,12 @@ def setup_new_collection(col):
     """Create the 'External' model used by Bibliobird.com."""
     mm = col.models
 
+    # NOTE: Supposedly, Anki will check the first field on any model
+    # for uniqueness. Since it's really important to us that the 'External ID'
+    # is unique, we're giving that one first!
+
     m = mm.new('External')
-    for field_name in ['Front', 'Back', 'External ID']:
+    for field_name in ['External ID', 'Front', 'Back']:
         fm = mm.newField(field_name)
         mm.addField(m, fm)
 

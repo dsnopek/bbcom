@@ -2,7 +2,7 @@
 
 class AnkiServerException extends Exception { }
 
-class AnkiDeck {
+class AnkiCollection {
   public $server;
   public $deck;
 
@@ -12,46 +12,76 @@ class AnkiDeck {
   }
 
   function setup() {
-    return $this->server->request($this->path, 'setup', array());
+    // NOTE: This is done automatically now, so this a non-OP!
   }
 
-  function addFact($fields) {
-    return $this->server->request($this->path, 'add_fact', array(
-      'fields' => $fields
-    ));
+  function addNote($note) {
+    return $this->server->request($this->path, 'add_note', $note);
   }
 
-  function addFactForNode($node) {
-    return $this->addFact(array(
+  function updateNote($note) {
+    return $this->server->request($this->path, "note/{$note['id']}/update", $note);
+  }
+
+  function addNoteForNode($node) {
+    $note = $this->findNoteForNode($node);
+    $new = is_null($note);
+
+    if ($new) {
+      $note = array(
+        'model' => 'External',
+        'fields' => array(
+          'External ID' => LingwoEntry::fromNode($node)->getLingwoId(),
+        ),
+      );
+    }
+
+    // Update / set the fields
+    $note['fields'] = array_merge($note['fields'], array(
       'Front' => theme('bbcom_flashcards_flashcard_front', $node),
       'Back'  => theme('bbcom_flashcards_flashcard_back', $node),
-      'External ID' => LingwoEntry::fromNode($node)->getLingwoId(),
     ));
-  }
 
-  function findFactForNode($node) {
-    return $this->server->request($this->path, 'find_fact', array(
-      'external_id' => LingwoEntry::fromNode($node)->getLingwoId(),
-    ));
-    if (empty($fact)) {
-      throw new AnkiServerError("Unable to find fact for node");
+    if ($new) {
+      return $this->addNote($note);
+    }
+    else {
+      return $this->updateNote($note);
     }
   }
 
-  function deleteFact($fact) {
-    return $this->server->request($this->path, 'delete_fact', array(
-      'fact_id' => $fact->id,
+  function findNoteForNode($node, $preload = TRUE) {
+    $lingwo_id = LingwoEntry::fromNode($node)->getLingwoId();
+    $query = '"External ID":"' . $lingwo_id . '"';
+    $result = $this->server->request($this->path, 'find_notes', array(
+      'query' => $query,
+      'preload' => $preload,
     ));
+
+    if (count($result) > 1) {
+      watchdog('bbcom_flashcards', "Duplicate notes for $lingwo_id in collection $this->path");
+    }
+
+    if (count($result) == 0) {
+      return NULL;
+    }
+
+    return $result[0];
   }
 
-  function deleteFactForNode($node) {
-    return $this->server->request($this->path, 'delete_fact', array(
-      'external_id' => LingwoEntry::fromNode($node)->getLingwoId(),
-    ));
+  function deleteNote($note) {
+    return $this->server->request($this->path, "note/{$note['id']}/delete", array());
   }
 
-  function resyncFacts($ids) {
-    return $this->server->request($this->path, 'resync_facts', array(
+  function deleteNoteForNode($node) {
+    $note = $this->findNoteForNode($node);
+    if ($note) {
+      return $this->deleteNote($note);
+    }
+  }
+
+  function resyncNotes($ids) {
+    return $this->server->request($this->path, 'resync_notes', array(
       'external_ids' => $ids,
     ));
   }
@@ -94,7 +124,7 @@ class AnkiServer {
   // TODO: should we provide convenience functions we the names and normal arguments?
   // I'm not aware of an automatic way to do it, so my inclination is to let it be.
   function request($path, $func, $args=array()) {
-    $url = 'http://'. $this->url .'/'. $path .'/'. $func;
+    $url = 'http://' . $this->url . '/' . $path . '/' . $func;
     $headers = array('Content-Type', 'application/json');
 
     $resp = drupal_http_request($url, $headers, 'POST', json_encode((object)$args));
@@ -103,19 +133,12 @@ class AnkiServer {
       throw new AnkiServerException($resp->data);
     }
 
-    if ($resp->headers['Content-Type'] == 'application/json') {
-      return json_decode($resp->data);
-    }
-
-    return $resp->data;
+    return json_decode($resp->data, TRUE);
   }
 
-  function openDeck($path) {
-    return new AnkiDeck($this, $path);
+  function openCollection($path) {
+    return new AnkiCollection($this, $path);
   }
 
-  function openWialDeck($uid) {
-    return $this->openDeck("$uid/bibliobird.anki");
-  }
 }
 

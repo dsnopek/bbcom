@@ -110,7 +110,7 @@ function bbcom_flashcards_user($op, &$edit, &$account, $category=NULL) {
     try {
       // create the WIAL deck for all new users
       bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($account->uid)
+        ->openCollection($account->uid)
         ->setup();
     }
     catch (AnkiServerException $e) {
@@ -128,8 +128,8 @@ function bbcom_flashcards_action_add_to_wial_deck($node, $user) {
   if ($node->type == 'entry' && _lingwo_is_translation($node)) {
     try {
       bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($user->uid)
-        ->addFactForNode($node);
+        ->openCollection($user->uid)
+        ->addNoteForNode($node);
     }
     catch (AnkiServerException $e) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
@@ -142,9 +142,8 @@ function bbcom_flashcards_action_remove_from_wial_deck($node, $user) {
   if ($node->type == 'entry' && _lingwo_is_translation($node)) {
     try {
       $deck = bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($user->uid);
-      #$deck->deleteFact($deck->findFactForNode($node));
-      $deck->deleteFactForNode($node);
+        ->openCollection($user->uid);
+      $deck->deleteNoteForNode($node);
     }
     catch (AnkiServerException $e) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
@@ -167,12 +166,12 @@ function bbcom_flashcards_user_operations_resync($accounts) {
       $ids[] = "$obj->slang-$obj->tlang/$obj->headword($obj->pos)";
     }
 
-    // call resyncFacts and so the AnkiServer can tell us which flashcards
+    // call resyncNotes and so the AnkiServer can tell us which flashcards
     // are missing that we should add
     try {
       $deck = bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($uid);
-      $res = $deck->resyncFacts($ids);
+        ->openCollection($uid);
+      $res = $deck->resyncNotes($ids);
     }
     catch (AnkiServerException $e) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
@@ -187,7 +186,7 @@ function bbcom_flashcards_user_operations_resync($accounts) {
       $entry = LingwoEntry::fromLingwoId($id);
       if (_lingwo_is_translation($entry->getNode())) {
         try {
-          $deck->addFactForNode($entry->getNode());
+          $deck->addNoteForNode($entry->getNode());
         }
         catch (AnkiServerException $e) {
           watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
@@ -212,7 +211,7 @@ function bbcom_flashcards_anki_server_connect() {
 
 function bbcom_flashcards_anki_server_url($value = NULL) {
   if (is_null($value)) {
-    return variable_get('bbcom_flashcards_anki_server_url', 'localhost:27701/decks');
+    return variable_get('bbcom_flashcards_anki_server_url', 'localhost:27701/collection');
   }
   variable_set('bbcom_flashcards_anki_server_url', $value);
 }
