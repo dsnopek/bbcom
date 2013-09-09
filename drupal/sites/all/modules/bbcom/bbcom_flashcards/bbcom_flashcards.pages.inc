@@ -8,7 +8,7 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
   }
 
   if (!empty($card)) {
-    if (!$card->finished) {
+    if (!$card['finished']) {
       $form['card'] = array(
         '#prefix' => '<div id="bibliobird-flashcards-flashcard"><center>',
         '#suffix' => '</center></div>',
@@ -16,29 +16,23 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       $form['card']['question'] = array(
         '#prefix' => '<div id="bibliobird-flashcards-flashcard-question">',
         '#suffix' => '</div>',
-        '#value' => $card->question,
+        '#value' => $card['question'],
       );
       $form['card']['answer'] = array(
         '#prefix' => '<div id="bibliobird-flashcards-flashcard-answer">',
         '#suffix' => '</div>',
-        '#value' => $card->answer,
+        '#value' => $card['answer'],
       );
 
       $form['ease_buttons'] = array(
         '#prefix' => '<div id="bibliobird-flashcards-ease-buttons">',
         '#suffix' => '</div>',
       );
-      $ease_list = array(
-        1 => 'Again (@time)',
-        2 => 'Hard (@time)',
-        3 => 'Good (@time)',
-        4 => 'Easy (@time)',
-      );
-      foreach ($ease_list as $id => $text) {
-        $form['ease_buttons']['ease_'. $id] = array(
+      foreach ($card['answer_buttons'] as $button) {
+        $form['ease_buttons']['ease_'. $button['ease']] = array(
           '#type' => 'submit',
-          '#value' => t($text, array('@time' => $card->intervals[$id-1])),
-          '#ease' => $id,
+          '#value' => t($button['label'] . ' (@time)', array('@time' => $button['interval_string'])),
+          '#ease' => $button['ease'],
         );
       }
     }
@@ -46,6 +40,7 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
       # If we are out of questions, we tell the user and let them reset the quiz,
       # if they want.
       $form['message'] = array(
+        // TODO: where do these come from?
         '#value' => theme('bbcom_flashcards_review_finished', $card->reviews_count, $card->new_count),
       );
       $form['learn_more'] = array(
@@ -64,9 +59,9 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
   }
   else {
     try {
-      $opts = bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($form['#user']->uid)
-        ->getOptions();
+      $counts = bbcom_flashcards_anki_server_connect()
+        ->openCollection($form['#user']->uid)
+        ->resetScheduler();
 
       // TODO: reset and get counts
     }
@@ -126,7 +121,7 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
 
 function _bbcom_flashcards_error($e) {
   watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-  drupal_set_message(t('Unable to open flashcard deck.  Sorry for the inconvenience!  Please try again later.'), 'error');
+  drupal_set_message(t('Unable to open flashcard collection.  Sorry for the inconvenience!  Please try again later.'), 'error');
 }
 
 function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
@@ -143,27 +138,26 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
 
   # answer the current card and fetch the next one
   try {
-    $deck = bbcom_flashcards_anki_server_connect()
-      ->openWialDeck($form['#user']->uid);
+    $collection = bbcom_flashcards_anki_server_connect()
+      ->openCollection($form['#user']->uid);
 
     switch ($form_state['clicked_button']['#value']) {
       case t('Review'):
-        $deck->setOptions($form_state['values']['study_options']);
-        $deck->setupScheduler('standard');
+        $collection->resetScheduler('standard');
         break;
 
       case t('Learn more'):
-        $deck->setupScheduler('learnMore');
+        $collection->resetScheduler('learnMore');
         break;
 
       case t('Review early'):
-        $deck->setupScheduler('reviewEarly');
+        $collection->resetScheduler('reviewEarly');
         break;
     }
 
     // answer the last card
     if ($form['#card'] && $ease > 0) {
-      if (!$deck->answerCard($form['#card'], $ease)) {
+      if (!$collection->answerCard($form['#card']['id'], $ease, $form['#card']['timerStarted'])) {
         // return to the options screen and tell user their session has ended
         $form_state['rebuild'] = FALSE;
         drupal_set_message(t('Your session has ended.  Please start your review again.'), 'error');
@@ -172,7 +166,7 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
     }
 
     // get the next one
-    $form_state['card'] = $deck->getCard();
+    $form_state['card'] = $collection->getNextCard();
   }
   catch (AnkiServerException $e) {
     _bbcom_flashcards_error($e);
