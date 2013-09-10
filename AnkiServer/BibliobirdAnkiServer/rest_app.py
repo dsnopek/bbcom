@@ -73,9 +73,6 @@ class CollectionHandler(RestHandlerBase):
         # Remove all the notes on the remove list
         col.remNotes(remove)
 
-        print "remove: ", remove
-        print "missing: ", lookup.keys()
-
         # Return the missing list
         return {'missing': lookup.keys()}
 
