@@ -87,11 +87,20 @@ class AnkiCollection {
     ));
   }
 
-  function resetScheduler($type = 'standard') {
-    // TODO: How will we handle the review types?
-    return $this->server->request($this->name, 'reset_scheduler', array(
-      'deck' => 'bibliobird',
-    ));
+  function resetScheduler($type = 'normal', $options = array()) {
+    switch ($type) {
+      case 'normal':
+        return $this->server->request($this->name, 'reset_scheduler', array(
+          'deck' => 'bibliobird',
+        ));
+
+      case 'cram':
+        $this->server->request($this->name, 'create_dynamic_deck', array(
+          'query' => 'deck:"bibliobird"',
+          'count' => !empty($options['dyn_cards']) ? $options['dyn_cards'] : 20,
+        ));
+        return array();
+    }
   }
 
   function getNextCard() {
@@ -102,7 +111,7 @@ class AnkiCollection {
 
   function answerCard($card_id, $ease, $timer_started = NULL) {
     return $this->server->request($this->name, 'answer_card', array(
-      'id' => $card->id,
+      'id' => $card_id,
       'ease' => $ease,
       'timerStarted' => $timer_started,
     ));

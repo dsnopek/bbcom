@@ -3,20 +3,26 @@
   margin: 20px 0;
 }
 
+.bibliobird-flashcards-study-options-normal {
+  display: block;
+}
+.bibliobird-flashcards-study-options-cram {
+  display: none;
+}
+
 #bibliobird-flashcards-flashcard {
   padding: 25px 0;
   font-size: 14pt;
 }
 
-#bibliobird-flashcards-flashcard-question {
-  padding: 10px 0 20px 0;
-  margin-bottom: 10px;
-  border-bottom: 1px solid black;
+#bibliobird-flashcards-flashcard-question,
+#bibliobird-flashcards-flashcard-answer {
+  padding: 10px 0 10px 0;
+  min-height: 200px;
 }
 
 #bibliobird-flashcards-flashcard-answer {
-  visibility: hidden;
-  padding: 10px 0;
+  display: none;
 }
 
 #bibliobird-flashcards-ease-buttons {
