@@ -180,7 +180,7 @@ function bbcom_flashcards_user_operations_resync($accounts) {
     }
 
     // add all the missing cards!
-    //foreach ($res->missing as $id) {
+    //foreach ($res['missing'] as $id) {
     // TODO: should only mess with missing, but for now we readd everything
     foreach ($ids as $id) {
       $entry = LingwoEntry::fromLingwoId($id);

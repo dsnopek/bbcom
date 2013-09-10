@@ -80,7 +80,6 @@ class AnkiCollection {
     }
   }
 
-  // TODO: We need to implement this!
   function resyncNotes($ids) {
     return $this->server->request($this->name, 'resync_notes', array(
       'external_ids' => $ids,
