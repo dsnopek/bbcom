@@ -53,7 +53,7 @@ def migrate_users_decks(src, dst):
 
     # loop over all the Anki1 decks, importing them
     for deck_path in glob.glob(os.path.join(src, '*.anki')):
-        importer = Anki1Importer(col, deck_path)
+        importer = Anki1Importer(col, deck_path.decode('utf-8'))
         importer.run()
 
     col.close()
