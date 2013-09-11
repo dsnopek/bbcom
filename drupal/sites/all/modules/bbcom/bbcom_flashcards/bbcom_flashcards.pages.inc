@@ -151,8 +151,24 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
       ->openCollection($form['#user']->uid);
 
     if ($form_state['clicked_button']['#value'] == t('Review')) {
-      $study_options = $form_state['storage']['study_options'] = $form_state['values']['study_options'];
-      $collection->resetScheduler($study_options['type'], $study_options);
+      $study_options = $form_state['values']['study_options'];
+
+      try {
+        $collection->resetScheduler($study_options['type'], $study_options);
+      }
+      catch (AnkiServerException $e) {
+        if (strpos($e->getMessage(), 'No cards matched the criteria you provided') !== FALSE) {
+          drupal_set_message(t("You have no cards to review! Please add some words to your \"Words I am Learning\" list."), 'warning');
+          return;
+        }
+        else {
+          throw $e;
+        }
+      }
+
+      // only set once we're sure that the $collection->resetScheduler(...)
+      // worked.
+      $form_state['storage']['study_options'] = $study_options;
     }
 
     // answer the last card
