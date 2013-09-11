@@ -1,6 +1,8 @@
 <?php
 
 function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
+  global $language;
+
   $form['#user'] = $account;
   $card = !empty($form_state['storage']['card']) ? $form_state['storage']['card'] : NULL;
   if ($card) {
@@ -41,18 +43,18 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     foreach ($card['answer_buttons'] as $button) {
       $form['ease_buttons']['ease_'. $button['ease']] = array(
         '#type' => 'submit',
-        '#value' => t($button['label'] . ' (!time)', array('!time' => $button['string_interval'])),
+        '#value' => $button['string_label'] . ' (' . $button['string_interval'] . ')',
         '#ease' => $button['ease'],
       );
     }
   }
   else {
     try {
-      $counts = bbcom_flashcards_anki_server_connect()
-        ->openCollection($form['#user']->uid)
-        ->resetScheduler();
+      $collection = bbcom_flashcards_anki_server_connect()
+        ->openCollection($form['#user']->uid);
 
-      // TODO: reset and get counts
+      $collection->setLanguage($language->language);
+      $counts = $collection->resetScheduler();
     }
     catch (AnkiServerException $e) {
       _bbcom_flashcards_error($e);

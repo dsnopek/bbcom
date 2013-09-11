@@ -102,6 +102,12 @@ class AnkiCollection {
     }
   }
 
+  function setLanguage($code) {
+    return $this->server->request($this->name, 'set_language', array(
+      'code' => $code,
+    ));
+  }
+
   function getNextCard() {
     return $this->server->request($this->name, 'next_card', array(
       'load_note' => TRUE,
