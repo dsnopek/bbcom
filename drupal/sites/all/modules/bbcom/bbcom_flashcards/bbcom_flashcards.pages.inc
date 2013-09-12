@@ -1,165 +1,119 @@
 <?php
 
 function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
+  global $language;
+
   $form['#user'] = $account;
-  $card = $form_state['card'];
+  $card = !empty($form_state['storage']['card']) ? $form_state['storage']['card'] : NULL;
   if ($card) {
     $form['#card'] = $card;
   }
 
-  if (!empty($card)) {
-    if (!$card->finished) {
-      $form['card'] = array(
-        '#prefix' => '<div id="bibliobird-flashcards-flashcard"><center>',
-        '#suffix' => '</center></div>',
-      );
-      $form['card']['question'] = array(
-        '#prefix' => '<div id="bibliobird-flashcards-flashcard-question">',
-        '#suffix' => '</div>',
-        '#value' => $card->question,
-      );
-      $form['card']['answer'] = array(
-        '#prefix' => '<div id="bibliobird-flashcards-flashcard-answer">',
-        '#suffix' => '</div>',
-        '#value' => $card->answer,
-      );
+  if (!empty($form_state['storage']['finished'])) {
+    // clear out storage, so the next time we load this page, it'll start over
+    unset($form_state['storage']);
 
-      $form['ease_buttons'] = array(
-        '#prefix' => '<div id="bibliobird-flashcards-ease-buttons">',
-        '#suffix' => '</div>',
-      );
-      $ease_list = array(
-        1 => 'Again (@time)',
-        2 => 'Hard (@time)',
-        3 => 'Good (@time)',
-        4 => 'Easy (@time)',
-      );
-      foreach ($ease_list as $id => $text) {
-        $form['ease_buttons']['ease_'. $id] = array(
-          '#type' => 'submit',
-          '#value' => t($text, array('@time' => $card->intervals[$id-1])),
-          '#ease' => $id,
-        );
-      }
-    }
-    else {
-      # If we are out of questions, we tell the user and let them reset the quiz,
-      # if they want.
-      $form['message'] = array(
-        '#value' => theme('bbcom_flashcards_review_finished', $card->reviews_count, $card->new_count),
-      );
-      $form['learn_more'] = array(
+    // If we are out of questions, we tell the user and let them reset the quiz,
+    // if they want.
+    $form['message'] = array(
+      // TODO: we don't currently have a way to forecast tomorrows review
+      '#value' => theme('bbcom_flashcards_review_finished', NULL, NULL),
+    );
+  }
+  elseif (!empty($card)) {
+    $form['card'] = array(
+      '#prefix' => '<div id="bibliobird-flashcards-flashcard"><center>',
+      '#suffix' => '</center></div>',
+    );
+    $form['card']['question'] = array(
+      '#prefix' => '<div id="bibliobird-flashcards-flashcard-question">',
+      '#suffix' => '</div>',
+      '#value' => $card['question'],
+    );
+    $form['card']['answer'] = array(
+      '#prefix' => '<div id="bibliobird-flashcards-flashcard-answer">',
+      '#suffix' => '</div>',
+      '#value' => $card['answer'],
+    );
+
+    $form['ease_buttons'] = array(
+      '#prefix' => '<div id="bibliobird-flashcards-ease-buttons">',
+      '#suffix' => '</div>',
+    );
+    foreach ($card['answer_buttons'] as $button) {
+      $form['ease_buttons']['ease_'. $button['ease']] = array(
         '#type' => 'submit',
-        '#value' => t('Learn more'),
-      );
-      $form['review_early'] = array(
-        '#type' => 'submit',
-        '#value' => t('Review early'),
-      );
-      $form['finish'] = array(
-        '#type' => 'submit',
-        '#value' => t('Finish'),
+        '#value' => $button['string_label'] . ' (' . $button['string_interval'] . ')',
+        '#ease' => $button['ease'],
       );
     }
   }
   else {
     try {
-      $opts = bbcom_flashcards_anki_server_connect()
-        ->openWialDeck($form['#user']->uid)
-        ->getOptions();
+      $collection = bbcom_flashcards_anki_server_connect()
+        ->openCollection($form['#user']->uid);
+
+      $collection->setLanguage($language->language);
+      $counts = $collection->resetScheduler();
     }
     catch (AnkiServerException $e) {
       _bbcom_flashcards_error($e);
       return $form;
     }
 
-    jquery_ui_add('ui.tabs');
-    drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/jquery-ui.css');
+    $form['#original_counts'] = $counts;
+    $total_count = array_sum($counts);
 
     $form['message'] = array(
       '#value' => '<div class="bbcom-important-message">' . t('You can also review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="http://www.youtube.com/watch?v=juqB3fPFcuM" target="_blank">Watch this video</a> to learn how to install Anki and configure it to communicate with BiblioBird.') . '</div>',
     );
 
     $form['study_options'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Study options'),
       '#tree' => TRUE,
     );
 
-    // generate some stuff for each tab
-    $tabs_list = array(
-      'new-cards' => t('New cards'),
-      'reviews' => t('Reviews'),
+    $form['study_options']['type'] = array(
+      '#type' => 'select',
+      '#title' => t('Type'),
+      '#options' => array(
+        // somehow explain that this is today's daily study regimin
+        'normal' => t('Normal'),
+        'cram'   => t('Cram'),
+      ),
+      '#description' => t("<em>Normal</em> will show you the cards due for today. <em>Cram</em> will randomly select cards regardless of when they are due."),
     );
-    $tabs = '<ul>';
-    foreach ($tabs_list as $tab_id => $tab) {
-      $tabs .= '<li><a href="#tab-' . $tab_id . '">' . $tab . '</a></li>';
-      $form['study_options'][str_replace('-', '_', $tab_id)] = array(
-        '#type' => 'fieldset',
-        '#title' => $tabs_list['new-cards'],
-        '#prefix' => '<div id="tab-' . $tab_id . '">',
-        '#suffix' => '</div>',
-      );
+
+    // if there are no cards for review today, we remove the option to review
+    // for a 'normal' review
+    if ($total_count == 0) {
+      unset($form['study_options']['type']['#options']['normal']);
+      $form['study_options']['type']['#description'] = t('<strong>There are no cards ready to review today!</strong> But you can still do a <em>"cram session"</em> which will randomly select cards regardless of when they are due.');
     }
-    $tabs .= '</ul>';
 
-    // setup the tabs html and wrap the whole thing
-    $form['study_options']['#prefix'] = '<h2>' . t('Study Options') . '</h2>' .
-      '<div id="bibliobird-flashcards-study-options">' . $tabs;
-      #'<div id="bibliobird-flashcards-study-options"><div id="bibliobird-flashcards-study-options-tabs">' . $tabs . '</div>';
-    $form['study_options']['#suffix'] = '</div>';
+    $form['study_options']['new_cards'] = array(
+      '#prefix' => '<div class="bibliobird-flashcards-study-options-toggle bibliobird-flashcards-study-options-normal">',
+      '#suffix' => '</div>',
+      '#type' => 'item',
+      '#title' => t('New cards'),
+      '#value' => $counts['new_cards'],
+    );
 
-    // New cards
-    $form['study_options']['new_cards']['cards_per_day'] = array(
+    $form['study_options']['review_cards'] = array(
+      '#prefix' => '<div class="bibliobird-flashcards-study-options-toggle bibliobird-flashcards-study-options-normal">',
+      '#suffix' => '</div>',
+      '#type' => 'item',
+      '#title' => t('Review cards'),
+      '#value' => $counts['review_cards'],
+    );
+
+    $form['study_options']['dyn_cards'] = array(
+      '#prefix' => '<div class="bibliobird-flashcards-study-options-toggle bibliobird-flashcards-study-options-cram">',
+      '#suffix' => '</div>',
       '#type' => 'textfield',
-      '#title' => t('New cards per day'),
-      '#default_value' => $opts->new_cards->cards_per_day,
-    );
-    $form['study_options']['new_cards']['order'] = array(
-      '#type' => 'select',
-      '#title' => t('Display order'),
-      '#options' => array(
-        0 => t('Show new cards in random order'),
-        1 => t('Show new cards in order added'),
-        2 => t('Show new cards in reverse order added'),
-      ),
-      '#default_value' => $opts->new_cards->order,
-    );
-    $form['study_options']['new_cards']['spacing'] = array(
-      '#type' => 'select',
-      '#options' => array(
-        0 => t('Spread new cards out through reviews'),
-        1 => t('Show new cards after all other cards'),
-        2 => t('Show new cards before reviews'),
-      ),
-      '#default_value' => $opts->new_cards->spacing,
-    );
-
-    // Reviews
-    $form['study_options']['reviews']['failed_card_max'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Max failed cards'),
-      '#default_value' => $opts->reviews->failed_card_max,
-    );
-    $form['study_options']['reviews']['order'] = array(
-      '#type' => 'select',
-      '#title' => t('Display order'),
-      '#options' => array(
-        0 => t('Review cards from largest interval'),
-        1 => t('Review cards from smallest interval'),
-        2 => t('Review cards in order due'),
-        3 => t('Review cards in random order'),
-      ),
-      '#default_value' => $opts->reviews->order,
-    );
-    $form['study_options']['reviews']['failed_policy'] = array(
-      '#type' => 'select',
-      '#options' => array(
-        0 => t('Show failed cards soon'),
-        1 => t('Show failed cards at end'),
-        2 => t('Show failed cards in 10 minutes'),
-        3 => t('Show failed cards in 8 hours'),
-        4 => t('Show failed cards in 3 days'),
-      ),
-      '#default_value' => $opts->reviews->failed_policy,
+      '#title' => t('Number of cards'),
+      '#value' => 20,
     );
 
     $form['start_quiz'] = array(
@@ -176,7 +130,7 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
 
 function _bbcom_flashcards_error($e) {
   watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
-  drupal_set_message(t('Unable to open flashcard deck.  Sorry for the inconvenience!  Please try again later.'), 'error');
+  drupal_set_message(t('Unable to open flashcard collection.  Sorry for the inconvenience!  Please try again later.'), 'error');
 }
 
 function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
@@ -193,36 +147,53 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
 
   # answer the current card and fetch the next one
   try {
-    $deck = bbcom_flashcards_anki_server_connect()
-      ->openWialDeck($form['#user']->uid);
+    $collection = bbcom_flashcards_anki_server_connect()
+      ->openCollection($form['#user']->uid);
 
-    switch ($form_state['clicked_button']['#value']) {
-      case t('Review'):
-        $deck->setOptions($form_state['values']['study_options']);
-        $deck->setupScheduler('standard');
-        break;
+    if ($form_state['clicked_button']['#value'] == t('Review')) {
+      $study_options = $form_state['values']['study_options'];
 
-      case t('Learn more'):
-        $deck->setupScheduler('learnMore');
-        break;
+      try {
+        $collection->resetScheduler($study_options['type'], $study_options);
+      }
+      catch (AnkiServerException $e) {
+        if (strpos($e->getMessage(), 'No cards matched the criteria you provided') !== FALSE) {
+          drupal_set_message(t("You have no cards to review! Please add some words to your \"Words I am Learning\" list."), 'warning');
+          return;
+        }
+        else {
+          throw $e;
+        }
+      }
 
-      case t('Review early'):
-        $deck->setupScheduler('reviewEarly');
-        break;
+      // only set once we're sure that the $collection->resetScheduler(...)
+      // worked.
+      $form_state['storage']['study_options'] = $study_options;
     }
 
     // answer the last card
     if ($form['#card'] && $ease > 0) {
-      if (!$deck->answerCard($form['#card'], $ease)) {
-        // return to the options screen and tell user their session has ended
-        $form_state['rebuild'] = FALSE;
-        drupal_set_message(t('Your session has ended.  Please start your review again.'), 'error');
-        return;
-      }
+      $collection->answerCard($form['#card']['id'], $ease, $form['#card']['timerStarted']);
     }
 
     // get the next one
-    $form_state['card'] = $deck->getCard();
+    $form_state['storage']['card'] = $collection->getNextCard();
+
+    // if there is no card, then the session is over!
+    if (empty($form_state['storage']['card'])) {
+      $form_state['rebuild'] = FALSE;
+
+      if ($form_state['storage']['study_options']['type'] == 'normal') {
+        // show the 'finished' screen which explains that they have to come back
+        // tomorrow
+        $form_state['storage']['finished'] = TRUE;
+      }
+      else {
+        // however, in cram mode, we simply return the user to the beginning.
+        unset($form_state['storage']);
+        drupal_set_message(t('Your session has ended.  Please start your review again.'));
+      }
+    }
   }
   catch (AnkiServerException $e) {
     _bbcom_flashcards_error($e);
