@@ -65,7 +65,7 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     $total_count = array_sum($counts);
 
     $form['message'] = array(
-      '#value' => '<div class="bbcom-important-message">' . t('You can also review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="http://www.youtube.com/watch?v=juqB3fPFcuM" target="_blank">Watch this video</a> to learn how to install Anki and configure it to communicate with BiblioBird.') . '</div>',
+      '#value' => '<div class="bbcom-important-message">' . t('You can also review the "Words I Am Learning" as <strong>flashcards</strong> with <a href="http://www.ankisrs.net/" target="_blank">Anki</a> on your desktop!  <a href="https://en.bibliobird.com/node/16362" target="_blank">Read this article</a> to learn how to install Anki and configure it to communicate with BiblioBird.') . '</div>',
     );
 
     $form['study_options'] = array(
