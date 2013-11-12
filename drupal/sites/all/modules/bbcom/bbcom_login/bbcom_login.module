@@ -100,6 +100,28 @@ function bbcom_login_user_register_validate($form, &$form_state) {
   if (!empty($form_state['values']['url'])) {
     form_set_error('url', t('Please leave the URL field blank.  It is there to catch bots!'));
   }
+
+  # Check the user name.
+  if ($error = bbcom_login_check_user_name($form_state['values']['name'])) {
+    form_set_error('name', $error);
+  }
+}
+
+function bbcom_login_check_user_name($name) {
+  if (strlen($name) < 4 || strlen($name) > 15)
+    return t('The username is too short. It must be more than 4 characters and less than 15 characters.');
+  if (preg_match('/^[0-9]/u', $name))
+    return t('The username cannot start with a number.');
+  if (!preg_match('/^[a-zA-Z0-9_. ]+$/u', $name))
+    return t('The username contains an illegal character. You can use only letters, digits, . and _ . Do not use any special characters.');
+  if (substr($name, 0, 1) == '_')
+    return t('The username cannot begin with "%char".', array('%char' => '_'));
+  if (substr($name, -1) == '_')
+    return t('The username cannot end with "%char".', array('%char' => '_'));
+  if (substr($name, 0, 1) == '.')
+    return t('The username cannot begin with "%char".', array('%char' => '.'));
+  if (substr($name, -1) == '.')
+    return t('The username cannot end with "%char".', array('%char' => '.'));
 }
 
 /*
