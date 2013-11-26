@@ -1,5 +1,4 @@
 <?php
-// $Id: automodal.module,v 1.1.2.8 2010/09/07 21:30:00 mfer Exp $
 
 /**
  * The main file for automodal.
@@ -154,6 +153,14 @@ function automodal_settings_form() {
     '#required' => FALSE,
   );
 
+  $form['automodal_excluded_forms'] = array(
+    '#type' => 'textarea',
+    '#title' => t('(Advanced) Exclude form IDs'),
+    '#description' => t('Exclude automodal from automatically closing on specific forms. Comma seperated.'),
+    '#default_value' => variable_get('automodal_exclude_forms', 'views_exposed_form'),
+    '#required' => FALSE,
+  );
+
   $form['automodal_autoscan'] = array(
     '#type' => 'checkbox',
     '#title' => t('Scan all pages adding automodal automatically.'),
@@ -188,11 +195,24 @@ function automodal_perm() {
 /**
  * Implementation of hook_form_alter()
  */
-function automodal_form_alter(&$form, $form_state, $form_id) {
+function automodal_form_alter(&$form, &$form_state, $form_id) {
   if (!empty($form_state['storage']['automodal']) || (automodal_request_is_child() && filter_input(INPUT_GET, 'automodalClose', FILTER_VALIDATE_BOOLEAN))) {
+    $excluded_forms = explode(',', variable_get('automodal_excluded_forms', 'views_exposed_form'));
+    if (in_array($form_id, $excluded_forms)) {
+      return;
+    }
+
     // Name the form submit entry so it can easily be found and replaced
     $form['#submit']['automodal'] = 'automodal_close_form_submit';
 
+    // Remove cancel link added by confirm_form when in modalframe.
+    // @see confirm_form()
+    if (isset($form['actions']['cancel']) && isset($form['#attributes']['class']) && strpos($form['#attributes']['class'], 'confirmation') === 0) {
+      unset($form['actions']['cancel']);
+    }
+
+    // Stash automodal settings in $form_state['storage'] in case AHAH is used
+    // on this form and wipes out the GET arguments.
     if (empty($form_state['storage']['automodal'])) {
       $form_state['storage']['automodal'] = array(
         'close'    => TRUE,
@@ -207,17 +227,28 @@ function automodal_form_alter(&$form, $form_state, $form_id) {
  * Implementation of hook_form_submit()
  */
 function automodal_close_form_submit($form, &$form_state) {
+  // Don't close if the form has errors.
+  $errors = form_get_errors();
+  if (!empty($errors)) {
+    return;
+  }
+
+  // Don't close if we are previewing the node form.
+  if ($form['#id'] == 'node-form' && $form_state['values']['op'] == t('Preview')) {
+    return;
+  }
+
+  // Get the automodal settings out of $form_state['storage'] and clear it, so
+  // that this submit will be the end of life for this form.
   $automodal = $form_state['storage']['automodal'];
   unset($form_state['storage']['automodal']);
 
-  $args = array();
-  if ($automodal['reload']) {
-    $args['reload'] = TRUE;
-  }
-  if ($redirect = $automodal['redirect']) {
-    $args['redirect'] = $redirect;
-  }
+  // Allow other modules to modify the automodal settings for this form.
+  drupal_alter('automodal_close_args', $automodal, $form, $form_state);
 
-  drupal_alter('automodal_close_args', $args);
-  modalframe_close_dialog($args);
+  // Close only if the drupal_alter() above didn't set $automodal['close']
+  // to FALSE.
+  if ($automodal['close']) {
+    modalframe_close_dialog($automodal);
+  }
 }

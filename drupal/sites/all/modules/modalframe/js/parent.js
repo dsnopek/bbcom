@@ -1,4 +1,3 @@
-// $Id: parent.js,v 1.1.2.24 2010/04/16 18:11:25 markuspetrux Exp $
 
 (function ($) {
 
@@ -117,7 +116,7 @@ Drupal.modalFrame.open = function(options) {
     onOpen: options.onOpen,
     onLoad: options.onLoad,
     onSubmit: options.onSubmit,
-    customDialogOptions: options.customDialogOptions
+    customDialogOptions: options.customDialogOptions || {}
   };
 
   // Create the dialog and related DOM elements.
@@ -435,7 +434,10 @@ Drupal.modalFrame.bindChild = function(iFrameWindow, isClosing) {
       // Install a custom resize handler to allow the child window to trigger
       // changes to the modal frame size.
       $(window).unbind(self.eventHandlerName('childResize')).bind(self.eventHandlerName('childResize'), function() {
+        var overflow = $('html', $iFrameDocument).css('overflow');
+        $('html', $iFrameDocument).css('overflow', 'hidden');
         self.iframe.documentSize = {width: $iFrameDocument.width(), height: $iFrameWindow('body').height() + 25};
+        $('html', $iFrameDocument).css('overflow', overflow);
         self.resize();
       });
     }
@@ -494,8 +496,11 @@ Drupal.modalFrame.bindChild = function(iFrameWindow, isClosing) {
           }
         }
         else if (event.keyCode == $.ui.keyCode.ESCAPE) {
-          setTimeout(function() { self.close(false); }, 10);
-          return false;
+          // Checking the closeOnEscape option, if is false then let the child window open
+          if (typeof self.options.customDialogOptions.closeOnEscape == 'undefined' || self.options.customDialogOptions.closeOnEscape) {
+            setTimeout(function() { self.close(false); }, 10);
+            return false;
+          }
         }
       }
     });

@@ -1,4 +1,3 @@
-// $Id: child.js,v 1.1.2.13 2010/01/01 20:31:01 markuspetrux Exp $
 
 (function ($) {
 
@@ -18,7 +17,12 @@ Drupal.modalFrameChild.attach = function(context) {
   var settings = Drupal.settings.modalFrameChild || {};
 
   // If we cannot reach the parent window, then we have nothing else todo here.
-  if (!self.isObject(parent.Drupal) || !self.isObject(parent.Drupal.modalFrame)) {
+  try {
+    if (!self.isObject(parent.Drupal) || !self.isObject(parent.Drupal.modalFrame)) {
+      return;
+    }
+  }
+  catch(e) {
     return;
   }
 
@@ -95,7 +99,7 @@ Drupal.modalFrameChild.attachBehaviors = function(context) {
 };
 
 /**
- * Add target="_new" to all external URLs.
+ * Add target="_blank" to all external URLs.
  */
 Drupal.modalFrameChild.behaviors.parseLinks = function(context) {
   $('a:not(.modalframe-processed)', context).addClass('modalframe-processed').each(function() {
@@ -105,11 +109,11 @@ Drupal.modalFrameChild.behaviors.parseLinks = function(context) {
     }
     // Obtain the href attribute of the link.
     var href = $(this).attr('href');
-    // Do not process links with an empty href, or that only have the fragment.
-    if (!href || href.length <= 0 || href.charAt(0) == '#') {
+    // Do not process links with an empty href, javascript or that only have the fragment.
+    if (!href || href.length <= 0 || href.charAt(0) == '#' || href.indexOf('javascript') >= 0) {
       return;
     }
-    $(this).attr('target', '_new');
+    $(this).attr('target', '_blank');
   });
 };
 

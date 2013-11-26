@@ -1,0 +1,20 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the automodal module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function automodal_uninstall() {
+  $variables = array(
+    'automodal_autoscan',
+    'automodal_default_selector',
+    'automodal_exclude_forms',
+  );
+
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}

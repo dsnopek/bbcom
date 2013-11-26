@@ -1,15 +1,13 @@
-;$Id: automodal.info,v 1.1 2010/01/13 23:02:14 crell Exp $
-
 name = Automodal
 package = User interface
 description = Automatically convert links to modal links.
 core = 6.x
-;php = 5.2
+php = 5.2
 dependencies[] = modalframe
 
-; Information added by drupal.org packaging script on 2010-09-21
-version = "6.x-1.0"
+; Information added by  packaging script on 2013-11-19
+version = "6.x-1.1"
 core = "6.x"
 project = "automodal"
-datestamp = "1285078558"
+datestamp = "1384870713"
 

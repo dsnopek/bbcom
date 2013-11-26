@@ -1,4 +1,3 @@
-// $Id: README.txt,v 1.1.2.1 2010/09/21 14:00:05 mfer Exp $
 
 Automatically convert certain classed links to modal popups and provides an API
 to add custom modals quickly and easily.

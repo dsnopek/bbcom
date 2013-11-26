@@ -1,5 +1,4 @@
 <?php
-// $Id: modalframe-page.tpl.php,v 1.1.2.4 2009/06/19 16:20:04 markuspetrux Exp $
 
 /**
  * @file
@@ -25,7 +24,7 @@
 <?php print $styles; ?>
 <?php print $scripts; ?>
 </head>
-<body>
+<body class="<?php print $body_classes; ?>">
 <div class="modalframe-page-wrapper">
   <div class="modalframe-page-container clear-block">
     <div class="modalframe-page-content">

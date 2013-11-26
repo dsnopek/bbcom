@@ -1,4 +1,3 @@
-// $ID$
 
 (function ($, Drupal, window, undefined) {
 
@@ -8,9 +7,16 @@
   Drupal.behaviors.automodal = function (context) {
     $.each(Drupal.settings.automodal, function(selector, settings) {
       $(selector +':not(.automodal-processed)', context)
+        .filter('a')
         .addClass('automodal-processed')
         .bind('click', function() {
           settings.url = $(this).attr('href') || '#';
+          // Grab the location of the fragment and parse it out.
+          var hash_location = settings.url.indexOf('#');
+          if (hash_location && hash_location != -1) {
+            settings.hash = settings.url.substring(hash_location);
+            settings.url = settings.url.substring(0, hash_location);
+          }
           if (settings.url.indexOf('?') >= 0) {
             settings.url += '&'
           }
@@ -21,7 +27,9 @@
 
           // Allow others to alter the settings as needed.
           settings = Drupal.automodal.settingsAlterCall(settings);
-
+          if (settings.hash) {
+            settings.url += settings.hash;
+          }
           settings.onSubmit = Drupal.automodal.onSubmitCall;
           Drupal.modalFrame.open(settings);
           return false;

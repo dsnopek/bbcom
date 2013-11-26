@@ -1,4 +1,3 @@
-// $Id: modalframe_example.js,v 1.1.2.7 2009/12/28 02:21:20 markuspetrux Exp $
 
 (function ($) {
 

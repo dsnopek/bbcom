@@ -1,5 +1,4 @@
 <?php
-// $Id: automodal.api.php,v 1.1.2.2 2010/09/07 20:53:10 mfer Exp $
 
 /**
  * Alter the settings for an automodal selector.
@@ -33,8 +32,12 @@ function hook_automodal_alter(&$settings, $selector) {
  * be executed.
  *
  * @param array $args
- *   An array of information to be passed into the JavaScript onSubmit callbacks.
+ *   An an associative array of information to be passed into the JavaScript
+ *   onSubmit callbacks. Can include the following special automodal keys:
+ *   - close: A boolean thats TRUE by default. Set to FALSE to prevent close.
+ *   - redirect: The URL to redirect to after close.
+ *   - reload: A boolean to indicate if the parent should be reloaded or not.
  */
-function hook_automodal_close_args_alter(array &$args) {
+function hook_automodal_close_args_alter(array &$args, $form, $form_state) {
   $args['foo'] = 'bar';
 }
