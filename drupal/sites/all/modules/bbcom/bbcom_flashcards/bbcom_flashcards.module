@@ -11,7 +11,9 @@ include_once('bbcom_flashcards.anki.inc');
 
 function bbcom_flashcards_perm() {
   return array(
-    'review bibliobird flashcards online'
+    'review bibliobird flashcards online',
+    'resync own bibliobird flashcards',
+    'resync any bibliobird flashcards',
   );
 }
 
@@ -39,6 +41,16 @@ function bbcom_flashcards_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['wial/%user/resync'] = array(
+    'title' => 'Resync flashcards',
+    'access callback' => 'bbcom_flashcards_resync_access',
+    'access arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bbcom_flashcards_resync_form', 1),
+    'file' => 'bbcom_flashcards.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -46,8 +58,14 @@ function bbcom_flashcards_review_access($account) {
   return bbcom_wial_page_access($account) && user_access('review bibliobird flashcards online');
 }
 
+function bbcom_flashcards_resync_access($account) {
+  global $user;
+  return user_access('resync any bibliobird flashcards') ||
+    ($user->uid == $account->uid && user_access('review own bibliobird flashcards'));
+}
+
 /**
- * Implementation of hook_theme()
+ * Implementation of hook_theme().
  */
 function bbcom_flashcards_theme() {
   return array(
@@ -117,6 +135,18 @@ function bbcom_flashcards_user($op, &$edit, &$account, $category=NULL) {
       watchdog('anki', $e->getMessage(), array(), WATCHDOG_ERROR);
       drupal_set_message(t('Unable to setup "Words I am Learning" deck.'), 'error');
     }
+  }
+  elseif ($op == 'view' && bbcom_flashcards_resync_access($account)) {
+    $account->content['bbcom_flashcards'] = array(
+      '#type' => 'user_profile_category',
+      '#title' => t('Flashcards and Anki'),
+    );
+    $account->content['bbcom_flashcards']['resync'] = array(
+      '#type' => 'user_profile_item',
+      //'#title' => t('Resync flashcards'),
+      '#value' => l(t('Click here to resync your flashcards'), "wial/{$account->uid}/resync",
+        array('query' => array('destination' => $_GET['q']))),
+    );
   }
 }
 

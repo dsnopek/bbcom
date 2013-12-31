@@ -200,3 +200,19 @@ function bbcom_flashcards_page_wial_review_form_submit($form, &$form_state) {
   }
 }
 
+function bbcom_flashcards_resync_form(&$form_state, $account) {
+  $form = array();
+  $form['#account'] = $account;
+  return confirm_form($form, t('Are you sure you want to resync your Anki flashcards?'),
+    isset($_GET['destination']) ? $_GET['destination'] : "wial/{$account->uid}/edit");
+}
+
+function bbcom_flashcards_resync_form_submit($form, &$form_state) {
+  $account = $form['#account'];
+
+  if ($form_state['values']['confirm']) {
+    bbcom_flashcards_user_operations_resync(array($account->uid));
+    drupal_set_message(t("Your Anki flashcards have been resync'd with Bibliobird."));
+  }
+}
+
