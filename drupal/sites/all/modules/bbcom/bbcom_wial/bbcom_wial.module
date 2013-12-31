@@ -63,6 +63,16 @@ function bbcom_wial_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+function bbcom_wial_count_user($uid) {
+  // Return the total number of cards on a users WIAL.
+  $view = views_get_view('wial_list');
+  $view->set_display('default');
+  $view->set_arguments(array($uid));
+  $view->get_total_rows = TRUE;
+  $view->execute();
+  return $view->total_rows;
+}
+
 function bbcom_wial_page_access($account) {
   global $user;
 

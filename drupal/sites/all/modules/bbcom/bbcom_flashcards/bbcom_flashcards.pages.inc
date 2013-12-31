@@ -49,12 +49,23 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
     }
   }
   else {
+    // Check the number of cards on the wial -- if it's zero, prompt the
+    // user to add some cards first!
+    $wial_count = bbcom_wial_count_user($form['#user']->uid);
+    if ($wial_count == 0) {
+      drupal_set_message(t('You have no flashcards! Please add some first.'), 'error');
+      return $form;
+    }
+
     try {
       $collection = bbcom_flashcards_anki_server_connect()
         ->openCollection($form['#user']->uid);
 
       $collection->setLanguage($language->language);
       $counts = $collection->resetScheduler();
+
+      // TODO: check the number of cards on the deck -- if it's not equal to the
+      // number on the wial, then ask the user to resync their cards.
     }
     catch (AnkiServerException $e) {
       _bbcom_flashcards_error($e);
