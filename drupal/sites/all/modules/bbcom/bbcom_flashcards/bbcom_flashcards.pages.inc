@@ -62,14 +62,20 @@ function bbcom_flashcards_page_wial_review_form(&$form_state, $account) {
         ->openCollection($form['#user']->uid);
 
       $collection->setLanguage($language->language);
+      $deck_count = count($collection->findNotes('deck:bibliobird'));
       $counts = $collection->resetScheduler();
 
-      // TODO: check the number of cards on the deck -- if it's not equal to the
-      // number on the wial, then ask the user to resync their cards.
     }
     catch (AnkiServerException $e) {
       _bbcom_flashcards_error($e);
       return $form;
+    }
+
+    // If the number of cards on the user's deck isn't the same as on their
+    // WIAL, then ask the user to resync their cards.
+    if ($wial_count != $deck_count) {
+      drupal_set_message(t('Your Anki deck appears to be out of sync with Bibliobird. Please <a href="!url">click here</a> to resync your flashcards.',
+        array('!url' => url("wial/{$form['#user']->uid}/resync", array('query' => array('destination' => $_GET['q']))))), 'warning');
     }
 
     $form['#original_counts'] = $counts;

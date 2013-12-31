@@ -50,13 +50,17 @@ class AnkiCollection {
     }
   }
 
-  function findNoteForNode($node, $preload = TRUE) {
-    $lingwo_id = LingwoEntry::fromNode($node)->getLingwoId();
-    $query = '"External ID":"' . $lingwo_id . '"';
-    $result = $this->server->request($this->name, 'find_notes', array(
+  function findNotes($query, $preload = TRUE) {
+    return $this->server->request($this->name, 'find_notes', array(
       'query' => $query,
       'preload' => $preload,
     ));
+  }
+
+  function findNoteForNode($node, $preload = TRUE) {
+    $lingwo_id = LingwoEntry::fromNode($node)->getLingwoId();
+    $query = '"External ID":"' . $lingwo_id . '"';
+    $result = $this->findNotes($query, $preload);
 
     if (count($result) > 1) {
       watchdog('bbcom_flashcards', "Duplicate notes for $lingwo_id in collection {$this->name}");
