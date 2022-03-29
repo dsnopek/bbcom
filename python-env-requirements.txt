@@ -19,7 +19,7 @@ nltk==2.0b9
 virtualenv==1.5.1
 Fabric==0.9.3
 pycrypto==2.0.1
-paramiko==1.7.6
+paramiko==2.10.1
 
 ## The following requirements were added by pip --freeze:
 Paste==1.7.5.1
