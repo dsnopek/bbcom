@@ -12,7 +12,7 @@ MySQL-python==1.2.3
 
 # these are install from zip/tarball (NOT pypi!)
 anki==1.0.1
-html5lib==0.90
+html5lib==0.99999999
 nltk==2.0b9
 
 # for our bootstrap
